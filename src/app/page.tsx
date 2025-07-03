@@ -1,9 +1,7 @@
-import Header from '@/components/header/header';
-import Hero1 from '@/components/hero/hero1';
-import Hero2 from '@/components/hero/hero2';
-import PlacementCompanies from '@/components/placement/placement-companies';
-import EnquiryPopup from '@/components/pop-up/enquiry-popup';
-import Footer from '@/components/footer/AdvancedFooterSolidBlue';
+import Hero1 from '@/components/hero1';
+import Hero2 from '@/components/hero2';
+import PlacementCompanies from '@/components/placement-companies';
+
 import CollegeCarousel from '@/components/carousel';
 import TestimonialCarousel from '@/components/testimonial';
 import EventsSection from '@/components/events/events-section';
@@ -11,9 +9,7 @@ import NoticesAnnouncementsScrollingSection from '@/components/notices/notices-a
 
 export default function Home() {
 	return (
-		<div className='min-h-screen'>
-			<Header />
-
+		<>
 			<Hero1 />
 
 			<Hero2 />
@@ -36,12 +32,6 @@ export default function Home() {
 					</div>
 				</div>
 			</div>
-
-			{/* Footer */}
-			<Footer />
-
-			{/* Enquiry Popup */}
-			<EnquiryPopup />
-		</div>
+		</>
 	);
 }
