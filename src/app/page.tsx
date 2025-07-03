@@ -1,6 +1,6 @@
-import Hero1 from '@/components/hero1';
-import Hero2 from '@/components/hero2';
-import PlacementCompanies from '@/components/placement-companies';
+import Hero1 from '@/components/hero/hero1';
+import Hero2 from '@/components/hero/hero2';
+import PlacementCompanies from '@/components/placement/placement-companies';
 
 import CollegeCarousel from '@/components/carousel';
 import TestimonialCarousel from '@/components/testimonial';
