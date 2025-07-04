@@ -140,39 +140,33 @@ const Header = () => {
 	const academiaItems = [
 		{
 			title: 'Academic Calendar',
-			href: '/calendar',
+			href: '/academia/calendar',
 			description: 'Important academic dates and semester schedules',
 			icon: <Calendar className='w-4 h-4 text-blue-600' />
 		},
 		{
 			title: 'Scheme & Syllabus',
-			href: '/syllabus',
+			href: '/academia/syllabus',
 			description: 'Course curriculum and subject details',
 			icon: <BookOpen className='w-4 h-4 text-blue-600' />
 		},
 		{
 			title: 'Fee Structure',
-			href: '/fees',
+			href: '/academia/fee-structure',
 			description: 'Program fees and payment information',
 			icon: <DollarSign className='w-4 h-4 text-blue-600' />
 		},
 		{
 			title: 'Scholarships',
-			href: '/scholarships',
+			href: '/academia/scholarships',
 			description: 'Financial assistance and merit scholarships',
 			icon: <GraduationCap className='w-4 h-4 text-blue-600' />
 		},
 		{
 			title: 'List of Students',
-			href: '/students',
+			href: '/academia/students',
 			description: 'List of students in the current batch',
 			icon: <Users className='w-4 h-4 text-blue-600' />
-		},
-		{
-			title: 'Library',
-			href: '/library',
-			description: 'Library resources and services',
-			icon: <BookOpen className='w-4 h-4 text-blue-600' />
 		}
 	];
 
