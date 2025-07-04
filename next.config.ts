@@ -2,11 +2,23 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
 	images: {
-		domains: [
-			'images.unsplash.com',
-			'logo.clearbit.com',
-			'hebbkx1anhila5yf.public.blob.vercel-storage.com',
-			'plus.unsplash.com'
+		remotePatterns: [
+			{
+				protocol: 'https',
+				hostname: 'images.unsplash.com'
+			},
+			{
+				protocol: 'https',
+				hostname: 'logo.clearbit.com'
+			},
+			{
+				protocol: 'https',
+				hostname: 'hebbkx1anhila5yf.public.blob.vercel-storage.com'
+			},
+			{
+				protocol: 'https',
+				hostname: 'plus.unsplash.com'
+			}
 		]
 	}
 };
