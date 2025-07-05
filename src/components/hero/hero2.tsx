@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import {
@@ -15,6 +15,8 @@ import {
 
 const Hero2 = () => {
 	const [currentSlide, setCurrentSlide] = useState(0);
+	const [isHovered, setIsHovered] = useState(false);
+	const timerRef = useRef<NodeJS.Timeout | null>(null);
 
 	const slides = [
 		{
@@ -63,23 +65,46 @@ const Hero2 = () => {
 		}
 	];
 
-	useEffect(() => {
-		const timer = setInterval(() => {
-			setCurrentSlide(prev => (prev + 1) % slides.length);
+	const resetTimer = () => {
+		if (timerRef.current) {
+			clearInterval(timerRef.current);
+		}
+		timerRef.current = setInterval(() => {
+			if (!isHovered) {
+				setCurrentSlide(prev => (prev + 1) % slides.length);
+			}
 		}, 5000);
-		return () => clearInterval(timer);
-	}, [slides.length]);
+	};
+
+	useEffect(() => {
+		resetTimer();
+		return () => {
+			if (timerRef.current) {
+				clearInterval(timerRef.current);
+			}
+		};
+	}, [isHovered, slides.length]);
 
 	const nextSlide = () => {
 		setCurrentSlide(prev => (prev + 1) % slides.length);
+		resetTimer(); // Reset timer when manually navigating
 	};
 
 	const prevSlide = () => {
 		setCurrentSlide(prev => (prev - 1 + slides.length) % slides.length);
+		resetTimer(); // Reset timer when manually navigating
+	};
+
+	const goToSlide = (index: number) => {
+		setCurrentSlide(index);
+		resetTimer(); // Reset timer when manually navigating
 	};
 
 	return (
-		<section className='relative h-screen bg-gray-900 overflow-hidden'>
+		<section
+			className='relative h-screen bg-gray-900 overflow-hidden'
+			onMouseEnter={() => setIsHovered(true)}
+			onMouseLeave={() => setIsHovered(false)}>
 			{/* Background Image Carousel */}
 			<AnimatePresence mode='wait'>
 				<motion.div
@@ -198,7 +223,7 @@ const Hero2 = () => {
 				{slides.map((_, index) => (
 					<button
 						key={index}
-						onClick={() => setCurrentSlide(index)}
+						onClick={() => goToSlide(index)}
 						aria-label={`Go to slide ${index + 1}`}
 						className={`h-3 transition-all duration-300 ${
 							index === currentSlide
@@ -214,8 +239,12 @@ const Hero2 = () => {
 				<motion.div
 					className='h-full bg-white'
 					initial={{ width: '0%' }}
-					animate={{ width: '100%' }}
-					transition={{ duration: 5, repeat: Infinity }}
+					animate={{ width: isHovered ? '0%' : '100%' }}
+					transition={{ 
+						duration: isHovered ? 0 : 5, 
+						repeat: isHovered ? 0 : Infinity,
+						ease: 'linear'
+					}}
 					key={currentSlide}
 				/>
 			</div>
