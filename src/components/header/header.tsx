@@ -65,15 +65,21 @@ const Header = () => {
 		},
 		{
 			title: 'Vision & Mission',
-			href: '/vision',
+			href: '/vision-mission',
 			description: 'Our goals and objectives for shaping future engineers',
 			icon: <Target className='w-4 h-4 text-blue-600' />
 		},
 		{
-			title: 'Management',
+			title: 'Administration & Management',
 			href: '/management',
 			description: 'Meet our leadership team and faculty members',
 			icon: <Users className='w-4 h-4 text-blue-600' />
+		},
+		{
+			title: 'IQAC',
+			href: '/iqac',
+			description: 'Internal Quality Assurance Cell for academic excellence',
+			icon: <Shield className='w-4 h-4 text-blue-600' />
 		},
 		{
 			title: 'Accreditation',
