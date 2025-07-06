@@ -381,6 +381,427 @@ const CSEDepartmentPage = () => {
           </div>
         );
 
+      case 'about':
+        return (
+          <div className='space-y-8'>
+            <AnimatedCard>
+              <div className='flex items-start gap-4 mb-6'>
+                <div className='w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0'>
+                  <Building className='w-6 h-6 text-blue-600' />
+                </div>
+                <div>
+                  <h2 className='text-2xl font-bold text-gray-900 mb-4'>About Department</h2>
+                  <div className='prose prose-gray max-w-none space-y-4'>
+                    <p className='text-gray-700 leading-relaxed'>
+                      The Department of Computer Science & Engineering is <span className='font-semibold text-blue-600'>NBA Accredited</span>. 
+                      The department has a full-fledged team of proficient faculty members to promote a highly engaging learning 
+                      experience, ensuring quality education in the field of Technology.
+                    </p>
+                    <p className='text-gray-700 leading-relaxed'>
+                      To cater to this need, the department is committed to inculcate technical, managerial and social skills 
+                      within the students, providing the required industrial experience and investing in the overall personality 
+                      development of a student. The department ensures that in addition to the course curriculum, the student 
+                      is also capable to implement his or her learning on practical grounds.
+                    </p>
+                    <div className='bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-lg border border-green-200 mt-4'>
+                      <p className='text-gray-700 font-medium'>
+                        <span className='text-green-600 font-semibold'>Partnership Excellence:</span> This is reflected with the 
+                        department's association in being a Remote Learning Center with IIT Bombay, IIT Kharagpur & IIT Delhi.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </AnimatedCard>
+          </div>
+        );
+
+      case 'hod':
+        return (
+          <div className='space-y-8'>
+            <AnimatedCard>
+              <div className='bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl p-6 border border-gray-200'>
+                <div className='flex flex-col md:flex-row gap-6 items-start'>
+                  <div className='flex-shrink-0'>
+                    <div className='w-32 h-32 bg-gray-200 rounded-xl flex items-center justify-center'>
+                      <User className='w-16 h-16 text-gray-400' />
+                    </div>
+                    <div className='text-center mt-3'>
+                      <h4 className='font-bold text-gray-900'>Prof. Achal Kausik</h4>
+                      <p className='text-sm text-blue-600 font-medium'>HOD, CSE</p>
+                    </div>
+                  </div>
+                  <div className='flex-1'>
+                    <h3 className='text-xl font-bold text-gray-900 mb-4 flex items-center gap-2'>
+                      <MessageSquare className='w-5 h-5 text-blue-600' />
+                      Message from HOD Desk
+                    </h3>
+                    <div className='space-y-3 text-gray-700 leading-relaxed'>
+                      <p>
+                        Welcome to the Department of Computer Science & Engineering. The Department of Computer Science and 
+                        Engineering (CSE), Bhagwan Parshuram Institute of Technology, has made fast strides in many spheres 
+                        since the inception of BPIT in 2007. It is NBA accredited and is well-equipped with excellent academic 
+                        and research facilities to produce quality Computer Science Engineers.
+                      </p>
+                      <p>
+                        The emphasis is on students' holistic growth through innovative teaching methods, result-oriented 
+                        knowledge through regular exposure to industry, seminars and popular lectures by experts. These 
+                        methodological efforts help in widening the academic horizon of the students.
+                      </p>
+                      <p className='font-medium text-blue-600'>
+                        The cherished dream of the Department is to equip and groom the students with clear concepts & shape 
+                        the career of our young technocrats in today's fast-changing developments in Computer Technology.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </AnimatedCard>
+          </div>
+        );
+
+      case 'events':
+        return (
+          <div className='space-y-8'>
+            <AnimatedCard>
+              <div>
+                <div className='flex items-center gap-3 mb-6'>
+                  <div className='w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center'>
+                    <Calendar className='w-5 h-5 text-purple-600' />
+                  </div>
+                  <h3 className='text-2xl font-bold text-gray-900'>Recent Events</h3>
+                </div>
+                <div className='grid md:grid-cols-2 gap-6'>
+                  {[
+                    {
+                      title: 'Virtual Labs Workshop',
+                      description: 'Department of CSE In Association with IIT Delhi organizing workshop on "Virtual Labs"',
+                      date: '21 Oct 2024',
+                      venue: 'Seminar Hall 6A',
+                      type: 'Workshop',
+                      image: '/api/placeholder/300/200'
+                    },
+                    {
+                      title: 'Machine Learning with Python',
+                      description: 'IEEE BPIT presents Online Webinar on "Machine Learning with Python"',
+                      type: 'Webinar',
+                      status: 'Online',
+                      image: '/api/placeholder/300/200'
+                    },
+                    {
+                      title: 'Building Dall-E2',
+                      description: 'IEEE BPIT presents Online Webinar on "Building Dall-E2"',
+                      type: 'Webinar',
+                      status: 'Online',
+                      image: '/api/placeholder/300/200'
+                    },
+                    {
+                      title: 'Careers Opportunities Abroad',
+                      description: 'BPIT in collaboration with SIEC Education on "Careers opportunities Abroad/Test Prep"',
+                      type: 'Seminar',
+                      image: '/api/placeholder/300/200'
+                    }
+                  ].map((event, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1 * index }}
+                      className='bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow'
+                    >
+                      <div className='h-40 bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center'>
+                        <Calendar className='w-12 h-12 text-purple-600' />
+                      </div>
+                      <div className='p-4'>
+                        <div className='flex justify-between items-start mb-2'>
+                          <span className='px-2 py-1 text-xs font-medium bg-purple-100 text-purple-700 rounded'>
+                            {event.type}
+                          </span>
+                          {event.status && (
+                            <span className='px-2 py-1 text-xs font-medium bg-green-100 text-green-700 rounded'>
+                              {event.status}
+                            </span>
+                          )}
+                        </div>
+                        <h4 className='font-semibold text-gray-900 mb-2'>{event.title}</h4>
+                        <p className='text-sm text-gray-600 mb-3'>{event.description}</p>
+                        {event.date && (
+                          <p className='text-xs text-gray-500'>
+                            📅 {event.date} {event.venue && `• 📍 ${event.venue}`}
+                          </p>
+                        )}
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </AnimatedCard>
+          </div>
+        );
+
+      case 'news':
+        return (
+          <div className='space-y-8'>
+            <AnimatedCard>
+              <div>
+                <div className='flex items-center gap-3 mb-6'>
+                  <div className='w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center'>
+                    <Newspaper className='w-5 h-5 text-red-600' />
+                  </div>
+                  <h3 className='text-2xl font-bold text-gray-900'>Latest News</h3>
+                </div>
+                <div className='space-y-4'>
+                  {[
+                    {
+                      title: 'The Optimistics-BPIT won first Price at "webdash" online Hackathon-JMI',
+                      type: 'Achievement',
+                      highlight: true,
+                      date: 'Nov 2024'
+                    },
+                    {
+                      title: 'ATAL online FDP on "Innovative Applications and Ethical Consideration of Artificial Intelligence in Modern Research"',
+                      type: 'FDP',
+                      date: 'Oct 2024'
+                    },
+                    {
+                      title: 'Mr. Pavneet Singh, CSE On receiving Gold Medal at 17th Convocation of GGSIPU',
+                      type: 'Award',
+                      highlight: true,
+                      date: 'Oct 2024'
+                    },
+                    {
+                      title: 'Delegates Visit at BPIT from Casio, Japan',
+                      type: 'Visit',
+                      date: 'Sep 2024'
+                    },
+                    {
+                      title: 'Webinar on "DEVOPS"',
+                      type: 'Webinar',
+                      date: 'Sep 2024'
+                    }
+                  ].map((news, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.1 * index }}
+                      className={`p-6 rounded-lg border-l-4 ${
+                        news.highlight 
+                          ? 'bg-yellow-50 border-yellow-500' 
+                          : 'bg-gray-50 border-gray-300'
+                      }`}
+                    >
+                      <div className='flex justify-between items-start'>
+                        <div className='flex-1'>
+                          <h4 className='font-semibold text-gray-900 mb-2'>{news.title}</h4>
+                          <p className='text-sm text-gray-500'>{news.date}</p>
+                        </div>
+                        <span className={`px-3 py-1 text-xs font-medium rounded-full flex-shrink-0 ml-4 ${
+                          news.highlight 
+                            ? 'bg-yellow-100 text-yellow-700' 
+                            : 'bg-gray-100 text-gray-600'
+                        }`}>
+                          {news.type}
+                        </span>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </AnimatedCard>
+          </div>
+        );
+
+      case 'highlights':
+        return (
+          <div className='space-y-8'>
+            <AnimatedCard>
+              <div>
+                <div className='flex items-center gap-3 mb-6'>
+                  <div className='w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center'>
+                    <TrendingUp className='w-5 h-5 text-orange-600' />
+                  </div>
+                  <h3 className='text-2xl font-bold text-gray-900'>Highlights of the Department</h3>
+                </div>
+                <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-6'>
+                  {[
+                    {
+                      event: 'Codezen, GTB4CEC!',
+                      institution: 'Bharatiya Vidyapeeth',
+                      position: '3rd Place',
+                      color: 'orange',
+                      icon: <Trophy className='w-6 h-6' />
+                    },
+                    {
+                      event: 'MAIT Hackathon Build',
+                      institution: 'MAIT',
+                      position: 'Winner',
+                      color: 'yellow',
+                      icon: <Trophy className='w-6 h-6' />
+                    },
+                    {
+                      event: 'Hackverse Hackathon, 2025',
+                      institution: 'IILM University',
+                      position: '5th Place',
+                      color: 'gray',
+                      icon: <Trophy className='w-6 h-6' />
+                    },
+                    {
+                      event: 'Technical Excellence Award',
+                      institution: 'GGSIPU',
+                      position: 'Gold Medal',
+                      color: 'yellow',
+                      icon: <Trophy className='w-6 h-6' />
+                    },
+                    {
+                      event: 'Research Innovation',
+                      institution: 'CSE Department',
+                      position: 'Best Project',
+                      color: 'blue',
+                      icon: <Lightbulb className='w-6 h-6' />
+                    },
+                    {
+                      event: 'Industry Partnership',
+                      institution: 'Leading Tech Companies',
+                      position: 'Collaboration',
+                      color: 'green',
+                      icon: <Briefcase className='w-6 h-6' />
+                    }
+                  ].map((highlight, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.1 * index }}
+                      className={`p-6 bg-${highlight.color}-50 border border-${highlight.color}-200 rounded-xl hover:shadow-lg transition-all duration-300`}
+                    >
+                      <div className={`text-${highlight.color}-600 mb-3`}>{highlight.icon}</div>
+                      <h4 className='font-bold text-gray-900 mb-2'>{highlight.event}</h4>
+                      <p className='text-sm text-gray-600 mb-2'>{highlight.institution}</p>
+                      <span className={`px-3 py-1 text-xs font-semibold bg-${highlight.color}-100 text-${highlight.color}-700 rounded-full`}>
+                        {highlight.position}
+                      </span>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </AnimatedCard>
+          </div>
+        );
+
+      case 'placements':
+        return (
+          <div className='space-y-8'>
+            <AnimatedCard>
+              <div>
+                <div className='flex items-center gap-3 mb-6'>
+                  <div className='w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center'>
+                    <Trophy className='w-5 h-5 text-yellow-600' />
+                  </div>
+                  <h3 className='text-2xl font-bold text-gray-900'>Top Placements (Glory)</h3>
+                </div>
+                <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-6'>
+                  {[
+                    {
+                      name: 'Shubham Jindal',
+                      batch: 'CSE(2019-23)',
+                      company: 'Zomato',
+                      package: '50 LPA',
+                      position: 'Senior Software Engineer',
+                      image: '/api/placeholder/100/100'
+                    },
+                    {
+                      name: 'Swarika Sharma',
+                      batch: 'CSE(2021-25)',
+                      company: 'Google',
+                      package: '51 LPA',
+                      position: 'Software Developer',
+                      image: '/api/placeholder/100/100'
+                    },
+                    {
+                      name: 'Yashika',
+                      batch: 'CSE(2021-25)',
+                      company: 'Microsoft',
+                      package: '51 LPA',
+                      position: 'Software Engineer',
+                      image: '/api/placeholder/100/100'
+                    },
+                    {
+                      name: 'Prajjwal Kapri',
+                      batch: 'CSE(2021-25)',
+                      company: 'Josh Technology',
+                      package: '12 LPA',
+                      position: 'Full Stack Developer',
+                      image: '/api/placeholder/100/100'
+                    },
+                    {
+                      name: 'Arjun Kumar',
+                      batch: 'CSE(2020-24)',
+                      company: 'Amazon',
+                      package: '45 LPA',
+                      position: 'SDE-II',
+                      image: '/api/placeholder/100/100'
+                    },
+                    {
+                      name: 'Priya Sharma',
+                      batch: 'CSE(2020-24)',
+                      company: 'Adobe',
+                      package: '42 LPA',
+                      position: 'Software Engineer',
+                      image: '/api/placeholder/100/100'
+                    }
+                  ].map((placement, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.1 * index }}
+                      className='bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300'
+                    >
+                      <div className='flex items-center gap-4 mb-4'>
+                        <div className='w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg'>
+                          {placement.name.split(' ').map(n => n[0]).join('')}
+                        </div>
+                        <div>
+                          <h4 className='font-bold text-gray-900'>{placement.name}</h4>
+                          <p className='text-sm text-gray-600'>{placement.batch}</p>
+                        </div>
+                      </div>
+                      <div className='space-y-2'>
+                        <div className='flex justify-between'>
+                          <span className='text-sm text-gray-600'>Company:</span>
+                          <span className='font-semibold text-blue-600'>{placement.company}</span>
+                        </div>
+                        <div className='flex justify-between'>
+                          <span className='text-sm text-gray-600'>Package:</span>
+                          <span className='font-bold text-green-600'>₹{placement.package}</span>
+                        </div>
+                        <div className='flex justify-between'>
+                          <span className='text-sm text-gray-600'>Role:</span>
+                          <span className='text-sm text-gray-900'>{placement.position}</span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </AnimatedCard>
+          </div>
+        );
+
+      case 'stars':
+        return (
+          <div className='space-y-8'>
+            <AnimatedCard>
+              <div className='text-center py-12'>
+                <Zap className='w-16 h-16 text-gray-400 mx-auto mb-4' />
+                <h3 className='text-xl font-semibold text-gray-900 mb-2'>Shining Stars</h3>
+                <p className='text-gray-600'>Content coming soon...</p>
+              </div>
+            </AnimatedCard>
+          </div>
+        );
+
       case 'vision-mission':
         return (
           <div className='space-y-8'>
