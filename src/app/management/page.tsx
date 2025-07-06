@@ -12,12 +12,9 @@ import {
 	Briefcase,
 	Shield,
 	Eye,
-	Heart,
 	Star,
 	ChevronRight,
 	Mail,
-	Phone,
-	MapPin,
 	Calendar,
 	GraduationCap,
 	BookOpen
@@ -34,35 +31,44 @@ const ManagementPage = () => {
 	const [activeTab, setActiveTab] = useState('management-overview');
 
 	// Animated Profile Card Component
-	const AnimatedProfileCard = ({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) => {
+	const AnimatedProfileCard = ({
+		children,
+		delay = 0
+	}: {
+		children: React.ReactNode;
+		delay?: number;
+	}) => {
 		const ref = useRef(null);
-		const isInView = useInView(ref, { 
-			once: true, 
-			margin: "-100px 0px -100px 0px" 
+		const isInView = useInView(ref, {
+			once: true,
+			margin: '-100px 0px -100px 0px'
 		});
 
 		return (
 			<motion.div
 				ref={ref}
 				initial={{ opacity: 0, y: -100, scale: 0.8 }}
-				animate={isInView ? { 
-					opacity: 1, 
-					y: 0, 
-					scale: 1,
-					transition: {
-						type: "spring",
-						damping: 25,
-						stiffness: 300,
-						delay: delay,
-						duration: 0.8
-					}
-				} : {}}
+				animate={
+					isInView
+						? {
+								opacity: 1,
+								y: 0,
+								scale: 1,
+								transition: {
+									type: 'spring',
+									damping: 25,
+									stiffness: 300,
+									delay: delay,
+									duration: 0.8
+								}
+						  }
+						: {}
+				}
 				className='bg-white rounded-xl p-6 shadow-lg border border-gray-200 hover:shadow-xl transition-shadow duration-300'
-				whileHover={{ 
+				whileHover={{
 					y: -5,
 					transition: { duration: 0.2 }
-				}}
-			>
+				}}>
 				{children}
 			</motion.div>
 		);
@@ -80,8 +86,7 @@ const ManagementPage = () => {
 						initial={{ opacity: 0, y: 20 }}
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.6 }}
-						className='bg-gradient-to-r from-blue-50 to-blue-100 rounded-2xl p-8 border border-blue-200'
-					>
+						className='bg-gradient-to-r from-blue-50 to-blue-100 rounded-2xl p-8 border border-blue-200'>
 						<div className='text-center mb-8'>
 							<div className='w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4'>
 								<Users className='w-8 h-8 text-white' />
@@ -100,19 +105,37 @@ const ManagementPage = () => {
 								<div className='w-32 h-40 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0'>
 									<User className='w-16 h-16 text-gray-400' />
 								</div>
-								
+
 								<div className='flex-1'>
 									<div className='mb-4'>
-										<h3 className='text-xl font-bold text-gray-900'>Shri Vinod Vats</h3>
+										<h3 className='text-xl font-bold text-gray-900'>
+											Shri Vinod Vats
+										</h3>
 										<p className='text-blue-600 font-medium'>Chairman</p>
 									</div>
-									
+
 									<div className='prose prose-gray max-w-none text-sm'>
 										<p className='text-gray-700 leading-relaxed mb-3'>
-											Shri Vinod Vats is the Chairman of Bhagwan Parshuram Institute of Technology and also the President of Bharatiya Brahmin's Charitable Trust. Being a visionary and a great social leader, he has played a vital role in the development of the institute. His endeavour for furthering and championing the cause of excellence in technical and higher education with a view to training and bringing up the future skilled engineers in diverse fields of Technology and management has inspired millions.
+											Shri Vinod Vats is the Chairman of Bhagwan Parshuram
+											Institute of Technology and also the President of
+											Bharatiya Brahmin&apos;s Charitable Trust. Being a
+											visionary and a great social leader, he has played a vital
+											role in the development of the institute. His endeavour
+											for furthering and championing the cause of excellence in
+											technical and higher education with a view to training and
+											bringing up the future skilled engineers in diverse fields
+											of Technology and management has inspired millions.
 										</p>
 										<p className='text-gray-700 leading-relaxed'>
-											This Institute was established under his dynamic Leadership. Presently as the President of the Management Committee and a member of the Bharatiya Technical Educational Society (BTES), he has been professional, educational and rational. Shri Vinod Vats has gained a prominent position as one for his exemplary social works and his key contributions to work in social span areas, and these include his entire life into contributing to the strong self-power.
+											This Institute was established under his dynamic
+											Leadership. Presently as the President of the Management
+											Committee and a member of the Bharatiya Technical
+											Educational Society (BTES), he has been professional,
+											educational and rational. Shri Vinod Vats has gained a
+											prominent position as one for his exemplary social works
+											and his key contributions to work in social span areas,
+											and these include his entire life into contributing to the
+											strong self-power.
 										</p>
 									</div>
 								</div>
@@ -125,19 +148,32 @@ const ManagementPage = () => {
 								<div className='w-32 h-40 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0'>
 									<User className='w-16 h-16 text-gray-400' />
 								</div>
-								
+
 								<div className='flex-1'>
 									<div className='mb-4'>
-										<h3 className='text-xl font-bold text-gray-900'>Shri Surender Sharma</h3>
+										<h3 className='text-xl font-bold text-gray-900'>
+											Shri Surender Sharma
+										</h3>
 										<p className='text-blue-600 font-medium'>Vice President</p>
 									</div>
-									
+
 									<div className='prose prose-gray max-w-none text-sm'>
 										<p className='text-gray-700 leading-relaxed mb-3'>
-											Padma Shri, Surender Sharma is the Vice President of Bhagwan Parshuram Institute of Technology as well as Bharatiya Brahmin's Charitable Trust. He is a popular renowned Hindi poet-chronicler across the globe. His phenomenal success-story and charismatic social service and the President of BPCT's Scholarship Trust.
+											Padma Shri, Surender Sharma is the Vice President of
+											Bhagwan Parshuram Institute of Technology as well as
+											Bharatiya Brahmin&apos;s Charitable Trust. He is a popular
+											renowned Hindi poet-chronicler across the globe. His
+											phenomenal success-story and charismatic social service
+											and the President of BPCT&apos;s Scholarship Trust.
 										</p>
 										<p className='text-gray-700 leading-relaxed'>
-											He has been bestowed with honours. His prominent social service and humanitarian work has earned a widespread recognition globally which includes a title 'Padma Shri', Bharatiya Jyoti Award from the government of India in 2015. He is known nationwide for his inspiring literary and literary works, he has also served with distinction as CPIO minister and corporation counselor.
+											He has been bestowed with honours. His prominent social
+											service and humanitarian work has earned a widespread
+											recognition globally which includes a title &lsquo;Padma
+											Shri&rsquo;, Bharatiya Jyoti Award from the government of
+											India in 2015. He is known nationwide for his inspiring
+											literary and literary works, he has also served with
+											distinction as CPIO minister and corporation counselor.
 										</p>
 									</div>
 								</div>
@@ -150,19 +186,33 @@ const ManagementPage = () => {
 								<div className='w-32 h-40 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0'>
 									<User className='w-16 h-16 text-gray-400' />
 								</div>
-								
+
 								<div className='flex-1'>
 									<div className='mb-4'>
-										<h3 className='text-xl font-bold text-gray-900'>Shri Ram Babu Sharma</h3>
-										<p className='text-blue-600 font-medium'>General Secretary</p>
+										<h3 className='text-xl font-bold text-gray-900'>
+											Shri Ram Babu Sharma
+										</h3>
+										<p className='text-blue-600 font-medium'>
+											General Secretary
+										</p>
 									</div>
-									
+
 									<div className='prose prose-gray max-w-none text-sm'>
 										<p className='text-gray-700 leading-relaxed mb-3'>
-											Shri Ram Babu Sharma is the General Secretary of Bhagwan Parshuram Institute of Technology and Bharatiya Brahmin's Charitable Trust. He has been associated with various social religious and sports organisations. He was a member of the Hotel Federation of Northern India. He is president of Shri Shasta Pavilion, a social organisation engaged in providing free schools and free coaching to underprivileged children.
+											Shri Ram Babu Sharma is the General Secretary of Bhagwan
+											Parshuram Institute of Technology and Bharatiya
+											Brahmin&apos;s Charitable Trust. He has been associated
+											with various social religious and sports organisations. He
+											was a member of the Hotel Federation of Northern India. He
+											is president of Shri Shasta Pavilion, a social
+											organisation engaged in providing free schools and free
+											coaching to underprivileged children.
 										</p>
 										<p className='text-gray-700 leading-relaxed'>
-											He is also in the consultant body of Satish Chandra Fertilizer Kohar in Darbhanga (Delhi). His vision of this institute is to develop a world-class perspective to college with the fast-changing technological scenario.
+											He is also in the consultant body of Satish Chandra
+											Fertilizer Kohar in Darbhanga (Delhi). His vision of this
+											institute is to develop a world-class perspective to
+											college with the fast-changing technological scenario.
 										</p>
 									</div>
 								</div>
@@ -175,19 +225,30 @@ const ManagementPage = () => {
 								<div className='w-32 h-40 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0'>
 									<User className='w-16 h-16 text-gray-400' />
 								</div>
-								
+
 								<div className='flex-1'>
 									<div className='mb-4'>
-										<h3 className='text-xl font-bold text-gray-900'>Shri Shambhu Sharma</h3>
+										<h3 className='text-xl font-bold text-gray-900'>
+											Shri Shambhu Sharma
+										</h3>
 										<p className='text-blue-600 font-medium'>Secretary</p>
 									</div>
-									
+
 									<div className='prose prose-gray max-w-none text-sm'>
 										<p className='text-gray-700 leading-relaxed mb-3'>
-											Shri Shambhu Sharma is the Secretary of Bhagwan Parshuram Institute of Technology. He is the General Secretary of Global Bharatiya Mahakumbh at a received an one of the concerned letters Law Pandit Maulavi Sharma. Former national President of Akhil Bharatiya Brahmin Mahasabha and is received in one of his concerned works for global Bharatiya Mahakumbh.
+											Shri Shambhu Sharma is the Secretary of Bhagwan Parshuram
+											Institute of Technology. He is the General Secretary of
+											Global Bharatiya Mahakumbh at a received an one of the
+											concerned letters Law Pandit Maulavi Sharma. Former
+											national President of Akhil Bharatiya Brahmin Mahasabha
+											and is received in one of his concerned works for global
+											Bharatiya Mahakumbh.
 										</p>
 										<p className='text-gray-700 leading-relaxed'>
-											He is actively involved operations of medical health. He is the national. He is serving around operations of medical health. He is developed a world-wide prospective to college with the fast-changing technological scenario.
+											He is actively involved operations of medical health. He
+											is the national. He is serving around operations of
+											medical health. He is developed a world-wide prospective
+											to college with the fast-changing technological scenario.
 										</p>
 									</div>
 								</div>
@@ -200,19 +261,31 @@ const ManagementPage = () => {
 								<div className='w-32 h-40 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0'>
 									<User className='w-16 h-16 text-gray-400' />
 								</div>
-								
+
 								<div className='flex-1'>
 									<div className='mb-4'>
-										<h3 className='text-xl font-bold text-gray-900'>Shri Sanjeev Sharma</h3>
+										<h3 className='text-xl font-bold text-gray-900'>
+											Shri Sanjeev Sharma
+										</h3>
 										<p className='text-blue-600 font-medium'>Treasurer</p>
 									</div>
-									
+
 									<div className='prose prose-gray max-w-none text-sm'>
 										<p className='text-gray-700 leading-relaxed mb-3'>
-											Working in the Treasurer of Bhagwan Parshuram Institute of Technology, he has been associated with both business and the best interests of educational society to a considerable time. His dedication and the hard work in this institute is so desired above all his other institutions.
+											Working in the Treasurer of Bhagwan Parshuram Institute of
+											Technology, he has been associated with both business and
+											the best interests of educational society to a
+											considerable time. His dedication and the hard work in
+											this institute is so desired above all his other
+											institutions.
 										</p>
 										<p className='text-gray-700 leading-relaxed'>
-											He has devoted and transformed segments alike and their institute & his dedicated teaching faculty. The mission of this institute is to develop a world-class perspective to college with the fast-changing technological scenario. In addition, online tech discipline wise a well-known of and well known colleges.
+											He has devoted and transformed segments alike and their
+											institute & his dedicated teaching faculty. The mission of
+											this institute is to develop a world-class perspective to
+											college with the fast-changing technological scenario. In
+											addition, online tech discipline wise a well-known of and
+											well known colleges.
 										</p>
 									</div>
 								</div>
@@ -226,11 +299,14 @@ const ManagementPage = () => {
 							<div className='w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4'>
 								<Target className='w-6 h-6 text-blue-600' />
 							</div>
-							<h3 className='text-2xl font-bold text-gray-900 mb-4'>Our Collective Vision</h3>
+							<h3 className='text-2xl font-bold text-gray-900 mb-4'>
+								Our Collective Vision
+							</h3>
 							<p className='text-gray-700 leading-relaxed max-w-3xl mx-auto'>
-								"Together, we are committed to creating an educational ecosystem that nurtures innovation, 
-								fosters excellence, and prepares future leaders who will drive technological advancement 
-								and social progress for a better tomorrow."
+								&ldquo;Together, we are committed to creating an educational
+								ecosystem that nurtures innovation, fosters excellence, and
+								prepares future leaders who will drive technological advancement
+								and social progress for a better tomorrow.&rdquo;
 							</p>
 						</div>
 					</AnimatedProfileCard>
@@ -246,8 +322,7 @@ const ManagementPage = () => {
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.6 }}
-					className='space-y-8'
-				>
+					className='space-y-8'>
 					<div className='bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl p-8 border border-purple-200'>
 						<div className='text-center mb-8'>
 							<div className='w-24 h-24 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4'>
@@ -265,14 +340,15 @@ const ManagementPage = () => {
 							{/* Principal */}
 							<motion.div
 								whileHover={{ scale: 1.02 }}
-								className='bg-white rounded-xl p-6 shadow-lg border border-gray-200'
-							>
+								className='bg-white rounded-xl p-6 shadow-lg border border-gray-200'>
 								<div className='flex items-center gap-4 mb-4'>
 									<div className='w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center'>
 										<Building2 className='w-8 h-8 text-blue-600' />
 									</div>
 									<div>
-										<h3 className='text-xl font-bold text-gray-900'>Dr. [Principal Name]</h3>
+										<h3 className='text-xl font-bold text-gray-900'>
+											Dr. [Principal Name]
+										</h3>
 										<p className='text-blue-600 font-medium'>Principal</p>
 									</div>
 								</div>
@@ -291,21 +367,23 @@ const ManagementPage = () => {
 									</div>
 								</div>
 								<p className='text-gray-700 mt-4 text-sm'>
-									Leading the institution with a vision for academic excellence and innovation in engineering education.
+									Leading the institution with a vision for academic excellence
+									and innovation in engineering education.
 								</p>
 							</motion.div>
 
 							{/* Vice Principal */}
 							<motion.div
 								whileHover={{ scale: 1.02 }}
-								className='bg-white rounded-xl p-6 shadow-lg border border-gray-200'
-							>
+								className='bg-white rounded-xl p-6 shadow-lg border border-gray-200'>
 								<div className='flex items-center gap-4 mb-4'>
 									<div className='w-16 h-16 bg-green-100 rounded-full flex items-center justify-center'>
 										<Users className='w-8 h-8 text-green-600' />
 									</div>
 									<div>
-										<h3 className='text-xl font-bold text-gray-900'>Dr. [Vice Principal Name]</h3>
+										<h3 className='text-xl font-bold text-gray-900'>
+											Dr. [Vice Principal Name]
+										</h3>
 										<p className='text-green-600 font-medium'>Vice Principal</p>
 									</div>
 								</div>
@@ -324,22 +402,26 @@ const ManagementPage = () => {
 									</div>
 								</div>
 								<p className='text-gray-700 mt-4 text-sm'>
-									Supporting institutional leadership and overseeing academic operations and faculty development.
+									Supporting institutional leadership and overseeing academic
+									operations and faculty development.
 								</p>
 							</motion.div>
 
 							{/* Dean Academics */}
 							<motion.div
 								whileHover={{ scale: 1.02 }}
-								className='bg-white rounded-xl p-6 shadow-lg border border-gray-200'
-							>
+								className='bg-white rounded-xl p-6 shadow-lg border border-gray-200'>
 								<div className='flex items-center gap-4 mb-4'>
 									<div className='w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center'>
 										<BookOpen className='w-8 h-8 text-orange-600' />
 									</div>
 									<div>
-										<h3 className='text-xl font-bold text-gray-900'>Dr. [Dean Name]</h3>
-										<p className='text-orange-600 font-medium'>Dean - Academics</p>
+										<h3 className='text-xl font-bold text-gray-900'>
+											Dr. [Dean Name]
+										</h3>
+										<p className='text-orange-600 font-medium'>
+											Dean - Academics
+										</p>
 									</div>
 								</div>
 								<div className='space-y-2 text-sm text-gray-600'>
@@ -357,21 +439,23 @@ const ManagementPage = () => {
 									</div>
 								</div>
 								<p className='text-gray-700 mt-4 text-sm'>
-									Overseeing academic policies, curriculum development, and maintaining educational standards.
+									Overseeing academic policies, curriculum development, and
+									maintaining educational standards.
 								</p>
 							</motion.div>
 
 							{/* Registrar */}
 							<motion.div
 								whileHover={{ scale: 1.02 }}
-								className='bg-white rounded-xl p-6 shadow-lg border border-gray-200'
-							>
+								className='bg-white rounded-xl p-6 shadow-lg border border-gray-200'>
 								<div className='flex items-center gap-4 mb-4'>
 									<div className='w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center'>
 										<Briefcase className='w-8 h-8 text-purple-600' />
 									</div>
 									<div>
-										<h3 className='text-xl font-bold text-gray-900'>Mr./Ms. [Registrar Name]</h3>
+										<h3 className='text-xl font-bold text-gray-900'>
+											Mr./Ms. [Registrar Name]
+										</h3>
 										<p className='text-purple-600 font-medium'>Registrar</p>
 									</div>
 								</div>
@@ -390,7 +474,8 @@ const ManagementPage = () => {
 									</div>
 								</div>
 								<p className='text-gray-700 mt-4 text-sm'>
-									Managing student records, admissions, examinations, and administrative operations.
+									Managing student records, admissions, examinations, and
+									administrative operations.
 								</p>
 							</motion.div>
 						</div>
@@ -407,8 +492,7 @@ const ManagementPage = () => {
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.6 }}
-					className='space-y-8'
-				>
+					className='space-y-8'>
 					<div className='bg-gradient-to-r from-green-50 to-teal-50 rounded-2xl p-8 border border-green-200'>
 						<div className='text-center mb-8'>
 							<div className='w-24 h-24 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4'>
@@ -429,13 +513,16 @@ const ManagementPage = () => {
 									Board of Governors
 								</h3>
 								<p className='text-gray-700 mb-4'>
-									The Board of Governors provides strategic oversight and policy direction for the institution. 
-									Comprising eminent personalities from academia, industry, and public service, the board ensures 
-									BPIT maintains its commitment to excellence.
+									The Board of Governors provides strategic oversight and policy
+									direction for the institution. Comprising eminent
+									personalities from academia, industry, and public service, the
+									board ensures BPIT maintains its commitment to excellence.
 								</p>
 								<div className='grid md:grid-cols-2 gap-4'>
 									<div className='bg-green-50 rounded-lg p-4'>
-										<h4 className='font-semibold text-green-800 mb-2'>Key Responsibilities</h4>
+										<h4 className='font-semibold text-green-800 mb-2'>
+											Key Responsibilities
+										</h4>
 										<ul className='text-sm text-green-700 space-y-1'>
 											<li>• Strategic planning and policy formulation</li>
 											<li>• Financial oversight and budget approval</li>
@@ -444,7 +531,9 @@ const ManagementPage = () => {
 										</ul>
 									</div>
 									<div className='bg-green-50 rounded-lg p-4'>
-										<h4 className='font-semibold text-green-800 mb-2'>Composition</h4>
+										<h4 className='font-semibold text-green-800 mb-2'>
+											Composition
+										</h4>
 										<ul className='text-sm text-green-700 space-y-1'>
 											<li>• Chairman (Industry Leader)</li>
 											<li>• Academic Representatives</li>
@@ -461,12 +550,15 @@ const ManagementPage = () => {
 									Academic Council
 								</h3>
 								<p className='text-gray-700 mb-4'>
-									The Academic Council is the primary academic decision-making body, responsible for maintaining 
-									and enhancing the quality of education, research, and academic programs.
+									The Academic Council is the primary academic decision-making
+									body, responsible for maintaining and enhancing the quality of
+									education, research, and academic programs.
 								</p>
 								<div className='grid md:grid-cols-2 gap-4'>
 									<div className='bg-blue-50 rounded-lg p-4'>
-										<h4 className='font-semibold text-blue-800 mb-2'>Functions</h4>
+										<h4 className='font-semibold text-blue-800 mb-2'>
+											Functions
+										</h4>
 										<ul className='text-sm text-blue-700 space-y-1'>
 											<li>• Curriculum development and review</li>
 											<li>• Faculty recruitment and promotion</li>
@@ -475,7 +567,9 @@ const ManagementPage = () => {
 										</ul>
 									</div>
 									<div className='bg-blue-50 rounded-lg p-4'>
-										<h4 className='font-semibold text-blue-800 mb-2'>Members</h4>
+										<h4 className='font-semibold text-blue-800 mb-2'>
+											Members
+										</h4>
 										<ul className='text-sm text-blue-700 space-y-1'>
 											<li>• Principal (Chairperson)</li>
 											<li>• Heads of Departments</li>
@@ -492,12 +586,15 @@ const ManagementPage = () => {
 									Administrative Structure
 								</h3>
 								<p className='text-gray-700 mb-4'>
-									Our administrative structure ensures efficient operations, student services, and support 
-									for academic activities through well-defined roles and responsibilities.
+									Our administrative structure ensures efficient operations,
+									student services, and support for academic activities through
+									well-defined roles and responsibilities.
 								</p>
 								<div className='grid md:grid-cols-3 gap-4'>
 									<div className='bg-purple-50 rounded-lg p-4'>
-										<h4 className='font-semibold text-purple-800 mb-2'>Academic Affairs</h4>
+										<h4 className='font-semibold text-purple-800 mb-2'>
+											Academic Affairs
+										</h4>
 										<ul className='text-sm text-purple-700 space-y-1'>
 											<li>• Admissions Office</li>
 											<li>• Examination Cell</li>
@@ -506,7 +603,9 @@ const ManagementPage = () => {
 										</ul>
 									</div>
 									<div className='bg-purple-50 rounded-lg p-4'>
-										<h4 className='font-semibold text-purple-800 mb-2'>Support Services</h4>
+										<h4 className='font-semibold text-purple-800 mb-2'>
+											Support Services
+										</h4>
 										<ul className='text-sm text-purple-700 space-y-1'>
 											<li>• Library Services</li>
 											<li>• IT Infrastructure</li>
@@ -515,7 +614,9 @@ const ManagementPage = () => {
 										</ul>
 									</div>
 									<div className='bg-purple-50 rounded-lg p-4'>
-										<h4 className='font-semibold text-purple-800 mb-2'>Quality Assurance</h4>
+										<h4 className='font-semibold text-purple-800 mb-2'>
+											Quality Assurance
+										</h4>
 										<ul className='text-sm text-purple-700 space-y-1'>
 											<li>• IQAC Cell</li>
 											<li>• Research & Development</li>
@@ -539,8 +640,7 @@ const ManagementPage = () => {
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.6 }}
-					className='space-y-8'
-				>
+					className='space-y-8'>
 					<div className='bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl p-8 border border-amber-200'>
 						<div className='text-center mb-8'>
 							<div className='w-24 h-24 bg-amber-600 rounded-full flex items-center justify-center mx-auto mb-4'>
@@ -686,28 +786,40 @@ const ManagementPage = () => {
 										<Eye className='w-6 h-6 text-blue-600' />
 									</div>
 									<h4 className='font-semibold text-gray-900 mb-2'>Review</h4>
-									<p className='text-sm text-gray-600'>Regular policy review and updates</p>
+									<p className='text-sm text-gray-600'>
+										Regular policy review and updates
+									</p>
 								</div>
 								<div className='text-center'>
 									<div className='w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3'>
 										<UserCheck className='w-6 h-6 text-green-600' />
 									</div>
 									<h4 className='font-semibold text-gray-900 mb-2'>Approval</h4>
-									<p className='text-sm text-gray-600'>Stakeholder consultation and approval</p>
+									<p className='text-sm text-gray-600'>
+										Stakeholder consultation and approval
+									</p>
 								</div>
 								<div className='text-center'>
 									<div className='w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3'>
 										<BookOpen className='w-6 h-6 text-purple-600' />
 									</div>
-									<h4 className='font-semibold text-gray-900 mb-2'>Communication</h4>
-									<p className='text-sm text-gray-600'>Policy dissemination and training</p>
+									<h4 className='font-semibold text-gray-900 mb-2'>
+										Communication
+									</h4>
+									<p className='text-sm text-gray-600'>
+										Policy dissemination and training
+									</p>
 								</div>
 								<div className='text-center'>
 									<div className='w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3'>
 										<Target className='w-6 h-6 text-orange-600' />
 									</div>
-									<h4 className='font-semibold text-gray-900 mb-2'>Monitoring</h4>
-									<p className='text-sm text-gray-600'>Compliance monitoring and evaluation</p>
+									<h4 className='font-semibold text-gray-900 mb-2'>
+										Monitoring
+									</h4>
+									<p className='text-sm text-gray-600'>
+										Compliance monitoring and evaluation
+									</p>
 								</div>
 							</div>
 						</div>
@@ -726,37 +838,35 @@ const ManagementPage = () => {
 					<div className='absolute top-20 left-10 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl'></div>
 					<div className='absolute bottom-20 right-10 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl'></div>
 				</div>
-				
+
 				<div className='relative z-10 container mx-auto px-4 py-24'>
 					<motion.div
 						initial={{ opacity: 0, y: 30 }}
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.8 }}
-						className='text-center max-w-4xl mx-auto'
-					>
+						className='text-center max-w-4xl mx-auto'>
 						<motion.div
 							initial={{ scale: 0 }}
 							animate={{ scale: 1 }}
 							transition={{ duration: 0.6, delay: 0.2 }}
-							className='w-20 h-20 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-6 backdrop-blur-sm'
-						>
+							className='w-20 h-20 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-6 backdrop-blur-sm'>
 							<Users className='w-10 h-10 text-white' />
 						</motion.div>
-						
+
 						<h1 className='text-5xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-100'>
 							Administration & Management
 						</h1>
-						
+
 						<p className='text-xl md:text-2xl text-blue-100 mb-8 leading-relaxed'>
-							Leadership Excellence Driving Institutional Growth and Academic Achievement
+							Leadership Excellence Driving Institutional Growth and Academic
+							Achievement
 						</p>
-						
+
 						<motion.div
 							initial={{ opacity: 0 }}
 							animate={{ opacity: 1 }}
 							transition={{ duration: 0.6, delay: 0.4 }}
-							className='flex flex-wrap justify-center gap-4 text-sm'
-						>
+							className='flex flex-wrap justify-center gap-4 text-sm'>
 							<div className='flex items-center gap-2 bg-white/10 rounded-full px-4 py-2 backdrop-blur-sm'>
 								<Star className='w-4 h-4 text-yellow-300' />
 								<span>Strategic Leadership</span>
@@ -782,8 +892,7 @@ const ManagementPage = () => {
 						initial={{ opacity: 0, x: -50 }}
 						animate={{ opacity: 1, x: 0 }}
 						transition={{ duration: 0.6 }}
-						className='lg:w-80 flex-shrink-0'
-					>
+						className='lg:w-80 flex-shrink-0'>
 						<div className='bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden sticky top-8'>
 							<div className='p-2'>
 								{tabContent.map((tab, index) => (
@@ -799,22 +908,26 @@ const ManagementPage = () => {
 										whileTap={{ scale: 0.98 }}
 										initial={{ opacity: 0, x: -20 }}
 										animate={{ opacity: 1, x: 0 }}
-										transition={{ duration: 0.3, delay: index * 0.1 }}
-									>
+										transition={{ duration: 0.3, delay: index * 0.1 }}>
 										<div className='flex items-center gap-3 relative z-10'>
-											<div className={`p-2 rounded-lg transition-colors ${
-												activeTab === tab.id 
-													? 'bg-blue-100 text-blue-600' 
-													: 'bg-gray-100 text-gray-500 group-hover:bg-gray-200'
-											}`}>
+											<div
+												className={`p-2 rounded-lg transition-colors ${
+													activeTab === tab.id
+														? 'bg-blue-100 text-blue-600'
+														: 'bg-gray-100 text-gray-500 group-hover:bg-gray-200'
+												}`}>
 												{tab.icon}
 											</div>
 											<span className='font-medium'>{tab.title}</span>
-											<ChevronRight className={`w-4 h-4 ml-auto transition-transform ${
-												activeTab === tab.id ? 'rotate-90 text-blue-600' : 'text-gray-400'
-											}`} />
+											<ChevronRight
+												className={`w-4 h-4 ml-auto transition-transform ${
+													activeTab === tab.id
+														? 'rotate-90 text-blue-600'
+														: 'text-gray-400'
+												}`}
+											/>
 										</div>
-										
+
 										{activeTab === tab.id && (
 											<motion.div
 												className='absolute inset-0 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl'
@@ -835,8 +948,7 @@ const ManagementPage = () => {
 						initial={{ opacity: 0, x: 50 }}
 						animate={{ opacity: 1, x: 0 }}
 						transition={{ duration: 0.6 }}
-						className='flex-1'
-					>
+						className='flex-1'>
 						<div className='bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden'>
 							<AnimatePresence mode='wait'>
 								<motion.div
@@ -845,8 +957,7 @@ const ManagementPage = () => {
 									animate={{ opacity: 1, y: 0 }}
 									exit={{ opacity: 0, y: -20 }}
 									transition={{ duration: 0.4 }}
-									className='p-8'
-								>
+									className='p-8'>
 									{tabContent.find(tab => tab.id === activeTab)?.content}
 								</motion.div>
 							</AnimatePresence>

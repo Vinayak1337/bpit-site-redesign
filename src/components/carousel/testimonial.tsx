@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
 import Image from 'next/image';
 import {
@@ -145,7 +145,7 @@ const Testimonial = () => {
 		}
 	];
 
-	const resetTimer = () => {
+	const resetTimer = useCallback(() => {
 		if (timerRef.current) {
 			clearInterval(timerRef.current);
 		}
@@ -155,7 +155,7 @@ const Testimonial = () => {
 				setCurrentIndex(prev => (prev + 1) % testimonials.length);
 			}
 		}, 5000);
-	};
+	}, [isPlaying, isHovered, testimonials.length]);
 
 	useEffect(() => {
 		resetTimer();
@@ -164,7 +164,7 @@ const Testimonial = () => {
 				clearInterval(timerRef.current);
 			}
 		};
-	}, [isPlaying, isHovered, testimonials.length]);
+	}, [resetTimer]);
 
 	const nextTestimonial = () => {
 		setDirection(1);
