@@ -90,7 +90,7 @@ const PlacementCompanies = () => {
 						<motion.div
 							className='flex space-x-12'
 							animate={{
-								x: [-1200, 0]
+								x: [0, -1200]
 							}}
 							transition={{
 								x: {

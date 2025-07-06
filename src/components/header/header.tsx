@@ -27,18 +27,29 @@ import {
 	BookOpen,
 	DollarSign,
 	GraduationCap,
-	Brain,
-	UserCheck,
 	Home,
 	Shield,
-	Eye,
-	Lightbulb,
 	Camera,
 	Music,
-	Info,
 	MessageSquare,
 	BarChart3,
-	Briefcase
+	Briefcase,
+	FileText,
+	Download,
+	HelpCircle,
+	Star,
+	CreditCard,
+	ClipboardList,
+	Bell,
+	BookMarked,
+	TrendingUp,
+	Network,
+	Users2,
+	Scale,
+	UserX,
+	LogIn,
+	CheckCircle,
+	BarChart
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { DropdownMenuLabel, DropdownMenuSeparator } from '../ui/dropdown-menu';
@@ -55,12 +66,11 @@ const Header = () => {
 		return () => window.removeEventListener('scroll', handleScroll);
 	}, []);
 
-	const instituteItems = [
+	const aboutBPITItems = [
 		{
-			title: 'About BPIT',
+			title: 'About Us',
 			href: '/about',
-			description:
-				'Learn about our history, achievements, and commitment to excellence',
+			description: 'Leadership insights and institutional overview',
 			icon: <Building2 className='w-4 h-4 text-blue-600' />
 		},
 		{
@@ -70,29 +80,107 @@ const Header = () => {
 			icon: <Target className='w-4 h-4 text-blue-600' />
 		},
 		{
-			title: 'Administration & Management',
+			title: 'Governing Body',
 			href: '/management',
-			description: 'Meet our leadership team and faculty members',
+			description: 'Management, administration & faculties',
 			icon: <Users className='w-4 h-4 text-blue-600' />
 		},
 		{
-			title: 'IQAC',
+			title: 'Statutory Committees',
 			href: '/iqac',
-			description: 'Internal Quality Assurance Cell for academic excellence',
+			description: 'IQAC, Anti-Ragging, and other statutory committees',
 			icon: <Shield className='w-4 h-4 text-blue-600' />
 		},
 		{
-			title: 'Accreditation',
+			title: 'Mandatory Disclosures',
 			href: '/accreditation',
-			description: 'NBA & NAAC certified quality education standards',
+			description: 'AICTE/NBA accreditation and mandatory disclosures',
 			icon: <Award className='w-4 h-4 text-blue-600' />
+		},
+		{
+			title: 'Photo & Video Gallery',
+			href: '/gallery',
+			description: 'Campus life, events, and institutional memories',
+			icon: <Camera className='w-4 h-4 text-blue-600' />
+		}
+	];
+
+	const admissionsItems = [
+		{
+			title: 'Why Choose BPIT?',
+			href: '/admissions/why-choose',
+			description: 'Top placement records, accreditation, and excellence',
+			icon: <Star className='w-4 h-4 text-blue-600' />
+		},
+		{
+			title: 'Admission Process & Eligibility',
+			href: '/admissions/process',
+			description: 'Step-by-step admission process and eligibility criteria',
+			icon: <ClipboardList className='w-4 h-4 text-blue-600' />
+		},
+		{
+			title: 'Fee Structure',
+			href: '/admissions/fees',
+			description: 'Program fees and payment information',
+			icon: <DollarSign className='w-4 h-4 text-blue-600' />
+		},
+		{
+			title: 'Scholarships',
+			href: '/admissions/scholarships',
+			description: 'Financial assistance and merit scholarships',
+			icon: <GraduationCap className='w-4 h-4 text-blue-600' />
+		},
+		{
+			title: 'Download Brochure',
+			href: '/admissions/brochure',
+			description: 'Complete information brochure and prospectus',
+			icon: <Download className='w-4 h-4 text-blue-600' />
+		},
+		{
+			title: 'FAQs',
+			href: '/admissions/faqs',
+			description: 'Frequently asked questions about admissions',
+			icon: <HelpCircle className='w-4 h-4 text-blue-600' />
+		}
+	];
+
+	const academicsItems = [
+		{
+			title: 'Academic Calendar',
+			href: '/academics/calendar',
+			description: 'Important academic dates and semester schedules',
+			icon: <Calendar className='w-4 h-4 text-blue-600' />
+		},
+		{
+			title: 'Examination & Results',
+			href: '/academics/examination',
+			description: 'Exam schedules, results, and academic performance',
+			icon: <FileText className='w-4 h-4 text-blue-600' />
+		},
+		{
+			title: 'Syllabus & Ordinances',
+			href: '/academics/syllabus',
+			description: 'Course curriculum, syllabus, and academic ordinances',
+			icon: <BookOpen className='w-4 h-4 text-blue-600' />
+		},
+		{
+			title: 'Library / Resource Center',
+			href: '/academics/library',
+			description: 'Library resources, digital collections, and services',
+			icon: <BookMarked className='w-4 h-4 text-blue-600' />
+		},
+		{
+			title: 'Notices & Circulars',
+			href: '/academics/notices',
+			description: 'Important notices, circulars, and announcements',
+			icon: <Bell className='w-4 h-4 text-blue-600' />
 		}
 	];
 
 	const departmentItems = [
 		{
-			title: 'Computer Science',
-			href: '/cse',
+			title: 'Computer Science & Engineering',
+			href: '/departments/cse',
 			description:
 				'Software development, algorithms, and programming expertise',
 			icon: (
@@ -103,7 +191,7 @@ const Header = () => {
 		},
 		{
 			title: 'Information Technology',
-			href: '/it',
+			href: '/departments/it',
 			description: 'Network systems, cybersecurity, and IT infrastructure',
 			icon: (
 				<div className='w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center'>
@@ -113,7 +201,7 @@ const Header = () => {
 		},
 		{
 			title: 'Electronics & Communication',
-			href: '/ece',
+			href: '/departments/ece',
 			description: 'Circuit design, telecommunications, and embedded systems',
 			icon: (
 				<div className='w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center'>
@@ -122,8 +210,8 @@ const Header = () => {
 			)
 		},
 		{
-			title: 'Electrical Engineering',
-			href: '/eee',
+			title: 'Electrical & Electronics',
+			href: '/departments/eee',
 			description: 'Power systems, automation, and electrical machinery',
 			icon: (
 				<div className='w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center'>
@@ -132,8 +220,8 @@ const Header = () => {
 			)
 		},
 		{
-			title: 'Management',
-			href: '/management',
+			title: 'Management Programs',
+			href: '/departments/mba',
 			description: 'Business administration and management studies',
 			icon: (
 				<div className='w-8 h-8 bg-rose-100 rounded-lg flex items-center justify-center'>
@@ -143,133 +231,102 @@ const Header = () => {
 		}
 	];
 
-	const academiaItems = [
+	const placementsItems = [
 		{
-			title: 'Academic Calendar',
-			href: '/calendar',
-			description: 'Important academic dates and semester schedules',
-			icon: <Calendar className='w-4 h-4 text-blue-600' />
+			title: 'Placement Cell Overview',
+			href: '/placements/overview',
+			description: 'About our placement cell and career services',
+			icon: <TrendingUp className='w-4 h-4 text-blue-600' />
 		},
 		{
-			title: 'Scheme & Syllabus',
-			href: '/syllabus',
-			description: 'Course curriculum and subject details',
-			icon: <BookOpen className='w-4 h-4 text-blue-600' />
+			title: 'About T&P',
+			href: '/placements/training-placement',
+			description: 'Message from T&P, T&P team, and department details',
+			icon: <MessageSquare className='w-4 h-4 text-blue-600' />
 		},
 		{
-			title: 'Fee Structure',
-			href: '/fees',
-			description: 'Program fees and payment information',
-			icon: <DollarSign className='w-4 h-4 text-blue-600' />
+			title: 'Our Recruiters',
+			href: '/placements/recruiters',
+			description: 'Industry partners and recruiting companies',
+			icon: <Briefcase className='w-4 h-4 text-blue-600' />
 		},
 		{
-			title: 'Scholarships',
-			href: '/scholarships',
-			description: 'Financial assistance and merit scholarships',
-			icon: <GraduationCap className='w-4 h-4 text-blue-600' />
+			title: 'Placement Statistics',
+			href: '/placements/statistics',
+			description: 'Placement records, packages, and success stories',
+			icon: <BarChart3 className='w-4 h-4 text-blue-600' />
 		},
 		{
-			title: 'List of Students',
-			href: '/students',
-			description: 'List of students in the current batch',
-			icon: <Users className='w-4 h-4 text-blue-600' />
+			title: 'Internship Opportunities',
+			href: '/placements/internships',
+			description: 'Industry internships and training programs',
+			icon: <Users2 className='w-4 h-4 text-blue-600' />
 		},
 		{
-			title: 'Library',
-			href: '/library',
-			description: 'Library resources and services',
-			icon: <BookOpen className='w-4 h-4 text-blue-600' />
+			title: 'Alumni Network',
+			href: '/placements/alumni',
+			description: 'Connect with our successful alumni network',
+			icon: <Network className='w-4 h-4 text-blue-600' />
 		}
 	];
 
-	const campusLifeItems = [
+	const studentLifeItems = [
 		{
-			title: 'Self Learning',
-			href: '/campus-life/self-learning',
-			description:
-				'Independent study resources and self-paced learning modules',
-			icon: <Brain className='w-4 h-4 text-blue-600' />
-		},
-		{
-			title: 'Mentorship Program',
-			href: '/campus-life/mentorship',
-			description: 'Faculty guidance and peer mentoring initiatives',
-			icon: <UserCheck className='w-4 h-4 text-blue-600' />
-		},
-		{
-			title: 'BPIT Campus Facilities',
-			href: '/campus-life/facilities',
-			description: 'Modern infrastructure, labs, library, and amenities',
+			title: 'Campus Facilities',
+			href: '/student-life/facilities',
+			description: 'Hostel, canteen, sports, and modern amenities',
 			icon: <Home className='w-4 h-4 text-blue-600' />
 		},
 		{
-			title: 'BPIT Societies',
-			href: '/campus-life/societies',
+			title: 'Clubs & Societies',
+			href: '/student-life/clubs',
 			description: 'Student clubs, cultural groups, and professional societies',
 			icon: <Users className='w-4 h-4 text-blue-600' />
 		},
 		{
-			title: 'NSS Cell',
-			href: '/campus-life/nss',
-			description: 'National Service Scheme and community outreach programs',
-			icon: <Shield className='w-4 h-4 text-blue-600' />
-		},
-		{
-			title: 'Drishti',
-			href: '/campus-life/drishti',
-			description: 'Student magazine and creative writing platform',
-			icon: <Eye className='w-4 h-4 text-blue-600' />
-		},
-		{
-			title: 'IIC',
-			href: '/campus-life/iic',
-			description: 'Institution Innovation Council for entrepreneurship',
-			icon: <Lightbulb className='w-4 h-4 text-blue-600' />
-		},
-		{
-			title: 'BPIT Gallery',
-			href: '/campus-life/gallery',
-			description: 'Photo gallery of campus events and activities',
-			icon: <Camera className='w-4 h-4 text-blue-600' />
-		},
-		{
-			title: 'BPIT Fest',
-			href: '/campus-life/fest',
-			description: 'Annual cultural festival and inter-college events',
+			title: 'Events & Festivals',
+			href: '/student-life/events',
+			description: 'Cultural festivals, tech fests, and campus events',
 			icon: <Music className='w-4 h-4 text-blue-600' />
+		},
+		{
+			title: 'Student Grievance Cell',
+			href: '/student-life/grievance',
+			description: 'Student support and grievance redressal system',
+			icon: <UserX className='w-4 h-4 text-blue-600' />
+		},
+		{
+			title: 'Code of Conduct',
+			href: '/student-life/code-of-conduct',
+			description: 'Student code of conduct and disciplinary guidelines',
+			icon: <Scale className='w-4 h-4 text-blue-600' />
 		}
 	];
 
-	const trainingPlacementItems = [
+	const studentPortalItems = [
 		{
-			title: 'About T&P',
-			href: '/training-placement/about',
-			description: 'Learn about our Training & Placement department',
-			icon: <Info className='w-4 h-4 text-blue-600' />
+			title: 'Login / Dashboard',
+			href: '/student-portal/login',
+			description: 'Access your student dashboard and portal',
+			icon: <LogIn className='w-4 h-4 text-blue-600' />
 		},
 		{
-			title: 'Message from T&P Head',
-			href: '/training-placement/message',
-			description: 'Words from our Training & Placement Head',
-			icon: <MessageSquare className='w-4 h-4 text-blue-600' />
+			title: 'Fee Payment',
+			href: '/student-portal/fee-payment',
+			description: 'Online fee payment and transaction history',
+			icon: <CreditCard className='w-4 h-4 text-blue-600' />
 		},
 		{
-			title: 'T&P Team',
-			href: '/training-placement/team',
-			description: 'Meet our dedicated placement team members',
-			icon: <Users className='w-4 h-4 text-blue-600' />
+			title: 'Attendance Tracker',
+			href: '/student-portal/attendance',
+			description: 'Track your attendance and academic progress',
+			icon: <CheckCircle className='w-4 h-4 text-blue-600' />
 		},
 		{
-			title: 'Placement Record',
-			href: '/training-placement/records',
-			description: 'View our impressive placement statistics and achievements',
-			icon: <BarChart3 className='w-4 h-4 text-blue-600' />
-		},
-		{
-			title: 'Recruiters',
-			href: '/training-placement/recruiters',
-			description: 'Our industry partners and recruiting companies',
-			icon: <Briefcase className='w-4 h-4 text-blue-600' />
+			title: 'Result Viewer',
+			href: '/student-portal/results',
+			description: 'View examination results and academic records',
+			icon: <BarChart className='w-4 h-4 text-blue-600' />
 		}
 	];
 
@@ -315,44 +372,85 @@ const Header = () => {
 				animate={{ y: 0 }}
 				transition={{ duration: 0.6, ease: 'easeOut' }}>
 				<div className='container mx-auto px-4'>
-					<div className='flex items-center lg:justify-center justify-between gap-5 h-20'>
+					<div className='flex items-center lg:justify-center justify-between gap-4 h-20'>
 						{/* Logo */}
-						<motion.div
-							className='flex items-center space-x-3'
-							whileHover={{ scale: 1.05 }}
-							transition={{ type: 'spring', stiffness: 300 }}>
-							<Image
-								src='/logo.png'
-								alt='BPIT Logo'
-								width={80}
-								height={80}
-								className='rounded-lg scale-150'
-							/>
-						</motion.div>
+						<Link href='/'>
+							<motion.div
+								className='flex items-center space-x-3'
+								whileHover={{ scale: 1.05 }}
+								transition={{ type: 'spring', stiffness: 300 }}>
+								<Image
+									src='/logo.png'
+									alt='BPIT Logo'
+									width={80}
+									height={80}
+									className='rounded-lg scale-150'
+								/>
+							</motion.div>
+						</Link>
 
 						{/* Desktop Navigation */}
-						<div className='hidden lg:flex items-center space-x-8'>
+						<div className='hidden lg:flex items-center space-x-5'>
+							{/* First Navigation Menu - Left Side */}
 							<NavigationMenu>
-								<NavigationMenuList className='space-x-2'>
+								<NavigationMenuList>
 									<NavigationMenuItem>
-										<NavigationMenuLink
-											className='text-gray-700 hover:text-blue-600 font-medium transition-colors px-3 py-2 rounded-md hover:bg-blue-50'
-											href='/'>
-											Home
-										</NavigationMenuLink>
+										<NavigationMenuTrigger className='text-gray-700 hover:text-blue-600 font-medium'>
+											About BPIT
+										</NavigationMenuTrigger>
+										<NavigationMenuContent>
+											<DropdownMenuLabel className='text-blue-600 font-semibold text-center'>
+												About BPIT
+											</DropdownMenuLabel>
+											<DropdownMenuSeparator />
+											<ul className='grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]'>
+												{aboutBPITItems.map(item => (
+													<ListItem
+														key={item.title}
+														title={item.title}
+														href={item.href}
+														icon={item.icon}>
+														{item.description}
+													</ListItem>
+												))}
+											</ul>
+										</NavigationMenuContent>
 									</NavigationMenuItem>
 
 									<NavigationMenuItem>
 										<NavigationMenuTrigger className='text-gray-700 hover:text-blue-600 font-medium'>
-											Institute
+											Admissions
 										</NavigationMenuTrigger>
 										<NavigationMenuContent>
 											<DropdownMenuLabel className='text-blue-600 font-semibold text-center'>
-												About Institute
+												Admissions
 											</DropdownMenuLabel>
-											<DropdownMenuSeparator />{' '}
+											<DropdownMenuSeparator />
 											<ul className='grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]'>
-												{instituteItems.map(item => (
+												{admissionsItems.map(item => (
+													<ListItem
+														key={item.title}
+														title={item.title}
+														href={item.href}
+														icon={item.icon}>
+														{item.description}
+													</ListItem>
+												))}
+											</ul>
+										</NavigationMenuContent>
+									</NavigationMenuItem>
+
+									<NavigationMenuItem>
+										<NavigationMenuTrigger className='text-gray-700 hover:text-blue-600 font-medium'>
+											Academics
+										</NavigationMenuTrigger>
+										<NavigationMenuContent>
+											<DropdownMenuLabel className='text-blue-600 font-semibold text-center'>
+												Academics
+											</DropdownMenuLabel>
+											<DropdownMenuSeparator />
+											<ul className='grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]'>
+												{academicsItems.map(item => (
 													<ListItem
 														key={item.title}
 														title={item.title}
@@ -387,18 +485,23 @@ const Header = () => {
 											</ul>
 										</NavigationMenuContent>
 									</NavigationMenuItem>
+								</NavigationMenuList>
+							</NavigationMenu>
 
+							{/* Second Navigation Menu - Right Side */}
+							<NavigationMenu>
+								<NavigationMenuList className='space-x-2'>
 									<NavigationMenuItem>
 										<NavigationMenuTrigger className='text-gray-700 hover:text-blue-600 font-medium'>
-											Academia
+											Placements
 										</NavigationMenuTrigger>
 										<NavigationMenuContent>
 											<DropdownMenuLabel className='text-blue-600 font-semibold text-center'>
-												Academia
+												Placements
 											</DropdownMenuLabel>
 											<DropdownMenuSeparator />
 											<ul className='grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]'>
-												{academiaItems.map(item => (
+												{placementsItems.map(item => (
 													<ListItem
 														key={item.title}
 														title={item.title}
@@ -413,15 +516,15 @@ const Header = () => {
 
 									<NavigationMenuItem>
 										<NavigationMenuTrigger className='text-gray-700 hover:text-blue-600 font-medium'>
-											Campus Life
+											Student Life
 										</NavigationMenuTrigger>
 										<NavigationMenuContent>
 											<DropdownMenuLabel className='text-blue-600 font-semibold text-center'>
-												Campus Life
+												Student Life
 											</DropdownMenuLabel>
 											<DropdownMenuSeparator />
 											<ul className='grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]'>
-												{campusLifeItems.map(item => (
+												{studentLifeItems.map(item => (
 													<ListItem
 														key={item.title}
 														title={item.title}
@@ -436,33 +539,25 @@ const Header = () => {
 
 									<NavigationMenuItem>
 										<NavigationMenuTrigger className='text-gray-700 hover:text-blue-600 font-medium'>
-											Training & Placement
-										</NavigationMenuTrigger>
-										<NavigationMenuContent>
-											<DropdownMenuLabel className='text-blue-600 font-semibold text-center'>
-												Training & Placement
-											</DropdownMenuLabel>
-											<DropdownMenuSeparator />
-											<ul className='grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]'>
-												{trainingPlacementItems.map(item => (
-													<ListItem
-														key={item.title}
-														title={item.title}
-														href={item.href}
-														icon={item.icon}>
-														{item.description}
-													</ListItem>
-												))}
-											</ul>
-										</NavigationMenuContent>
-									</NavigationMenuItem>
-
-									<NavigationMenuItem>
-										<NavigationMenuLink
-											className='text-gray-700 hover:text-blue-600 font-medium transition-colors px-3 py-2 rounded-md hover:bg-blue-50'
-											href='/admission'>
 											Student Portal
-										</NavigationMenuLink>
+										</NavigationMenuTrigger>
+										<NavigationMenuContent>
+											<DropdownMenuLabel className='text-blue-600 font-semibold text-center'>
+												Student Portal
+											</DropdownMenuLabel>
+											<DropdownMenuSeparator />
+											<ul className='grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]'>
+												{studentPortalItems.map(item => (
+													<ListItem
+														key={item.title}
+														title={item.title}
+														href={item.href}
+														icon={item.icon}>
+														{item.description}
+													</ListItem>
+												))}
+											</ul>
+										</NavigationMenuContent>
 									</NavigationMenuItem>
 								</NavigationMenuList>
 							</NavigationMenu>
@@ -507,7 +602,17 @@ const Header = () => {
 								<Link
 									href='/about'
 									className='block px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors'>
-									Institute
+									About BPIT
+								</Link>
+								<Link
+									href='/admissions'
+									className='block px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors'>
+									Admissions
+								</Link>
+								<Link
+									href='/academics'
+									className='block px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors'>
+									Academics
 								</Link>
 								<Link
 									href='/departments'
@@ -515,24 +620,19 @@ const Header = () => {
 									Departments
 								</Link>
 								<Link
-									href='/academia'
+									href='/placements'
 									className='block px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors'>
-									Academia
+									Placements
 								</Link>
 								<Link
-									href='/campus-life'
+									href='/student-life'
 									className='block px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors'>
-									Campus Life
+									Student Life
 								</Link>
 								<Link
-									href='/training-placement'
+									href='/student-portal'
 									className='block px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors'>
-									Training & Placement
-								</Link>
-								<Link
-									href='/admission'
-									className='block px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors'>
-									Admission
+									Student Portal
 								</Link>
 								<div className='px-4'>
 									<Button
@@ -554,13 +654,14 @@ const Header = () => {
 };
 
 const ListItem = React.forwardRef<
-	React.ElementRef<'a'>,
-	React.ComponentPropsWithoutRef<'a'> & { icon?: React.ReactNode }
->(({ className, title, children, icon, ...props }, ref) => {
+	React.ComponentRef<'a'>,
+	React.ComponentPropsWithoutRef<'a'> & { icon?: React.ReactNode; href: string }
+>(({ className, title, children, icon, href, ...props }, ref) => {
 	return (
 		<li>
 			<NavigationMenuLink asChild>
-				<a
+				<Link
+					href={href}
 					ref={ref}
 					className={cn(
 						'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
@@ -574,7 +675,7 @@ const ListItem = React.forwardRef<
 					<p className='line-clamp-2 text-sm leading-snug text-muted-foreground'>
 						{children}
 					</p>
-				</a>
+				</Link>
 			</NavigationMenuLink>
 		</li>
 	);

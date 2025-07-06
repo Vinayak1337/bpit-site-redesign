@@ -144,7 +144,6 @@ const Testimonial = () => {
 				clearInterval(timerRef.current);
 			}
 		};
-
 	}, [isPlaying, isHovered, testimonials.length, resetTimer]);
 
 	const nextTestimonial = () => {
@@ -284,7 +283,7 @@ const Testimonial = () => {
 					</motion.div>
 
 					<h2 className='text-4xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-blue-900 via-blue-700 to-blue-900 bg-clip-text text-transparent leading-tight mb-6'>
-						Student Testimonials
+						Voices of Excellence
 					</h2>
 
 					<motion.p
