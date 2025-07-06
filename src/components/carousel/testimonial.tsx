@@ -144,6 +144,7 @@ const Testimonial = () => {
 				clearInterval(timerRef.current);
 			}
 		};
+
 	}, [isPlaying, isHovered, testimonials.length, resetTimer]);
 
 	const nextTestimonial = () => {
