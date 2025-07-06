@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { motion, useScroll, useTransform, useInView } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import {
@@ -157,9 +157,9 @@ const events = [
 
 const categoryConfig = {
 	Technology: {
-		gradient: 'from-blue-500 via-cyan-500 to-teal-500',
-		bgGradient: 'from-blue-50 via-cyan-50 to-teal-50',
-		darkGradient: 'from-blue-900 via-cyan-900 to-teal-900',
+		gradient: 'from-blue-500 to-blue-600',
+		bgGradient: 'from-blue-50 to-blue-100',
+		darkGradient: 'from-blue-900 to-blue-800',
 		icon: <Zap className='w-5 h-5' />,
 		color: 'text-blue-600',
 		accentColor: 'bg-blue-500',
@@ -167,44 +167,44 @@ const categoryConfig = {
 		glowColor: 'shadow-blue-500/25'
 	},
 	Cultural: {
-		gradient: 'from-purple-500 via-pink-500 to-rose-500',
-		bgGradient: 'from-purple-50 via-pink-50 to-rose-50',
-		darkGradient: 'from-purple-900 via-pink-900 to-rose-900',
+		gradient: 'from-red-500 to-red-600',
+		bgGradient: 'from-red-50 to-red-100',
+		darkGradient: 'from-red-900 to-red-800',
 		icon: <Palette className='w-5 h-5' />,
-		color: 'text-purple-600',
-		accentColor: 'bg-purple-500',
-		borderColor: 'border-purple-200',
-		glowColor: 'shadow-purple-500/25'
+		color: 'text-red-600',
+		accentColor: 'bg-red-500',
+		borderColor: 'border-red-200',
+		glowColor: 'shadow-red-500/25'
 	},
 	Professional: {
-		gradient: 'from-green-500 via-emerald-500 to-teal-500',
-		bgGradient: 'from-green-50 via-emerald-50 to-teal-50',
-		darkGradient: 'from-green-900 via-emerald-900 to-teal-900',
+		gradient: 'from-blue-500 to-blue-600',
+		bgGradient: 'from-blue-50 to-blue-100',
+		darkGradient: 'from-blue-900 to-blue-800',
 		icon: <Target className='w-5 h-5' />,
-		color: 'text-green-600',
-		accentColor: 'bg-green-500',
-		borderColor: 'border-green-200',
-		glowColor: 'shadow-green-500/25'
+		color: 'text-blue-600',
+		accentColor: 'bg-blue-500',
+		borderColor: 'border-blue-200',
+		glowColor: 'shadow-blue-500/25'
 	},
 	Academic: {
-		gradient: 'from-orange-500 via-amber-500 to-yellow-500',
-		bgGradient: 'from-orange-50 via-amber-50 to-yellow-50',
-		darkGradient: 'from-orange-900 via-amber-900 to-yellow-900',
+		gradient: 'from-red-500 to-red-600',
+		bgGradient: 'from-red-50 to-red-100',
+		darkGradient: 'from-red-900 to-red-800',
 		icon: <Lightbulb className='w-5 h-5' />,
-		color: 'text-orange-600',
-		accentColor: 'bg-orange-500',
-		borderColor: 'border-orange-200',
-		glowColor: 'shadow-orange-500/25'
+		color: 'text-red-600',
+		accentColor: 'bg-red-500',
+		borderColor: 'border-red-200',
+		glowColor: 'shadow-red-500/25'
 	},
 	Networking: {
-		gradient: 'from-indigo-500 via-purple-500 to-blue-500',
-		bgGradient: 'from-indigo-50 via-purple-50 to-blue-50',
-		darkGradient: 'from-indigo-900 via-purple-900 to-blue-900',
+		gradient: 'from-blue-500 to-blue-600',
+		bgGradient: 'from-blue-50 to-blue-100',
+		darkGradient: 'from-blue-900 to-blue-800',
 		icon: <Globe className='w-5 h-5' />,
-		color: 'text-indigo-600',
-		accentColor: 'bg-indigo-500',
-		borderColor: 'border-indigo-200',
-		glowColor: 'shadow-indigo-500/25'
+		color: 'text-blue-600',
+		accentColor: 'bg-blue-500',
+		borderColor: 'border-blue-200',
+		glowColor: 'shadow-blue-500/25'
 	}
 };
 
@@ -237,32 +237,21 @@ const UltraEventCard = ({
 	return (
 		<motion.div
 			ref={cardRef}
-			initial={{ opacity: 0, y: 100, rotateX: -15 }}
-			animate={
-				isInView
-					? { opacity: 1, y: 0, rotateX: 0 }
-					: { opacity: 0, y: 100, rotateX: -15 }
-			}
+			initial={{ opacity: 0, y: 50 }}
+			animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
 			transition={{
-				duration: 0.8,
-				delay: index * 0.2,
-				type: 'spring',
-				stiffness: 100,
-				damping: 20
+				duration: 0.6,
+				delay: index * 0.1,
+				ease: 'easeOut'
 			}}
 			whileHover={{
-				y: -20,
-				rotateY: 5,
-				rotateX: 5,
+				y: -10,
 				scale: 1.02,
-				transition: { duration: 0.4 }
+				transition: { duration: 0.3 }
 			}}
 			onHoverStart={() => setIsHovered(true)}
 			onHoverEnd={() => setIsHovered(false)}
-			className='relative group perspective-1000'
-			style={{
-				transformStyle: 'preserve-3d'
-			}}>
+			className='relative group'>
 			<div
 				className={`
 				relative overflow-hidden rounded-3xl bg-white/90 backdrop-blur-xl
@@ -270,38 +259,9 @@ const UltraEventCard = ({
 				transform-gpu transition-all duration-500
 				${isHovered ? 'shadow-2xl shadow-black/10' : 'shadow-lg'}
 			`}>
-				<motion.div
-					className={`absolute inset-0 bg-gradient-to-br ${config.bgGradient} opacity-50`}
-					animate={{
-						background: isHovered
-							? `linear-gradient(135deg, ${config.bgGradient})`
-							: `linear-gradient(45deg, ${config.bgGradient})`
-					}}
-					transition={{ duration: 0.6 }}
+				<div
+					className={`absolute inset-0 bg-gradient-to-br ${config.bgGradient} opacity-30`}
 				/>
-
-				<div className='absolute inset-0 overflow-hidden pointer-events-none'>
-					{[...Array(6)].map((_, i) => (
-						<motion.div
-							key={i}
-							className={`absolute w-1 h-1 ${config.accentColor} rounded-full opacity-40`}
-							style={{
-								top: `${20 + i * 15}%`,
-								left: `${10 + i * 12}%`
-							}}
-							animate={{
-								y: isHovered ? [0, -20, 0] : [0, -10, 0],
-								opacity: isHovered ? [0.4, 1, 0.4] : [0.2, 0.6, 0.2],
-								scale: isHovered ? [1, 1.5, 1] : [1, 1.2, 1]
-							}}
-							transition={{
-								duration: 2 + i * 0.3,
-								repeat: Infinity,
-								delay: i * 0.4
-							}}
-						/>
-					))}
-				</div>
 
 				{event.featured && (
 					<motion.div
@@ -344,20 +304,14 @@ const UltraEventCard = ({
 				</div>
 
 				<div className='relative h-64 overflow-hidden'>
-					<motion.div
-						animate={{
-							scale: isHovered ? 1.1 : 1,
-							y: isHovered ? -10 : 0
-						}}
-						transition={{ duration: 0.6 }}
-						className='h-full'>
+					<div className='h-full transition-transform duration-300 hover:scale-105'>
 						<Image
 							src={event.image}
 							alt={event.title}
 							fill
 							className='object-cover'
 						/>
-					</motion.div>
+					</div>
 
 					<div
 						className={`absolute inset-0 bg-gradient-to-t ${config.darkGradient} opacity-30`}
@@ -499,13 +453,6 @@ const UltraEventCard = ({
 export default function UltraModernEventsSection() {
 	const sectionRef = useRef(null);
 	const [isPaused, setIsPaused] = useState(false);
-	const { scrollYProgress } = useScroll({
-		target: sectionRef,
-		offset: ['start end', 'end start']
-	});
-
-	const y = useTransform(scrollYProgress, [0, 1], [100, -100]);
-	const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
 
 	const CARD_WIDTH = 400;
 	const SCROLL_DISTANCE = events.length * CARD_WIDTH;
@@ -533,93 +480,19 @@ export default function UltraModernEventsSection() {
 				}}
 			/>
 
-			<motion.section
+			<section
 				ref={sectionRef}
-				style={{ opacity }}
 				className='relative py-32 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 overflow-hidden'>
 				<div className='absolute inset-0'>
-					<motion.div
-						style={{ y }}
-						className='absolute top-20 left-10 w-[500px] h-[500px] bg-blue-300/20 rounded-full mix-blend-multiply filter blur-3xl'
-						animate={{
-							scale: [1, 1.2, 1],
-							rotate: [0, 90, 0]
-						}}
-						transition={{
-							duration: 20,
-							repeat: Infinity,
-							ease: 'linear'
-						}}
-					/>
-					<motion.div
-						style={{ y: useTransform(scrollYProgress, [0, 1], [-50, 50]) }}
-						className='absolute top-40 right-10 w-[450px] h-[450px] bg-purple-300/20 rounded-full mix-blend-multiply filter blur-3xl'
-						animate={{
-							scale: [1.2, 1, 1.2],
-							rotate: [90, 180, 90]
-						}}
-						transition={{
-							duration: 25,
-							repeat: Infinity,
-							ease: 'linear'
-						}}
-					/>
-					<motion.div
-						style={{ y: useTransform(scrollYProgress, [0, 1], [50, -50]) }}
-						className='absolute bottom-20 left-20 w-[600px] h-[600px] bg-pink-300/20 rounded-full mix-blend-multiply filter blur-3xl'
-						animate={{
-							scale: [1, 1.3, 1],
-							rotate: [180, 270, 180]
-						}}
-						transition={{
-							duration: 30,
-							repeat: Infinity,
-							ease: 'linear'
-						}}
-					/>
-
-					<div className='absolute inset-0 overflow-hidden pointer-events-none'>
-						{[...Array(20)].map((_, i) => (
-							<motion.div
-								key={i}
-								className='absolute'
-								style={{
-									top: `${10 + (i % 4) * 25}%`,
-									left: `${5 + (i % 5) * 20}%`
-								}}
-								animate={{
-									y: [0, -50, 0],
-									rotate: [0, 360],
-									opacity: [0.2, 1, 0.2],
-									scale: [1, 1.5, 1]
-								}}
-								transition={{
-									duration: 8 + i * 0.5,
-									repeat: Infinity,
-									delay: i * 0.3,
-									ease: 'easeInOut'
-								}}>
-								<div
-									className={`w-2 h-2 rounded-full ${
-										i % 4 === 0
-											? 'bg-blue-400'
-											: i % 4 === 1
-											? 'bg-purple-400'
-											: i % 4 === 2
-											? 'bg-pink-400'
-											: 'bg-cyan-400'
-									} shadow-lg`}
-								/>
-							</motion.div>
-						))}
-					</div>
+					<div className='absolute top-20 left-10 w-[300px] h-[300px] bg-blue-300/10 rounded-full mix-blend-multiply filter blur-2xl' />
+					<div className='absolute top-40 right-10 w-[250px] h-[250px] bg-red-300/10 rounded-full mix-blend-multiply filter blur-2xl' />
 				</div>
 
 				<div className='relative z-10 container mx-auto px-4'>
 					<div className='max-w-7xl mx-auto'>
 						<div className='flex items-center justify-between mb-8'>
 							<div className='flex items-center gap-3'>
-								<div className='p-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl shadow-lg'>
+								<div className='p-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl shadow-lg'>
 									<Calendar className='w-6 h-6' />
 								</div>
 								<div>
@@ -633,7 +506,7 @@ export default function UltraModernEventsSection() {
 							</div>
 
 							<motion.button
-								className='group flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300'
+								className='group flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300'
 								whileHover={{ scale: 1.05, x: 5 }}
 								whileTap={{ scale: 0.95 }}>
 								<span className='font-semibold'>View All Events</span>
@@ -673,7 +546,7 @@ export default function UltraModernEventsSection() {
 						</div>
 					</div>
 				</div>
-			</motion.section>
+			</section>
 		</>
 	);
 }

@@ -231,13 +231,34 @@ const Testimonial = () => {
 
 			{/* Floating Particles */}
 			<div className='absolute inset-0 pointer-events-none overflow-hidden'>
-				{[...Array(20)].map((_, i) => (
+				{[
+					{ left: 10, top: 20 },
+					{ left: 85, top: 15 },
+					{ left: 25, top: 60 },
+					{ left: 70, top: 80 },
+					{ left: 45, top: 25 },
+					{ left: 15, top: 75 },
+					{ left: 90, top: 45 },
+					{ left: 35, top: 85 },
+					{ left: 60, top: 10 },
+					{ left: 5, top: 50 },
+					{ left: 75, top: 35 },
+					{ left: 30, top: 70 },
+					{ left: 95, top: 60 },
+					{ left: 20, top: 40 },
+					{ left: 80, top: 90 },
+					{ left: 50, top: 5 },
+					{ left: 65, top: 55 },
+					{ left: 40, top: 30 },
+					{ left: 55, top: 75 },
+					{ left: 25, top: 45 }
+				].map((position, i) => (
 					<div
 						key={i}
 						className='absolute'
 						style={{
-							left: `${Math.random() * 100}%`,
-							top: `${Math.random() * 100}%`
+							left: `${position.left}%`,
+							top: `${position.top}%`
 						}}>
 						<FloatingParticle delay={i * 0.3} />
 					</div>
