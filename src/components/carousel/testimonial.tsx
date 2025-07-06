@@ -12,8 +12,6 @@ import {
 	ChevronLeft,
 	ChevronRight,
 	Award,
-	Users,
-	GraduationCap,
 	ArrowRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -127,24 +125,6 @@ const Testimonial = () => {
 		}
 	];
 
-	const stats = [
-		{
-			icon: <Users className='w-6 h-6' />,
-			number: '10,000+',
-			label: 'Alumni Worldwide'
-		},
-		{
-			icon: <Award className='w-6 h-6' />,
-			number: '100%',
-			label: 'Placement Rate'
-		},
-		{
-			icon: <GraduationCap className='w-6 h-6' />,
-			number: '25 LPA',
-			label: 'Highest Package'
-		}
-	];
-
 	const resetTimer = useCallback(() => {
 		if (timerRef.current) {
 			clearInterval(timerRef.current);
@@ -164,7 +144,8 @@ const Testimonial = () => {
 				clearInterval(timerRef.current);
 			}
 		};
-	}, [resetTimer]);
+
+	}, [isPlaying, isHovered, testimonials.length, resetTimer]);
 
 	const nextTestimonial = () => {
 		setDirection(1);
@@ -219,18 +200,6 @@ const Testimonial = () => {
 		})
 	};
 
-	const cardVariants = {
-		hidden: { y: 50, opacity: 0 },
-		visible: {
-			y: 0,
-			opacity: 1,
-			transition: {
-				duration: 0.6,
-				ease: 'easeOut' as const
-			}
-		}
-	};
-
 	// Floating particles animation
 	const FloatingParticle = ({ delay = 0 }) => (
 		<motion.div
@@ -263,13 +232,34 @@ const Testimonial = () => {
 
 			{/* Floating Particles */}
 			<div className='absolute inset-0 pointer-events-none overflow-hidden'>
-				{[...Array(20)].map((_, i) => (
+				{[
+					{ left: 10, top: 20 },
+					{ left: 85, top: 15 },
+					{ left: 25, top: 60 },
+					{ left: 70, top: 80 },
+					{ left: 45, top: 25 },
+					{ left: 15, top: 75 },
+					{ left: 90, top: 45 },
+					{ left: 35, top: 85 },
+					{ left: 60, top: 10 },
+					{ left: 5, top: 50 },
+					{ left: 75, top: 35 },
+					{ left: 30, top: 70 },
+					{ left: 95, top: 60 },
+					{ left: 20, top: 40 },
+					{ left: 80, top: 90 },
+					{ left: 50, top: 5 },
+					{ left: 65, top: 55 },
+					{ left: 40, top: 30 },
+					{ left: 55, top: 75 },
+					{ left: 25, top: 45 }
+				].map((position, i) => (
 					<div
 						key={i}
 						className='absolute'
 						style={{
-							left: `${Math.random() * 100}%`,
-							top: `${Math.random() * 100}%`
+							left: `${position.left}%`,
+							top: `${position.top}%`
 						}}>
 						<FloatingParticle delay={i * 0.3} />
 					</div>
@@ -294,7 +284,7 @@ const Testimonial = () => {
 					</motion.div>
 
 					<h2 className='text-4xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-blue-900 via-blue-700 to-blue-900 bg-clip-text text-transparent leading-tight mb-6'>
-						Voices of Excellence
+						Student Testimonials
 					</h2>
 
 					<motion.p
@@ -302,35 +292,9 @@ const Testimonial = () => {
 						animate={isInView ? { opacity: 1, y: 0 } : {}}
 						transition={{ delay: 0.5, duration: 0.6 }}
 						className='text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed'>
-						Discover how BPIT has transformed lives and careers. From industry
-						leaders to innovative entrepreneurs, our alumni are making their
-						mark globally.
+						Hear from our students and alumni about their transformative journey
+						at BPIT and how it shaped their successful careers.
 					</motion.p>
-				</motion.div>
-
-				{/* Stats Section */}
-				<motion.div
-					initial={{ opacity: 0, y: 40 }}
-					animate={isInView ? { opacity: 1, y: 0 } : {}}
-					transition={{ delay: 0.7, duration: 0.8 }}
-					className='grid grid-cols-1 md:grid-cols-3 gap-8 mb-16'>
-					{stats.map((stat, index) => (
-						<motion.div
-							key={index}
-							custom={index}
-							variants={cardVariants}
-							initial='hidden'
-							animate={isInView ? 'visible' : 'hidden'}
-							className='text-center bg-white/70 backdrop-blur-lg rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 border border-white/20 group hover:scale-105'>
-							<div className='flex justify-center mb-4 text-blue-600 group-hover:text-blue-700 transition-colors'>
-								{stat.icon}
-							</div>
-							<div className='text-3xl md:text-4xl font-bold text-gray-900 mb-2'>
-								{stat.number}
-							</div>
-							<div className='text-gray-600 font-medium'>{stat.label}</div>
-						</motion.div>
-					))}
 				</motion.div>
 
 				{/* Main Testimonial Display */}

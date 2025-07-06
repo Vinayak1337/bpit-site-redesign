@@ -3,7 +3,7 @@ import Hero2 from '@/components/hero/hero2';
 import PlacementCompanies from '@/components/placement/placement-companies';
 
 import Testimonial from '@/components/carousel/testimonial';
-import ModernEventsSection from '@/components/events/modern-events-section';
+import UltraModernEventsSection from '@/components/events/events-section';
 import ModernNoticesSection from '@/components/notices/modern-notices-section';
 
 export default function Home() {
@@ -13,11 +13,11 @@ export default function Home() {
 
 			<Hero2 />
 
-			<PlacementCompanies />
-
-			<ModernEventsSection />
-
 			<ModernNoticesSection />
+
+			<UltraModernEventsSection />
+
+			<PlacementCompanies />
 
 			<Testimonial />
 		</>
