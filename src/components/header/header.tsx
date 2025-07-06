@@ -330,11 +330,38 @@ const Header = () => {
 		}
 	];
 
+	const importantAnnouncements = [
+		{
+			title: 'Admission 2024-25 Session Open - Apply Now',
+			href: '/admissions/apply'
+		},
+		{
+			title: 'Semester End Examinations Schedule Released',
+			href: '/academics/examination'
+		},
+		{
+			title: 'Placement Drive 2024 - Register Today',
+			href: '/placements/register'
+		},
+		{
+			title: 'Annual Tech Fest "INNOVATE 2024" - March 15-17',
+			href: '/events/tech-fest'
+		},
+		{
+			title: 'Library New Books Collection Available',
+			href: '/academics/library'
+		},
+		{
+			title: 'Scholarship Applications Open - Merit & Need Based',
+			href: '/admissions/scholarships'
+		}
+	];
+
 	return (
 		<>
 			{/* Top Contact Bar */}
 			<motion.div
-				className='bg-blue-900 text-white py-2 px-4 text-sm hidden md:block'
+				className='bg-gradient-to-r from-blue-800 to-blue-900 text-white py-2 px-4 text-sm hidden md:block'
 				initial={{ y: -20, opacity: 0 }}
 				animate={{ y: 0, opacity: 1 }}
 				transition={{ duration: 0.5 }}>
@@ -356,6 +383,80 @@ const Header = () => {
 					<div className='text-sm'>
 						<span className='text-yellow-300'>NBA Accredited</span> B.Tech
 						Programs
+					</div>
+				</div>
+			</motion.div>
+
+			{/* Important Announcements Bar */}
+			<motion.div
+				className='bg-gradient-to-r from-blue-800 to-blue-900 text-white py-2 overflow-hidden relative hidden md:block'
+				initial={{ y: -20, opacity: 0 }}
+				animate={{ y: 0, opacity: 1 }}
+				transition={{ duration: 0.5, delay: 0.2 }}>
+				<div className='flex items-center'>
+					<div className='flex-shrink-0 px-4 font-semibold text-sm border-r border-blue-400'>
+						<span className='flex items-center gap-2'>
+							<Bell className='w-4 h-4' />
+							Important Announcements:
+						</span>
+					</div>
+					<div className='flex-1 overflow-hidden'>
+						<div className='animate-marquee flex items-center whitespace-nowrap'>
+							{importantAnnouncements.map((announcement, index) => (
+								<Link
+									key={index}
+									href={announcement.href}
+									className='text-sm hover:text-yellow-300 transition-colors duration-200 mx-8 flex-shrink-0'>
+									{announcement.title}
+								</Link>
+							))}
+							{/* Duplicate for seamless loop */}
+							{importantAnnouncements.map((announcement, index) => (
+								<Link
+									key={`duplicate-${index}`}
+									href={announcement.href}
+									className='text-sm hover:text-yellow-300 transition-colors duration-200 mx-8 flex-shrink-0'>
+									{announcement.title}
+								</Link>
+							))}
+						</div>
+					</div>
+				</div>
+			</motion.div>
+
+			{/* Mobile Announcements Bar */}
+			<motion.div
+				className='bg-gradient-to-r from-blue-600 to-blue-700 text-white py-2 overflow-hidden relative md:hidden'
+				initial={{ y: -20, opacity: 0 }}
+				animate={{ y: 0, opacity: 1 }}
+				transition={{ duration: 0.5, delay: 0.2 }}>
+				<div className='flex items-center'>
+					<div className='flex-shrink-0 px-3 font-semibold text-xs border-r border-blue-400'>
+						<span className='flex items-center gap-1'>
+							<Bell className='w-3 h-3' />
+							News:
+						</span>
+					</div>
+					<div className='flex-1 overflow-hidden'>
+						<div className='animate-marquee flex items-center whitespace-nowrap'>
+							{importantAnnouncements.map((announcement, index) => (
+								<Link
+									key={index}
+									href={announcement.href}
+									className='text-xs hover:text-yellow-300 transition-colors duration-200 mx-6 flex-shrink-0'>
+									{announcement.title}
+								</Link>
+							))}
+							{/* Duplicate for seamless loop */}
+							{importantAnnouncements.map((announcement, index) => (
+								<Link
+									key={`duplicate-${index}`}
+									href={announcement.href}
+									className='text-xs hover:text-yellow-300 transition-colors duration-200 mx-6 flex-shrink-0'>
+									{announcement.title}
+								</Link>
+							))}
+						</div>
 					</div>
 				</div>
 			</motion.div>
