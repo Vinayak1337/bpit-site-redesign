@@ -250,7 +250,7 @@ const ModernBPITFooter = () => {
 				</div>
 
 				{/* Top Border Accent */}
-				<div className='absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 via-purple-500 to-blue-400' />
+				<div className='absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 via-red-500 to-blue-400' />
 
 				{/* Main Content */}
 				<div className='relative z-10 container mx-auto px-4 py-16'>
@@ -578,7 +578,7 @@ const ModernBPITFooter = () => {
 				</div>
 
 				{/* Bottom Gradient */}
-				<div className='absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 via-purple-500 to-blue-400' />
+				{/* <div className='absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 via-red-500 to-blue-400' /> */}
 			</footer>
 		</>
 	);

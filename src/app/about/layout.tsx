@@ -1,9 +1,13 @@
-import React from 'react'
-import type { Metadata } from 'next'
+import React from 'react';
+import type { Metadata } from 'next';
+import AboutHero from '@/app/about/components/AboutHero';
+import AboutSidebar from '@/app/about/components/AboutSidebar';
+import AboutContentWrapper from '@/app/about/components/AboutContentWrapper';
 
 export const metadata: Metadata = {
 	title: 'About BPIT - Bhagwan Parshuram Institute of Technology',
-	description: 'Learn about BPIT\'s history, vision, mission, and leadership. Discover our commitment to excellence in engineering education and innovation.',
+	description:
+		"Learn about BPIT's history, vision, mission, and leadership. Discover our commitment to excellence in engineering education and innovation.",
 	keywords: [
 		'About BPIT',
 		'Bhagwan Parshuram Institute of Technology',
@@ -16,18 +20,30 @@ export const metadata: Metadata = {
 		'NBA accredited college',
 		'GGSIPU affiliated college'
 	]
-}
+};
 
 const AboutLayout = ({
 	children
 }: Readonly<{
 	children: React.ReactNode;
 }>) => {
-  return (
-    <main className="relative">
-      {children}
-    </main>
-  )
-}
+	return (
+		<main className='min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50'>
+			{/* Hero Section */}
+			<AboutHero />
 
-export default AboutLayout
+			{/* Main Content with Sidebar */}
+			<div className='container mx-auto px-4 py-12'>
+				<div className='flex flex-col lg:flex-row gap-8'>
+					{/* Sidebar Navigation */}
+					<AboutSidebar />
+
+					{/* Content Area */}
+					<AboutContentWrapper>{children}</AboutContentWrapper>
+				</div>
+			</div>
+		</main>
+	);
+};
+
+export default AboutLayout;
