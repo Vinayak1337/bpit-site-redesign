@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
 import { Building2, Award, Users, Shield } from 'lucide-react';
 
 const GovernanceStructurePage = () => {
