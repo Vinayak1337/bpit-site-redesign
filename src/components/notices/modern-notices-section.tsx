@@ -455,8 +455,6 @@ const ScrollingSection = ({
 	icon: React.ReactNode;
 	gradient: string;
 }) => {
-	const [isPlaying, setIsPlaying] = useState(true);
-
 	return (
 		<div className='relative'>
 			{/* Section Header */}
@@ -473,13 +471,6 @@ const ScrollingSection = ({
 				</div>
 
 				<div className='flex items-center gap-3'>
-					<Button
-						onClick={() => setIsPlaying(!isPlaying)}
-						variant='outline'
-						size='sm'
-						className='rounded-xl'>
-						{isPlaying ? 'Pause' : 'Play'}
-					</Button>
 					<Button variant='outline' size='sm' className='rounded-xl'>
 						<Filter className='w-4 h-4 mr-2' />
 						Filter
@@ -499,7 +490,7 @@ const ScrollingSection = ({
 				<div className='absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-indigo-50 via-indigo-50/80 to-transparent z-10 pointer-events-none' />
 
 				<motion.div
-					animate={isPlaying ? { x: [0, -(items.length * 380)] } : {}}
+					animate={{ x: [0, -(items.length * 380)] }}
 					transition={{
 						duration: items.length * 3,
 						repeat: Infinity,

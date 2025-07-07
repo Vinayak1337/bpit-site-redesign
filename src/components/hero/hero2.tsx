@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import {
@@ -65,7 +65,7 @@ const Hero2 = () => {
 		}
 	];
 
-	const resetTimer = () => {
+	const resetTimer = useCallback(() => {
 		if (timerRef.current) {
 			clearInterval(timerRef.current);
 		}
@@ -74,7 +74,7 @@ const Hero2 = () => {
 				setCurrentSlide(prev => (prev + 1) % slides.length);
 			}
 		}, 5000);
-	};
+	}, [isHovered, slides.length]);
 
 	useEffect(() => {
 		resetTimer();
@@ -83,7 +83,7 @@ const Hero2 = () => {
 				clearInterval(timerRef.current);
 			}
 		};
-	}, [isHovered, slides.length]);
+	}, [resetTimer]);
 
 	const nextSlide = () => {
 		setCurrentSlide(prev => (prev + 1) % slides.length);
@@ -240,8 +240,8 @@ const Hero2 = () => {
 					className='h-full bg-white'
 					initial={{ width: '0%' }}
 					animate={{ width: isHovered ? '0%' : '100%' }}
-					transition={{ 
-						duration: isHovered ? 0 : 5, 
+					transition={{
+						duration: isHovered ? 0 : 5,
 						repeat: isHovered ? 0 : Infinity,
 						ease: 'linear'
 					}}
