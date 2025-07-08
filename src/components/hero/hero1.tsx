@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import {
 	ChevronLeft,
@@ -14,9 +14,15 @@ import {
 	Award
 } from 'lucide-react';
 
-const Hero2 = () => {
+const Hero1 = () => {
 	const [currentSlide, setCurrentSlide] = useState(0);
 	const timerRef = useRef<NodeJS.Timeout | null>(null);
+	const [isHovering, setIsHovering] = useState(false);
+
+	const progressBarControls = useAnimation();
+	const floatingControls1 = useAnimation();
+	const floatingControls2 = useAnimation();
+	const floatingControls3 = useAnimation();
 
 	const slides = [
 		{
@@ -31,8 +37,10 @@ const Hero2 = () => {
 					<span>(Approved by AICTE, Ministry of Education (MoE))</span>
 					<br />
 					<span>
-						Affiliated to {' '}
-						<span className='font-semibold bg-gradient-to-r from-blue-500 to-blue-700 bg-clip-text text-transparent'>Guru Gobind Singh Indraprastha University, Delhi</span>
+						Affiliated to{' '}
+						<span className='font-semibold bg-gradient-to-r from-blue-500 to-blue-700 bg-clip-text text-transparent'>
+							Guru Gobind Singh Indraprastha University, Delhi
+						</span>
 					</span>
 				</>
 			),
@@ -107,37 +115,99 @@ const Hero2 = () => {
 		}
 	];
 
-	const resetTimer = useCallback(() => {
+	const handleMouseEnter = () => setIsHovering(true);
+	const handleMouseLeave = () => setIsHovering(false);
+
+	const startTimer = useCallback(() => {
 		if (timerRef.current) {
 			clearInterval(timerRef.current);
 		}
-		timerRef.current = setInterval(() => {
-			setCurrentSlide((prev: number) => (prev + 1) % slides.length);
-		}, 5000);
-	}, [slides.length]);
+		if (!isHovering) {
+			timerRef.current = setInterval(() => {
+				setCurrentSlide(prev => (prev + 1) % slides.length);
+			}, 5000);
+		}
+	}, [isHovering, slides.length]);
 
 	useEffect(() => {
-		resetTimer();
+		startTimer();
 		return () => {
 			if (timerRef.current) {
 				clearInterval(timerRef.current);
 			}
 		};
-	}, [resetTimer]);
+	}, [isHovering, startTimer]);
+
+	useEffect(() => {
+		const allFloatingControls = [
+			floatingControls1,
+			floatingControls2,
+			floatingControls3
+		];
+
+		if (isHovering) {
+			allFloatingControls.forEach(controls => controls.stop());
+			progressBarControls.stop();
+		} else {
+			floatingControls1.start({
+				y: [0, -20, 0],
+				opacity: [0.3, 1, 0.3],
+				transition: {
+					duration: 3,
+					repeat: Infinity,
+					delay: 0
+				}
+			});
+			floatingControls2.start({
+				y: [0, -15, 0],
+				opacity: [0.5, 1, 0.5],
+				transition: {
+					duration: 2.5,
+					repeat: Infinity,
+					delay: 1
+				}
+			});
+			floatingControls3.start({
+				y: [0, -25, 0],
+				opacity: [0.4, 1, 0.4],
+				transition: {
+					duration: 3.5,
+					repeat: Infinity,
+					delay: 2
+				}
+			});
+		}
+	}, [
+		isHovering,
+		floatingControls1,
+		floatingControls2,
+		floatingControls3,
+		progressBarControls
+	]);
+
+	useEffect(() => {
+		if (!isHovering) {
+			progressBarControls.set({ width: '0%' });
+			progressBarControls.start({
+				width: '100%',
+				transition: { duration: 5, ease: 'linear' }
+			});
+		}
+	}, [currentSlide, isHovering, progressBarControls]);
 
 	const nextSlide = () => {
 		setCurrentSlide(prev => (prev + 1) % slides.length);
-		resetTimer();
+		startTimer();
 	};
 
 	const prevSlide = () => {
 		setCurrentSlide(prev => (prev - 1 + slides.length) % slides.length);
-		resetTimer();
+		startTimer();
 	};
 
 	const goToSlide = (index: number) => {
 		setCurrentSlide(index);
-		resetTimer();
+		startTimer();
 	};
 
 	return (
@@ -152,7 +222,9 @@ const Hero2 = () => {
 					transition={{ duration: 0.7 }}
 					className='absolute inset-0'>
 					<div
-						className='w-full h-full bg-cover bg-center bg-no-repeat'
+						className={`w-full h-full bg-cover bg-center bg-no-repeat transition-all duration-300 ease-in-out ${
+							currentSlide === 0 ? 'blur-sm' : 'blur-none'
+						}`}
 						style={{
 							backgroundImage: `url(${slides[currentSlide].image})`
 						}}
@@ -227,7 +299,9 @@ const Hero2 = () => {
 									initial={{ opacity: 0, y: 20 }}
 									animate={{ opacity: 1, y: 0 }}
 									transition={{ delay: 0.7 }}
-									className='flex flex-col sm:flex-row gap-4 justify-center'>
+									className='flex flex-col sm:flex-row gap-4 justify-center'
+									onMouseEnter={handleMouseEnter}
+									onMouseLeave={handleMouseLeave}>
 									{slides[currentSlide].cta && (
 										<Button
 											size='lg'
@@ -270,18 +344,25 @@ const Hero2 = () => {
 			<button
 				onClick={prevSlide}
 				aria-label='Previous slide'
-				className='absolute left-4 top-1/2 transform -translate-y-1/2 z-20 p-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 text-white hover:bg-white/20 transition-all duration-300 group'>
+				className='absolute left-4 top-1/2 transform -translate-y-1/2 z-20 p-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 text-white hover:bg-white/20 transition-all duration-300 group'
+				onMouseEnter={handleMouseEnter}
+				onMouseLeave={handleMouseLeave}>
 				<ChevronLeft className='w-6 h-6 group-hover:-translate-x-1 transition-transform' />
 			</button>
 			<button
 				onClick={nextSlide}
 				aria-label='Next slide'
-				className='absolute right-4 top-1/2 transform -translate-y-1/2 z-20 p-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 text-white hover:bg-white/20 transition-all duration-300 group'>
+				className='absolute right-4 top-1/2 transform -translate-y-1/2 z-20 p-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 text-white hover:bg-white/20 transition-all duration-300 group'
+				onMouseEnter={handleMouseEnter}
+				onMouseLeave={handleMouseLeave}>
 				<ChevronRight className='w-6 h-6 group-hover:translate-x-1 transition-transform' />
 			</button>
 
 			{/* Slide Indicators */}
-			<div className='absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 flex space-x-3'>
+			<div
+				className='absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 flex space-x-3'
+				onMouseEnter={handleMouseEnter}
+				onMouseLeave={handleMouseLeave}>
 				{slides.map((_, index) => (
 					<button
 						key={index}
@@ -301,13 +382,7 @@ const Hero2 = () => {
 				<motion.div
 					className='h-full bg-white'
 					initial={{ width: '0%' }}
-					animate={{ width: '100%' }}
-					transition={{
-						duration: 5,
-						repeat: Infinity,
-						ease: 'linear'
-					}}
-					key={currentSlide}
+					animate={progressBarControls}
 				/>
 			</div>
 
@@ -315,43 +390,19 @@ const Hero2 = () => {
 			<div className='absolute inset-0 pointer-events-none overflow-hidden'>
 				<motion.div
 					className='absolute top-1/4 left-1/4 w-2 h-2 bg-white/30 rounded-full'
-					animate={{
-						y: [0, -20, 0],
-						opacity: [0.3, 1, 0.3]
-					}}
-					transition={{
-						duration: 3,
-						repeat: Infinity,
-						delay: 0
-					}}
+					animate={floatingControls1}
 				/>
 				<motion.div
 					className='absolute top-1/3 right-1/4 w-1 h-1 bg-blue-300/50 rounded-full'
-					animate={{
-						y: [0, -15, 0],
-						opacity: [0.5, 1, 0.5]
-					}}
-					transition={{
-						duration: 2.5,
-						repeat: Infinity,
-						delay: 1
-					}}
+					animate={floatingControls2}
 				/>
 				<motion.div
 					className='absolute bottom-1/3 left-1/5 w-1.5 h-1.5 bg-white/40 rounded-full'
-					animate={{
-						y: [0, -25, 0],
-						opacity: [0.4, 1, 0.4]
-					}}
-					transition={{
-						duration: 3.5,
-						repeat: Infinity,
-						delay: 2
-					}}
+					animate={floatingControls3}
 				/>
 			</div>
 		</section>
 	);
 };
 
-export default Hero2;
+export default Hero1;
