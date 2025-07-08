@@ -10,7 +10,8 @@ import {
 	Users,
 	BookOpen,
 	Trophy,
-	Building
+	Building,
+	Award
 } from 'lucide-react';
 
 const Hero2 = () => {
@@ -18,6 +19,36 @@ const Hero2 = () => {
 	const timerRef = useRef<NodeJS.Timeout | null>(null);
 
 	const slides = [
+		{
+			title: 'Engineering Excellence',
+			subtitle: "Shaping Tomorrow's Innovators",
+			description: (
+				<>
+					<span>
+						A Unit of Bhartiya Brahmin Charitable Trust (Regd.).
+					</span>
+					<br />
+					<span>(Approved by AICTE, Ministry of Education (MoE))</span>
+					<br />
+					<span>
+						Affiliated to {' '}
+						<span>Guru Gobind Singh Indraprastha University, Delhi</span>
+					</span>
+				</>
+			),
+			image:
+				'https://images.unsplash.com/photo-1562774053-701939374585?w=1200&q=80',
+			icon: <Award className='w-8 h-8' />,
+			stats: 'NBA Accredited Institution',
+			cta: {
+				label: 'Apply Now',
+				isEnquiry: true
+			},
+			secondary_cta: {
+				label: 'Explore Programs',
+				href: '/admissions'
+			}
+		},
 		{
 			title: 'Engineering Excellence',
 			subtitle: 'NBA Accredited Programs',
@@ -40,7 +71,11 @@ const Hero2 = () => {
 			image:
 				'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1200&q=80',
 			icon: <Users className='w-8 h-8' />,
-			stats: '50+ Clubs'
+			stats: '50+ Clubs',
+			cta: {
+				label: 'Discover More',
+				href: '/campus-life'
+			}
 		},
 		{
 			title: 'Placement Success',
@@ -50,7 +85,11 @@ const Hero2 = () => {
 			image:
 				'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=1200&q=80',
 			icon: <Trophy className='w-8 h-8' />,
-			stats: '100% Placement'
+			stats: '100% Placement',
+			cta: {
+				label: 'View Placements',
+				href: '/placements'
+			}
 		},
 		{
 			title: 'Modern Infrastructure',
@@ -60,7 +99,11 @@ const Hero2 = () => {
 			image:
 				'https://images.unsplash.com/photo-1562774053-701939374585?w=1200&q=80',
 			icon: <Building className='w-8 h-8' />,
-			stats: 'Modern Facilities'
+			stats: 'Modern Facilities',
+			cta: {
+				label: 'See Facilities',
+				href: '/facilities'
+			}
 		}
 	];
 
@@ -84,17 +127,17 @@ const Hero2 = () => {
 
 	const nextSlide = () => {
 		setCurrentSlide(prev => (prev + 1) % slides.length);
-		resetTimer(); // Reset timer when manually navigating
+		resetTimer();
 	};
 
 	const prevSlide = () => {
 		setCurrentSlide(prev => (prev - 1 + slides.length) % slides.length);
-		resetTimer(); // Reset timer when manually navigating
+		resetTimer();
 	};
 
 	const goToSlide = (index: number) => {
 		setCurrentSlide(index);
-		resetTimer(); // Reset timer when manually navigating
+		resetTimer();
 	};
 
 	return (
@@ -185,12 +228,37 @@ const Hero2 = () => {
 									animate={{ opacity: 1, y: 0 }}
 									transition={{ delay: 0.7 }}
 									className='flex flex-col sm:flex-row gap-4 justify-center'>
-									<Button
-										size='lg'
-										className='bg-white text-blue-900 hover:bg-blue-50 px-8 py-4 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 group'>
-										Learn More
-										<ArrowRight className='ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform' />
-									</Button>
+									{slides[currentSlide].cta && (
+										<Button
+											size='lg'
+											className='bg-white text-blue-900 hover:bg-blue-50 px-8 py-4 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 group'
+											onClick={() => {
+												if (slides[currentSlide].cta?.isEnquiry) {
+													const event = new CustomEvent('openEnquiry');
+													window.dispatchEvent(event);
+												} else if (slides[currentSlide].cta?.href) {
+													window.location.href = slides[currentSlide].cta
+														.href as string;
+												}
+											}}>
+											{slides[currentSlide].cta.label}
+											<ArrowRight className='ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform' />
+										</Button>
+									)}
+									{slides[currentSlide].secondary_cta && (
+										<Button
+											variant='outline'
+											size='lg'
+											className='border-2 border-white hover:bg-white text-blue-900 px-8 py-4 rounded-full font-semibold transition-all duration-300'
+											onClick={() => {
+												if (slides[currentSlide].secondary_cta?.href) {
+													window.location.href = slides[currentSlide]
+														.secondary_cta.href as string;
+												}
+											}}>
+											{slides[currentSlide].secondary_cta.label}
+										</Button>
+									)}
 								</motion.div>
 							</motion.div>
 						</AnimatePresence>
