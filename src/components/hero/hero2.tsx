@@ -15,7 +15,6 @@ import {
 
 const Hero2 = () => {
 	const [currentSlide, setCurrentSlide] = useState(0);
-	const [isHovered, setIsHovered] = useState(false);
 	const timerRef = useRef<NodeJS.Timeout | null>(null);
 
 	const slides = [
@@ -70,11 +69,9 @@ const Hero2 = () => {
 			clearInterval(timerRef.current);
 		}
 		timerRef.current = setInterval(() => {
-			if (!isHovered) {
-				setCurrentSlide(prev => (prev + 1) % slides.length);
-			}
+			setCurrentSlide((prev: number) => (prev + 1) % slides.length);
 		}, 5000);
-	}, [isHovered, slides.length]);
+	}, [slides.length]);
 
 	useEffect(() => {
 		resetTimer();
@@ -101,10 +98,7 @@ const Hero2 = () => {
 	};
 
 	return (
-		<section
-			className='relative h-screen bg-gray-900 overflow-hidden'
-			onMouseEnter={() => setIsHovered(true)}
-			onMouseLeave={() => setIsHovered(false)}>
+		<section className='relative h-screen bg-gray-900 overflow-hidden'>
 			{/* Background Image Carousel */}
 			<AnimatePresence mode='wait'>
 				<motion.div
@@ -239,10 +233,10 @@ const Hero2 = () => {
 				<motion.div
 					className='h-full bg-white'
 					initial={{ width: '0%' }}
-					animate={{ width: isHovered ? '0%' : '100%' }}
+					animate={{ width: '100%' }}
 					transition={{
-						duration: isHovered ? 0 : 5,
-						repeat: isHovered ? 0 : Infinity,
+						duration: 5,
+						repeat: Infinity,
 						ease: 'linear'
 					}}
 					key={currentSlide}
