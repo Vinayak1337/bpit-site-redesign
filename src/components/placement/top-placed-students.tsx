@@ -15,7 +15,7 @@ const TopPlacedStudents = () => {
 			branch: 'Computer Science',
 			year: '2024',
 			image:
-				'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=400&fit=crop&crop=face',
+				'https://images.unsplash.com/photo-1554151228-14d9def656e4?w=400&h=400&fit=crop&crop=face',
 			companyLogo: 'https://logo.clearbit.com/google.com'
 		},
 		{
