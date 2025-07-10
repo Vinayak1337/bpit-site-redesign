@@ -36,31 +36,34 @@ const ImportantAnnouncement = () => {
 	const desktopLabelRef = useRef<HTMLDivElement>(null);
 	const mobileLabelRef = useRef<HTMLDivElement>(null);
 
-	type AnimationState = {
-		duration: number;
-		animateX: (string | number)[];
-	};
-
 	const desktopContainerRef = useRef<HTMLDivElement>(null);
 	const desktopAnnouncementsRef = useRef<HTMLDivElement>(null);
-	const [desktopAnimation, setDesktopAnimation] = useState<AnimationState>({
-		duration: 20,
-		animateX: ['100%', '-120%']
+	const [desktopAnimation, setDesktopAnimation] = useState({
+		duration: 100,
+		from: '100%',
+		to: '-100%'
 	});
 
 	const mobileContainerRef = useRef<HTMLDivElement>(null);
 	const mobileAnnouncementsRef = useRef<HTMLDivElement>(null);
-	const [mobileAnimation, setMobileAnimation] = useState<AnimationState>({
-		duration: 20,
-		animateX: ['100%', '-120%']
+	const [mobileAnimation, setMobileAnimation] = useState({
+		duration: 100,
+		from: '100%',
+		to: '-100%'
 	});
+
+	const [isHovering, setIsHovering] = useState(false);
+	const [isClient, setIsClient] = useState(false);
+
+	useEffect(() => {
+		setIsClient(true);
+	}, []);
 
 	useEffect(() => {
 		const calculateAnimation = (
 			containerRef: React.RefObject<HTMLDivElement | null>,
 			announcementsRef: React.RefObject<HTMLDivElement | null>,
-			labelRef: React.RefObject<HTMLDivElement | null>,
-			setAnimation: React.Dispatch<React.SetStateAction<AnimationState>>
+			labelRef: React.RefObject<HTMLDivElement | null>
 		) => {
 			if (
 				containerRef.current &&
@@ -74,46 +77,73 @@ const ImportantAnnouncement = () => {
 				if (announcementsWidth > 0) {
 					const totalDistance =
 						containerWidth + announcementsWidth + labelWidth;
-					const speed = 180; // pixels per second
+					const speed = 100; // pixels per second
 					const newDuration = totalDistance / speed;
 
-					setAnimation({
+					return {
 						duration: newDuration,
-						animateX: [containerWidth, -(1.6 * announcementsWidth + labelWidth)]
-					});
+						from: `${containerWidth}px`,
+						to: `-${announcementsWidth + labelWidth}px`
+					};
 				}
 			}
+			return null;
 		};
 
 		const setupAnimations = () => {
-			calculateAnimation(
+			if (!isClient) return;
+
+			const desktopAnim = calculateAnimation(
 				desktopContainerRef,
 				desktopAnnouncementsRef,
-				desktopLabelRef,
-				setDesktopAnimation
+				desktopLabelRef
 			);
-			calculateAnimation(
+			if (desktopAnim) setDesktopAnimation(desktopAnim);
+
+			const mobileAnim = calculateAnimation(
 				mobileContainerRef,
 				mobileAnnouncementsRef,
-				mobileLabelRef,
-				setMobileAnimation
+				mobileLabelRef
 			);
+			if (mobileAnim) setMobileAnimation(mobileAnim);
 		};
 
 		setupAnimations();
-
 		window.addEventListener('resize', setupAnimations);
 		return () => window.removeEventListener('resize', setupAnimations);
-	}, []);
+	}, [isClient]);
+
+	const desktopKeyframes = `
+    @keyframes scrollDesktop {
+      from { transform: translateX(${desktopAnimation.from}); }
+      to { transform: translateX(${desktopAnimation.to}); }
+    }
+  `;
+
+	const mobileKeyframes = `
+    @keyframes scrollMobile {
+      from { transform: translateX(${mobileAnimation.from}); }
+      to { transform: translateX(${mobileAnimation.to}); }
+    }
+  `;
 
 	return (
 		<>
+			{isClient && (
+				<style>
+					{desktopKeyframes}
+					{mobileKeyframes}
+					{`.animation-paused { animation-play-state: paused !important; }`}
+				</style>
+			)}
 			{/* Desktop Announcements Bar */}
 			<motion.div
 				className='bg-gradient-to-r from-blue-800 to-blue-900 text-white py-2 overflow-hidden relative hidden md:block'
 				initial={{ y: -20, opacity: 0 }}
 				animate={{ y: 0, opacity: 1 }}
-				transition={{ duration: 0.5, delay: 0.2 }}>
+				transition={{ duration: 0.5, delay: 0.2 }}
+				onMouseEnter={() => setIsHovering(true)}
+				onMouseLeave={() => setIsHovering(false)}>
 				<div className='flex items-center'>
 					<div
 						ref={desktopLabelRef}
@@ -124,18 +154,18 @@ const ImportantAnnouncement = () => {
 						</span>
 					</div>
 					<div className='flex-1 overflow-hidden' ref={desktopContainerRef}>
-						<motion.div
+						<div
 							ref={desktopAnnouncementsRef}
-							className='flex items-center whitespace-nowrap'
-							animate={{
-								x: desktopAnimation.animateX
-							}}
-							transition={{
-								repeat: Infinity,
-								repeatType: 'loop',
-								duration: desktopAnimation.duration,
-								ease: 'linear'
-							}}>
+							className={`flex items-center whitespace-nowrap ${
+								isHovering ? 'animation-paused' : ''
+							}`}
+							style={
+								isClient
+									? {
+											animation: `scrollDesktop ${desktopAnimation.duration}s linear infinite`
+									  }
+									: {}
+							}>
 							{importantAnnouncements.map((announcement, index) => (
 								<Link
 									key={index}
@@ -144,7 +174,16 @@ const ImportantAnnouncement = () => {
 									{announcement.title}
 								</Link>
 							))}
-						</motion.div>
+							{importantAnnouncements.map((announcement, index) => (
+								<Link
+									key={`desktop-clone-${index}`}
+									href={announcement.href}
+									aria-hidden='true'
+									className='text-sm hover:text-yellow-300 transition-colors duration-200 mx-8 flex-shrink-0'>
+									{announcement.title}
+								</Link>
+							))}
+						</div>
 					</div>
 				</div>
 			</motion.div>
@@ -154,7 +193,9 @@ const ImportantAnnouncement = () => {
 				className='bg-gradient-to-r from-blue-600 to-blue-700 text-white py-2 overflow-hidden relative md:hidden'
 				initial={{ y: -20, opacity: 0 }}
 				animate={{ y: 0, opacity: 1 }}
-				transition={{ duration: 0.5, delay: 0.2 }}>
+				transition={{ duration: 0.5, delay: 0.2 }}
+				onMouseEnter={() => setIsHovering(true)}
+				onMouseLeave={() => setIsHovering(false)}>
 				<div className='flex items-center'>
 					<div
 						ref={mobileLabelRef}
@@ -165,18 +206,18 @@ const ImportantAnnouncement = () => {
 						</span>
 					</div>
 					<div className='flex-1 overflow-hidden' ref={mobileContainerRef}>
-						<motion.div
+						<div
 							ref={mobileAnnouncementsRef}
-							className='flex items-center whitespace-nowrap'
-							animate={{
-								x: mobileAnimation.animateX
-							}}
-							transition={{
-								repeat: Infinity,
-								repeatType: 'loop',
-								duration: mobileAnimation.duration,
-								ease: 'linear'
-							}}>
+							className={`flex items-center whitespace-nowrap ${
+								isHovering ? 'animation-paused' : ''
+							}`}
+							style={
+								isClient
+									? {
+											animation: `scrollMobile ${mobileAnimation.duration}s linear infinite`
+									  }
+									: {}
+							}>
 							{importantAnnouncements.map((announcement, index) => (
 								<Link
 									key={index}
@@ -185,7 +226,16 @@ const ImportantAnnouncement = () => {
 									{announcement.title}
 								</Link>
 							))}
-						</motion.div>
+							{importantAnnouncements.map((announcement, index) => (
+								<Link
+									key={`mobile-clone-${index}`}
+									href={announcement.href}
+									aria-hidden='true'
+									className='text-xs hover:text-yellow-300 transition-colors duration-200 mx-6 flex-shrink-0'>
+									{announcement.title}
+								</Link>
+							))}
+						</div>
 					</div>
 				</div>
 			</motion.div>
