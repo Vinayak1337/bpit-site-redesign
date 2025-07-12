@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import React, { useState, useRef, useEffect } from 'react';
+import { motion, useInView, useAnimation } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import {
@@ -155,57 +155,12 @@ const events = [
 	}
 ];
 
-const categoryConfig = {
-	Technology: {
-		gradient: 'from-blue-500 to-blue-600',
-		bgGradient: 'from-blue-50 to-blue-100',
-		darkGradient: 'from-blue-900 to-blue-800',
-		icon: <Zap className='w-5 h-5' />,
-		color: 'text-blue-600',
-		accentColor: 'bg-blue-500',
-		borderColor: 'border-blue-200',
-		glowColor: 'shadow-blue-500/25'
-	},
-	Cultural: {
-		gradient: 'from-red-500 to-red-600',
-		bgGradient: 'from-red-50 to-red-100',
-		darkGradient: 'from-red-900 to-red-800',
-		icon: <Palette className='w-5 h-5' />,
-		color: 'text-red-600',
-		accentColor: 'bg-red-500',
-		borderColor: 'border-red-200',
-		glowColor: 'shadow-red-500/25'
-	},
-	Professional: {
-		gradient: 'from-blue-500 to-blue-600',
-		bgGradient: 'from-blue-50 to-blue-100',
-		darkGradient: 'from-blue-900 to-blue-800',
-		icon: <Target className='w-5 h-5' />,
-		color: 'text-blue-600',
-		accentColor: 'bg-blue-500',
-		borderColor: 'border-blue-200',
-		glowColor: 'shadow-blue-500/25'
-	},
-	Academic: {
-		gradient: 'from-red-500 to-red-600',
-		bgGradient: 'from-red-50 to-red-100',
-		darkGradient: 'from-red-900 to-red-800',
-		icon: <Lightbulb className='w-5 h-5' />,
-		color: 'text-red-600',
-		accentColor: 'bg-red-500',
-		borderColor: 'border-red-200',
-		glowColor: 'shadow-red-500/25'
-	},
-	Networking: {
-		gradient: 'from-blue-500 to-blue-600',
-		bgGradient: 'from-blue-50 to-blue-100',
-		darkGradient: 'from-blue-900 to-blue-800',
-		icon: <Globe className='w-5 h-5' />,
-		color: 'text-blue-600',
-		accentColor: 'bg-blue-500',
-		borderColor: 'border-blue-200',
-		glowColor: 'shadow-blue-500/25'
-	}
+const categoryIcons = {
+	Technology: <Zap className='w-5 h-5' />,
+	Cultural: <Palette className='w-5 h-5' />,
+	Professional: <Target className='w-5 h-5' />,
+	Academic: <Lightbulb className='w-5 h-5' />,
+	Networking: <Globe className='w-5 h-5' />
 };
 
 const formatDate = (dateString: string) => {
@@ -218,21 +173,19 @@ const formatDate = (dateString: string) => {
 	};
 };
 
-const UltraEventCard = ({
+const EventCard = ({
 	event,
 	index
 }: {
 	event: (typeof events)[0];
 	index: number;
 }) => {
-	const [isHovered, setIsHovered] = useState(false);
 	const [isLiked, setIsLiked] = useState(false);
 	const [isBookmarked, setIsBookmarked] = useState(false);
 	const cardRef = useRef(null);
 	const isInView = useInView(cardRef, { once: true, margin: '-100px' });
 
 	const dateObj = formatDate(event.date);
-	const config = categoryConfig[event.category as keyof typeof categoryConfig];
 
 	return (
 		<motion.div
@@ -246,65 +199,54 @@ const UltraEventCard = ({
 			}}
 			whileHover={{
 				y: -10,
-				scale: 1.02,
 				transition: { duration: 0.3 }
 			}}
-			onHoverStart={() => setIsHovered(true)}
-			onHoverEnd={() => setIsHovered(false)}
 			className='relative group'>
 			<div
-				className={`
+				className='
 				relative overflow-hidden rounded-3xl bg-white/90 backdrop-blur-xl
-				border border-white/40 ${config.glowColor}
+				border border-white/40 shadow-lg
 				transform-gpu transition-all duration-500
-				${isHovered ? 'shadow-2xl shadow-black/10' : 'shadow-lg'}
-			`}>
-				<div
-					className={`absolute inset-0 bg-gradient-to-br ${config.bgGradient} opacity-30`}
-				/>
+				group-hover:shadow-2xl group-hover:shadow-black/10
+			'>
+				<div className='absolute inset-0 bg-gradient-to-br from-blue-50 to-blue-100 opacity-30' />
 
 				{event.featured && (
-					<motion.div
-						initial={{ scale: 0, rotate: -180 }}
-						animate={{ scale: 1, rotate: 0 }}
-						transition={{ delay: index * 0.2 + 0.5, type: 'spring' }}
-						className='absolute top-4 left-4 z-20'>
+					<div className='absolute top-4 left-4 z-20'>
 						<div className='flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-sm font-bold rounded-full shadow-lg'>
 							<Star className='w-4 h-4 fill-current' />
 							Featured
 						</div>
-					</motion.div>
+					</div>
 				)}
 
 				<div className='absolute top-4 right-4 z-20 flex gap-2'>
-					<motion.button
-						whileHover={{ scale: 1.1 }}
-						whileTap={{ scale: 0.9 }}
+					<button
 						onClick={() => setIsLiked(!isLiked)}
+						aria-label='Like event'
 						className={`p-2 rounded-full backdrop-blur-md transition-all duration-300 ${
 							isLiked
-								? 'bg-red-500 text-white shadow-lg'
+								? 'bg-blue-500 text-white shadow-lg'
 								: 'bg-white/80 text-gray-600 hover:bg-white'
 						}`}>
 						<Heart className={`w-4 h-4 ${isLiked ? 'fill-current' : ''}`} />
-					</motion.button>
-					<motion.button
-						whileHover={{ scale: 1.1 }}
-						whileTap={{ scale: 0.9 }}
+					</button>
+					<button
 						onClick={() => setIsBookmarked(!isBookmarked)}
+						aria-label='Bookmark event'
 						className={`p-2 rounded-full backdrop-blur-md transition-all duration-300 ${
 							isBookmarked
-								? `${config.accentColor} text-white shadow-lg`
+								? 'bg-blue-500 text-white shadow-lg'
 								: 'bg-white/80 text-gray-600 hover:bg-white'
 						}`}>
 						<Bookmark
 							className={`w-4 h-4 ${isBookmarked ? 'fill-current' : ''}`}
 						/>
-					</motion.button>
+					</button>
 				</div>
 
 				<div className='relative h-64 overflow-hidden'>
-					<div className='h-full transition-transform duration-300 hover:scale-105'>
+					<div className='h-full transition-transform duration-300 group-hover:scale-105'>
 						<Image
 							src={event.image}
 							alt={event.title}
@@ -313,18 +255,12 @@ const UltraEventCard = ({
 						/>
 					</div>
 
-					<div
-						className={`absolute inset-0 bg-gradient-to-t ${config.darkGradient} opacity-30`}
-					/>
+					<div className='absolute inset-0 bg-gradient-to-t from-blue-900 to-blue-800 opacity-30' />
 
-					<motion.div
-						initial={{ x: -100 }}
-						animate={{ x: 0 }}
-						transition={{ delay: index * 0.2 + 0.3 }}
-						className='absolute bottom-4 left-4'>
+					<div className='absolute bottom-4 left-4'>
 						<div className='bg-white/95 backdrop-blur-md rounded-2xl p-3 shadow-xl border border-white/40'>
 							<div className='text-center'>
-								<div className={`text-2xl font-bold ${config.color}`}>
+								<div className='text-2xl font-bold text-blue-600'>
 									{dateObj.day}
 								</div>
 								<div className='text-sm font-semibold text-gray-600'>
@@ -332,13 +268,9 @@ const UltraEventCard = ({
 								</div>
 							</div>
 						</div>
-					</motion.div>
+					</div>
 
-					<motion.div
-						initial={{ x: 100 }}
-						animate={{ x: 0 }}
-						transition={{ delay: index * 0.2 + 0.4 }}
-						className='absolute bottom-4 right-4'>
+					<div className='absolute bottom-4 right-4'>
 						<div className='flex items-center gap-1 px-3 py-1.5 bg-white/95 backdrop-blur-md rounded-full shadow-xl border border-white/40'>
 							<Star className='w-4 h-4 text-yellow-500 fill-current' />
 							<span className='text-sm font-bold text-gray-800'>
@@ -348,50 +280,35 @@ const UltraEventCard = ({
 								({event.totalRatings})
 							</span>
 						</div>
-					</motion.div>
+					</div>
 				</div>
 
 				<div className='relative p-6 space-y-4'>
-					<motion.div
-						initial={{ opacity: 0, scale: 0.8 }}
-						animate={{ opacity: 1, scale: 1 }}
-						transition={{ delay: index * 0.2 + 0.6 }}
-						className='flex items-center gap-2'>
-						<div
-							className={`p-2 rounded-xl bg-gradient-to-r ${config.gradient} text-white shadow-lg`}>
-							{config.icon}
+					<div className='flex items-center gap-2'>
+						<div className='p-2 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg'>
+							{categoryIcons[event.category as keyof typeof categoryIcons] || (
+								<Zap className='w-5 h-5' />
+							)}
 						</div>
-						<span
-							className={`text-sm font-bold ${config.color} bg-gradient-to-r ${config.gradient} bg-clip-text text-transparent`}>
+						<span className='text-sm font-bold text-blue-600 bg-gradient-to-r from-blue-500 to-blue-600 bg-clip-text'>
 							{event.category}
 						</span>
-					</motion.div>
+					</div>
 
-					<motion.div
-						initial={{ opacity: 0, y: 20 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ delay: index * 0.2 + 0.7 }}>
+					<div>
 						<h3 className='text-xl font-bold text-gray-900 mb-1 line-clamp-2'>
 							{event.title}
 						</h3>
 						<p className='text-sm font-medium text-gray-600'>
 							{event.subtitle}
 						</p>
-					</motion.div>
+					</div>
 
-					<motion.p
-						initial={{ opacity: 0, y: 20 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ delay: index * 0.2 + 0.8 }}
-						className='text-sm text-gray-600 leading-relaxed line-clamp-3'>
+					<p className='text-sm text-gray-600 leading-relaxed line-clamp-3'>
 						{event.description}
-					</motion.p>
+					</p>
 
-					<motion.div
-						initial={{ opacity: 0, y: 20 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ delay: index * 0.2 + 0.9 }}
-						className='space-y-2'>
+					<div className='space-y-2'>
 						<div className='flex items-center gap-2 text-sm text-gray-600'>
 							<Clock className='w-4 h-4' />
 							<span>{event.time}</span>
@@ -404,30 +321,22 @@ const UltraEventCard = ({
 							<Users className='w-4 h-4' />
 							<span>{event.attendees} attendees</span>
 						</div>
-					</motion.div>
+					</div>
 
-					<motion.div
-						initial={{ opacity: 0, y: 20 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ delay: index * 0.2 + 1.0 }}
-						className='flex flex-wrap gap-2'>
+					<div className='flex flex-wrap gap-2'>
 						{event.highlights.map((highlight, i) => (
 							<span
 								key={i}
-								className={`px-3 py-1 text-xs font-medium rounded-full bg-gradient-to-r ${config.gradient} text-white shadow-md`}>
+								className='px-3 py-1 text-xs font-medium rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'>
 								{highlight}
 							</span>
 						))}
-					</motion.div>
+					</div>
 
-					<motion.div
-						initial={{ opacity: 0, scale: 0.8 }}
-						animate={{ opacity: 1, scale: 1 }}
-						transition={{ delay: index * 0.2 + 1.1 }}
-						className='pt-4'>
+					<div className='pt-4'>
 						<motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
 							<Button
-								className={`w-full bg-gradient-to-r ${config.gradient} hover:shadow-xl text-white border-0 rounded-2xl py-3 font-bold transition-all duration-300`}
+								className='w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:shadow-xl text-white border-0 rounded-2xl py-3 font-bold transition-all duration-300'
 								disabled={!event.registrationOpen}>
 								{event.registrationOpen ? (
 									<>
@@ -443,110 +352,102 @@ const UltraEventCard = ({
 								)}
 							</Button>
 						</motion.div>
-					</motion.div>
+					</div>
 				</div>
 			</div>
 		</motion.div>
 	);
 };
 
-export default function UltraModernEventsSection() {
+export default function EventsSection() {
 	const sectionRef = useRef(null);
-	const [isPaused, setIsPaused] = useState(false);
+	const controls = useAnimation();
+	const [isHovering, setIsHovering] = useState(false);
 
-	const CARD_WIDTH = 400;
-	const SCROLL_DISTANCE = events.length * CARD_WIDTH;
+	const CARD_WIDTH = 360;
+	const GAP = 24;
+	const DURATION = events.length * 2;
+
+	useEffect(() => {
+		const animation = () => {
+			const scrollWidth = events.length * (CARD_WIDTH + GAP);
+			controls.start({
+				x: -scrollWidth,
+				transition: {
+					duration: DURATION,
+					ease: 'linear',
+					repeat: Infinity,
+					repeatType: 'loop'
+				}
+			});
+		};
+
+		if (!isHovering) {
+			animation();
+		} else {
+			controls.stop();
+		}
+	}, [isHovering, controls, DURATION]);
 
 	return (
-		<>
-			<style
-				dangerouslySetInnerHTML={{
-					__html: `
-						@keyframes scroll-left-events {
-							0% {
-								transform: translateX(0);
-							}
-							100% {
-								transform: translateX(-${SCROLL_DISTANCE}px);
-							}
-						}
-						.scroll-left-animation {
-							animation: scroll-left-events ${events.length * 4}s linear infinite;
-						}
-						.scroll-paused {
-							animation-play-state: paused;
-						}
-					`
-				}}
-			/>
+		<section
+			ref={sectionRef}
+			className='relative py-32 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 overflow-hidden'>
+			<div className='absolute inset-0'>
+				<div className='absolute top-20 left-10 w-[300px] h-[300px] bg-blue-300/10 rounded-full mix-blend-multiply filter blur-2xl' />
+				<div className='absolute top-40 right-10 w-[250px] h-[250px] bg-red-300/10 rounded-full mix-blend-multiply filter blur-2xl' />
+			</div>
 
-			<section
-				ref={sectionRef}
-				className='relative py-32 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 overflow-hidden'>
-				<div className='absolute inset-0'>
-					<div className='absolute top-20 left-10 w-[300px] h-[300px] bg-blue-300/10 rounded-full mix-blend-multiply filter blur-2xl' />
-					<div className='absolute top-40 right-10 w-[250px] h-[250px] bg-red-300/10 rounded-full mix-blend-multiply filter blur-2xl' />
-				</div>
-
-				<div className='relative z-10 container mx-auto px-4'>
-					<div className='max-w-7xl mx-auto'>
-						<div className='flex items-center justify-between mb-8'>
-							<div className='flex items-center gap-3'>
-								<div className='p-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl shadow-lg'>
-									<Calendar className='w-6 h-6' />
-								</div>
-								<div>
-									<h3 className='text-2xl font-bold text-gray-800'>
-										Official Events
-									</h3>
-									<p className='text-gray-600'>
-										Latest campus events and activities
-									</p>
-								</div>
+			<div className='relative z-10 container mx-auto px-4'>
+				<div className='max-w-7xl mx-auto'>
+					<div className='flex items-center justify-between mb-8'>
+						<div className='flex items-center gap-3'>
+							<div className='p-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl shadow-lg'>
+								<Calendar className='w-6 h-6' />
 							</div>
-
-							<motion.button
-								className='group flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300'
-								whileHover={{ scale: 1.05, x: 5 }}
-								whileTap={{ scale: 0.95 }}>
-								<span className='font-semibold'>View All Events</span>
-								<ArrowRight className='w-5 h-5 group-hover:translate-x-1 transition-transform' />
-							</motion.button>
-						</div>
-
-						<div
-							className='relative overflow-hidden rounded-2xl'
-							onMouseEnter={() => setIsPaused(true)}
-							onMouseLeave={() => setIsPaused(false)}>
-							{/* Gradient masks for seamless edge effect */}
-							<div className='absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-slate-50 via-blue-50/80 to-transparent z-10 pointer-events-none' />
-							<div className='absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-indigo-50 via-blue-50/80 to-transparent z-10 pointer-events-none' />
-
-							{/* Scrolling Container */}
-							<div
-								className={`flex gap-6 scroll-left-animation ${
-									isPaused ? 'scroll-paused' : ''
-								}`}
-								style={{ width: `${events.length * CARD_WIDTH * 2}px` }}>
-								{/* Duplicate events for seamless infinite scroll */}
-								{[...events, ...events].map((event, index) => (
-									<motion.div
-										key={`${event.id}-${Math.floor(index / events.length)}`}
-										className='w-[360px] flex-shrink-0'
-										initial={{ opacity: 1, scale: 1 }}
-										whileHover={{ scale: 1.02 }}
-										transition={{ duration: 0.3 }}>
-										<UltraEventCard
-											event={event}
-											index={index % events.length}
-										/>
-									</motion.div>
-								))}
+							<div>
+								<h3 className='text-2xl font-bold text-gray-800'>
+									Official Events
+								</h3>
+								<p className='text-gray-600'>
+									Latest campus events and activities
+								</p>
 							</div>
 						</div>
+
+						<motion.button
+							className='group flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300'
+							whileHover={{ scale: 1.05, x: 5 }}
+							whileTap={{ scale: 0.95 }}>
+							<span className='font-semibold'>View All Events</span>
+							<ArrowRight className='w-5 h-5 group-hover:translate-x-1 transition-transform' />
+						</motion.button>
+					</div>
+
+					<div
+						className='relative overflow-hidden rounded-2xl'
+						onMouseEnter={() => setIsHovering(true)}
+						onMouseLeave={() => setIsHovering(false)}>
+						<div className='absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-slate-50 via-blue-50/80 to-transparent z-10 pointer-events-none' />
+						<div className='absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-indigo-50 via-blue-50/80 to-transparent z-10 pointer-events-none' />
+
+						<motion.div
+							className='flex gap-6'
+							animate={controls}
+							style={{
+								width: `${(CARD_WIDTH + GAP) * events.length * 2}px`
+							}}>
+							{events.map((event, index) => (
+								<motion.div
+									key={`${event.id}-${index}`}
+									className='w-[360px] flex-shrink-0'>
+									<EventCard event={event} index={index % events.length} />
+								</motion.div>
+							))}
+						</motion.div>
 					</div>
 				</div>
-			</section>
-		</>
+			</div>
+		</section>
 	);
 }

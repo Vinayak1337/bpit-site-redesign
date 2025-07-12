@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import Header from '@/components/header/header';
-import AdvancedFooterSolidBlue from '@/components/footer/AdvancedFooterSolidBlue';
+import Footer from '@/components/footer/ModernBPITFooter';
 import EnquiryPopup from '@/components/pop-up/enquiry-popup';
 
 const geistSans = Geist({
@@ -115,7 +115,7 @@ export default function RootLayout({
 				className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}>
 				<Header />
 				{children}
-				<AdvancedFooterSolidBlue />
+				<Footer />
 				<EnquiryPopup />
 			</body>
 		</html>

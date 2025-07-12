@@ -32,9 +32,17 @@ const ModernBPITFooter = () => {
 	const [isVisible, setIsVisible] = useState(false);
 	const [showScrollTop, setShowScrollTop] = useState(false);
 	const [isMobile, setIsMobile] = useState(false);
+	const [isClient, setIsClient] = useState(false);
 
-	// Check if we're on client side and screen size
+	// Check if we're on client side
 	useEffect(() => {
+		setIsClient(true);
+	}, []);
+
+	// Check screen size only on client side
+	useEffect(() => {
+		if (!isClient) return;
+
 		const checkMobile = () => {
 			setIsMobile(window.innerWidth < 768);
 		};
@@ -43,10 +51,12 @@ const ModernBPITFooter = () => {
 		window.addEventListener('resize', checkMobile);
 
 		return () => window.removeEventListener('resize', checkMobile);
-	}, []);
+	}, [isClient]);
 
 	// Scroll visibility effect
 	useEffect(() => {
+		if (!isClient) return;
+
 		const observer = new IntersectionObserver(
 			([entry]) => {
 				setIsVisible(entry.isIntersecting);
@@ -70,7 +80,7 @@ const ModernBPITFooter = () => {
 			if (footerElement) observer.unobserve(footerElement);
 			window.removeEventListener('scroll', handleScroll);
 		};
-	}, []);
+	}, [isClient]);
 
 	const quickLinks = [
 		{
@@ -178,7 +188,9 @@ const ModernBPITFooter = () => {
 	];
 
 	const scrollToTop = () => {
-		window.scrollTo({ top: 0, behavior: 'smooth' });
+		if (typeof window !== 'undefined') {
+			window.scrollTo({ top: 0, behavior: 'smooth' });
+		}
 	};
 
 	const toggleMobileSection = (section: string) => {
@@ -215,29 +227,30 @@ const ModernBPITFooter = () => {
 
 				{/* Floating Particles */}
 				<div className='absolute inset-0 overflow-hidden pointer-events-none'>
-					{[...Array(20)].map((_, i) => (
-						<motion.div
-							key={i}
-							className='absolute w-1 h-1 bg-white/20 rounded-full'
-							style={{
-								left: `${Math.random() * 100}%`,
-								top: `${Math.random() * 100}%`
-							}}
-							animate={{
-								y: [0, -30, 0],
-								opacity: [0.2, 1, 0.2]
-							}}
-							transition={{
-								duration: 3 + Math.random() * 2,
-								repeat: Infinity,
-								delay: Math.random() * 2
-							}}
-						/>
-					))}
+					{isClient &&
+						[...Array(20)].map((_, i) => (
+							<motion.div
+								key={i}
+								className='absolute w-1 h-1 bg-white/20 rounded-full'
+								style={{
+									left: `${Math.random() * 100}%`,
+									top: `${Math.random() * 100}%`
+								}}
+								animate={{
+									y: [0, -30, 0],
+									opacity: [0.2, 1, 0.2]
+								}}
+								transition={{
+									duration: 3 + Math.random() * 2,
+									repeat: Infinity,
+									delay: Math.random() * 2
+								}}
+							/>
+						))}
 				</div>
 
 				{/* Top Border Accent */}
-				<div className='absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 via-purple-500 to-blue-400' />
+				<div className='absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 via-red-500 to-blue-400' />
 
 				{/* Main Content */}
 				<div className='relative z-10 container mx-auto px-4 py-16'>
@@ -565,7 +578,7 @@ const ModernBPITFooter = () => {
 				</div>
 
 				{/* Bottom Gradient */}
-				<div className='absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 via-purple-500 to-blue-400' />
+				{/* <div className='absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 via-red-500 to-blue-400' /> */}
 			</footer>
 		</>
 	);
