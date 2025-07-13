@@ -36,12 +36,12 @@ interface Hero2Props {
 
 const getIcon = (iconName: string) => {
 	const icons: { [key: string]: React.ReactNode } = {
-		BookOpen: <BookOpen className='w-8 h-8' />,
-		Users: <Users className='w-8 h-8' />,
-		Trophy: <Trophy className='w-8 h-8' />,
-		Building: <Building className='w-8 h-8' />
+		BookOpen: <BookOpen className='w-6 h-6 sm:w-8 sm:h-8' />,
+		Users: <Users className='w-6 h-6 sm:w-8 sm:h-8' />,
+		Trophy: <Trophy className='w-6 h-6 sm:w-8 sm:h-8' />,
+		Building: <Building className='w-6 h-6 sm:w-8 sm:h-8' />
 	};
-	return icons[iconName] || <BookOpen className='w-8 h-8' />;
+	return icons[iconName] || <BookOpen className='w-6 h-6 sm:w-8 sm:h-8' />;
 };
 
 const Hero2 = ({ data }: Hero2Props) => {
@@ -108,7 +108,7 @@ const Hero2 = ({ data }: Hero2Props) => {
 
 			{/* Content */}
 			<div className='relative z-10 h-full flex items-center'>
-				<div className='container mx-auto px-4'>
+				<div className='container mx-auto px-4 sm:px-6 lg:px-8'>
 					<div className='max-w-4xl mx-auto text-center text-white'>
 						<AnimatePresence mode='wait'>
 							<motion.div
@@ -117,14 +117,14 @@ const Hero2 = ({ data }: Hero2Props) => {
 								animate={{ opacity: 1, y: 0 }}
 								exit={{ opacity: 0, y: -50 }}
 								transition={{ duration: 0.6 }}
-								className='space-y-6'>
+								className='space-y-4 sm:space-y-6'>
 								{/* Icon */}
 								<motion.div
 									initial={{ scale: 0 }}
 									animate={{ scale: 1 }}
 									transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-									className='flex justify-center mb-6'>
-									<div className='p-4 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20'>
+									className='flex justify-center mb-4 sm:mb-6'>
+									<div className='p-3 sm:p-4 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20'>
 										{getIcon(slides[currentSlide].icon)}
 									</div>
 								</motion.div>
@@ -134,7 +134,7 @@ const Hero2 = ({ data }: Hero2Props) => {
 									initial={{ opacity: 0, scale: 0.8 }}
 									animate={{ opacity: 1, scale: 1 }}
 									transition={{ delay: 0.3 }}
-									className='inline-block px-4 py-2 bg-blue-500/20 backdrop-blur-sm rounded-full text-sm font-medium border border-blue-400/30'>
+									className='inline-block px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-500/20 backdrop-blur-sm rounded-full text-xs sm:text-sm font-medium border border-blue-400/30'>
 									{slides[currentSlide].stats}
 								</motion.div>
 
@@ -143,7 +143,7 @@ const Hero2 = ({ data }: Hero2Props) => {
 									initial={{ opacity: 0, y: 30 }}
 									animate={{ opacity: 1, y: 0 }}
 									transition={{ delay: 0.4 }}
-									className='text-5xl md:text-7xl font-bold mb-4'>
+									className='text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-3 sm:mb-4 leading-tight'>
 									{slides[currentSlide].title}
 								</motion.h2>
 
@@ -152,7 +152,7 @@ const Hero2 = ({ data }: Hero2Props) => {
 									initial={{ opacity: 0, y: 20 }}
 									animate={{ opacity: 1, y: 0 }}
 									transition={{ delay: 0.5 }}
-									className='text-xl md:text-2xl text-blue-200 font-medium mb-6'>
+									className='text-base sm:text-lg md:text-xl lg:text-2xl text-blue-200 font-medium mb-4 sm:mb-6'>
 									{slides[currentSlide].subtitle}
 								</motion.p>
 
@@ -161,7 +161,7 @@ const Hero2 = ({ data }: Hero2Props) => {
 									initial={{ opacity: 0, y: 20 }}
 									animate={{ opacity: 1, y: 0 }}
 									transition={{ delay: 0.6 }}
-									className='text-lg md:text-xl text-gray-200 max-w-3xl mx-auto leading-relaxed mb-8'>
+									className='text-sm sm:text-base md:text-lg lg:text-xl text-gray-200 max-w-3xl mx-auto leading-relaxed mb-6 sm:mb-8 px-2 sm:px-0'>
 									{slides[currentSlide].description}
 								</motion.p>
 
@@ -170,12 +170,12 @@ const Hero2 = ({ data }: Hero2Props) => {
 									initial={{ opacity: 0, y: 20 }}
 									animate={{ opacity: 1, y: 0 }}
 									transition={{ delay: 0.7 }}
-									className='flex flex-col sm:flex-row gap-4 justify-center'>
+									className='flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center'>
 									<Button
 										size='lg'
-										className='bg-white text-blue-900 hover:bg-blue-50 px-8 py-4 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 group'>
+										className='bg-white text-blue-900 hover:bg-blue-50 px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 group text-sm sm:text-base'>
 										Learn More
-										<ArrowRight className='ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform' />
+										<ArrowRight className='ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform' />
 									</Button>
 								</motion.div>
 							</motion.div>
@@ -188,34 +188,34 @@ const Hero2 = ({ data }: Hero2Props) => {
 			<button
 				onClick={prevSlide}
 				aria-label='Previous slide'
-				className='absolute left-4 top-1/2 transform -translate-y-1/2 z-20 p-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 text-white hover:bg-white/20 transition-all duration-300 group'>
-				<ChevronLeft className='w-6 h-6 group-hover:-translate-x-1 transition-transform' />
+				className='absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 z-20 p-2 sm:p-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 text-white hover:bg-white/20 transition-all duration-300 group'>
+				<ChevronLeft className='w-5 h-5 sm:w-6 sm:h-6 group-hover:-translate-x-1 transition-transform' />
 			</button>
 			<button
 				onClick={nextSlide}
 				aria-label='Next slide'
-				className='absolute right-4 top-1/2 transform -translate-y-1/2 z-20 p-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 text-white hover:bg-white/20 transition-all duration-300 group'>
-				<ChevronRight className='w-6 h-6 group-hover:translate-x-1 transition-transform' />
+				className='absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 z-20 p-2 sm:p-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 text-white hover:bg-white/20 transition-all duration-300 group'>
+				<ChevronRight className='w-5 h-5 sm:w-6 sm:h-6 group-hover:translate-x-1 transition-transform' />
 			</button>
 
 			{/* Slide Indicators */}
-			<div className='absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 flex space-x-3'>
+			<div className='absolute bottom-6 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-20 flex space-x-2 sm:space-x-3'>
 				{slides.map((_, index) => (
 					<button
 						key={index}
 						onClick={() => goToSlide(index)}
 						aria-label={`Go to slide ${index + 1}`}
-						className={`h-3 transition-all duration-300 ${
+						className={`h-2 sm:h-3 transition-all duration-300 ${
 							index === currentSlide
-								? 'w-8 bg-white rounded-lg'
-								: 'w-3 bg-white/50 hover:bg-white/75 rounded-full'
+								? 'w-6 sm:w-8 bg-white rounded-lg'
+								: 'w-2 sm:w-3 bg-white/50 hover:bg-white/75 rounded-full'
 						}`}
 					/>
 				))}
 			</div>
 
 			{/* Progress Bar */}
-			<div className='absolute bottom-0 left-0 w-full h-1 bg-white/20'>
+			<div className='absolute bottom-0 left-0 w-full h-0.5 sm:h-1 bg-white/20'>
 				<motion.div
 					className='h-full bg-white'
 					initial={{ width: '0%' }}
@@ -232,7 +232,7 @@ const Hero2 = ({ data }: Hero2Props) => {
 			{/* Floating Elements */}
 			<div className='absolute inset-0 pointer-events-none overflow-hidden'>
 				<motion.div
-					className='absolute top-1/4 left-1/4 w-2 h-2 bg-white/30 rounded-full'
+					className='absolute top-1/4 left-1/4 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white/30 rounded-full'
 					animate={{
 						y: [0, -20, 0],
 						opacity: [0.3, 1, 0.3]
@@ -256,7 +256,7 @@ const Hero2 = ({ data }: Hero2Props) => {
 					}}
 				/>
 				<motion.div
-					className='absolute bottom-1/3 left-1/5 w-1.5 h-1.5 bg-white/40 rounded-full'
+					className='absolute bottom-1/3 left-1/5 w-1 h-1 sm:w-1.5 sm:h-1.5 bg-white/40 rounded-full'
 					animate={{
 						y: [0, -25, 0],
 						opacity: [0.4, 1, 0.4]

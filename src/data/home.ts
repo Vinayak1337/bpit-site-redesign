@@ -76,7 +76,7 @@ export const homeHero2Data = {
 	]
 };
 
-export const homeNoticesData = {
+export const homeNoticesData: NoticesSectionData = {
 	notices: [
 		{
 			id: 1,
@@ -159,6 +159,22 @@ export const homeNoticesData = {
 			views: 620,
 			pinned: false,
 			urgent: false
+		},
+		{
+			id: 3,
+			category: 'Admission' as const,
+			title: 'Last date for semester registration extended',
+			subtitle: 'Extended deadline for course registration',
+			date: '2024-12-24',
+			time: '5:00 PM',
+			image: '/events/img1.png',
+			priority: 'high' as const,
+			tags: ['Registration', 'Deadline', 'Extension'],
+			description:
+				'The deadline for semester registration has been extended by one week. Students who have not yet registered are advised to complete the process immediately.',
+			views: 2100,
+			pinned: true,
+			urgent: true
 		}
 	]
 };

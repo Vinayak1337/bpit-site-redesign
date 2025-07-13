@@ -138,7 +138,7 @@ const ImportantAnnouncement = () => {
 			)}
 			{/* Desktop Announcements Bar */}
 			<motion.div
-				className='bg-gradient-to-r from-blue-800 to-blue-900 text-white py-2 overflow-hidden relative hidden md:block'
+				className='bg-gradient-to-r from-blue-800 to-blue-900 text-white py-2 lg:py-3 overflow-hidden relative hidden md:block'
 				initial={{ y: -20, opacity: 0 }}
 				animate={{ y: 0, opacity: 1 }}
 				transition={{ duration: 0.5, delay: 0.2 }}
@@ -147,10 +147,11 @@ const ImportantAnnouncement = () => {
 				<div className='flex items-center'>
 					<div
 						ref={desktopLabelRef}
-						className='flex-shrink-0 px-4 font-semibold text-sm border-r border-blue-400'>
+						className='flex-shrink-0 px-4 lg:px-6 font-semibold text-sm border-r border-blue-400'>
 						<span className='flex items-center gap-2'>
 							<Bell className='w-4 h-4' />
-							Important Announcements:
+							<span className='hidden lg:inline'>Important Announcements:</span>
+							<span className='lg:hidden'>News:</span>
 						</span>
 					</div>
 					<div className='flex-1 overflow-hidden' ref={desktopContainerRef}>
@@ -170,7 +171,7 @@ const ImportantAnnouncement = () => {
 								<Link
 									key={index}
 									href={announcement.href}
-									className='text-sm hover:text-yellow-300 transition-colors duration-200 mx-8 flex-shrink-0'>
+									className='text-sm lg:text-base hover:text-yellow-300 transition-colors duration-200 mx-6 lg:mx-8 flex-shrink-0'>
 									{announcement.title}
 								</Link>
 							))}
@@ -179,7 +180,7 @@ const ImportantAnnouncement = () => {
 									key={`desktop-clone-${index}`}
 									href={announcement.href}
 									aria-hidden='true'
-									className='text-sm hover:text-yellow-300 transition-colors duration-200 mx-8 flex-shrink-0'>
+									className='text-sm lg:text-base hover:text-yellow-300 transition-colors duration-200 mx-6 lg:mx-8 flex-shrink-0'>
 									{announcement.title}
 								</Link>
 							))}
@@ -190,7 +191,7 @@ const ImportantAnnouncement = () => {
 
 			{/* Mobile Announcements Bar */}
 			<motion.div
-				className='bg-gradient-to-r from-blue-600 to-blue-700 text-white py-2 overflow-hidden relative md:hidden'
+				className='bg-gradient-to-r from-blue-600 to-blue-700 text-white py-2 sm:py-3 overflow-hidden relative md:hidden'
 				initial={{ y: -20, opacity: 0 }}
 				animate={{ y: 0, opacity: 1 }}
 				transition={{ duration: 0.5, delay: 0.2 }}
@@ -199,10 +200,11 @@ const ImportantAnnouncement = () => {
 				<div className='flex items-center'>
 					<div
 						ref={mobileLabelRef}
-						className='flex-shrink-0 px-3 font-semibold text-xs border-r border-blue-400'>
-						<span className='flex items-center gap-1'>
-							<Bell className='w-3 h-3' />
-							News:
+						className='flex-shrink-0 px-3 sm:px-4 font-semibold text-xs sm:text-sm border-r border-blue-400'>
+						<span className='flex items-center gap-1 sm:gap-2'>
+							<Bell className='w-3 h-3 sm:w-4 sm:h-4' />
+							<span className='hidden sm:inline'>News:</span>
+							<span className='sm:hidden'>📢</span>
 						</span>
 					</div>
 					<div className='flex-1 overflow-hidden' ref={mobileContainerRef}>
@@ -222,7 +224,7 @@ const ImportantAnnouncement = () => {
 								<Link
 									key={index}
 									href={announcement.href}
-									className='text-xs hover:text-yellow-300 transition-colors duration-200 mx-6 flex-shrink-0'>
+									className='text-xs sm:text-sm hover:text-yellow-300 transition-colors duration-200 mx-4 sm:mx-6 flex-shrink-0 py-1'>
 									{announcement.title}
 								</Link>
 							))}
@@ -231,7 +233,7 @@ const ImportantAnnouncement = () => {
 									key={`mobile-clone-${index}`}
 									href={announcement.href}
 									aria-hidden='true'
-									className='text-xs hover:text-yellow-300 transition-colors duration-200 mx-6 flex-shrink-0'>
+									className='text-xs sm:text-sm hover:text-yellow-300 transition-colors duration-200 mx-4 sm:mx-6 flex-shrink-0 py-1'>
 									{announcement.title}
 								</Link>
 							))}

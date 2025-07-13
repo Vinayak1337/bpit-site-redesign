@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useAnimate } from 'framer-motion';
 import Image from 'next/image';
 import {
 	Bell,
@@ -17,60 +17,10 @@ import {
 	Filter,
 	ExternalLink,
 	Pin,
-	Eye
+	Eye,
+	Megaphone
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-
-type Priority = 'high' | 'medium' | 'low';
-type Category =
-	| 'Academic'
-	| 'Financial Aid'
-	| 'Admission'
-	| 'Innovation'
-	| 'Sports'
-	| 'Library'
-	| 'General';
-
-interface Notice {
-	id: number;
-	category: Category;
-	title: string;
-	subtitle: string;
-	date: string;
-	time: string;
-	image: string;
-	priority: Priority;
-	tags: string[];
-	description: string;
-	views: number;
-	pinned: boolean;
-	urgent: boolean;
-}
-
-interface Announcement {
-	id: number;
-	category: Category;
-	title: string;
-	subtitle: string;
-	date: string;
-	time: string;
-	image: string;
-	priority: Priority;
-	tags: string[];
-	description: string;
-	views: number;
-	pinned: boolean;
-	urgent: boolean;
-}
-
-interface NoticesSectionData {
-	notices: Notice[];
-	announcements: Announcement[];
-}
-
-interface NoticesSectionProps {
-	data: NoticesSectionData;
-}
 
 const getCategoryConfig = (category: Category) => {
 	const configs = {
@@ -184,7 +134,7 @@ const NoticeCard = ({ item, index }: { item: Notice; index: number }) => {
 			className='group relative'
 			onMouseEnter={() => setIsHovered(true)}
 			onMouseLeave={() => setIsHovered(false)}>
-			<div className='relative overflow-hidden rounded-2xl bg-white/90 backdrop-blur-xl border border-white/40 shadow-lg hover:shadow-xl transition-all duration-500 hover:-translate-y-1'>
+			<div className='relative overflow-hidden rounded-2xl bg-white/90 backdrop-blur-xl border border-white/40 shadow-sm md:shadow-lg hover:shadow-xl transition-all duration-500 hover:-translate-y-1'>
 				{/* Priority Indicator */}
 				{item.priority === 'high' && (
 					<div className='absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500 to-rose-600' />
@@ -209,7 +159,7 @@ const NoticeCard = ({ item, index }: { item: Notice; index: number }) => {
 						initial={{ opacity: 0 }}
 						animate={{ opacity: 1 }}
 						transition={{ delay: 0.3 }}
-						className='absolute top-3 left-3 z-10'>
+						className='absolute top-3 left-3 z-10 hidden md:block'>
 						<div className='bg-gradient-to-r from-red-500 to-red-600 text-white px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1'>
 							<div className='w-2 h-2 bg-white rounded-full animate-pulse' />
 							Urgent
@@ -217,11 +167,11 @@ const NoticeCard = ({ item, index }: { item: Notice; index: number }) => {
 					</motion.div>
 				)}
 
-				<div className='p-6'>
+				<div className='p-4 sm:p-6'>
 					{/* Header */}
-					<div className='flex items-start gap-4 mb-4'>
+					<div className='flex items-start gap-3 sm:gap-4 mb-3 sm:mb-4'>
 						{/* Image */}
-						<div className='relative w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 border-2 border-white shadow-lg'>
+						<div className='relative w-10 h-10 sm:w-12 sm:h-12 rounded-xl overflow-hidden flex-shrink-0 border-2 border-white shadow-lg'>
 							<Image
 								src={item.image}
 								alt={item.title}
@@ -232,34 +182,44 @@ const NoticeCard = ({ item, index }: { item: Notice; index: number }) => {
 
 						{/* Content Header */}
 						<div className='flex-1 min-w-0'>
-							<div className='flex items-center gap-2 mb-2'>
+							<div className='flex flex-row flex-wrap items-center gap-1.5 mb-2'>
+								{item.urgent && (
+									<div className='md:hidden bg-red-500 text-white px-2 py-0.5 rounded-full text-xs font-bold flex items-center gap-1'>
+										<div className='w-1.5 h-1.5 bg-white rounded-full animate-pulse' />
+										<span>Urgent</span>
+									</div>
+								)}
 								<div
 									className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${categoryConfig.bg} ${categoryConfig.border} ${categoryConfig.text} border`}>
 									{categoryConfig.icon}
-									{item.category}
+									<span className='hidden sm:inline'>{item.category}</span>
+									<span className='sm:hidden'>{item.category.slice(0, 3)}</span>
 								</div>
 								<div
 									className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${priorityConfig.bg} ${priorityConfig.border} ${priorityConfig.text} border`}>
-									{priorityConfig.label}
+									<span className='hidden sm:inline'>
+										{priorityConfig.label}
+									</span>
+									<span className='sm:hidden'>{item.priority}</span>
 								</div>
 							</div>
 
-							<h3 className='font-bold text-gray-800 text-sm leading-tight mb-1 line-clamp-2 group-hover:text-gray-900 transition-colors duration-300'>
+							<h3 className='font-bold text-gray-800 text-xs sm:text-sm leading-tight mb-1 line-clamp-2 group-hover:text-gray-900 transition-colors duration-300'>
 								{item.title}
 							</h3>
-							<p className='text-xs text-gray-600 font-medium leading-relaxed'>
+							<p className='text-xs text-gray-500 font-medium leading-relaxed line-clamp-1'>
 								{item.subtitle}
 							</p>
 						</div>
 					</div>
 
 					{/* Description */}
-					<p className='text-gray-600 text-sm leading-relaxed line-clamp-2 mb-4'>
+					<p className='text-gray-600 text-xs sm:text-sm leading-relaxed line-clamp-2 mb-3 sm:mb-4'>
 						{item.description}
 					</p>
 
 					{/* Tags */}
-					<div className='flex flex-wrap gap-1 mb-4'>
+					<div className='flex flex-wrap gap-1 mb-3 sm:mb-4'>
 						{item.tags.slice(0, 3).map((tag, tagIndex) => (
 							<span
 								key={tagIndex}
@@ -275,17 +235,22 @@ const NoticeCard = ({ item, index }: { item: Notice; index: number }) => {
 					</div>
 
 					{/* Footer */}
-					<div className='flex items-center justify-between pt-4 border-t border-gray-100'>
-						<div className='flex items-center gap-4 text-xs text-gray-500'>
+					<div className='flex items-center justify-between pt-3 sm:pt-4 border-t border-gray-100'>
+						<div className='flex items-center gap-3 text-xs text-gray-500 sm:gap-4'>
 							<div className='flex items-center gap-1'>
 								<Calendar className='w-3 h-3' />
-								<span>{formatDate(item.date)}</span>
+								<span className='hidden sm:inline'>
+									{formatDate(item.date)}
+								</span>
+								<span className='sm:hidden'>
+									{formatDate(item.date).split(' ')[0]}
+								</span>
 							</div>
 							<div className='flex items-center gap-1'>
 								<Clock className='w-3 h-3' />
 								<span>{item.time}</span>
 							</div>
-							<div className='flex items-center gap-1'>
+							<div className='items-center gap-1 hidden sm:flex'>
 								<Eye className='w-3 h-3' />
 								<span>{item.views}</span>
 							</div>
@@ -316,81 +281,220 @@ const NoticeCard = ({ item, index }: { item: Notice; index: number }) => {
 const ScrollingSection = ({
 	title,
 	items,
-	icon,
-	gradient
+	icon
 }: {
 	title: string;
 	items: Notice[];
 	icon: React.ReactNode;
-	gradient: string;
 }) => {
+	const [scope, animate] = useAnimate();
+	const [isHovered, setIsHovered] = useState(false);
+	const containerRef = useRef<HTMLDivElement>(null);
+	const animationRef = useRef<ReturnType<typeof animate> | null>(null);
+	const currentPositionRef = useRef(0);
+
+	// Card dimensions - responsive based on screen size
+	const getCardWidth = () => {
+		if (typeof window !== 'undefined') {
+			if (window.innerWidth >= 1024) return 360; // lg breakpoint
+			if (window.innerWidth >= 640) return 320; // sm breakpoint
+			return 260; // mobile - smaller for better fit
+		}
+		return 360; // fallback
+	};
+
+	const [cardWidth, setCardWidth] = useState(getCardWidth());
+	const getCardGap = () => {
+		if (typeof window !== 'undefined') {
+			if (window.innerWidth >= 1024) return 24; // lg breakpoint
+			if (window.innerWidth >= 640) return 16; // sm breakpoint
+			return 12; // mobile
+		}
+		return 24; // fallback
+	};
+	const [cardGap, setCardGap] = useState(getCardGap());
+	const cardWithGap = cardWidth + cardGap;
+	const totalCardsWidth = items.length * cardWithGap * 2;
+	const speed = 160; // pixels per second
+
+	// Update card width and gap on resize
+	useEffect(() => {
+		const handleResize = () => {
+			setCardWidth(getCardWidth());
+			setCardGap(getCardGap());
+		};
+
+		window.addEventListener('resize', handleResize);
+		return () => window.removeEventListener('resize', handleResize);
+	}, []);
+
+	useEffect(() => {
+		if (!scope.current || !containerRef.current) return;
+
+		const containerWidth = containerRef.current.offsetWidth;
+
+		const startPosition = (containerWidth - cardWidth) / 2;
+
+		animate(scope.current, { x: startPosition }, { duration: 0 });
+		currentPositionRef.current = startPosition;
+
+		const runAnimation = () => {
+			if (isHovered || !scope.current) return;
+
+			const endPosition = -totalCardsWidth;
+
+			const remainingDistance = Math.abs(
+				endPosition - currentPositionRef.current
+			);
+			const duration = remainingDistance / speed;
+
+			animationRef.current = animate(
+				scope.current,
+				{ x: endPosition },
+				{
+					duration: duration,
+					ease: 'linear',
+					onUpdate: latest => {
+						currentPositionRef.current = latest;
+					},
+					onComplete: () => {
+						if (isHovered) return;
+
+						const resetPosition = containerWidth;
+						animate(scope.current, { x: resetPosition }, { duration: 0 });
+						currentPositionRef.current = resetPosition;
+
+						setTimeout(() => {
+							runAnimation();
+						}, 100);
+					}
+				}
+			);
+		};
+
+		const timer = setTimeout(runAnimation, 500);
+
+		return () => {
+			clearTimeout(timer);
+			if (animationRef.current) {
+				animationRef.current.stop();
+			}
+		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [scope, animate, items.length, totalCardsWidth, cardWidth, cardGap]);
+
+	useEffect(() => {
+		if (!isHovered && scope.current && containerRef.current) {
+			const containerWidth = containerRef.current.offsetWidth;
+
+			const continueAnimation = () => {
+				if (isHovered || !scope.current) return;
+
+				const endPosition = -totalCardsWidth;
+				const remainingDistance = Math.abs(
+					endPosition - currentPositionRef.current
+				);
+				const duration = remainingDistance / speed;
+
+				animationRef.current = animate(
+					scope.current,
+					{ x: endPosition },
+					{
+						duration: duration,
+						ease: 'linear',
+						onUpdate: latest => {
+							currentPositionRef.current = latest;
+						},
+						onComplete: () => {
+							if (isHovered) return;
+
+							const resetPosition = containerWidth;
+							animate(scope.current, { x: resetPosition }, { duration: 0 });
+							currentPositionRef.current = resetPosition;
+
+							setTimeout(() => {
+								continueAnimation();
+							}, 100);
+						}
+					}
+				);
+			};
+
+			setTimeout(continueAnimation, 50);
+		}
+	}, [isHovered, scope, animate, totalCardsWidth, cardWidth, cardGap]);
+
+	useEffect(() => {
+		if (isHovered) {
+			if (animationRef.current) {
+				animationRef.current.stop();
+			}
+		}
+	}, [isHovered]);
+
+	const handleCardHover = (hovered: boolean) => {
+		setIsHovered(hovered);
+	};
+
 	return (
 		<div className='relative'>
 			{/* Section Header */}
-			<div className='flex items-center justify-between mb-8'>
+			<div className='flex flex-row items-center justify-between mb-6 lg:mb-8 gap-4'>
 				<div className='flex items-center gap-3'>
 					<div
-						className={`p-3 bg-gradient-to-r ${gradient} text-white rounded-xl shadow-lg`}>
+						className={`p-2 lg:p-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl shadow-lg`}>
 						{icon}
 					</div>
 					<div>
-						<h3 className='text-2xl font-bold text-gray-800'>{title}</h3>
-						<p className='text-gray-600'>Latest updates and information</p>
+						<h3 className='text-xl lg:text-2xl font-bold text-gray-800'>
+							{title}
+						</h3>
+						<p className='text-sm lg:text-base text-gray-600 hidden md:block'>
+							Latest updates and information
+						</p>
 					</div>
 				</div>
 
-				<div className='flex items-center gap-3'>
-					<Button variant='outline' size='sm' className='rounded-xl'>
-						<Filter className='w-4 h-4 mr-2' />
-						Filter
+				<div className='flex items-center gap-2 lg:gap-3 flex-wrap'>
+					<Button
+						variant='outline'
+						size='sm'
+						className='rounded-xl text-xs lg:text-sm'>
+						<Filter className='w-3 h-3 lg:w-4 lg:h-4 mr-1 lg:mr-2' />
+						<span className='hidden sm:inline'>Filter</span>
 					</Button>
 					<Button
-						className={`bg-gradient-to-r ${gradient} hover:opacity-90 rounded-xl border-0`}>
-						View All
-						<ExternalLink className='w-4 h-4 ml-2' />
+						className={`bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-90 rounded-xl border-0 text-xs lg:text-sm`}>
+						<span className='hidden sm:inline'>View All</span>
+						<span className='sm:hidden'>All</span>
+						<ExternalLink className='w-3 h-3 lg:w-4 lg:h-4 ml-1 lg:ml-2' />
 					</Button>
 				</div>
 			</div>
 
 			{/* Infinite Scrolling Container */}
-			<div className='relative overflow-hidden rounded-2xl'>
-				{/* Gradient masks for seamless edge effect */}
-				<div className='absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-indigo-50 via-indigo-50/80 to-transparent z-10 pointer-events-none' />
-				<div className='absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-indigo-50 via-indigo-50/80 to-transparent z-10 pointer-events-none' />
+			<div ref={containerRef} className='relative overflow-hidden rounded-2xl'>
+				{/* Gradient masks for seamless edge effect - hidden on mobile */}
+				<div className='absolute left-0 top-0 bottom-0 w-0 sm:w-16 lg:w-20 bg-gradient-to-r from-indigo-50 via-indigo-50/80 to-transparent z-10 pointer-events-none' />
+				<div className='absolute right-0 top-0 bottom-0 w-0 sm:w-16 lg:w-20 bg-gradient-to-l from-indigo-50 via-indigo-50/80 to-transparent z-10 pointer-events-none' />
 
-				<motion.div
-					animate={{ x: [0, -(items.length * 380)] }}
-					transition={{
-						duration: items.length * 3,
-						repeat: Infinity,
-						ease: 'linear'
-					}}
-					className='flex gap-6'
-					style={{ width: `${items.length * 380 * 3}px` }}>
-					{/* Triple the items for seamless infinite scroll */}
-					{[...items, ...items, ...items].map((item, index) => (
-						<motion.div
+				<div ref={scope} className='flex gap-3 sm:gap-4 lg:gap-6 w-max'>
+					{[...items, ...items].map((item, index) => (
+						<div
 							key={`${item.id}-${index}`}
-							className='w-[360px] flex-shrink-0'
-							initial={{ opacity: 1, scale: 1 }}
-							animate={{
-								opacity: 1,
-								scale: 1
-							}}>
-							<NoticeCard item={item} index={index % items.length} />
-						</motion.div>
+							className='w-[260px] sm:w-[320px] lg:w-[360px] flex-shrink-0'
+							onMouseEnter={() => handleCardHover(true)}
+							onMouseLeave={() => handleCardHover(false)}>
+							<NoticeCard item={item} index={index} />
+						</div>
 					))}
-				</motion.div>
+				</div>
 			</div>
 		</div>
 	);
 };
 
-export default function NoticesSection({
-	data
-}: NoticesSectionProps) {
-	const [activeFilter, setActiveFilter] = useState<Category | 'All'>('All');
-
+export default function NoticesSection({ data }: NoticesSectionProps) {
 	const { notices, announcements } = data;
 
 	return (
@@ -460,121 +564,25 @@ export default function NoticesSection({
 						</div>
 					</motion.div>
 
-					{/* Tab Navigation */}
-					<motion.div
-						initial={{ opacity: 0, y: 20 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ duration: 0.6, delay: 0.2 }}
-						className='flex justify-center mb-12'>
-						<div className='inline-flex bg-white/80 backdrop-blur-md rounded-2xl p-2 border border-white/40 shadow-xl'>
-							<button
-								onClick={() => setActiveFilter('All')}
-								className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
-									activeFilter === 'All'
-										? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
-										: 'text-gray-600 hover:text-gray-800'
-								}`}>
-								All Notices
-							</button>
-							<button
-								onClick={() => setActiveFilter('Academic')}
-								className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
-									activeFilter === 'Academic'
-										? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
-										: 'text-gray-600 hover:text-gray-800'
-								}`}>
-								Academic
-							</button>
-							<button
-								onClick={() => setActiveFilter('Financial Aid')}
-								className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
-									activeFilter === 'Financial Aid'
-										? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
-										: 'text-gray-600 hover:text-gray-800'
-								}`}>
-								Financial Aid
-							</button>
-							<button
-								onClick={() => setActiveFilter('Admission')}
-								className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
-									activeFilter === 'Admission'
-										? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
-										: 'text-gray-600 hover:text-gray-800'
-								}`}>
-								Admission
-							</button>
-							<button
-								onClick={() => setActiveFilter('Innovation')}
-								className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
-									activeFilter === 'Innovation'
-										? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
-										: 'text-gray-600 hover:text-gray-800'
-								}`}>
-								Innovation
-							</button>
-							<button
-								onClick={() => setActiveFilter('Sports')}
-								className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
-									activeFilter === 'Sports'
-										? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
-										: 'text-gray-600 hover:text-gray-800'
-								}`}>
-								Sports
-							</button>
-							<button
-								onClick={() => setActiveFilter('Library')}
-								className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
-									activeFilter === 'Library'
-										? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
-										: 'text-gray-600 hover:text-gray-800'
-								}`}>
-								Library
-							</button>
-							<button
-								onClick={() => setActiveFilter('General')}
-								className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
-									activeFilter === 'General'
-										? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
-										: 'text-gray-600 hover:text-gray-800'
-								}`}>
-								General
-							</button>
-						</div>
-					</motion.div>
-
 					{/* Content */}
 					<AnimatePresence mode='wait'>
 						<motion.div
-							key={activeFilter}
 							initial={{ opacity: 0, y: 20 }}
 							animate={{ opacity: 1, y: 0 }}
 							exit={{ opacity: 0, y: -20 }}
 							transition={{ duration: 0.5 }}>
-							{activeFilter === 'All' ? (
-								<>
-									<ScrollingSection
-										title='Official Notices'
-										items={notices}
-										icon={<Bell className='w-6 h-6' />}
-										gradient='from-indigo-600 to-purple-600'
-									/>
-									<ScrollingSection
-										title='Latest Announcements'
-										items={announcements}
-										icon={<Sparkles className='w-6 h-6' />}
-										gradient='from-purple-600 to-pink-600'
-									/>
-								</>
-							) : (
+							<div className='flex flex-col gap-6'>
 								<ScrollingSection
-									title={`${activeFilter} Notices`}
-									items={notices.filter(
-										notice => notice.category === activeFilter
-									)}
-									icon={getCategoryConfig(activeFilter).icon}
-									gradient={getCategoryConfig(activeFilter).gradient}
+									title='Official Notices'
+									items={notices}
+									icon={<Bell className='w-6 h-6' />}
 								/>
-							)}
+								<ScrollingSection
+									title='Announcements'
+									items={announcements}
+									icon={<Megaphone className='w-6 h-6' />}
+								/>
+							</div>
 						</motion.div>
 					</AnimatePresence>
 				</div>

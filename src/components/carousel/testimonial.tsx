@@ -223,9 +223,7 @@ export default function Testimonial({ data }: TestimonialProps) {
 				</motion.div>
 
 				{/* Main Testimonial Display */}
-				<div
-					className='relative max-w-6xl mx-auto mb-16'
-					style={{ height: '600px' }}>
+				<div className='relative max-w-6xl mx-auto mb-16 h-[700px] md:h-[600px]'>
 					<AnimatePresence mode='wait' custom={direction}>
 						<motion.div
 							key={currentIndex}
@@ -247,7 +245,7 @@ export default function Testimonial({ data }: TestimonialProps) {
 								onMouseLeave={() => setIsHovered(false)}>
 								<div className='grid md:grid-cols-2 h-full'>
 									{/* Left Side - Image/Video */}
-									<div className='relative overflow-hidden'>
+									<div className='relative overflow-hidden h-[300px] md:h-full'>
 										<Image
 											src={testimonials[currentIndex].image}
 											alt={testimonials[currentIndex].name}

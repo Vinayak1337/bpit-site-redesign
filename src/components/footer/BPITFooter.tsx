@@ -207,10 +207,10 @@ const BPITFooter = () => {
 						animate={{ opacity: 1, scale: 1 }}
 						exit={{ opacity: 0, scale: 0.8 }}
 						onClick={scrollToTop}
-						className='fixed bottom-8 right-8 z-50 w-12 h-12 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group'
+						className='fixed bottom-4 right-4 sm:bottom-6 sm:right-6 lg:bottom-8 lg:right-8 z-50 w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group'
 						whileHover={{ scale: 1.1 }}
 						whileTap={{ scale: 0.9 }}>
-						<ArrowUp className='w-5 h-5 group-hover:-translate-y-1 transition-transform' />
+						<ArrowUp className='w-4 h-4 sm:w-5 sm:h-5 group-hover:-translate-y-1 transition-transform' />
 					</motion.button>
 				)}
 			</AnimatePresence>
@@ -253,44 +253,44 @@ const BPITFooter = () => {
 				<div className='absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 via-red-500 to-blue-400' />
 
 				{/* Main Content */}
-				<div className='relative z-10 container mx-auto px-4 py-16'>
+				<div className='relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20'>
 					{/* Header Section */}
 					<motion.div
 						initial={{ opacity: 0, y: 30 }}
 						animate={isVisible ? { opacity: 1, y: 0 } : {}}
 						transition={{ duration: 0.8 }}
-						className='text-center mb-16'>
-						<div className='flex items-center justify-center gap-4 mb-6'>
-							<div className='w-16 h-16 bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl flex items-center justify-center'>
-								<Building2 className='w-8 h-8 text-white' />
+						className='text-center mb-12 sm:mb-16 lg:mb-20'>
+						<div className='flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-6 sm:mb-8'>
+							<div className='w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl flex items-center justify-center'>
+								<Building2 className='w-6 h-6 sm:w-8 sm:h-8 text-white' />
 							</div>
-							<div className='text-left'>
-								<h2 className='text-3xl md:text-4xl font-bold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent'>
+							<div className='text-center sm:text-left'>
+								<h2 className='text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent leading-tight'>
 									Bhagwan Parshuram Institute of Technology
 								</h2>
-								<p className='text-blue-200 text-lg'>
+								<p className='text-blue-200 text-sm sm:text-base lg:text-lg mt-1'>
 									Excellence in Engineering Education
 								</p>
 							</div>
 						</div>
 
 						{/* Achievement Stats */}
-						<div className='grid grid-cols-2 md:grid-cols-4 gap-6 mt-12'>
+						<div className='grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mt-8 sm:mt-12'>
 							{achievements.map((achievement, index) => (
 								<motion.div
 									key={achievement.label}
 									initial={{ opacity: 0, scale: 0.8 }}
 									animate={isVisible ? { opacity: 1, scale: 1 } : {}}
 									transition={{ duration: 0.6, delay: 0.1 * index }}
-									className='bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300 group'
+									className='bg-white/5 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/10 hover:border-white/20 transition-all duration-300 group'
 									whileHover={{ scale: 1.05 }}>
-									<div className='flex items-center justify-center mb-3 text-blue-400 group-hover:text-blue-300 transition-colors'>
+									<div className='flex items-center justify-center mb-2 sm:mb-3 text-blue-400 group-hover:text-blue-300 transition-colors'>
 										{achievement.icon}
 									</div>
-									<div className='text-2xl font-bold text-white mb-1'>
+									<div className='text-lg sm:text-xl lg:text-2xl font-bold text-white mb-1'>
 										{achievement.number}
 									</div>
-									<div className='text-sm text-blue-200'>
+									<div className='text-xs sm:text-sm text-blue-200'>
 										{achievement.label}
 									</div>
 								</motion.div>
@@ -299,7 +299,7 @@ const BPITFooter = () => {
 					</motion.div>
 
 					{/* Main Footer Grid */}
-					<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12'>
+					<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 mb-8 sm:mb-12'>
 						{/* Quick Links */}
 						<motion.div
 							initial={{ opacity: 0, x: -30 }}
@@ -544,10 +544,10 @@ const BPITFooter = () => {
 						initial={{ opacity: 0, y: 30 }}
 						animate={isVisible ? { opacity: 1, y: 0 } : {}}
 						transition={{ duration: 0.8, delay: 0.6 }}
-						className='border-t border-white/10 pt-8 mt-12'>
-						<div className='flex flex-col md:flex-row items-center justify-between gap-6'>
-							<div className='text-center md:text-left'>
-								<p className='text-white/80 text-sm'>
+						className='border-t border-white/10 pt-6 sm:pt-8 mt-8 sm:mt-12'>
+						<div className='flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6'>
+							<div className='text-center sm:text-left'>
+								<p className='text-white/80 text-xs sm:text-sm'>
 									© 2024 Bhagwan Parshuram Institute of Technology. All rights
 									reserved.
 								</p>
@@ -556,7 +556,7 @@ const BPITFooter = () => {
 								</p>
 							</div>
 
-							<div className='flex items-center gap-6 text-sm text-white/60'>
+							<div className='flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-xs sm:text-sm text-white/60'>
 								<Link
 									href='/privacy'
 									className='hover:text-white transition-colors'>
