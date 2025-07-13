@@ -105,7 +105,7 @@ const Navbar = () => {
 	const admissionsItems = [
 		{
 			title: 'Why Choose BPIT?',
-			href: '/why-bpit',
+			href: '/admissions/why-bpit',
 			description: 'Top placement records, accreditation, and excellence',
 			icon: <Star className='w-4 h-4 text-blue-600' />
 		},
