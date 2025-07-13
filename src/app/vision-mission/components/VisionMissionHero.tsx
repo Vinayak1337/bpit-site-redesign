@@ -11,7 +11,7 @@ const iconMap = {
 };
 
 const VisionMissionHero = () => {
-	const { title, subtitle, description, gradient, tags } =
+	const { title, subtitle, gradient, tags } =
 		visionMissionHeroData;
 
 	return (

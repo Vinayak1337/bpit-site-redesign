@@ -40,7 +40,12 @@ const DynamicSidebar = ({ navItems, theme }: DynamicSidebarProps) => {
 	};
 
 	const getIcon = (iconName: string) => {
-		const IconComponent = (Icons as any)[iconName];
+		const IconComponent = (
+			Icons as unknown as Record<
+				string,
+				React.ComponentType<{ className?: string }>
+			>
+		)[iconName];
 		return IconComponent ? <IconComponent className='w-5 h-5' /> : null;
 	};
 
