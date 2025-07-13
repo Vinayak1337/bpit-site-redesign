@@ -13,56 +13,42 @@ import {
 	Building
 } from 'lucide-react';
 
-const Hero2 = () => {
+interface Slide {
+	title: string;
+	subtitle: string;
+	description: string;
+	image: string;
+	icon: string;
+	stats: string;
+	cta?: {
+		label: string;
+		href: string;
+	};
+}
+
+interface Hero2Data {
+	slides: Slide[];
+}
+
+interface Hero2Props {
+	data: Hero2Data;
+}
+
+const getIcon = (iconName: string) => {
+	const icons: { [key: string]: React.ReactNode } = {
+		BookOpen: <BookOpen className='w-8 h-8' />,
+		Users: <Users className='w-8 h-8' />,
+		Trophy: <Trophy className='w-8 h-8' />,
+		Building: <Building className='w-8 h-8' />
+	};
+	return icons[iconName] || <BookOpen className='w-8 h-8' />;
+};
+
+const Hero2 = ({ data }: Hero2Props) => {
 	const [currentSlide, setCurrentSlide] = useState(0);
 	const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-	const slides = [
-		{
-			title: 'Engineering Excellence',
-			subtitle: 'NBA Accredited Programs',
-			description:
-				"Discover our world-class engineering programs in Computer Science, Information Technology, Electronics, and Electrical Engineering designed to shape tomorrow's innovators.",
-			image:
-				'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=1200&q=80',
-			icon: <BookOpen className='w-8 h-8' />,
-			stats: '1000+ Students',
-			cta: {
-				label: 'Learn More',
-				href: '/admissions'
-			}
-		},
-		{
-			title: 'Campus Life',
-			subtitle: 'Beyond Academics',
-			description:
-				'Experience vibrant campus life with state-of-the-art facilities, hostels, sports complexes, and numerous clubs and societies that nurture holistic development.',
-			image:
-				'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1200&q=80',
-			icon: <Users className='w-8 h-8' />,
-			stats: '50+ Clubs'
-		},
-		{
-			title: 'Placement Success',
-			subtitle: 'Industry Ready',
-			description:
-				'Join our alumni network working at top companies like Amazon, Microsoft, and Google. Our dedicated placement cell ensures 100% placement assistance.',
-			image:
-				'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=1200&q=80',
-			icon: <Trophy className='w-8 h-8' />,
-			stats: '100% Placement'
-		},
-		{
-			title: 'Modern Infrastructure',
-			subtitle: 'Learning Environment',
-			description:
-				'Study in modern classrooms, well-equipped laboratories, digital libraries, and smart campus facilities that provide the perfect environment for learning.',
-			image:
-				'https://images.unsplash.com/photo-1562774053-701939374585?w=1200&q=80',
-			icon: <Building className='w-8 h-8' />,
-			stats: 'Modern Facilities'
-		}
-	];
+	const slides = data.slides;
 
 	const resetTimer = useCallback(() => {
 		if (timerRef.current) {
@@ -139,7 +125,7 @@ const Hero2 = () => {
 									transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
 									className='flex justify-center mb-6'>
 									<div className='p-4 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20'>
-										{slides[currentSlide].icon}
+										{getIcon(slides[currentSlide].icon)}
 									</div>
 								</motion.div>
 

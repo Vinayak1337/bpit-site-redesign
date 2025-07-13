@@ -3,10 +3,20 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Compass, Star } from 'lucide-react';
+import { visionMissionHeroData } from '@/data/vision-mission';
+
+const iconMap = {
+	Compass: Compass,
+	Star: Star
+};
 
 const VisionMissionHero = () => {
+	const { title, subtitle, description, gradient, tags } =
+		visionMissionHeroData;
+
 	return (
-		<section className='relative bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 text-white overflow-hidden'>
+		<section
+			className={`relative bg-gradient-to-br ${gradient} text-white overflow-hidden`}>
 			<div className='absolute inset-0 bg-black/20'></div>
 			<div className='absolute inset-0'>
 				<div className='absolute top-20 left-10 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl'></div>
@@ -28,12 +38,11 @@ const VisionMissionHero = () => {
 					</motion.div>
 
 					<h1 className='text-5xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-100'>
-						Vision & Mission
+						{title}
 					</h1>
 
 					<p className='text-xl md:text-2xl text-blue-100 mb-8 leading-relaxed'>
-						Guiding Principles for Educational Excellence and Institutional
-						Growth
+						{subtitle}
 					</p>
 
 					<motion.div
@@ -41,18 +50,17 @@ const VisionMissionHero = () => {
 						animate={{ opacity: 1 }}
 						transition={{ duration: 0.6, delay: 0.4 }}
 						className='flex flex-wrap justify-center gap-4 text-sm'>
-						<div className='flex items-center gap-2 bg-white/10 rounded-full px-4 py-2 backdrop-blur-sm'>
-							<Star className='w-4 h-4 text-yellow-300' />
-							<span>Vision for Excellence</span>
-						</div>
-						<div className='flex items-center gap-2 bg-white/10 rounded-full px-4 py-2 backdrop-blur-sm'>
-							<Star className='w-4 h-4 text-yellow-300' />
-							<span>Mission Driven</span>
-						</div>
-						<div className='flex items-center gap-2 bg-white/10 rounded-full px-4 py-2 backdrop-blur-sm'>
-							<Star className='w-4 h-4 text-yellow-300' />
-							<span>Quality Assured</span>
-						</div>
+						{tags.map((tag, index) => {
+							const IconComponent = iconMap[tag.icon as keyof typeof iconMap];
+							return (
+								<div
+									key={index}
+									className='flex items-center gap-2 bg-white/10 rounded-full px-4 py-2 backdrop-blur-sm'>
+									<IconComponent className='w-4 h-4 text-yellow-300' />
+									<span>{tag.text}</span>
+								</div>
+							);
+						})}
 					</motion.div>
 				</motion.div>
 			</div>

@@ -31,171 +31,46 @@ type Category =
 	| 'Library'
 	| 'General';
 
-const notices = [
-	{
-		id: 1,
-		category: 'Academic' as Category,
-		title: 'Mid-semester examination schedule released',
-		subtitle: 'Check your exam dates and prepare accordingly',
-		date: '2024-12-28',
-		time: '10:00 AM',
-		image: '/events/img1.png',
-		priority: 'high' as Priority,
-		tags: ['Exam', 'Schedule', 'Important'],
-		description:
-			'The mid-semester examination schedule has been released. Students are advised to check their individual exam timetables and prepare accordingly.',
-		views: 1250,
-		pinned: true,
-		urgent: true
-	},
-	{
-		id: 2,
-		category: 'Financial Aid' as Category,
-		title: 'Education loans available through PM Vidya Laxmi scheme',
-		subtitle: 'Apply now for financial assistance',
-		date: '2024-12-25',
-		time: '2:30 PM',
-		image: '/events/img2.png',
-		priority: 'medium' as Priority,
-		tags: ['Scholarship', 'Finance', 'Government'],
-		description:
-			'Students can now apply for education loans through the PM Vidya Laxmi scheme. Eligible students can receive financial assistance for their studies.',
-		views: 890,
-		pinned: false,
-		urgent: false
-	},
-	{
-		id: 3,
-		category: 'Admission' as Category,
-		title: 'Last date for semester registration extended',
-		subtitle: 'Extended deadline for course registration',
-		date: '2024-12-24',
-		time: '5:00 PM',
-		image: '/events/img1.png',
-		priority: 'high' as Priority,
-		tags: ['Registration', 'Deadline', 'Extension'],
-		description:
-			'The deadline for semester registration has been extended by one week. Students who have not yet registered are advised to complete the process immediately.',
-		views: 2100,
-		pinned: true,
-		urgent: true
-	},
-	{
-		id: 4,
-		category: 'Academic' as Category,
-		title: 'Final year project submission guidelines published',
-		subtitle: 'Important guidelines for project submission',
-		date: '2024-12-23',
-		time: '11:15 AM',
-		image: '/events/img2.png',
-		priority: 'medium' as Priority,
-		tags: ['Project', 'Guidelines', 'Final Year'],
-		description:
-			'Final year students can now access the comprehensive guidelines for project submission including format requirements and deadlines.',
-		views: 1450,
-		pinned: false,
-		urgent: false
-	},
-	{
-		id: 5,
-		category: 'Innovation' as Category,
-		title: 'Startup incubation program applications open',
-		subtitle: 'Transform your ideas into reality',
-		date: '2024-12-20',
-		time: '11:00 AM',
-		image: '/events/img1.png',
-		priority: 'medium' as Priority,
-		tags: ['Startup', 'Innovation', 'Incubation'],
-		description:
-			"The institute's startup incubation program is now accepting applications. Students with innovative business ideas are encouraged to apply.",
-		views: 780,
-		pinned: false,
-		urgent: false
-	},
-	{
-		id: 6,
-		category: 'Library' as Category,
-		title: 'Extended library hours during exams',
-		subtitle: '24/7 access during examination period',
-		date: '2024-12-19',
-		time: '6:00 AM',
-		image: '/events/img2.png',
-		priority: 'high' as Priority,
-		tags: ['Library', 'Exams', 'Extended Hours'],
-		description:
-			"The library will remain open 24/7 during the examination period to support students' preparation needs.",
-		views: 1650,
-		pinned: true,
-		urgent: false
-	}
-];
+interface Notice {
+	id: number;
+	category: Category;
+	title: string;
+	subtitle: string;
+	date: string;
+	time: string;
+	image: string;
+	priority: Priority;
+	tags: string[];
+	description: string;
+	views: number;
+	pinned: boolean;
+	urgent: boolean;
+}
 
-const announcements = [
-	{
-		id: 1,
-		category: 'Innovation' as Category,
-		title: 'Institute Innovation Council (IIC) Meeting',
-		subtitle: 'Monthly innovation council update',
-		date: '2024-12-24',
-		time: '1:30 PM',
-		image: '/events/img1.png',
-		priority: 'high' as Priority,
-		tags: ['Innovation', 'Council', 'Meeting'],
-		description:
-			'Monthly meeting of the Institute Innovation Council to discuss ongoing projects and future initiatives.',
-		views: 450,
-		pinned: true,
-		urgent: false
-	},
-	{
-		id: 2,
-		category: 'Sports' as Category,
-		title: 'Inter-college basketball tournament registration',
-		subtitle: 'Register your team now',
-		date: '2024-12-23',
-		time: '4:00 PM',
-		image: '/events/img2.png',
-		priority: 'medium' as Priority,
-		tags: ['Sports', 'Tournament', 'Basketball'],
-		description:
-			'Registration is now open for the inter-college basketball tournament. Teams must register before the deadline.',
-		views: 620,
-		pinned: false,
-		urgent: false
-	},
-	{
-		id: 3,
-		category: 'Academic' as Category,
-		title: 'Guest lecture series on AI and Machine Learning',
-		subtitle: 'Industry experts share insights',
-		date: '2024-12-22',
-		time: '10:30 AM',
-		image: '/events/img1.png',
-		priority: 'medium' as Priority,
-		tags: ['AI', 'Machine Learning', 'Guest Lecture'],
-		description:
-			'Join us for an exciting guest lecture series featuring industry experts discussing the latest trends in AI and Machine Learning.',
-		views: 980,
-		pinned: false,
-		urgent: false
-	},
-	{
-		id: 4,
-		category: 'General' as Category,
-		title: 'Campus maintenance scheduled for this weekend',
-		subtitle: 'Temporary service disruptions expected',
-		date: '2024-12-21',
-		time: '8:00 AM',
-		image: '/events/img2.png',
-		priority: 'low' as Priority,
-		tags: ['Maintenance', 'Campus', 'Weekend'],
-		description:
-			'Scheduled maintenance work will be conducted over the weekend. Some services may be temporarily unavailable.',
-		views: 340,
-		pinned: false,
-		urgent: false
-	}
-];
+interface Announcement {
+	id: number;
+	category: Category;
+	title: string;
+	subtitle: string;
+	date: string;
+	time: string;
+	image: string;
+	priority: Priority;
+	tags: string[];
+	description: string;
+	views: number;
+	pinned: boolean;
+	urgent: boolean;
+}
+
+interface NoticesSectionData {
+	notices: Notice[];
+	announcements: Announcement[];
+}
+
+interface NoticesSectionProps {
+	data: NoticesSectionData;
+}
 
 const getCategoryConfig = (category: Category) => {
 	const configs = {
@@ -296,13 +171,7 @@ const formatDate = (dateString: string) => {
 	});
 };
 
-const NoticeCard = ({
-	item,
-	index
-}: {
-	item: (typeof notices)[0];
-	index: number;
-}) => {
+const NoticeCard = ({ item, index }: { item: Notice; index: number }) => {
 	const [isHovered, setIsHovered] = useState(false);
 	const categoryConfig = getCategoryConfig(item.category);
 	const priorityConfig = getPriorityConfig(item.priority);
@@ -451,7 +320,7 @@ const ScrollingSection = ({
 	gradient
 }: {
 	title: string;
-	items: typeof notices;
+	items: Notice[];
 	icon: React.ReactNode;
 	gradient: string;
 }) => {
@@ -517,10 +386,12 @@ const ScrollingSection = ({
 	);
 };
 
-export default function ModernNoticesSection() {
-	const [activeTab, setActiveTab] = useState<'notices' | 'announcements'>(
-		'notices'
-	);
+export default function NoticesSection({
+	data
+}: NoticesSectionProps) {
+	const [activeFilter, setActiveFilter] = useState<Category | 'All'>('All');
+
+	const { notices, announcements } = data;
 
 	return (
 		<section className='relative py-20 bg-gradient-to-br from-indigo-50 via-white to-purple-50 overflow-hidden'>
@@ -597,22 +468,76 @@ export default function ModernNoticesSection() {
 						className='flex justify-center mb-12'>
 						<div className='inline-flex bg-white/80 backdrop-blur-md rounded-2xl p-2 border border-white/40 shadow-xl'>
 							<button
-								onClick={() => setActiveTab('notices')}
+								onClick={() => setActiveFilter('All')}
 								className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
-									activeTab === 'notices'
+									activeFilter === 'All'
 										? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
 										: 'text-gray-600 hover:text-gray-800'
 								}`}>
-								Official Notices
+								All Notices
 							</button>
 							<button
-								onClick={() => setActiveTab('announcements')}
+								onClick={() => setActiveFilter('Academic')}
 								className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
-									activeTab === 'announcements'
+									activeFilter === 'Academic'
 										? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
 										: 'text-gray-600 hover:text-gray-800'
 								}`}>
-								Announcements
+								Academic
+							</button>
+							<button
+								onClick={() => setActiveFilter('Financial Aid')}
+								className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
+									activeFilter === 'Financial Aid'
+										? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
+										: 'text-gray-600 hover:text-gray-800'
+								}`}>
+								Financial Aid
+							</button>
+							<button
+								onClick={() => setActiveFilter('Admission')}
+								className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
+									activeFilter === 'Admission'
+										? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
+										: 'text-gray-600 hover:text-gray-800'
+								}`}>
+								Admission
+							</button>
+							<button
+								onClick={() => setActiveFilter('Innovation')}
+								className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
+									activeFilter === 'Innovation'
+										? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
+										: 'text-gray-600 hover:text-gray-800'
+								}`}>
+								Innovation
+							</button>
+							<button
+								onClick={() => setActiveFilter('Sports')}
+								className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
+									activeFilter === 'Sports'
+										? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
+										: 'text-gray-600 hover:text-gray-800'
+								}`}>
+								Sports
+							</button>
+							<button
+								onClick={() => setActiveFilter('Library')}
+								className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
+									activeFilter === 'Library'
+										? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
+										: 'text-gray-600 hover:text-gray-800'
+								}`}>
+								Library
+							</button>
+							<button
+								onClick={() => setActiveFilter('General')}
+								className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
+									activeFilter === 'General'
+										? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
+										: 'text-gray-600 hover:text-gray-800'
+								}`}>
+								General
 							</button>
 						</div>
 					</motion.div>
@@ -620,75 +545,38 @@ export default function ModernNoticesSection() {
 					{/* Content */}
 					<AnimatePresence mode='wait'>
 						<motion.div
-							key={activeTab}
+							key={activeFilter}
 							initial={{ opacity: 0, y: 20 }}
 							animate={{ opacity: 1, y: 0 }}
 							exit={{ opacity: 0, y: -20 }}
 							transition={{ duration: 0.5 }}>
-							{activeTab === 'notices' ? (
-								<ScrollingSection
-									title='Official Notices'
-									items={notices}
-									icon={<Bell className='w-6 h-6' />}
-									gradient='from-indigo-600 to-purple-600'
-								/>
+							{activeFilter === 'All' ? (
+								<>
+									<ScrollingSection
+										title='Official Notices'
+										items={notices}
+										icon={<Bell className='w-6 h-6' />}
+										gradient='from-indigo-600 to-purple-600'
+									/>
+									<ScrollingSection
+										title='Latest Announcements'
+										items={announcements}
+										icon={<Sparkles className='w-6 h-6' />}
+										gradient='from-purple-600 to-pink-600'
+									/>
+								</>
 							) : (
 								<ScrollingSection
-									title='Latest Announcements'
-									items={announcements}
-									icon={<Sparkles className='w-6 h-6' />}
-									gradient='from-purple-600 to-pink-600'
+									title={`${activeFilter} Notices`}
+									items={notices.filter(
+										notice => notice.category === activeFilter
+									)}
+									icon={getCategoryConfig(activeFilter).icon}
+									gradient={getCategoryConfig(activeFilter).gradient}
 								/>
 							)}
 						</motion.div>
 					</AnimatePresence>
-
-					{/* Quick Stats */}
-					{/* <motion.div
-						initial={{ opacity: 0, y: 20 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ duration: 0.8, delay: 0.4 }}
-						className='mt-16 grid grid-cols-1 md:grid-cols-4 gap-6'>
-						{[
-							{
-								label: 'Active Notices',
-								value: notices.length,
-								icon: <Bell className='w-5 h-5' />
-							},
-							{
-								label: 'Announcements',
-								value: announcements.length,
-								icon: <Sparkles className='w-5 h-5' />
-							},
-							{
-								label: 'High Priority',
-								value: [...notices, ...announcements].filter(
-									item => item.priority === 'high'
-								).length,
-								icon: <TrendingUp className='w-5 h-5' />
-							},
-							{
-								label: 'Total Views',
-								value: '12.5K',
-								icon: <Eye className='w-5 h-5' />
-							}
-						].map((stat, index) => (
-							<motion.div
-								key={stat.label}
-								initial={{ opacity: 0, scale: 0.9 }}
-								animate={{ opacity: 1, scale: 1 }}
-								transition={{ duration: 0.5, delay: 0.6 + index * 0.1 }}
-								className='bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-white/40 shadow-lg hover:shadow-xl transition-all duration-300'>
-								<div className='flex items-center justify-between mb-2'>
-									<div className='text-indigo-600'>{stat.icon}</div>
-									<div className='text-2xl font-bold text-gray-800'>
-										{stat.value}
-									</div>
-								</div>
-								<p className='text-gray-600 font-medium'>{stat.label}</p>
-							</motion.div>
-						))}
-					</motion.div> */}
 				</div>
 			</div>
 		</section>

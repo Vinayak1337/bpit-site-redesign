@@ -1,8 +1,10 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import VisionMissionHero from '@/app/vision-mission/components/VisionMissionHero';
-import VisionMissionSidebar from '@/app/vision-mission/components/VisionMissionSidebar';
+import DynamicSidebar from '@/components/ui/DynamicSidebar';
 import VisionMissionContentWrapper from '@/app/vision-mission/components/VisionMissionContentWrapper';
+
+import { visionMissionSidebarData } from '@/data/sidebar';
 
 export const metadata: Metadata = {
 	title: 'Vision & Mission - Bhagwan Parshuram Institute of Technology',
@@ -36,7 +38,10 @@ const VisionMissionLayout = ({
 			<div className='container mx-auto px-4 py-12'>
 				<div className='flex flex-col lg:flex-row gap-8'>
 					{/* Sidebar Navigation */}
-					<VisionMissionSidebar />
+					<DynamicSidebar
+						navItems={visionMissionSidebarData.navItems}
+						theme={visionMissionSidebarData.theme}
+					/>
 
 					{/* Content Area */}
 					<VisionMissionContentWrapper>{children}</VisionMissionContentWrapper>

@@ -3,26 +3,36 @@ import Hero2 from '@/components/hero/hero2';
 import PlacementCompanies from '@/components/placement/placement-companies';
 
 import Testimonial from '@/components/carousel/testimonial';
-import UltraModernEventsSection from '@/components/events/events-section';
-import ModernNoticesSection from '@/components/notices/modern-notices-section';
+import EventsSection from '@/components/carousel/events-section';
+import NoticesSection from '@/components/carousel/notices-section';
 import TopPlacedStudents from '@/components/placement/top-placed-students';
+
+import {
+	homeHeroData,
+	homeHero2Data,
+	homeNoticesData,
+	homeEventsData,
+	homePlacementData,
+	homeTopPlacedStudentsData,
+	homeTestimonialsData
+} from '@/data/home';
 
 export default function Home() {
 	return (
 		<>
-			<Hero1 />
+			<Hero1 data={homeHeroData} />
 
-			<Hero2 />
+			<Hero2 data={homeHero2Data} />
 
-			<ModernNoticesSection />
+			<NoticesSection data={homeNoticesData} />
 
-			<UltraModernEventsSection />
+			<EventsSection data={homeEventsData} />
 
-			<PlacementCompanies />
+			<PlacementCompanies data={homePlacementData} />
 
-			<TopPlacedStudents />
+			<TopPlacedStudents data={homeTopPlacedStudentsData} />
 
-			<Testimonial />
+			<Testimonial data={homeTestimonialsData} />
 		</>
 	);
 }

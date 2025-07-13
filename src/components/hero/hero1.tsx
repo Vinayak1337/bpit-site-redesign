@@ -10,14 +10,27 @@ import {
 	CheckCircle
 } from 'lucide-react';
 
-const Hero1 = () => {
+interface HeroData {
+	mainTitle: string;
+	subTitle: string;
+	institutionName: string;
+	unitInfo: string;
+	approvalInfo: string;
+	affiliationInfo: string;
+	nbaAccredited: boolean;
+	highlights: string[];
+	buttons: Array<{
+		text: string;
+		type: 'primary' | 'outline';
+		action: string;
+	}>;
+}
 
-	const highlights = [
-		'Industry-Aligned Curriculum',
-		'Expert Faculty & Research',
-		'Innovation & Entrepreneurship Hub',
-		'Modern Labs & Smart Campus'
-	];
+interface Hero1Props {
+	data: HeroData;
+}
+
+const Hero1 = ({ data }: Hero1Props) => {
 
 	return (
 		<section className='relative max-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50  overflow-hidden'>
@@ -79,10 +92,10 @@ const Hero1 = () => {
 							transition={{ duration: 0.8, delay: 0.1 }}
 							className='space-y-6'>
 							<h1 className='text-4xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-blue-900 via-blue-700 to-blue-900 bg-clip-text text-transparent leading-tight'>
-								Engineering Excellence
+								{data.mainTitle}
 								<br />
 								<span className='text-3xl md:text-5xl lg:text-6xl bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent'>
-									Shaping Tomorrow&apos;s Innovators
+									{data.subTitle}
 								</span>
 							</h1>
 
@@ -93,25 +106,27 @@ const Hero1 = () => {
 								transition={{ duration: 0.6, delay: 0.3 }}
 								className='space-y-2'>
 								<p className='text-xl md:text-2xl font-semibold text-gray-700 tracking-wide'>
-									Bhagwan Parshuram Institute of Technology
+									{data.institutionName}
 								</p>
 								<div className='w-24 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 mx-auto rounded-full' />
 							</motion.div>
 
 							{/* NBA Badge - More Prominent */}
-							<motion.div
-								initial={{ opacity: 0, scale: 0.9 }}
-								animate={{ opacity: 1, scale: 1 }}
-								transition={{ duration: 0.6, delay: 0.4 }}
-								className='flex justify-center'>
-								<div className='inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-100 to-blue-50 border-2 border-blue-200 text-blue-800 rounded-full font-semibold shadow-lg'>
-									<Star className='w-5 h-5 mr-3 text-yellow-500 fill-current' />
-									<span className='text-base md:text-lg'>
-										NBA Accredited Institution
-									</span>
-									<Award className='w-5 h-5 ml-3 text-blue-600' />
-								</div>
-							</motion.div>
+							{data.nbaAccredited && (
+								<motion.div
+									initial={{ opacity: 0, scale: 0.9 }}
+									animate={{ opacity: 1, scale: 1 }}
+									transition={{ duration: 0.6, delay: 0.4 }}
+									className='flex justify-center'>
+									<div className='inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-100 to-blue-50 border-2 border-blue-200 text-blue-800 rounded-full font-semibold shadow-lg'>
+										<Star className='w-5 h-5 mr-3 text-yellow-500 fill-current' />
+										<span className='text-base md:text-lg'>
+											NBA Accredited Institution
+										</span>
+										<Award className='w-5 h-5 ml-3 text-blue-600' />
+									</div>
+								</motion.div>
+							)}
 						</motion.div>
 
 						{/* Institutional Information */}
@@ -126,7 +141,7 @@ const Hero1 = () => {
 								animate={{ opacity: 1, y: 0 }}
 								transition={{ duration: 0.6, delay: 0.6 }}
 								className='text-base md:text-lg font-semibold text-red-600 tracking-wide'>
-								A Unit of Bhartiya Brahmin Charitable Trust (Regd.)
+								{data.unitInfo}
 							</motion.p>
 
 							{/* Approval Information */}
@@ -135,7 +150,7 @@ const Hero1 = () => {
 								animate={{ opacity: 1, y: 0 }}
 								transition={{ duration: 0.6, delay: 0.7 }}
 								className='text-sm md:text-base text-gray-700 font-medium bg-gradient-to-r from-gray-100 to-blue-50 px-4 py-2 rounded-full inline-block border border-gray-200'>
-								(Approved by AICTE, Ministry of Education (MoE))
+								{data.approvalInfo}
 							</motion.p>
 
 							{/* Affiliation Information */}
@@ -144,10 +159,7 @@ const Hero1 = () => {
 								animate={{ opacity: 1, y: 0 }}
 								transition={{ duration: 0.6, delay: 0.8 }}
 								className='text-base md:text-lg text-gray-700 leading-relaxed'>
-								Affiliated to{' '}
-								<span className='font-bold text-blue-700 bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text'>
-									Guru Gobind Singh Indraprastha University, Delhi
-								</span>
+								{data.affiliationInfo}
 							</motion.p>
 
 							{/* Decorative Element */}
@@ -169,7 +181,7 @@ const Hero1 = () => {
 							transition={{ duration: 0.8, delay: 1.0 }}
 							className='flex justify-center w-full'>
 							<div className='grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl'>
-								{highlights.map((highlight, index) => (
+								{data.highlights.map((highlight, index) => (
 									<div
 										key={index}
 										className='flex items-center justify-start space-x-2 text-gray-700'>
@@ -186,22 +198,27 @@ const Hero1 = () => {
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ duration: 0.8, delay: 1.1 }}
 							className='flex flex-col sm:flex-row gap-4 justify-center items-center'>
-							<Button
-								size='lg'
-								className='bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 group'
-								onClick={() => {
-									const event = new CustomEvent('openEnquiry');
-									window.dispatchEvent(event);
-								}}>
-								Apply Now
-								<ArrowRight className='ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform' />
-							</Button>
-							<Button
-								variant='outline'
-								size='lg'
-								className='border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-4 rounded-full font-semibold transition-all duration-300'>
-								Explore Programs
-							</Button>
+							{data.buttons.map((button, index) => (
+								<Button
+									key={index}
+									size='lg'
+									variant={button.type === 'outline' ? 'outline' : 'default'}
+									className={button.type === 'primary' 
+										? 'bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 group'
+										: 'border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-4 rounded-full font-semibold transition-all duration-300'
+									}
+									onClick={() => {
+										if (button.action === 'openEnquiry') {
+											const event = new CustomEvent('openEnquiry');
+											window.dispatchEvent(event);
+										}
+									}}>
+									{button.text}
+									{button.type === 'primary' && (
+										<ArrowRight className='ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform' />
+									)}
+								</Button>
+							))}
 						</motion.div>
 					</div>
 				</div>

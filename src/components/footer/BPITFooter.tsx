@@ -27,7 +27,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
-const ModernBPITFooter = () => {
+const BPITFooter = () => {
 	const [expandedSection, setExpandedSection] = useState<string | null>(null);
 	const [isVisible, setIsVisible] = useState(false);
 	const [showScrollTop, setShowScrollTop] = useState(false);
@@ -64,7 +64,7 @@ const ModernBPITFooter = () => {
 			{ threshold: 0.1 }
 		);
 
-		const footerElement = document.getElementById('modern-footer');
+		const footerElement = document.getElementById('footer');
 		if (footerElement) {
 			observer.observe(footerElement);
 		}
@@ -216,7 +216,7 @@ const ModernBPITFooter = () => {
 			</AnimatePresence>
 
 			<footer
-				id='modern-footer'
+				id='footer'
 				className='relative bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 text-white overflow-hidden'>
 				{/* Animated Background Elements */}
 				<div className='absolute inset-0 overflow-hidden'>
@@ -584,4 +584,4 @@ const ModernBPITFooter = () => {
 	);
 };
 
-export default ModernBPITFooter;
+export default BPITFooter;

@@ -5,75 +5,35 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { DollarSign } from 'lucide-react';
 
-const TopPlacedStudents = () => {
-	const topStudents = [
-		{
-			id: 1,
-			name: 'Priya Sharma',
-			company: 'Google',
-			package: '45 LPA',
-			branch: 'Computer Science',
-			year: '2024',
-			image:
-				'https://images.unsplash.com/photo-1554151228-14d9def656e4?w=400&h=400&fit=crop&crop=face',
-			companyLogo: 'https://logo.clearbit.com/google.com'
-		},
-		{
-			id: 2,
-			name: 'Arjun Gupta',
-			company: 'Microsoft',
-			package: '42 LPA',
-			branch: 'Information Technology',
-			year: '2024',
-			image:
-				'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
-			companyLogo: 'https://logo.clearbit.com/microsoft.com'
-		},
-		{
-			id: 3,
-			name: 'Sneha Patel',
-			company: 'Amazon',
-			package: '38 LPA',
-			branch: 'Computer Science',
-			year: '2024',
-			image:
-				'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face',
-			companyLogo: 'https://logo.clearbit.com/amazon.com'
-		},
-		{
-			id: 4,
-			name: 'Rohit Kumar',
-			company: 'Adobe',
-			package: '35 LPA',
-			branch: 'Electronics & Communication',
-			year: '2024',
-			image:
-				'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face',
-			companyLogo: 'https://logo.clearbit.com/adobe.com'
-		},
-		{
-			id: 5,
-			name: 'Ananya Singh',
-			company: 'Oracle',
-			package: '32 LPA',
-			branch: 'Information Technology',
-			year: '2024',
-			image:
-				'https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=400&h=400&fit=crop&crop=face',
-			companyLogo: 'https://logo.clearbit.com/oracle.com'
-		},
-		{
-			id: 6,
-			name: 'Karan Mehta',
-			company: 'IBM',
-			package: '28 LPA',
-			branch: 'Computer Science',
-			year: '2024',
-			image:
-				'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face',
-			companyLogo: 'https://logo.clearbit.com/ibm.com'
-		}
-	];
+interface Student {
+	id: number;
+	name: string;
+	company: string;
+	package: string;
+	branch: string;
+	year: string;
+	image: string;
+	companyLogo: string;
+}
+
+interface Statistic {
+	value: string;
+	label: string;
+}
+
+interface TopPlacedStudentsData {
+	title: string;
+	subtitle: string;
+	students: Student[];
+	statistics: Statistic[];
+}
+
+interface TopPlacedStudentsProps {
+	data: TopPlacedStudentsData;
+}
+
+const TopPlacedStudents = ({ data }: TopPlacedStudentsProps) => {
+	const topStudents = data.students;
 
 	// Duplicate the array for seamless infinite scroll
 	const duplicatedStudents = [...topStudents, ...topStudents];
@@ -89,7 +49,7 @@ const TopPlacedStudents = () => {
 						transition={{ duration: 0.6 }}
 						viewport={{ once: true }}
 						className='text-3xl md:text-4xl font-bold text-gray-900 mb-4'>
-						Our Top Placed Students
+						{data.title}
 					</motion.h2>
 					<motion.p
 						initial={{ opacity: 0, y: 20 }}
@@ -97,8 +57,7 @@ const TopPlacedStudents = () => {
 						transition={{ duration: 0.6, delay: 0.2 }}
 						viewport={{ once: true }}
 						className='text-lg text-gray-600 max-w-2xl mx-auto'>
-						Meet the bright minds from BPIT who secured exceptional packages at
-						top-tier companies worldwide
+						{data.subtitle}
 					</motion.p>
 				</div>
 
@@ -190,30 +149,14 @@ const TopPlacedStudents = () => {
 					transition={{ duration: 0.6, delay: 0.4 }}
 					viewport={{ once: true }}
 					className='grid grid-cols-2 md:grid-cols-4 gap-8 mt-16 max-w-4xl mx-auto'>
-					<div className='text-center'>
-						<div className='text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2'>
-							45 LPA
+					{data.statistics.map((stat, index) => (
+						<div key={index} className='text-center'>
+							<div className='text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2'>
+								{stat.value}
+							</div>
+							<div className='text-sm text-gray-600'>{stat.label}</div>
 						</div>
-						<div className='text-sm text-gray-600'>Highest Package</div>
-					</div>
-					<div className='text-center'>
-						<div className='text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2'>
-							15+
-						</div>
-						<div className='text-sm text-gray-600'>Dream Offers</div>
-					</div>
-					<div className='text-center'>
-						<div className='text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2'>
-							50+
-						</div>
-						<div className='text-sm text-gray-600'>Top Companies</div>
-					</div>
-					<div className='text-center'>
-						<div className='text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2'>
-							98%
-						</div>
-						<div className='text-sm text-gray-600'>Success Rate</div>
-					</div>
+					))}
 				</motion.div>
 			</div>
 		</section>

@@ -1,8 +1,11 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import AboutHero from '@/app/about/components/AboutHero';
-import AboutSidebar from '@/app/about/components/AboutSidebar';
+import DynamicSidebar from '@/components/ui/DynamicSidebar';
 import AboutContentWrapper from '@/app/about/components/AboutContentWrapper';
+
+import { aboutHeroData } from '@/data/about';
+import { aboutSidebarData } from '@/data/sidebar';
 
 export const metadata: Metadata = {
 	title: 'About BPIT - Bhagwan Parshuram Institute of Technology',
@@ -30,13 +33,16 @@ const AboutLayout = ({
 	return (
 		<main className='min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50'>
 			{/* Hero Section */}
-			<AboutHero />
+			<AboutHero data={aboutHeroData} />
 
 			{/* Main Content with Sidebar */}
 			<div className='container mx-auto px-4 py-12'>
 				<div className='flex flex-col lg:flex-row gap-8'>
 					{/* Sidebar Navigation */}
-					<AboutSidebar />
+					<DynamicSidebar
+						navItems={aboutSidebarData.navItems}
+						theme={aboutSidebarData.theme}
+					/>
 
 					{/* Content Area */}
 					<AboutContentWrapper>{children}</AboutContentWrapper>

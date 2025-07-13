@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, useInView, useAnimation } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
@@ -20,140 +20,35 @@ import {
 	Palette
 } from 'lucide-react';
 
-const events = [
-	{
-		id: 1,
-		title: 'BPIT TechFest 2024',
-		subtitle: 'Innovation Summit & Tech Showcase',
-		description:
-			'Join us for the most spectacular tech festival featuring AI/ML workshops, robotics competitions, startup showcases, and industry expert keynotes.',
-		image: '/events/img1.png',
-		date: '2024-03-15',
-		time: '9:00 AM - 8:00 PM',
-		location: 'BPIT Main Auditorium',
-		category: 'Technology',
-		attendees: 1200,
-		featured: true,
-		status: 'upcoming',
-		tags: ['AI/ML', 'Robotics', 'Startups', 'Innovation'],
-		organizer: 'Technical Society BPIT',
-		registrationOpen: true,
-		price: 'Free',
-		highlights: ['Industry Leaders', '48+ Hours', '₹50K+ Prizes'],
-		rating: 4.9,
-		totalRatings: 847
-	},
-	{
-		id: 2,
-		title: 'Industry Connect 2024',
-		subtitle: 'Career Guidance & Networking',
-		description:
-			'Exclusive networking event with senior engineers from FAANG companies sharing career insights, technical guidance, and placement strategies.',
-		image: '/events/img2.png',
-		date: '2024-03-22',
-		time: '2:00 PM - 7:00 PM',
-		location: 'Conference Hall Complex',
-		category: 'Professional',
-		attendees: 450,
-		featured: true,
-		status: 'upcoming',
-		tags: ['FAANG', 'Career', 'Networking', 'Placement'],
-		organizer: 'Training & Placement Cell',
-		registrationOpen: true,
-		price: '₹199',
-		highlights: ['FAANG Engineers', 'Live Q&A', 'Job Referrals'],
-		rating: 4.8,
-		totalRatings: 623
-	},
-	{
-		id: 3,
-		title: 'Sanskriti Cultural Fest',
-		subtitle: 'Celebrating Arts & Heritage',
-		description:
-			'Experience the vibrant tapestry of Indian culture through music, dance, drama, art exhibitions, and traditional performances.',
-		image: '/events/img3.png',
-		date: '2024-04-05',
-		time: '6:00 PM - 11:00 PM',
-		location: 'Open Air Theatre',
-		category: 'Cultural',
-		attendees: 1500,
-		featured: false,
-		status: 'upcoming',
-		tags: ['Music', 'Dance', 'Art', 'Heritage'],
-		organizer: 'Cultural Committee',
-		registrationOpen: true,
-		price: 'Free',
-		highlights: ['Live Performances', '15+ Events', 'Celebrity Guest'],
-		rating: 4.7,
-		totalRatings: 1024
-	},
-	{
-		id: 4,
-		title: 'CodeCraft Hackathon',
-		subtitle: '72-Hour Innovation Marathon',
-		description:
-			'The ultimate coding challenge to solve real-world problems with cutting-edge technology, mentorship, and massive prize pool.',
-		image: '/events/img1.png',
-		date: '2024-04-12',
-		time: '9:00 AM - 9:00 AM (+3 days)',
-		location: 'Computer Science Block',
-		category: 'Technology',
-		attendees: 300,
-		featured: true,
-		status: 'upcoming',
-		tags: ['Hackathon', 'Innovation', 'Prizes', 'Mentorship'],
-		organizer: 'CSE Department',
-		registrationOpen: true,
-		price: '₹299',
-		highlights: ['₹1L+ Prizes', '72 Hours', 'Mentor Support'],
-		rating: 4.9,
-		totalRatings: 412
-	},
-	{
-		id: 5,
-		title: 'Research Symposium',
-		subtitle: 'Future of Engineering',
-		description:
-			'Showcase of groundbreaking research in emerging technologies, sustainable engineering, and next-generation innovations.',
-		image: '/events/img2.png',
-		date: '2024-04-18',
-		time: '10:00 AM - 6:00 PM',
-		location: 'Research Center',
-		category: 'Academic',
-		attendees: 350,
-		featured: false,
-		status: 'upcoming',
-		tags: ['Research', 'Innovation', 'Future Tech', 'Sustainability'],
-		organizer: 'R&D Cell',
-		registrationOpen: true,
-		price: 'Free',
-		highlights: ['20+ Papers', 'Expert Panel', 'Publication'],
-		rating: 4.6,
-		totalRatings: 267
-	},
-	{
-		id: 6,
-		title: 'Alumni Homecoming',
-		subtitle: 'Reconnect & Celebrate Success',
-		description:
-			'Annual alumni gathering celebrating achievements, sharing experiences, and strengthening the BPIT family bonds.',
-		image: '/events/img3.png',
-		date: '2024-04-25',
-		time: '4:00 PM - 10:00 PM',
-		location: 'Alumni Memorial Hall',
-		category: 'Networking',
-		attendees: 800,
-		featured: false,
-		status: 'upcoming',
-		tags: ['Alumni', 'Success Stories', 'Networking', 'Legacy'],
-		organizer: 'Alumni Association',
-		registrationOpen: false,
-		price: 'Invite Only',
-		highlights: ['Success Stories', 'Gala Dinner', 'Awards'],
-		rating: 4.8,
-		totalRatings: 956
-	}
-];
+interface Event {
+	id: number;
+	title: string;
+	subtitle: string;
+	description: string;
+	image: string;
+	date: string;
+	time: string;
+	location: string;
+	category: string;
+	attendees: number;
+	featured: boolean;
+	status: string;
+	tags: string[];
+	organizer: string;
+	registrationOpen: boolean;
+	price: string;
+	highlights: string[];
+	rating: number;
+	totalRatings: number;
+}
+
+interface EventsSectionData {
+	events: Event[];
+}
+
+interface EventsSectionProps {
+	data: EventsSectionData;
+}
 
 const categoryIcons = {
 	Technology: <Zap className='w-5 h-5' />,
@@ -173,13 +68,7 @@ const formatDate = (dateString: string) => {
 	};
 };
 
-const EventCard = ({
-	event,
-	index
-}: {
-	event: (typeof events)[0];
-	index: number;
-}) => {
+const EventCard = ({ event, index }: { event: Event; index: number }) => {
 	const [isLiked, setIsLiked] = useState(false);
 	const [isBookmarked, setIsBookmarked] = useState(false);
 	const cardRef = useRef(null);
@@ -359,35 +248,30 @@ const EventCard = ({
 	);
 };
 
-export default function EventsSection() {
+export default function EventsSection({
+	data
+}: EventsSectionProps) {
 	const sectionRef = useRef(null);
 	const controls = useAnimation();
-	const [isHovering, setIsHovering] = useState(false);
 
-	const CARD_WIDTH = 360;
-	const GAP = 24;
-	const DURATION = events.length * 2;
+	const { events } = data;
+
+	const animation = useCallback(() => {
+		const scrollWidth = events.length * (360 + 24); // CARD_WIDTH + GAP
+		controls.start({
+			x: -scrollWidth,
+			transition: {
+				duration: 10, // DURATION
+				ease: 'linear',
+				repeat: Infinity,
+				repeatType: 'loop'
+			}
+		});
+	}, [controls, events.length]);
 
 	useEffect(() => {
-		const animation = () => {
-			const scrollWidth = events.length * (CARD_WIDTH + GAP);
-			controls.start({
-				x: -scrollWidth,
-				transition: {
-					duration: DURATION,
-					ease: 'linear',
-					repeat: Infinity,
-					repeatType: 'loop'
-				}
-			});
-		};
-
-		if (!isHovering) {
-			animation();
-		} else {
-			controls.stop();
-		}
-	}, [isHovering, controls, DURATION]);
+		animation();
+	}, [animation]);
 
 	return (
 		<section
@@ -424,10 +308,7 @@ export default function EventsSection() {
 						</motion.button>
 					</div>
 
-					<div
-						className='relative overflow-hidden rounded-2xl'
-						onMouseEnter={() => setIsHovering(true)}
-						onMouseLeave={() => setIsHovering(false)}>
+					<div className='relative overflow-hidden rounded-2xl'>
 						<div className='absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-slate-50 via-blue-50/80 to-transparent z-10 pointer-events-none' />
 						<div className='absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-indigo-50 via-blue-50/80 to-transparent z-10 pointer-events-none' />
 
@@ -435,7 +316,7 @@ export default function EventsSection() {
 							className='flex gap-6'
 							animate={controls}
 							style={{
-								width: `${(CARD_WIDTH + GAP) * events.length * 2}px`
+								width: `${(360 + 24) * events.length * 2}px`
 							}}>
 							{events.map((event, index) => (
 								<motion.div

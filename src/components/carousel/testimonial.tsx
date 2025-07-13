@@ -16,7 +16,31 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-const Testimonial = () => {
+interface TestimonialItem {
+	id: number;
+	name: string;
+	batch: string;
+	company: string;
+	position: string;
+	image: string;
+	video: string;
+	testimonial: string;
+	rating: number;
+	achievement: string;
+	tags: string[];
+}
+
+interface TestimonialData {
+	title: string;
+	subtitle: string;
+	testimonials: TestimonialItem[];
+}
+
+interface TestimonialProps {
+	data: TestimonialData;
+}
+
+export default function Testimonial({ data }: TestimonialProps) {
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const [isPlaying, setIsPlaying] = useState(false);
 	const [playingIndex, setPlayingIndex] = useState<number | null>(null);
@@ -26,104 +50,7 @@ const Testimonial = () => {
 	const isInView = useInView(sectionRef, { once: true, margin: '-100px' });
 	const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-	const testimonials = [
-		{
-			id: 1,
-			name: 'Arjun Sharma',
-			batch: 'B.Tech CSE 2024',
-			company: 'Microsoft',
-			position: 'Software Engineer',
-			image:
-				'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
-			video:
-				'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4',
-			testimonial:
-				"BPIT transformed my career. The faculty's guidance and modern infrastructure helped me secure my dream job at Microsoft. The coding culture here is exceptional.",
-			rating: 5,
-			achievement: 'Placed at Microsoft with 18 LPA package',
-			tags: ['Coding', 'Placements', 'Faculty']
-		},
-		{
-			id: 2,
-			name: 'Priya Patel',
-			batch: 'B.Tech IT 2023',
-			company: 'Amazon',
-			position: 'Product Manager',
-			image:
-				'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop&crop=face',
-			video:
-				'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4',
-			testimonial:
-				'The entrepreneurship ecosystem at BPIT is incredible. From ideation to execution, the support system helped me grow both personally and professionally.',
-			rating: 5,
-			achievement: 'Started her own tech startup',
-			tags: ['Innovation', 'Entrepreneurship', 'Leadership']
-		},
-		{
-			id: 3,
-			name: 'Rajesh Kumar',
-			batch: 'B.Tech ECE 2022',
-			company: 'Google',
-			position: 'Hardware Engineer',
-			image:
-				'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face',
-			video:
-				'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4',
-			testimonial:
-				'The research opportunities and advanced labs at BPIT gave me hands-on experience that directly contributed to my success at Google.',
-			rating: 5,
-			achievement: 'Published 3 research papers',
-			tags: ['Research', 'Innovation', 'Technology']
-		},
-		{
-			id: 4,
-			name: 'Sneha Gupta',
-			batch: 'B.Tech EEE 2024',
-			company: 'Tesla',
-			position: 'Electrical Engineer',
-			image:
-				'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face',
-			video:
-				'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4',
-			testimonial:
-				"BPIT's industry connections and practical learning approach prepared me for the global stage. Now I'm working on sustainable technology at Tesla.",
-			rating: 5,
-			achievement: 'Working on EV technology at Tesla',
-			tags: ['Sustainability', 'Global Exposure', 'Innovation']
-		},
-		{
-			id: 5,
-			name: 'Vikash Singh',
-			batch: 'MBA 2023',
-			company: 'McKinsey & Company',
-			position: 'Business Analyst',
-			image:
-				'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face',
-			video:
-				'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4',
-			testimonial:
-				'The management program at BPIT combines theoretical knowledge with practical experience. The case study approach and industry mentorship were game-changers.',
-			rating: 5,
-			achievement: 'Youngest team lead at McKinsey',
-			tags: ['Leadership', 'Strategy', 'Management']
-		},
-		{
-			id: 6,
-			name: 'Ananya Reddy',
-			batch: 'B.Tech CSE 2023',
-			company: 'Adobe',
-			position: 'UX Designer',
-			image:
-				'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=400&h=400&fit=crop&crop=face',
-			video:
-				'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4',
-			testimonial:
-				"BPIT's creative environment and supportive faculty helped me discover my passion for design. The college encourages interdisciplinary learning.",
-			rating: 5,
-			achievement: 'Leading design team at Adobe',
-			tags: ['Creativity', 'Design', 'Innovation']
-		}
-	];
+	const { title, subtitle, testimonials } = data;
 
 	const resetTimer = useCallback(() => {
 		if (timerRef.current) {
@@ -283,7 +210,7 @@ const Testimonial = () => {
 					</motion.div>
 
 					<h2 className='text-4xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-blue-900 via-blue-700 to-blue-900 bg-clip-text text-transparent leading-tight mb-6'>
-						Voices of Excellence
+						{title}
 					</h2>
 
 					<motion.p
@@ -291,8 +218,7 @@ const Testimonial = () => {
 						animate={isInView ? { opacity: 1, y: 0 } : {}}
 						transition={{ delay: 0.5, duration: 0.6 }}
 						className='text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed'>
-						Hear from our students and alumni about their transformative journey
-						at BPIT and how it shaped their successful careers.
+						{subtitle}
 					</motion.p>
 				</motion.div>
 
@@ -508,6 +434,4 @@ const Testimonial = () => {
 			`}</style>
 		</section>
 	);
-};
-
-export default Testimonial;
+}

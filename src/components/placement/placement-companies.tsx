@@ -4,61 +4,30 @@ import React from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 
-const PlacementCompanies = () => {
-	// Company logos data - using well-known tech/engineering companies
-	const companies = [
-		{
-			name: 'Microsoft',
-			logo: 'https://logo.clearbit.com/microsoft.com'
-		},
-		{
-			name: 'Google',
-			logo: 'https://logo.clearbit.com/google.com'
-		},
-		{
-			name: 'Amazon',
-			logo: 'https://logo.clearbit.com/amazon.com'
-		},
-		{
-			name: 'IBM',
-			logo: 'https://logo.clearbit.com/ibm.com'
-		},
-		{
-			name: 'TCS',
-			logo: 'https://logo.clearbit.com/tcs.com'
-		},
-		{
-			name: 'Infosys',
-			logo: 'https://logo.clearbit.com/infosys.com'
-		},
-		{
-			name: 'Wipro',
-			logo: 'https://logo.clearbit.com/wipro.com'
-		},
-		{
-			name: 'Accenture',
-			logo: 'https://logo.clearbit.com/accenture.com'
-		},
-		{
-			name: 'Dell',
-			logo: 'https://logo.clearbit.com/dell.com'
-		},
-		{
-			name: 'Oracle',
-			logo: 'https://logo.clearbit.com/oracle.com'
-		},
-		{
-			name: 'Adobe',
-			logo: 'https://logo.clearbit.com/adobe.com'
-		},
-		{
-			name: 'Cisco',
-			logo: 'https://logo.clearbit.com/cisco.com'
-		}
-	];
+interface Company {
+	name: string;
+	logo: string;
+}
 
+interface Statistic {
+	value: string;
+	label: string;
+}
+
+interface PlacementCompaniesData {
+	title: string;
+	subtitle: string;
+	companies: Company[];
+	statistics: Statistic[];
+}
+
+interface PlacementCompaniesProps {
+	data: PlacementCompaniesData;
+}
+
+const PlacementCompanies = ({ data }: PlacementCompaniesProps) => {
 	// Duplicate the array for seamless infinite scroll
-	const duplicatedCompanies = [...companies, ...companies];
+	const duplicatedCompanies = [...data.companies, ...data.companies];
 
 	return (
 		<section className='py-16 bg-gray-50 overflow-hidden'>
@@ -71,7 +40,7 @@ const PlacementCompanies = () => {
 						transition={{ duration: 0.6 }}
 						viewport={{ once: true }}
 						className='text-3xl md:text-4xl font-bold text-gray-900 mb-4'>
-						Our Placement Partners
+						{data.title}
 					</motion.h2>
 					<motion.p
 						initial={{ opacity: 0, y: 20 }}
@@ -79,8 +48,7 @@ const PlacementCompanies = () => {
 						transition={{ duration: 0.6, delay: 0.2 }}
 						viewport={{ once: true }}
 						className='text-lg text-gray-600 max-w-2xl mx-auto'>
-						Leading companies trust BPIT graduates for their innovation,
-						technical expertise, and professional excellence
+						{data.subtitle}
 					</motion.p>
 				</div>
 
@@ -133,30 +101,14 @@ const PlacementCompanies = () => {
 					transition={{ duration: 0.6, delay: 0.4 }}
 					viewport={{ once: true }}
 					className='grid grid-cols-2 md:grid-cols-4 gap-8 mt-16 max-w-4xl mx-auto'>
-					<div className='text-center'>
-						<div className='text-2xl md:text-3xl font-bold text-blue-600 mb-2'>
-							100+
+					{data.statistics.map((stat, index) => (
+						<div key={index} className='text-center'>
+							<div className='text-2xl md:text-3xl font-bold text-blue-600 mb-2'>
+								{stat.value}
+							</div>
+							<div className='text-sm text-gray-600'>{stat.label}</div>
 						</div>
-						<div className='text-sm text-gray-600'>Partner Companies</div>
-					</div>
-					<div className='text-center'>
-						<div className='text-2xl md:text-3xl font-bold text-blue-600 mb-2'>
-							95%
-						</div>
-						<div className='text-sm text-gray-600'>Placement Rate</div>
-					</div>
-					<div className='text-center'>
-						<div className='text-2xl md:text-3xl font-bold text-blue-600 mb-2'>
-							12 LPA
-						</div>
-						<div className='text-sm text-gray-600'>Highest Package</div>
-					</div>
-					<div className='text-center'>
-						<div className='text-2xl md:text-3xl font-bold text-blue-600 mb-2'>
-							6.5 LPA
-						</div>
-						<div className='text-sm text-gray-600'>Average Package</div>
-					</div>
+					))}
 				</motion.div>
 			</div>
 		</section>
