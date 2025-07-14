@@ -1487,7 +1487,7 @@ const CSEDepartmentPage = () => {
 															category: "exam"
 														}
 													].map((item, index) => {
-														const getCategoryColor = (category) => {
+														const getCategoryColor = (category: string) => {
 															switch (category) {
 																case 'academic': return 'bg-blue-100 text-blue-800';
 																case 'exam': return 'bg-red-100 text-red-800';
@@ -1502,10 +1502,10 @@ const CSEDepartmentPage = () => {
 															}
 														};
 
-														const calculateDuration = (start, end) => {
+														const calculateDuration = (start: string, end: string) => {
 															const startDate = new Date(start.split('-').reverse().join('-'));
 															const endDate = new Date(end.split('-').reverse().join('-'));
-															const diffTime = Math.abs(endDate - startDate);
+															const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
 															const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
 															return `${diffDays} days`;
 														};
@@ -1645,7 +1645,7 @@ const CSEDepartmentPage = () => {
 															category: "break"
 														}
 													].map((item, index) => {
-														const getCategoryColor = (category) => {
+														const getCategoryColor = (category: string) => {
 															switch (category) {
 																case 'academic': return 'bg-blue-100 text-blue-800';
 																case 'exam': return 'bg-red-100 text-red-800';
@@ -1660,10 +1660,10 @@ const CSEDepartmentPage = () => {
 															}
 														};
 
-														const calculateDuration = (start, end) => {
+														const calculateDuration = (start: string, end: string) => {
 															const startDate = new Date(start.split('-').reverse().join('-'));
 															const endDate = new Date(end.split('-').reverse().join('-'));
-															const diffTime = Math.abs(endDate - startDate);
+															const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
 															const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
 															return `${diffDays} days`;
 														};
@@ -1853,7 +1853,7 @@ const CSEDepartmentPage = () => {
 															category: "exam"
 														}
 													].map((item, index) => {
-														const getCategoryColor = (category) => {
+														const getCategoryColor = (category: string) => {
 															switch (category) {
 																case 'academic': return 'bg-blue-100 text-blue-800';
 																case 'exam': return 'bg-red-100 text-red-800';
@@ -1868,10 +1868,10 @@ const CSEDepartmentPage = () => {
 															}
 														};
 
-														const calculateDuration = (start, end) => {
+														const calculateDuration = (start: string, end: string) => {
 															const startDate = new Date(start.split('-').reverse().join('-'));
 															const endDate = new Date(end.split('-').reverse().join('-'));
-															const diffTime = Math.abs(endDate - startDate);
+															const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
 															const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
 															return `${diffDays} days`;
 														};
@@ -2031,7 +2031,7 @@ const CSEDepartmentPage = () => {
 															category: "break"
 														}
 													].map((item, index) => {
-														const getCategoryColor = (category) => {
+														const getCategoryColor = (category: string) => {
 															switch (category) {
 																case 'academic': return 'bg-blue-100 text-blue-800';
 																case 'exam': return 'bg-red-100 text-red-800';
@@ -2046,10 +2046,10 @@ const CSEDepartmentPage = () => {
 															}
 														};
 
-														const calculateDuration = (start, end) => {
+														const calculateDuration = (start: string, end: string) => {
 															const startDate = new Date(start.split('-').reverse().join('-'));
 															const endDate = new Date(end.split('-').reverse().join('-'));
-															const diffTime = Math.abs(endDate - startDate);
+															const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
 															const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
 															return `${diffDays} days`;
 														};

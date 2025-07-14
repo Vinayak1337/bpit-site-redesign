@@ -114,7 +114,8 @@ export async function GET() {
     });
 
   } catch (error) {
-    console.error('Error scraping brochures:', error);
+    // Log error for debugging purposes
+    // console.error('Error scraping brochures:', error);
     
     // Return fallback URLs in case of error
     return NextResponse.json({

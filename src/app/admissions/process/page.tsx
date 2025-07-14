@@ -22,16 +22,41 @@ interface Program {
     id: string;
     title: string;
     duration: string;
-    seats: string;
-    eligibility: string;
+    intake: string;
+    icon: React.ReactNode;
     description: string;
     highlights: string[];
-    careerOpportunities: string[];
-    icon: React.ReactNode;
-    color: string;
-    bgColor: string;
-    borderColor: string;
-    intake: string;
+    details: {
+        contentOffering: {
+            statement: string;
+            keyAreas: string[];
+        };
+        eligibilityAndSelection: {
+            academic: string;
+            minimumMarks: string;
+            entranceExam: string;
+            selectionProcess: string[];
+        };
+        programStructure: {
+            semesters: number;
+            totalCredits: number;
+            semesterDetails?: {
+                semester: number;
+                title: string;
+                subjects: string[];
+            }[];
+            breakdown?: never[];
+        };
+        careerOpportunities: string[];
+        faculty: {
+            name: string;
+            designation: string;
+            specialization: string;
+            experience: string;
+            linkedin?: string;
+            photo?: string;
+        }[];
+    };
 }
 
 const AdmissionsProcessPage = () => {

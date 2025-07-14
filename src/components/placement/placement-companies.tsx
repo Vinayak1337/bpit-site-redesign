@@ -113,7 +113,7 @@ const PlacementCompanies = () => {
 										className='object-contain filter grayscale hover:grayscale-0 transition-all duration-300 opacity-70 group-hover:opacity-100'
 										onError={() => {
 											// Fallback handled by Next.js Image component
-											console.log(`Failed to load logo for ${company.name}`);
+											// Handle image loading error silently
 										}}
 									/>
 								</motion.div>

@@ -1036,7 +1036,7 @@ const ProgramDetailsPage = () => {
                     >
                         <h2 className="text-2xl font-bold text-gray-900 mb-6">Faculty Members</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {currentProgram.details.faculty.map((faculty: { name: string; designation: string; qualification: string; photo?: string }, index: number) => (
+                            {currentProgram.details.faculty.map((faculty: { name: string; designation: string; specialization: string; experience: string; photo: string }, index: number) => (
                                 <motion.div 
                                     key={index} 
                                     className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden group"
@@ -1078,7 +1078,7 @@ const ProgramDetailsPage = () => {
                                             {faculty.designation}
                                         </p>
                                         <p className="text-gray-500 text-sm mb-2">
-                                            {faculty.experience}
+                                            {faculty.specialization}
                                         </p>
                                         <p className="text-gray-900 text-sm font-medium mb-4">
                                             Engineering and Technology
@@ -1087,9 +1087,7 @@ const ProgramDetailsPage = () => {
                                         {/* Connect Button */}
                                         <button 
                                             onClick={() => {
-                                                if (faculty.linkedin) {
-                                                    window.open(faculty.linkedin, '_blank');
-                                                }
+                                                // Connect functionality can be added here
                                             }}
                                             className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-600 transition-colors duration-200 text-sm"
                                         >
