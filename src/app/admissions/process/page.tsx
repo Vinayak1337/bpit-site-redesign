@@ -4,26 +4,38 @@ import { motion, AnimatePresence } from 'framer-motion';
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-    ChevronDown,
     ChevronRight,
     BookOpen,
     Users,
     Clock,
     GraduationCap,
-    Building2,
     Computer,
     Cpu,
     Brain,
-    Calculator,
     TrendingUp,
     Award,
     FileText,
     UserPlus
 } from 'lucide-react';
 
+interface Program {
+    id: string;
+    title: string;
+    duration: string;
+    seats: string;
+    eligibility: string;
+    description: string;
+    highlights: string[];
+    careerOpportunities: string[];
+    icon: React.ReactNode;
+    color: string;
+    bgColor: string;
+    borderColor: string;
+    intake: string;
+}
+
 const AdmissionsProcessPage = () => {
     const router = useRouter();
-    const [activeSection, setActiveSection] = useState('');
     const [activeSubsection, setActiveSubsection] = useState('');
     const [expandedSections, setExpandedSections] = useState<string[]>([]);
 
@@ -37,7 +49,6 @@ const AdmissionsProcessPage = () => {
 
     const handleSubsectionClick = (subsection: string) => {
         setActiveSubsection(subsection);
-        setActiveSection(subsection);
     };
 
     const handleViewDetails = (programId: string) => {
@@ -620,7 +631,7 @@ const AdmissionsProcessPage = () => {
         ]
     };
 
-    const renderProgramCards = (programs: any[]) => {
+    const renderProgramCards = (programs: Program[]) => {
         return (
             <motion.div
                 initial={{ opacity: 0, y: 20 }}

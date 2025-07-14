@@ -40,7 +40,6 @@ import {
 	BarChart,
 	CheckCircle,
 	BookOpenCheck,
-	Mail,
 	Award,
 	MapPin,
 	Menu,
@@ -187,7 +186,7 @@ const DepartmentHighlightsCarousel = () => {
 	];
 
 	// Create duplicate arrays for seamless infinite scrolling
-	const duplicatedHighlights = [...highlights, ...highlights];    const renderHighlightCard = (highlight: any, index: number) => (
+	const duplicatedHighlights = [...highlights, ...highlights];    const renderHighlightCard = (highlight: typeof highlights[0], index: number) => (
 		<div
 			key={`highlight-${index}`}
 			className='bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 group flex-shrink-0 w-72 sm:w-80 mx-2 sm:mx-3'
@@ -2203,7 +2202,7 @@ const CSEDepartmentPage = () => {
 												<div className='bg-gray-50 rounded-lg p-4'>
 													<h4 className='font-medium text-gray-900 mb-2'>Important Events</h4>
 													<ul className='text-sm text-gray-600 space-y-1'>
-														<li>• Freshers' Orientation: Aug 10, 2024</li>
+														<li>• Freshers&apos; Orientation: Aug 10, 2024</li>
 														<li>• Tech Symposium: Oct 5, 2024</li>
 														<li>• Project Presentations: Nov 20, 2024</li>
 														<li>• Winter Break: Dec 21, 2024</li>
@@ -3060,7 +3059,7 @@ const CSEDepartmentPage = () => {
                             </div>
                             <div className='bg-white/70 backdrop-blur-sm rounded-xl p-4'>
                                 <p className='text-gray-700 mb-4'>
-                                    The faculty members apply any of these methods in their respective subjects to make their teaching more interactive and increases the students' interest in the class.
+                                    The faculty members apply any of these methods in their respective subjects to make their teaching more interactive and increases the students&apos; interest in the class.
                                 </p>
                                 <div className='flex items-center'>
                                     <div className='w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3'>
@@ -3263,7 +3262,7 @@ const CSEDepartmentPage = () => {
                             </div>
                             <div className='prose max-w-none text-gray-700 leading-relaxed mb-6'>
                                 <p className='text-base mb-4'>
-                                    The Lab is equipped with the facility for Robotics. e-Yantra Robotic Lab is a MHRD funded project initiated by IIT Bombay under "e-Yantra Lab Setup Initiative (eLSI)" under which colleges are encouraged to setup robotics labs.
+                                    The Lab is equipped with the facility for Robotics. e-Yantra Robotic Lab is a MHRD funded project initiated by IIT Bombay under &quot;e-Yantra Lab Setup Initiative (eLSI)&quot; under which colleges are encouraged to setup robotics labs.
                                 </p>
                                 <p className='text-base mb-4'>
                                     It is designed as a scalable and sustainable approach that addresses infrastructure creation and teacher training – to create an eco-system at the colleges to impart effective engineering education.
@@ -3717,7 +3716,7 @@ const CSEDepartmentPage = () => {
                                             </div>
                                             <div className='flex items-center'>
                                                 <div className='w-2 h-2 bg-indigo-500 rounded-full mr-3'></div>
-                                                <span><strong>18 Systems:</strong> 18.5" Screen, i5 Processor, 16GB RAM, 500GB SSD</span>
+                                                <span><strong>18 Systems:</strong> 18.5&quot; Screen, i5 Processor, 16GB RAM, 500GB SSD</span>
                                             </div>
                                         </div>
                                     </div>
@@ -4032,7 +4031,7 @@ const CSEDepartmentPage = () => {
                                     <div className='space-y-3'>
                                         <div className='flex items-center justify-between p-3 bg-gray-50 rounded-lg'>
                                             <span className='text-sm font-medium text-gray-700'>Screen Size</span>
-                                            <span className='text-sm text-gray-900 font-semibold'>18.5" Display</span>
+                                            <span className='text-sm text-gray-900 font-semibold'>18.5&quot; Display</span>
                                         </div>
                                         <div className='flex items-center justify-between p-3 bg-gray-50 rounded-lg'>
                                             <span className='text-sm font-medium text-gray-700'>Processor</span>
@@ -4285,18 +4284,18 @@ const CSEDepartmentPage = () => {
 									<div className='lg:col-span-3'>
 										<div className='bg-white/70 backdrop-blur-sm rounded-xl p-4'>
 											<p className='text-gray-700 italic mb-3 text-sm'>
-												"Welcome to the Department of Computer Science & Engineering. Our department 
+												&quot;Welcome to the Department of Computer Science & Engineering. Our department 
 												is committed to providing quality education and fostering innovation in the 
-												field of computer science and engineering."
+												field of computer science and engineering.&quot;
 											</p>
 											<p className='text-gray-700 italic mb-3 text-sm'>
-												"We strive to create an environment where students can develop their 
+												&quot;We strive to create an environment where students can develop their 
 												technical skills, critical thinking abilities, and professional competencies 
-												to become successful engineers and leaders in the technology industry."
+												to become successful engineers and leaders in the technology industry.&quot;
 											</p>
 											<p className='text-gray-700 italic text-sm'>
-												"I invite you to explore our programs, research opportunities, and the 
-												vibrant academic community that makes our department a great place to learn and grow."
+												&quot;I invite you to explore our programs, research opportunities, and the 
+												vibrant academic community that makes our department a great place to learn and grow.&quot;
 											</p>
 										</div>
 									</div>

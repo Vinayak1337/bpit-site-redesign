@@ -133,7 +133,7 @@ export default function ScholarshipPage() {
                             </h2>
                         </div>
                         <p className="text-gray-600 text-lg leading-relaxed">
-                            BPIT is committed to supporting students' educational aspirations through various scholarship programs. 
+                            BPIT is committed to supporting students&apos; educational aspirations through various scholarship programs. 
                             Below are the detailed scholarships available from different sources including the University, Delhi Government, 
                             and National Scholarship Portal.
                         </p>

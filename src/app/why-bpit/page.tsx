@@ -21,7 +21,6 @@ import {
     Target,
     Globe,
     Phone,
-    Calendar,
     ArrowRight,
     Play,
     ChevronLeft,
@@ -31,7 +30,6 @@ import {
 const WhyBPITPage = () => {
     const [activeTab, setActiveTab] = useState('academics');
     const [currentTestimonial, setCurrentTestimonial] = useState(0);
-    const [currentStudentLifeSlide, setCurrentStudentLifeSlide] = useState(0);
     
     // Individual carousel states for each campus facility
     const [currentModernLabs, setCurrentModernLabs] = useState(0);
@@ -781,7 +779,7 @@ const WhyBPITPage = () => {
                                     </p>
                                     <div className="bg-blue-50 rounded-lg p-4 max-w-2xl mx-auto">
                                         <p className="text-blue-800 italic">
-                                            "The curriculum at BPIT bridges the gap between academic learning and industry requirements perfectly." - CSE Student, 2023
+                                            &quot;The curriculum at BPIT bridges the gap between academic learning and industry requirements perfectly.&quot; - CSE Student, 2023
                                         </p>
                                     </div>
                                 </motion.div>
@@ -803,7 +801,7 @@ const WhyBPITPage = () => {
                                     </p>
                                     <div className="bg-green-50 rounded-lg p-4 max-w-2xl mx-auto">
                                         <p className="text-green-800 italic">
-                                            "Faculty not only taught—they mentored us for success." - ECE Student, 2023
+                                            &quot;Faculty not only taught—they mentored us for success.&quot; - ECE Student, 2023
                                         </p>
                                     </div>
                                 </motion.div>
@@ -825,7 +823,7 @@ const WhyBPITPage = () => {
                                     </p>
                                     <div className="bg-purple-50 rounded-lg p-4 max-w-2xl mx-auto">
                                         <p className="text-purple-800 italic">
-                                            "The industry exposure and hands-on projects gave me a competitive edge." - EEE Student, 2023
+                                            &quot;The industry exposure and hands-on projects gave me a competitive edge.&quot; - EEE Student, 2023
                                         </p>
                                     </div>
                                 </motion.div>
@@ -1653,7 +1651,7 @@ const WhyBPITPage = () => {
                                 className="text-center"
                             >
                                 <p className="text-lg text-gray-700 italic leading-relaxed mb-6">
-                                    "{testimonials[currentTestimonial].quote}"
+                                    &quot;{testimonials[currentTestimonial].quote}&quot;
                                 </p>
                                 <div className="flex justify-center gap-2">
                                     {testimonials.map((_, index) => (

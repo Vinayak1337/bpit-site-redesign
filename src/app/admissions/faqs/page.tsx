@@ -315,7 +315,7 @@ export default function FAQPage() {
                             Still Have Questions?
                         </h3>
                         <p className="text-lg mb-6 text-blue-100">
-                            Can't find what you're looking for? Get in touch with our admissions team
+                            Can&apos;t find what you&apos;re looking for? Get in touch with our admissions team
                         </p>
                         <div className="grid md:grid-cols-3 gap-6 mt-8">
                             <div className="bg-white/20 rounded-lg p-4">

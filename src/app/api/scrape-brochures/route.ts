@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const IPU_ADMISSION_URL = 'http://www.ipu.ac.in/admission2025main2.php';
     

@@ -4,28 +4,19 @@ import { motion, AnimatePresence } from 'framer-motion';
 import React, { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import {
-    ChevronDown,
-    ChevronRight,
     BookOpen,
-    Users,
-    Clock,
-    GraduationCap,
-    Building2,
-    Computer,
-    Cpu,
-    Brain,
-    Calculator,
     TrendingUp,
     Award,
-    X,
     CheckCircle,
     User,
     Calendar,
-    BookOpenCheck,
     Briefcase,
     ArrowLeft,
     FileText,
-    UserPlus
+    UserPlus,
+    Computer,
+    Cpu,
+    Brain
 } from 'lucide-react';
 
 const ProgramDetailsPage = () => {
@@ -981,7 +972,7 @@ const ProgramDetailsPage = () => {
                                 <div>
                                     <h3 className="text-xl font-semibold text-gray-900 mb-6">Semester-wise Curriculum</h3>
                                     <div className="grid grid-cols-2 gap-6">
-                                        {currentProgram.details.programStructure.semesterDetails.map((semester: any, index: number) => (
+                                        {currentProgram.details.programStructure.semesterDetails.map((semester: { semester: number; title: string; subjects: string[] }, index: number) => (
                                             <motion.div 
                                                 key={index} 
                                                 className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-md transition-shadow"
@@ -1045,7 +1036,7 @@ const ProgramDetailsPage = () => {
                     >
                         <h2 className="text-2xl font-bold text-gray-900 mb-6">Faculty Members</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {currentProgram.details.faculty.map((faculty: any, index: number) => (
+                            {currentProgram.details.faculty.map((faculty: { name: string; designation: string; qualification: string; photo?: string }, index: number) => (
                                 <motion.div 
                                     key={index} 
                                     className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden group"

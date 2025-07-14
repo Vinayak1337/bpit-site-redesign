@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Download, FileText, GraduationCap, Calendar, ExternalLink, RefreshCw, AlertCircle } from 'lucide-react';
 
@@ -24,14 +24,7 @@ interface ScrapedBrochures {
     pgText?: string;
 }
 
-interface ApiResponse {
-    success: boolean;
-    brochures?: ScrapedBrochures;
-    fallback?: ScrapedBrochures;
-    error?: string;
-    scrapedAt: string;
-    sourceUrl?: string;
-}
+
 
 export default function BrochurePage() {
     const [brochures, setBrochures] = useState<BrochureInfo[]>([]);
@@ -40,30 +33,6 @@ export default function BrochurePage() {
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [scrapingStatus, setScrapingStatus] = useState<string>('');
     const [autoDetected, setAutoDetected] = useState<boolean>(false);
-
-    // Function to fetch brochures from IPU website automatically
-    const fetchBrochuresFromIPU = async (): Promise<ScrapedBrochures> => {
-        try {
-            setScrapingStatus('Scanning IPU website for brochures...');
-            
-            const response = await fetch('/api/scrape-brochures');
-            const data: ApiResponse = await response.json();
-            
-            if (data.success && data.brochures) {
-                setScrapingStatus('✓ Successfully found brochures on IPU website');
-                setAutoDetected(true);
-                return data.brochures;
-            } else {
-                setScrapingStatus('⚠ Could not find brochures automatically, using fallback URLs');
-                setAutoDetected(false);
-                return data.fallback || getCurrentBrochureUrls();
-            }
-        } catch (error) {
-            setScrapingStatus('❌ Error scanning website, using fallback URLs');
-            setAutoDetected(false);
-            return getCurrentBrochureUrls();
-        }
-    };
 
     // Function to get current year's brochure URLs (fallback)
     const getCurrentBrochureUrls = (): ScrapedBrochures => {
@@ -85,8 +54,31 @@ export default function BrochurePage() {
         };
     };
 
-    const initializeBrochures = async () => {
+    const initializeBrochures = useCallback(async () => {
         setIsLoading(true);
+        
+        // Inline the fetchBrochuresFromIPU logic
+        const fetchBrochuresFromIPU = async (): Promise<ScrapedBrochures> => {
+            try {
+                const response = await fetch('/api/scrape-brochures');
+                const data = await response.json();
+                
+                if (data.success && data.brochures) {
+                    setScrapingStatus('✅ Successfully found brochures on IPU website');
+                    setAutoDetected(true);
+                    return data.brochures;
+                } else {
+                    setScrapingStatus('⚠ Could not find brochures automatically, using fallback URLs');
+                    setAutoDetected(false);
+                    return data.fallback || getCurrentBrochureUrls();
+                }
+            } catch {
+                setScrapingStatus('❌ Error scanning website, using fallback URLs');
+                setAutoDetected(false);
+                return getCurrentBrochureUrls();
+            }
+        };
+        
         const urls = await fetchBrochuresFromIPU();
         const currentYear = new Date().getFullYear();
         
@@ -118,21 +110,22 @@ export default function BrochurePage() {
         setBrochures(brochureData);
         setLastChecked(new Date().toLocaleString());
         setIsLoading(false);
-    };
+    }, [autoDetected]);
 
-    const checkBrochureAvailability = async (url: string): Promise<boolean> => {
-        try {
-            // Use a proxy or CORS-enabled approach to check URL availability
-            const response = await fetch(url, { 
-                method: 'HEAD',
-                mode: 'no-cors'
-            });
-            return true;
-        } catch (error) {
-            console.warn(`Brochure URL may not be available: ${url}`);
-            return false;
-        }
-    };
+    // Remove unused function
+    // const checkBrochureAvailability = async (url: string): Promise<boolean> => {
+    //     try {
+    //         // Use a proxy or CORS-enabled approach to check URL availability
+    //         await fetch(url, { 
+    //             method: 'HEAD',
+    //             mode: 'no-cors'
+    //         });
+    //         return true;
+    //     } catch {
+    //         console.warn(`Brochure URL may not be available: ${url}`);
+    //         return false;
+    //     }
+    // };
 
     const refreshBrochureUrls = async () => {
         setIsRefreshing(true);
@@ -167,7 +160,7 @@ export default function BrochurePage() {
 
     useEffect(() => {
         initializeBrochures();
-    }, []);
+    }, [initializeBrochures]);
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
@@ -260,7 +253,7 @@ export default function BrochurePage() {
                                         </p>
                                         {brochure.detectedText && (
                                             <p className="text-xs opacity-75 mt-1">
-                                                Source: "{brochure.detectedText}"
+                                                Source: &quot;{brochure.detectedText}&quot;
                                             </p>
                                         )}
                                     </div>
@@ -278,7 +271,7 @@ export default function BrochurePage() {
                                 </p>
                                 
                                 <div className="bg-gray-50 rounded-lg p-4 mb-6">
-                                    <h4 className="font-semibold text-gray-800 mb-2">What's Included:</h4>
+                                    <h4 className="font-semibold text-gray-800 mb-2">What&apos;s Included:</h4>
                                     <ul className="text-sm text-gray-600 space-y-1">
                                         <li>• Program details and curriculum</li>
                                         <li>• Admission requirements and eligibility</li>
@@ -328,7 +321,7 @@ export default function BrochurePage() {
                         <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                             <h4 className="font-semibold text-green-800 mb-2">✓ Smart Auto-Detection</h4>
                             <p className="text-sm text-green-700">
-                                The system automatically scans <a href="http://www.ipu.ac.in/admission2025main2.php" target="_blank" rel="noopener noreferrer" className="underline">IPU's admission page</a> to find the latest undergraduate and postgraduate brochures. When you click "Refresh from IPU", it will scan the page and automatically detect new brochure links.
+                                The system automatically scans <a href="http://www.ipu.ac.in/admission2025main2.php" target="_blank" rel="noopener noreferrer" className="underline">IPU&apos;s admission page</a> to find the latest undergraduate and postgraduate brochures. When you click &quot;Refresh from IPU&quot;, it will scan the page and automatically detect new brochure links.
                             </p>
                         </div>
                         <div className="grid md:grid-cols-2 gap-6">
@@ -359,8 +352,8 @@ export default function BrochurePage() {
                             <h4 className="font-semibold text-blue-800 mb-2">How Auto-Detection Works</h4>
                             <ul className="text-sm text-blue-700 space-y-1">
                                 <li>• Scans the official IPU admission page: <span className="font-mono">admission2025main2.php</span></li>
-                                <li>• Looks for PDF links containing keywords like "undergraduate", "postgraduate", "brochure"</li>
-                                <li>• Matches URL patterns like "brug" (undergraduate) and "brPG" (postgraduate)</li>
+                                <li>• Looks for PDF links containing keywords like &quot;undergraduate&quot;, &quot;postgraduate&quot;, &quot;brochure&quot;</li>
+                                <li>• Matches URL patterns like &quot;brug&quot; (undergraduate) and &quot;brPG&quot; (postgraduate)</li>
                                 <li>• Falls back to known URLs if auto-detection fails</li>
                                 <li>• Updates automatically when IPU publishes new brochures</li>
                             </ul>
