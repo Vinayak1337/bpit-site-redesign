@@ -179,7 +179,7 @@ export const homeNoticesData: NoticesSectionData = {
 	]
 };
 
-export const homeEventsData = {
+export const homeEventsData: { events: EventItem[] } = {
 	events: [
 		{
 			id: 1,
