@@ -15,7 +15,64 @@ import {
 	Lightbulb
 } from 'lucide-react';
 
-const AboutPage = () => {
+import { aboutPageData } from '@/data/about';
+
+interface AboutPageData {
+	header: {
+		title: string;
+		subtitle: string;
+		established: string;
+		location: string;
+		accreditation: string;
+		affiliation: string;
+	};
+	stats: Array<{
+		icon: string;
+		value: string;
+		label: string;
+		color: string;
+	}>;
+	legacy: {
+		title: string;
+		paragraphs: string[];
+	};
+	features: Array<{
+		icon: string;
+		title: string;
+		description: string;
+		color: string;
+	}>;
+}
+
+interface AboutPageProps {
+	data: AboutPageData;
+}
+
+const getIcon = (iconName: string) => {
+	const icons: { [key: string]: React.ReactNode } = {
+		GraduationCap: <GraduationCap className='w-5 h-5' />,
+		BookOpen: <BookOpen className='w-5 h-5' />,
+		Trophy: <Trophy className='w-6 h-6' />,
+		Lightbulb: <Lightbulb className='w-6 h-6' />,
+		Users: <Users className='w-6 h-6' />
+	};
+	return icons[iconName] || <Building2 className='w-5 h-5' />;
+};
+
+const getColorClasses = (color: string) => {
+	const colors: { [key: string]: { text: string; bg: string } } = {
+		green: { text: 'text-green-600', bg: 'bg-green-100' },
+		purple: { text: 'text-purple-600', bg: 'bg-purple-100' },
+		blue: { text: 'text-blue-600', bg: 'bg-blue-100' }
+	};
+	return colors[color] || { text: 'text-gray-600', bg: 'bg-gray-100' };
+};
+
+const AboutPageWrapper = () => {
+	return <AboutPage data={aboutPageData} />;
+};
+
+const AboutPage = ({ data }: AboutPageProps) => {
 	return (
 		<div className='space-y-8'>
 			<motion.div
@@ -29,10 +86,10 @@ const AboutPage = () => {
 					</div>
 					<div>
 						<h1 className='text-3xl font-bold text-gray-900'>
-							Bhagwan Parshuram Institute of Technology
+							{data.header.title}
 						</h1>
 						<p className='text-blue-600 font-medium'>
-							Excellence in Engineering Education
+							{data.header.subtitle}
 						</p>
 					</div>
 				</div>
@@ -41,36 +98,36 @@ const AboutPage = () => {
 					<div className='space-y-4'>
 						<div className='flex items-center gap-3'>
 							<Calendar className='w-5 h-5 text-blue-600' />
-							<span className='text-gray-700'>Established: 2007</span>
+							<span className='text-gray-700'>Established: {data.header.established}</span>
 						</div>
 						<div className='flex items-center gap-3'>
 							<MapPin className='w-5 h-5 text-blue-600' />
-							<span className='text-gray-700'>Location: Rohini, New Delhi</span>
+							<span className='text-gray-700'>Location: {data.header.location}</span>
 						</div>
 						<div className='flex items-center gap-3'>
 							<Award className='w-5 h-5 text-blue-600' />
-							<span className='text-gray-700'>Accreditation: NBA & NAAC</span>
+							<span className='text-gray-700'>Accreditation: {data.header.accreditation}</span>
 						</div>
 						<div className='flex items-center gap-3'>
 							<Users className='w-5 h-5 text-blue-600' />
-							<span className='text-gray-700'>Affiliation: GGSIPU</span>
+							<span className='text-gray-700'>Affiliation: {data.header.affiliation}</span>
 						</div>
 					</div>
 					<div className='space-y-4'>
-						<div className='bg-white rounded-lg p-4 shadow-sm'>
-							<div className='flex items-center gap-2 mb-2'>
-								<GraduationCap className='w-5 h-5 text-green-600' />
-								<span className='font-semibold text-gray-900'>1000+</span>
-							</div>
-							<p className='text-sm text-gray-600'>Students Enrolled</p>
-						</div>
-						<div className='bg-white rounded-lg p-4 shadow-sm'>
-							<div className='flex items-center gap-2 mb-2'>
-								<BookOpen className='w-5 h-5 text-purple-600' />
-								<span className='font-semibold text-gray-900'>5</span>
-							</div>
-							<p className='text-sm text-gray-600'>Engineering Departments</p>
-						</div>
+						{data.stats.map((stat, index) => {
+							const colorClasses = getColorClasses(stat.color);
+							return (
+								<div key={index} className='bg-white rounded-lg p-4 shadow-sm'>
+									<div className='flex items-center gap-2 mb-2'>
+										<div className={colorClasses.text}>
+											{getIcon(stat.icon)}
+										</div>
+										<span className='font-semibold text-gray-900'>{stat.value}</span>
+									</div>
+									<p className='text-sm text-gray-600'>{stat.label}</p>
+								</div>
+							);
+						})}
 					</div>
 				</div>
 			</motion.div>
@@ -82,81 +139,41 @@ const AboutPage = () => {
 				className='space-y-6'>
 				<h2 className='text-2xl font-bold text-gray-900 flex items-center gap-3'>
 					<Globe className='w-6 h-6 text-blue-600' />
-					Our Legacy
+					{data.legacy.title}
 				</h2>
 
 				<div className='prose prose-lg text-gray-700 leading-relaxed'>
-					<p>
-						Bhagwan Parshuram Institute of Technology (BPIT) stands as a beacon
-						of excellence in engineering education in Delhi. Established in
-						2007, BPIT has been committed to providing world-class technical
-						education and fostering innovation among aspiring engineers.
-					</p>
-
-					<p>
-						Located in the heart of Rohini, New Delhi, our institution is
-						affiliated with Guru Gobind Singh Indraprastha University (GGSIPU)
-						and is accredited by the National Board of Accreditation (NBA) and
-						National Assessment and Accreditation Council (NAAC), ensuring the
-						highest standards of education quality.
-					</p>
-
-					<p>
-						Our campus is equipped with state-of-the-art laboratories, modern
-						classrooms, and cutting-edge research facilities. We offer
-						undergraduate programs in Computer Science, Information Technology,
-						Electronics & Communication, Electrical Engineering, and Management
-						Studies.
-					</p>
+					{data.legacy.paragraphs.map((paragraph, index) => (
+						<p key={index}>{paragraph}</p>
+					))}
 				</div>
 
 				<div className='grid md:grid-cols-3 gap-6 mt-8'>
-					<motion.div
-						whileHover={{ scale: 1.05 }}
-						className='bg-white rounded-xl p-6 shadow-lg border border-gray-200'>
-						<div className='w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4'>
-							<Trophy className='w-6 h-6 text-blue-600' />
-						</div>
-						<h3 className='font-semibold text-gray-900 mb-2'>
-							Academic Excellence
-						</h3>
-						<p className='text-gray-600 text-sm'>
-							Consistently high placement rates and academic achievements by our
-							students.
-						</p>
-					</motion.div>
-
-					<motion.div
-						whileHover={{ scale: 1.05 }}
-						className='bg-white rounded-xl p-6 shadow-lg border border-gray-200'>
-						<div className='w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4'>
-							<Lightbulb className='w-6 h-6 text-green-600' />
-						</div>
-						<h3 className='font-semibold text-gray-900 mb-2'>Innovation Hub</h3>
-						<p className='text-gray-600 text-sm'>
-							Fostering creativity and innovation through research projects and
-							startups.
-						</p>
-					</motion.div>
-
-					<motion.div
-						whileHover={{ scale: 1.05 }}
-						className='bg-white rounded-xl p-6 shadow-lg border border-gray-200'>
-						<div className='w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4'>
-							<Users className='w-6 h-6 text-purple-600' />
-						</div>
-						<h3 className='font-semibold text-gray-900 mb-2'>
-							Industry Connect
-						</h3>
-						<p className='text-gray-600 text-sm'>
-							Strong industry partnerships providing internships and placement
-							opportunities.
-						</p>
-					</motion.div>
+					{data.features.map((feature, index) => {
+						const colorClasses = getColorClasses(feature.color);
+						return (
+							<motion.div
+								key={index}
+								whileHover={{ scale: 1.05 }}
+								className='bg-white rounded-xl p-6 shadow-lg border border-gray-200'>
+								<div className={`w-12 h-12 ${colorClasses.bg} rounded-lg flex items-center justify-center mb-4`}>
+									<div className={colorClasses.text}>
+										{getIcon(feature.icon)}
+									</div>
+								</div>
+								<h3 className='font-semibold text-gray-900 mb-2'>
+									{feature.title}
+								</h3>
+								<p className='text-gray-600 text-sm'>
+									{feature.description}
+								</p>
+							</motion.div>
+						);
+					})}
 				</div>
 			</motion.div>
 		</div>
 	);
 };
 
-export default AboutPage;
+export default AboutPageWrapper;

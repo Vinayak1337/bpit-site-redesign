@@ -4,44 +4,49 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { Eye, Target, Award, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
+import * as Icons from 'lucide-react';
 
 interface NavItem {
 	id: string;
 	title: string;
-	icon: React.ReactNode;
+	icon: string;
 	href: string;
 }
 
-const navItems: NavItem[] = [
-	{
-		id: 'vision',
-		title: 'Our Vision',
-		icon: <Eye className='w-5 h-5' />,
-		href: '/vision-mission'
-	},
-	{
-		id: 'mission',
-		title: 'Our Mission',
-		icon: <Target className='w-5 h-5' />,
-		href: '/vision-mission/mission'
-	},
-	{
-		id: 'quality-policy',
-		title: 'Quality Policy',
-		icon: <Award className='w-5 h-5' />,
-		href: '/vision-mission/quality-policy'
-	}
-];
+interface Theme {
+	primary: string;
+	activeGradient: string;
+	activeBorder: string;
+	activeText: string;
+	activeIcon: string;
+	activeChevron: string;
+}
 
-const VisionMissionSidebar = () => {
+interface DynamicSidebarProps {
+	navItems: NavItem[];
+	theme: Theme;
+}
+
+const DynamicSidebar = ({ navItems, theme }: DynamicSidebarProps) => {
 	const pathname = usePathname();
 
 	const isActive = (href: string) => {
-		if (href === '/vision-mission') {
-			return pathname === '/vision-mission';
+		const basePath = navItems[0]?.href || '';
+		if (href === basePath) {
+			return pathname === basePath;
 		}
 		return pathname.startsWith(href);
+	};
+
+	const getIcon = (iconName: string) => {
+		const IconComponent = (
+			Icons as unknown as Record<
+				string,
+				React.ComponentType<{ className?: string }>
+			>
+		)[iconName];
+		return IconComponent ? <IconComponent className='w-5 h-5' /> : null;
 	};
 
 	return (
@@ -62,23 +67,23 @@ const VisionMissionSidebar = () => {
 								href={item.href}
 								className={`w-full text-left p-4 rounded-xl mb-2 transition-all duration-300 group relative overflow-hidden block ${
 									isActive(item.href)
-										? 'bg-blue-50 text-blue-700 shadow-md border border-blue-200'
+										? `bg-${theme.primary}-50 ${theme.activeText} shadow-md ${theme.activeBorder}`
 										: 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
 								}`}>
 								<div className='flex items-center gap-3 relative z-10'>
 									<div
 										className={`p-2 rounded-lg transition-colors ${
 											isActive(item.href)
-												? 'bg-blue-100 text-blue-600'
+												? `bg-${theme.primary}-100 ${theme.activeIcon}`
 												: 'bg-gray-100 text-gray-500 group-hover:bg-gray-200'
 										}`}>
-										{item.icon}
+										{getIcon(item.icon)}
 									</div>
 									<span className='font-medium'>{item.title}</span>
 									<ChevronRight
 										className={`w-4 h-4 ml-auto transition-transform ${
 											isActive(item.href)
-												? 'rotate-90 text-blue-600'
+												? `rotate-90 ${theme.activeChevron}`
 												: 'text-gray-400'
 										}`}
 									/>
@@ -86,7 +91,7 @@ const VisionMissionSidebar = () => {
 
 								{isActive(item.href) && (
 									<motion.div
-										className='absolute inset-0 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl'
+										className={`absolute inset-0 bg-gradient-to-r ${theme.activeGradient} rounded-xl`}
 										layoutId='activeTab'
 										initial={{ opacity: 0 }}
 										animate={{ opacity: 1 }}
@@ -102,4 +107,4 @@ const VisionMissionSidebar = () => {
 	);
 };
 
-export default VisionMissionSidebar;
+export default DynamicSidebar;

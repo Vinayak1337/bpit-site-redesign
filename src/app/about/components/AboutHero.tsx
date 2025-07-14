@@ -3,19 +3,28 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-const AboutHero = () => {
+interface AboutHeroData {
+	title: string;
+	subtitle: string;
+	gradient: string;
+}
+
+interface AboutHeroProps {
+	data: AboutHeroData;
+}
+
+const AboutHero = ({ data }: AboutHeroProps) => {
 	return (
-		<section className='bg-gradient-to-r from-blue-600 to-blue-700 text-white py-16'>
+		<section className={`bg-gradient-to-r ${data.gradient} text-white py-16`}>
 			<div className='container mx-auto px-4'>
 				<motion.div
 					initial={{ opacity: 0, y: 30 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.8 }}
 					className='text-center'>
-					<h1 className='text-4xl md:text-5xl font-bold mb-4'>About BPIT</h1>
+					<h1 className='text-4xl md:text-5xl font-bold mb-4'>{data.title}</h1>
 					<p className='text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto'>
-						Discover our journey of excellence, vision, and commitment to
-						engineering education
+						{data.subtitle}
 					</p>
 
 					{/* Floating Elements */}
