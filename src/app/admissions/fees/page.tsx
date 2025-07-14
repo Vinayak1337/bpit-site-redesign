@@ -546,16 +546,16 @@ export default function FeesPage() {
                                 <p className="text-xl font-bold mt-4">{formatCurrency(program.totalProgramFee)}</p>
                                 <p className="text-xs opacity-75 mb-4">Total Program Fee</p>
                                 <div className="flex gap-2">
-                                    <button
+                                    <div
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             downloadFeeStructure(program);
                                         }}
-                                        className="bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded text-xs flex items-center gap-1 transition-colors duration-200"
+                                        className="bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded text-xs flex items-center gap-1 transition-colors duration-200 cursor-pointer"
                                     >
                                         <Download className="w-3 h-3" />
                                         Download
-                                    </button>
+                                    </div>
                                 </div>
                             </motion.button>
                         ))}
@@ -622,16 +622,16 @@ export default function FeesPage() {
                                                         </p>
                                                         <p className="text-sm text-gray-600">Annual Fee</p>
                                                     </div>
-                                                    <button
+                                                    <div
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             downloadFeeStructure(currentProgram, yearData.year);
                                                         }}
-                                                        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg flex items-center gap-2 text-sm transition-colors duration-200"
+                                                        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg flex items-center gap-2 text-sm transition-colors duration-200 cursor-pointer"
                                                     >
                                                         <Download className="w-4 h-4" />
                                                         Download
-                                                    </button>
+                                                    </div>
                                                     {expandedYear === yearData.year ? (
                                                         <ChevronUp className="w-6 h-6 text-gray-500" />
                                                     ) : (
