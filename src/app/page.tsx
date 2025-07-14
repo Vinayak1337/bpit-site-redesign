@@ -2,10 +2,10 @@ import Hero1 from '@/components/hero/hero1';
 import Hero2 from '@/components/hero/hero2';
 import PlacementCompanies from '@/components/placement/placement-companies';
 
-import CollegeCarousel from '@/components/carousel';
-import TestimonialCarousel from '@/components/testimonial';
-import EventsSection from '@/components/events/events-section';
-import NoticesAnnouncementsScrollingSection from '@/components/notices/notices-announcements-scrolling';
+import Testimonial from '@/components/carousel/testimonial';
+import UltraModernEventsSection from '@/components/events/events-section';
+import ModernNoticesSection from '@/components/notices/modern-notices-section';
+import TopPlacedStudents from '@/components/placement/top-placed-students';
 
 export default function Home() {
 	return (
@@ -14,24 +14,15 @@ export default function Home() {
 
 			<Hero2 />
 
-			{/* Placement Companies */}
+			<ModernNoticesSection />
+
+			<UltraModernEventsSection />
+
 			<PlacementCompanies />
 
-			<EventsSection />
+			<TopPlacedStudents />
 
-			<NoticesAnnouncementsScrollingSection />
-
-			{/* Existing Components */}
-			<div className='bg-slate-50 py-16'>
-				<div className='container mx-auto px-4'>
-					<div className='m-5'>
-						<CollegeCarousel />
-					</div>
-					<div className='h-1/4 mt-16'>
-						<TestimonialCarousel />
-					</div>
-				</div>
-			</div>
+			<Testimonial />
 		</>
 	);
 }

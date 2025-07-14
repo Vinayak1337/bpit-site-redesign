@@ -1,237 +1,453 @@
-"use client"
+'use client';
 
-import { useState, useEffect } from "react"
-import Image from "next/image"
-import { ChevronLeft, ChevronRight, Calendar, MapPin, Clock } from "lucide-react"
-
+import React, { useState, useRef, useEffect } from 'react';
+import { motion, useInView, useAnimation } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import Image from 'next/image';
+import {
+	Clock,
+	MapPin,
+	Users,
+	ArrowRight,
+	Calendar,
+	Star,
+	Bookmark,
+	Zap,
+	Heart,
+	Globe,
+	Target,
+	Lightbulb,
+	Palette
+} from 'lucide-react';
 
 const events = [
 	{
 		id: 1,
-		title: "Annual Tech Symposium 2024",
-		date: "March 15, 2024",
-		time: "9:00 AM - 5:00 PM",
-		location: "Main Auditorium",
-		image: "/events/img3.png?height=400&width=400",
-		category: "Technology",
+		title: 'BPIT TechFest 2024',
+		subtitle: 'Innovation Summit & Tech Showcase',
+		description:
+			'Join us for the most spectacular tech festival featuring AI/ML workshops, robotics competitions, startup showcases, and industry expert keynotes.',
+		image: '/events/img1.png',
+		date: '2024-03-15',
+		time: '9:00 AM - 8:00 PM',
+		location: 'BPIT Main Auditorium',
+		category: 'Technology',
+		attendees: 1200,
+		featured: true,
+		status: 'upcoming',
+		tags: ['AI/ML', 'Robotics', 'Startups', 'Innovation'],
+		organizer: 'Technical Society BPIT',
+		registrationOpen: true,
+		price: 'Free',
+		highlights: ['Industry Leaders', '48+ Hours', '₹50K+ Prizes'],
+		rating: 4.9,
+		totalRatings: 847
 	},
 	{
 		id: 2,
-		title: "Cultural Fest - Harmony",
-		date: "March 22, 2024",
-		time: "6:00 PM - 11:00 PM",
-		location: "Campus Grounds",
-		image: "/events/img2.png?height=400&width=400",
-		category: "Cultural",
+		title: 'Industry Connect 2024',
+		subtitle: 'Career Guidance & Networking',
+		description:
+			'Exclusive networking event with senior engineers from FAANG companies sharing career insights, technical guidance, and placement strategies.',
+		image: '/events/img2.png',
+		date: '2024-03-22',
+		time: '2:00 PM - 7:00 PM',
+		location: 'Conference Hall Complex',
+		category: 'Professional',
+		attendees: 450,
+		featured: true,
+		status: 'upcoming',
+		tags: ['FAANG', 'Career', 'Networking', 'Placement'],
+		organizer: 'Training & Placement Cell',
+		registrationOpen: true,
+		price: '₹199',
+		highlights: ['FAANG Engineers', 'Live Q&A', 'Job Referrals'],
+		rating: 4.8,
+		totalRatings: 623
 	},
 	{
 		id: 3,
-		title: "Career Fair 2024",
-		date: "April 5, 2024",
-		time: "10:00 AM - 4:00 PM",
-		location: "Sports Complex",
-		image: "/events/img3.png?height=400&width=400",
-		category: "Career",
+		title: 'Sanskriti Cultural Fest',
+		subtitle: 'Celebrating Arts & Heritage',
+		description:
+			'Experience the vibrant tapestry of Indian culture through music, dance, drama, art exhibitions, and traditional performances.',
+		image: '/events/img3.png',
+		date: '2024-04-05',
+		time: '6:00 PM - 11:00 PM',
+		location: 'Open Air Theatre',
+		category: 'Cultural',
+		attendees: 1500,
+		featured: false,
+		status: 'upcoming',
+		tags: ['Music', 'Dance', 'Art', 'Heritage'],
+		organizer: 'Cultural Committee',
+		registrationOpen: true,
+		price: 'Free',
+		highlights: ['Live Performances', '15+ Events', 'Celebrity Guest'],
+		rating: 4.7,
+		totalRatings: 1024
 	},
 	{
 		id: 4,
-		title: "Research Conference",
-		date: "April 12, 2024",
-		time: "9:30 AM - 6:00 PM",
-		location: "Conference Hall",
-		image: "/events/img2.png?height=400&width=400",
-		category: "Academic",
+		title: 'CodeCraft Hackathon',
+		subtitle: '72-Hour Innovation Marathon',
+		description:
+			'The ultimate coding challenge to solve real-world problems with cutting-edge technology, mentorship, and massive prize pool.',
+		image: '/events/img1.png',
+		date: '2024-04-12',
+		time: '9:00 AM - 9:00 AM (+3 days)',
+		location: 'Computer Science Block',
+		category: 'Technology',
+		attendees: 300,
+		featured: true,
+		status: 'upcoming',
+		tags: ['Hackathon', 'Innovation', 'Prizes', 'Mentorship'],
+		organizer: 'CSE Department',
+		registrationOpen: true,
+		price: '₹299',
+		highlights: ['₹1L+ Prizes', '72 Hours', 'Mentor Support'],
+		rating: 4.9,
+		totalRatings: 412
 	},
 	{
 		id: 5,
-		title: "Sports Meet 2024",
-		date: "April 20, 2024",
-		time: "8:00 AM - 6:00 PM",
-		location: "Sports Ground",
-		image: "/events/img3.png?height=400&width=400",
-		category: "Sports",
+		title: 'Research Symposium',
+		subtitle: 'Future of Engineering',
+		description:
+			'Showcase of groundbreaking research in emerging technologies, sustainable engineering, and next-generation innovations.',
+		image: '/events/img2.png',
+		date: '2024-04-18',
+		time: '10:00 AM - 6:00 PM',
+		location: 'Research Center',
+		category: 'Academic',
+		attendees: 350,
+		featured: false,
+		status: 'upcoming',
+		tags: ['Research', 'Innovation', 'Future Tech', 'Sustainability'],
+		organizer: 'R&D Cell',
+		registrationOpen: true,
+		price: 'Free',
+		highlights: ['20+ Papers', 'Expert Panel', 'Publication'],
+		rating: 4.6,
+		totalRatings: 267
 	},
 	{
 		id: 6,
-		title: "Alumni Meet",
-		date: "May 5, 2024",
-		time: "5:00 PM - 10:00 PM",
-		location: "Main Hall",
-		image: "/events/img2.png?height=400&width=400",
-		category: "Alumni",
-	},
-]
-
-const getCategoryColor = (category: string) => {
-	const colors = {
-		Technology: "bg-blue-100 text-blue-800",
-		Cultural: "bg-purple-100 text-purple-800",
-		Career: "bg-green-100 text-green-800",
-		Academic: "bg-blue-100 text-blue-800",
-		Sports: "bg-orange-100 text-orange-800",
-		Alumni: "bg-indigo-100 text-indigo-800",
+		title: 'Alumni Homecoming',
+		subtitle: 'Reconnect & Celebrate Success',
+		description:
+			'Annual alumni gathering celebrating achievements, sharing experiences, and strengthening the BPIT family bonds.',
+		image: '/events/img3.png',
+		date: '2024-04-25',
+		time: '4:00 PM - 10:00 PM',
+		location: 'Alumni Memorial Hall',
+		category: 'Networking',
+		attendees: 800,
+		featured: false,
+		status: 'upcoming',
+		tags: ['Alumni', 'Success Stories', 'Networking', 'Legacy'],
+		organizer: 'Alumni Association',
+		registrationOpen: false,
+		price: 'Invite Only',
+		highlights: ['Success Stories', 'Gala Dinner', 'Awards'],
+		rating: 4.8,
+		totalRatings: 956
 	}
-	return colors[category as keyof typeof colors] || "bg-gray-100 text-gray-800"
-}
+];
 
-export default function EventsSection() {
-	const [currentIndex, setCurrentIndex] = useState(0)
-	const [cardsPerView, setCardsPerView] = useState(4)
+const categoryIcons = {
+	Technology: <Zap className='w-5 h-5' />,
+	Cultural: <Palette className='w-5 h-5' />,
+	Professional: <Target className='w-5 h-5' />,
+	Academic: <Lightbulb className='w-5 h-5' />,
+	Networking: <Globe className='w-5 h-5' />
+};
 
+const formatDate = (dateString: string) => {
+	const date = new Date(dateString);
+	return {
+		day: date.getDate().toString().padStart(2, '0'),
+		month: date.toLocaleDateString('en-US', { month: 'short' }).toUpperCase(),
+		year: date.getFullYear().toString(),
+		weekday: date.toLocaleDateString('en-US', { weekday: 'long' })
+	};
+};
 
-	const getCardsPerView = () => {
-		if (typeof window !== "undefined") {
-			if (window.innerWidth < 640) return 1 // Mobile: 1 card
-			if (window.innerWidth < 1024) return 2 // Tablet: 2 cards
-			return 4 // Desktop: 4 cards
-		}
-		return 4
-	}
+const EventCard = ({
+	event,
+	index
+}: {
+	event: (typeof events)[0];
+	index: number;
+}) => {
+	const [isLiked, setIsLiked] = useState(false);
+	const [isBookmarked, setIsBookmarked] = useState(false);
+	const cardRef = useRef(null);
+	const isInView = useInView(cardRef, { once: true, margin: '-100px' });
 
-	useEffect(() => {
-		const handleResize = () => {
-			setCardsPerView(getCardsPerView())
-		}
-
-		// Set initial value
-		setCardsPerView(getCardsPerView())
-
-		window.addEventListener("resize", handleResize)
-		return () => window.removeEventListener("resize", handleResize)
-	}, [])
-
-	const maxIndex = Math.max(0, events.length - cardsPerView)
-
-	const nextSlide = () => {
-		setCurrentIndex((prev) => {
-			const nextIndex = prev + 1
-			if (nextIndex > maxIndex) {
-				return 0
-			}
-			return nextIndex
-		})
-	}
-
-	const prevSlide = () => {
-		setCurrentIndex((prev) => {
-			const prevIndex = prev - 1
-			if (prevIndex < 0) {
-				return maxIndex
-			}
-			return prevIndex
-		})
-	}
-
-	const getVisibleEvents = () => {
-		return events.slice(currentIndex, currentIndex + cardsPerView)
-	}
+	const dateObj = formatDate(event.date);
 
 	return (
-		<section className="py-16 px-4 md:px-6 lg:px-8 bg-white">
-			<div className="max-w-7xl mx-auto">
-				<div className="text-center mb-12">
-					<h2 className="text-3xl md:text-4xl font-bold text-gray-600 mb-4 font-sans">
-						Upcoming Events
-					</h2>
+		<motion.div
+			ref={cardRef}
+			initial={{ opacity: 0, y: 50 }}
+			animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+			transition={{
+				duration: 0.6,
+				delay: index * 0.1,
+				ease: 'easeOut'
+			}}
+			whileHover={{
+				y: -10,
+				transition: { duration: 0.3 }
+			}}
+			className='relative group'>
+			<div
+				className='
+				relative overflow-hidden rounded-3xl bg-white/90 backdrop-blur-xl
+				border border-white/40 shadow-lg
+				transform-gpu transition-all duration-500
+				group-hover:shadow-2xl group-hover:shadow-black/10
+			'>
+				<div className='absolute inset-0 bg-gradient-to-br from-blue-50 to-blue-100 opacity-30' />
+
+				{event.featured && (
+					<div className='absolute top-4 left-4 z-20'>
+						<div className='flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-sm font-bold rounded-full shadow-lg'>
+							<Star className='w-4 h-4 fill-current' />
+							Featured
+						</div>
+					</div>
+				)}
+
+				<div className='absolute top-4 right-4 z-20 flex gap-2'>
+					<button
+						onClick={() => setIsLiked(!isLiked)}
+						aria-label='Like event'
+						className={`p-2 rounded-full backdrop-blur-md transition-all duration-300 ${
+							isLiked
+								? 'bg-blue-500 text-white shadow-lg'
+								: 'bg-white/80 text-gray-600 hover:bg-white'
+						}`}>
+						<Heart className={`w-4 h-4 ${isLiked ? 'fill-current' : ''}`} />
+					</button>
+					<button
+						onClick={() => setIsBookmarked(!isBookmarked)}
+						aria-label='Bookmark event'
+						className={`p-2 rounded-full backdrop-blur-md transition-all duration-300 ${
+							isBookmarked
+								? 'bg-blue-500 text-white shadow-lg'
+								: 'bg-white/80 text-gray-600 hover:bg-white'
+						}`}>
+						<Bookmark
+							className={`w-4 h-4 ${isBookmarked ? 'fill-current' : ''}`}
+						/>
+					</button>
 				</div>
 
-				<div className="relative px-8 md:px-12">
-					{/* Navigation Arrows */}
-					<button
-						onClick={prevSlide}
-						className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 backdrop-blur-sm shadow-xl border-2 border-blue-100 hover:bg-blue-50 hover:border-blue-200 transition-all duration-200 w-12 h-12 rounded-full flex items-center justify-center cursor-pointer"
-						aria-label="Previous slide"
-						type="button"
-					>
-						<ChevronLeft className="w-6 h-6 text-blue-600 group-hover:text-blue-800 transition-colors" />
-					</button>
+				<div className='relative h-64 overflow-hidden'>
+					<div className='h-full transition-transform duration-300 group-hover:scale-105'>
+						<Image
+							src={event.image}
+							alt={event.title}
+							fill
+							className='object-cover'
+						/>
+					</div>
 
-					<button
-						onClick={nextSlide}
-						className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 backdrop-blur-sm shadow-xl border-2 border-blue-100 hover:bg-blue-50 hover:border-blue-200 transition-all duration-200 w-12 h-12 rounded-full flex items-center justify-center cursor-pointer"
-						aria-label="Next slide"
-						type="button"
-					>
-						<ChevronRight className="w-6 h-6 text-blue-600 group-hover:text-blue-800 transition-colors" />
-					</button>
+					<div className='absolute inset-0 bg-gradient-to-t from-blue-900 to-blue-800 opacity-30' />
 
-					{/* Events Carousel Container */}
-					<div className="overflow-hidden">
-						<div className="flex transition-transform duration-500 ease-in-out gap-4 md:gap-6">
-							{getVisibleEvents().map((event) => (
-								<div
-									key={event.id}
-									className={`group relative overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 flex-shrink-0 ${
-										cardsPerView === 1
-											? "w-full max-w-sm mx-auto"
-											: cardsPerView === 2
-											? "w-[calc(50%-8px)] max-w-xs"
-											: "w-[calc(25%-18px)] max-w-xs"
-									}`}
-								>
-									<div className="relative h-[420px]">
-										<Image
-											src={event.image || "/placeholder.svg"}
-											alt={event.title}
-											fill
-											className="object-cover transition-transform duration-300 group-hover:scale-105"
-										/>
-										<div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-
-										{/* Category Badge */}
-										<div className="absolute top-4 left-4">
-											<span
-												className={`px-3 py-1 rounded-full text-xs font-semibold font-sans ${getCategoryColor(
-													event.category
-												)}`}
-											>
-												{event.category}
-											</span>
-										</div>
-
-										{/* Event Info Overlay */}
-										<div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 text-white">
-											<h3 className="text-lg md:text-xl font-bold mb-3 line-clamp-2 font-sans">
-												{event.title}
-											</h3>
-											<div className="space-y-2">
-												<div className="flex items-center text-xs md:text-sm font-sans">
-													<Calendar className="w-3 h-3 md:w-4 md:h-4 mr-2 flex-shrink-0" />
-													<span>{event.date}</span>
-												</div>
-												<div className="flex items-center text-xs md:text-sm font-sans">
-													<Clock className="w-3 h-3 md:w-4 md:h-4 mr-2 flex-shrink-0" />
-													<span>{event.time}</span>
-												</div>
-												<div className="flex items-center text-xs md:text-sm font-sans">
-													<MapPin className="w-3 h-3 md:w-4 md:h-4 mr-2 flex-shrink-0" />
-													<span>{event.location}</span>
-												</div>
-											</div>
-										</div>
-									</div>
+					<div className='absolute bottom-4 left-4'>
+						<div className='bg-white/95 backdrop-blur-md rounded-2xl p-3 shadow-xl border border-white/40'>
+							<div className='text-center'>
+								<div className='text-2xl font-bold text-blue-600'>
+									{dateObj.day}
 								</div>
-							))}
+								<div className='text-sm font-semibold text-gray-600'>
+									{dateObj.month}
+								</div>
+							</div>
 						</div>
 					</div>
 
-					{/* Dots Indicator */}
-					<div className="flex justify-center mt-8 space-x-2">
-						{Array.from({ length: maxIndex + 1 }).map((_, index) => (
-							<button
-								key={index}
-								onClick={() => setCurrentIndex(index)}
-								className={`w-3 h-3 rounded-full transition-colors duration-200 ${
-									index === currentIndex
-										? "bg-blue-600"
-										: "bg-gray-300 hover:bg-gray-400"
-								}`}
-								aria-label={`Go to slide ${index + 1}`}
-							/>
+					<div className='absolute bottom-4 right-4'>
+						<div className='flex items-center gap-1 px-3 py-1.5 bg-white/95 backdrop-blur-md rounded-full shadow-xl border border-white/40'>
+							<Star className='w-4 h-4 text-yellow-500 fill-current' />
+							<span className='text-sm font-bold text-gray-800'>
+								{event.rating}
+							</span>
+							<span className='text-xs text-gray-500'>
+								({event.totalRatings})
+							</span>
+						</div>
+					</div>
+				</div>
+
+				<div className='relative p-6 space-y-4'>
+					<div className='flex items-center gap-2'>
+						<div className='p-2 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg'>
+							{categoryIcons[event.category as keyof typeof categoryIcons] || (
+								<Zap className='w-5 h-5' />
+							)}
+						</div>
+						<span className='text-sm font-bold text-blue-600 bg-gradient-to-r from-blue-500 to-blue-600 bg-clip-text'>
+							{event.category}
+						</span>
+					</div>
+
+					<div>
+						<h3 className='text-xl font-bold text-gray-900 mb-1 line-clamp-2'>
+							{event.title}
+						</h3>
+						<p className='text-sm font-medium text-gray-600'>
+							{event.subtitle}
+						</p>
+					</div>
+
+					<p className='text-sm text-gray-600 leading-relaxed line-clamp-3'>
+						{event.description}
+					</p>
+
+					<div className='space-y-2'>
+						<div className='flex items-center gap-2 text-sm text-gray-600'>
+							<Clock className='w-4 h-4' />
+							<span>{event.time}</span>
+						</div>
+						<div className='flex items-center gap-2 text-sm text-gray-600'>
+							<MapPin className='w-4 h-4' />
+							<span>{event.location}</span>
+						</div>
+						<div className='flex items-center gap-2 text-sm text-gray-600'>
+							<Users className='w-4 h-4' />
+							<span>{event.attendees} attendees</span>
+						</div>
+					</div>
+
+					<div className='flex flex-wrap gap-2'>
+						{event.highlights.map((highlight, i) => (
+							<span
+								key={i}
+								className='px-3 py-1 text-xs font-medium rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'>
+								{highlight}
+							</span>
 						))}
+					</div>
+
+					<div className='pt-4'>
+						<motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+							<Button
+								className='w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:shadow-xl text-white border-0 rounded-2xl py-3 font-bold transition-all duration-300'
+								disabled={!event.registrationOpen}>
+								{event.registrationOpen ? (
+									<>
+										<Calendar className='w-4 h-4 mr-2' />
+										Register Now
+										<ArrowRight className='w-4 h-4 ml-2' />
+									</>
+								) : (
+									<>
+										<Clock className='w-4 h-4 mr-2' />
+										Registration Closed
+									</>
+								)}
+							</Button>
+						</motion.div>
+					</div>
+				</div>
+			</div>
+		</motion.div>
+	);
+};
+
+export default function EventsSection() {
+	const sectionRef = useRef(null);
+	const controls = useAnimation();
+	const [isHovering, setIsHovering] = useState(false);
+
+	const CARD_WIDTH = 360;
+	const GAP = 24;
+	const DURATION = events.length * 2;
+
+	useEffect(() => {
+		const animation = () => {
+			const scrollWidth = events.length * (CARD_WIDTH + GAP);
+			controls.start({
+				x: -scrollWidth,
+				transition: {
+					duration: DURATION,
+					ease: 'linear',
+					repeat: Infinity,
+					repeatType: 'loop'
+				}
+			});
+		};
+
+		if (!isHovering) {
+			animation();
+		} else {
+			controls.stop();
+		}
+	}, [isHovering, controls, DURATION]);
+
+	return (
+		<section
+			ref={sectionRef}
+			className='relative py-32 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 overflow-hidden'>
+			<div className='absolute inset-0'>
+				<div className='absolute top-20 left-10 w-[300px] h-[300px] bg-blue-300/10 rounded-full mix-blend-multiply filter blur-2xl' />
+				<div className='absolute top-40 right-10 w-[250px] h-[250px] bg-red-300/10 rounded-full mix-blend-multiply filter blur-2xl' />
+			</div>
+
+			<div className='relative z-10 container mx-auto px-4'>
+				<div className='max-w-7xl mx-auto'>
+					<div className='flex items-center justify-between mb-8'>
+						<div className='flex items-center gap-3'>
+							<div className='p-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl shadow-lg'>
+								<Calendar className='w-6 h-6' />
+							</div>
+							<div>
+								<h3 className='text-2xl font-bold text-gray-800'>
+									Official Events
+								</h3>
+								<p className='text-gray-600'>
+									Latest campus events and activities
+								</p>
+							</div>
+						</div>
+
+						<motion.button
+							className='group flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300'
+							whileHover={{ scale: 1.05, x: 5 }}
+							whileTap={{ scale: 0.95 }}>
+							<span className='font-semibold'>View All Events</span>
+							<ArrowRight className='w-5 h-5 group-hover:translate-x-1 transition-transform' />
+						</motion.button>
+					</div>
+
+					<div
+						className='relative overflow-hidden rounded-2xl'
+						onMouseEnter={() => setIsHovering(true)}
+						onMouseLeave={() => setIsHovering(false)}>
+						<div className='absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-slate-50 via-blue-50/80 to-transparent z-10 pointer-events-none' />
+						<div className='absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-indigo-50 via-blue-50/80 to-transparent z-10 pointer-events-none' />
+
+						<motion.div
+							className='flex gap-6'
+							animate={controls}
+							style={{
+								width: `${(CARD_WIDTH + GAP) * events.length * 2}px`
+							}}>
+							{events.map((event, index) => (
+								<motion.div
+									key={`${event.id}-${index}`}
+									className='w-[360px] flex-shrink-0'>
+									<EventCard event={event} index={index % events.length} />
+								</motion.div>
+							))}
+						</motion.div>
 					</div>
 				</div>
 			</div>
 		</section>
-	)
+	);
 }

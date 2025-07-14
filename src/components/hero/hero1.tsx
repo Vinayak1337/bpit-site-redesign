@@ -4,30 +4,13 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import {
-	GraduationCap,
-	Users,
 	Award,
-	BookOpen,
 	ArrowRight,
 	Star,
 	CheckCircle
 } from 'lucide-react';
 
 const Hero1 = () => {
-	const stats = [
-		{
-			icon: <GraduationCap className='w-6 h-6' />,
-			number: '1000+',
-			label: 'Students'
-		},
-		{ icon: <Users className='w-6 h-6' />, number: '50+', label: 'Faculty' },
-		{ icon: <Award className='w-6 h-6' />, number: 'NBA', label: 'Accredited' },
-		{
-			icon: <BookOpen className='w-6 h-6' />,
-			number: '5',
-			label: 'Departments'
-		}
-	];
 
 	const highlights = [
 		'Industry-Aligned Curriculum',
@@ -36,9 +19,8 @@ const Hero1 = () => {
 		'Modern Labs & Smart Campus'
 	];
 
-	// add opacity to the background white color
 	return (
-		<section className='relative min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50  overflow-hidden'>
+		<section className='relative max-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50  overflow-hidden'>
 			{/* Background Elements */}
 			<div className='absolute inset-0'>
 				<div className='absolute top-20 left-10 w-72 h-72 bg-blue-100 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob' />
@@ -222,50 +204,6 @@ const Hero1 = () => {
 							</Button>
 						</motion.div>
 					</div>
-
-					{/* Stats Section */}
-					<motion.div
-						initial={{ opacity: 0, y: 40 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ duration: 0.8, delay: 1.2 }}
-						className='mt-20 grid grid-cols-2 md:grid-cols-4 gap-8'>
-						{stats.map((stat, index) => (
-							<motion.div
-								key={index}
-								initial={{ opacity: 0, scale: 0.8 }}
-								animate={{ opacity: 1, scale: 1 }}
-								transition={{ duration: 0.5, delay: 1.4 + index * 0.1 }}
-								className='text-center bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20'>
-								<div className='flex justify-center mb-3 text-blue-600'>
-									{stat.icon}
-								</div>
-								<div className='text-2xl md:text-3xl font-bold text-gray-900 mb-1'>
-									{stat.number}
-								</div>
-								<div className='text-sm text-gray-600 font-medium'>
-									{stat.label}
-								</div>
-							</motion.div>
-						))}
-					</motion.div>
-
-					{/* Scroll Indicator */}
-					<motion.div
-						initial={{ opacity: 0 }}
-						animate={{ opacity: 1 }}
-						transition={{ duration: 0.8, delay: 1.8 }}
-						className='absolute bottom-8 left-1/2 transform -translate-x-1/2'>
-						<motion.div
-							animate={{ y: [0, 10, 0] }}
-							transition={{ duration: 2, repeat: Infinity }}
-							className='w-6 h-10 border-2 border-gray-400 rounded-full flex justify-center'>
-							<motion.div
-								animate={{ y: [0, 12, 0] }}
-								transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
-								className='w-1 h-3 bg-gray-400 rounded-full mt-2'
-							/>
-						</motion.div>
-					</motion.div>
 				</div>
 			</div>
 
