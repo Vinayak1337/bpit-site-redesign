@@ -5,7 +5,6 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
     ChevronRight,
-    BookOpen,
     Users,
     Clock,
     GraduationCap,
@@ -13,10 +12,9 @@ import {
     Cpu,
     Brain,
     TrendingUp,
-    Award,
-    FileText,
-    UserPlus
+    Award
 } from 'lucide-react';
+import AdmissionsSidebar from '@/components/admissions/AdmissionsSidebar';
 
 interface Program {
     id: string;
@@ -672,16 +670,16 @@ const AdmissionsProcessPage = () => {
                         transition={{ duration: 0.5, delay: index * 0.1 }}
                         className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 overflow-hidden"
                     >
-                        <div className="p-6">
-                            <div className="flex items-start justify-between">
+                        <div className="p-4 sm:p-6">
+                            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                                 <div className="flex-1">
                                     <div className="flex items-center gap-3 mb-3">
-                                        <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600">
+                                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 flex-shrink-0">
                                             {program.icon}
                                         </div>
-                                        <div>
-                                            <h3 className="text-xl font-bold text-gray-900">{program.title}</h3>
-                                            <div className="flex items-center gap-4 mt-1 text-sm text-gray-600">
+                                        <div className="min-w-0 flex-1">
+                                            <h3 className="text-lg sm:text-xl font-bold text-gray-900 leading-tight">{program.title}</h3>
+                                            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mt-1 text-sm text-gray-600">
                                                 <span className="flex items-center gap-1">
                                                     <Clock className="w-4 h-4" />
                                                     Duration {program.duration}
@@ -693,12 +691,12 @@ const AdmissionsProcessPage = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <p className="text-gray-600 mb-4">{program.description}</p>
+                                    <p className="text-gray-600 mb-4 text-sm sm:text-base">{program.description}</p>
                                     <div className="flex flex-wrap gap-2 mb-4">
                                         {program.highlights.map((highlight: string, idx: number) => (
                                             <span
                                                 key={idx}
-                                                className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm font-medium"
+                                                className="px-2 py-1 sm:px-3 sm:py-1 bg-blue-50 text-blue-700 rounded-full text-xs sm:text-sm font-medium"
                                             >
                                                 {highlight}
                                             </span>
@@ -707,7 +705,7 @@ const AdmissionsProcessPage = () => {
                                 </div>
                                 <button 
                                     onClick={() => handleViewDetails(program.id)}
-                                    className="ml-6 px-6 py-2 bg-white border-2 border-blue-500 text-blue-600 rounded-lg font-semibold hover:bg-blue-500 hover:text-white transition-all duration-300 whitespace-nowrap">
+                                    className="w-full sm:w-auto sm:ml-6 px-4 py-2 sm:px-6 sm:py-2 bg-white border-2 border-blue-500 text-blue-600 rounded-lg font-semibold hover:bg-blue-500 hover:text-white transition-all duration-300 whitespace-nowrap text-sm sm:text-base">
                                     View Details
                                 </button>
                             </div>
@@ -729,139 +727,59 @@ const AdmissionsProcessPage = () => {
             </div>
 
             <div className="container mx-auto px-4 py-8">
-                <div className="flex gap-8">
+                <div className="flex flex-col lg:flex-row gap-8">
                     {/* Sidebar Navigation */}
-                    <div className="w-80 flex-shrink-0">
-                        <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden sticky top-4">
-                            <div className="p-6 border-b border-gray-100">
-                                <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                                    <GraduationCap className="w-5 h-5 text-blue-600" />
-                                    Program Categories
-                                </h2>
-                            </div>
-
-                            <div className="p-4">
-                                {/* Undergraduate Section */}
-                                <div className="mb-4">
-                                    <button
-                                        onClick={() => toggleSection('undergraduate')}
-                                        className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-all duration-200"
-                                    >
-                                        <span className="font-semibold text-gray-900">Undergraduate</span>
-                                        <motion.div
-                                            animate={{ rotate: expandedSections.includes('undergraduate') ? 90 : 0 }}
-                                            transition={{ duration: 0.2 }}
-                                        >
-                                            <ChevronRight className="w-5 h-5 text-gray-500" />
-                                        </motion.div>
-                                    </button>
-
-                                    <AnimatePresence>
-                                        {expandedSections.includes('undergraduate') && (
-                                            <motion.div
-                                                initial={{ height: 0, opacity: 0 }}
-                                                animate={{ height: 'auto', opacity: 1 }}
-                                                exit={{ height: 0, opacity: 0 }}
-                                                transition={{ duration: 0.3 }}
-                                                className="overflow-hidden ml-4 mt-2"
-                                            >
-                                                <button
-                                                    onClick={() => handleSubsectionClick('engineering')}
-                                                    className={`w-full text-left p-3 rounded-lg mb-2 transition-all duration-200 ${
-                                                        activeSubsection === 'engineering'
-                                                            ? 'bg-blue-500 text-white'
-                                                            : 'hover:bg-gray-50 text-gray-700'
-                                                    }`}
-                                                >
-                                                    Engineering and Technology
-                                                </button>
-                                                <button
-                                                    onClick={() => handleSubsectionClick('ugManagement')}
-                                                    className={`w-full text-left p-3 rounded-lg transition-all duration-200 ${
-                                                        activeSubsection === 'ugManagement'
-                                                            ? 'bg-blue-500 text-white'
-                                                            : 'hover:bg-gray-50 text-gray-700'
-                                                    }`}
-                                                >
-                                                    Management
-                                                </button>
-                                            </motion.div>
-                                        )}
-                                    </AnimatePresence>
-                                </div>
-
-                                {/* Postgraduate Section */}
-                                <div>
-                                    <button
-                                        onClick={() => toggleSection('postgraduate')}
-                                        className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-all duration-200"
-                                    >
-                                        <span className="font-semibold text-gray-900">Postgraduate</span>
-                                        <motion.div
-                                            animate={{ rotate: expandedSections.includes('postgraduate') ? 90 : 0 }}
-                                            transition={{ duration: 0.2 }}
-                                        >
-                                            <ChevronRight className="w-5 h-5 text-gray-500" />
-                                        </motion.div>
-                                    </button>
-
-                                    <AnimatePresence>
-                                        {expandedSections.includes('postgraduate') && (
-                                            <motion.div
-                                                initial={{ height: 0, opacity: 0 }}
-                                                animate={{ height: 'auto', opacity: 1 }}
-                                                exit={{ height: 0, opacity: 0 }}
-                                                transition={{ duration: 0.3 }}
-                                                className="overflow-hidden ml-4 mt-2"
-                                            >
-                                                <button
-                                                    onClick={() => handleSubsectionClick('pgManagement')}
-                                                    className={`w-full text-left p-3 rounded-lg transition-all duration-200 ${
-                                                        activeSubsection === 'pgManagement'
-                                                            ? 'bg-blue-500 text-white'
-                                                            : 'hover:bg-gray-50 text-gray-700'
-                                                    }`}
-                                                >
-                                                    Management
-                                                </button>
-                                            </motion.div>
-                                        )}
-                                    </AnimatePresence>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Additional Info Card */}
-                        <div className="mt-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
-                            <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                                <BookOpen className="w-5 h-5 text-blue-600" />
-                                Admission Support
-                            </h3>
-                            <p className="text-sm text-gray-600 mb-4">
-                                Need help with the admission process? Our counselors are here to guide you.
-                            </p>
-                            <div className="flex flex-col gap-3">
-                                <button 
-                                    onClick={handleApplyNow}
-                                    className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-600 transition-colors duration-200 flex items-center justify-center gap-2"
-                                >
-                                    <UserPlus className="w-4 h-4" />
-                                    Apply Now
-                                </button>
-                                <button 
-                                    onClick={handleDownloadBrochure}
-                                    className="w-full bg-white border-2 border-blue-500 text-blue-500 py-2 px-4 rounded-lg font-semibold hover:bg-blue-500 hover:text-white transition-colors duration-200 flex items-center justify-center gap-2"
-                                >
-                                    <FileText className="w-4 h-4" />
-                                    Download Brochure
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                    <AdmissionsSidebar
+                        activeSubsection={activeSubsection}
+                        expandedSections={expandedSections}
+                        onToggleSection={toggleSection}
+                        onSubsectionClick={handleSubsectionClick}
+                        onApplyNow={handleApplyNow}
+                        onDownloadBrochure={handleDownloadBrochure}
+                        showAdditionalInfo={true}
+                    />
 
                     {/* Main Content Area */}
-                    <div className="flex-1">
-                        <div className="bg-white rounded-xl shadow-md border border-gray-200 p-8">
+                    <div className="flex-1 lg:max-w-none">
+                        <div className="bg-white rounded-xl shadow-md border border-gray-200 p-4 sm:p-6 lg:p-8">
+                            {/* Mobile Back Button */}
+                            {activeSubsection && (
+                                <motion.button
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ duration: 0.3 }}
+                                    onClick={() => setActiveSubsection('')}
+                                    className="lg:hidden mb-4 flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors duration-200"
+                                >
+                                    <ChevronRight className="w-4 h-4 rotate-180" />
+                                    <span className="text-sm font-medium">Back to Categories</span>
+                                </motion.button>
+                            )}
+
+                            {/* Breadcrumb Navigation */}
+                            {activeSubsection && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.3 }}
+                                    className="mb-6"
+                                >
+                                    <nav className="flex items-center space-x-2 text-sm text-gray-600">
+                                        <span>Programs</span>
+                                        <ChevronRight className="w-4 h-4" />
+                                        <span>
+                                            {activeSubsection === 'pgManagement' ? 'Postgraduate' : 'Undergraduate'}
+                                        </span>
+                                        <ChevronRight className="w-4 h-4" />
+                                        <span className="text-blue-600 font-medium">
+                                            {activeSubsection === 'engineering' && 'Engineering & Technology'}
+                                            {activeSubsection === 'ugManagement' && 'Management'}
+                                            {activeSubsection === 'pgManagement' && 'Management'}
+                                        </span>
+                                    </nav>
+                                </motion.div>
+                            )}
+
                             {/* Content Header */}
                             <div className="mb-8">
                                 <h2 className="text-2xl font-bold text-gray-900 mb-2">

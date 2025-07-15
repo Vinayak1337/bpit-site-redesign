@@ -1134,10 +1134,10 @@ const ProgramDetailsPage = () => {
             </div>
 
             <div className="container mx-auto px-4 py-8">
-                <div className="flex gap-8">
+                <div className="flex flex-col lg:flex-row gap-8">
                     {/* Sidebar Navigation */}
-                    <div className="w-80 flex-shrink-0">
-                        <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden sticky top-4">
+                    <div className="w-full lg:w-80 lg:flex-shrink-0">
+                        <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden lg:sticky lg:top-4">
                             <div className="p-6 border-b border-gray-100">
                                 <h2 className="text-lg font-bold text-gray-900">Program Details</h2>
                             </div>
