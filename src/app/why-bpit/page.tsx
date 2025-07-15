@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import {
     GraduationCap,
     Users,
@@ -1167,10 +1168,10 @@ const WhyBPITPage = () => {
 
                                             {/* Company Logo */}
                                             <div className="relative z-10 flex flex-col items-center w-full h-full">
-                                                <img 
+                                                <Image 
                                                     src={recruiter.logo} 
                                                     alt={`${recruiter.name} logo`}
-                                                    className="max-w-full max-h-12 object-contain group-hover:scale-110 transition-transform duration-300"
+                                                    width={150} height={48} className="max-w-full max-h-12 object-contain group-hover:scale-110 transition-transform duration-300"
                                                     onError={(e) => {
                                                         const target = e.target as HTMLImageElement;
                                                         const nextSibling = target.nextSibling as HTMLElement;
@@ -1207,10 +1208,10 @@ const WhyBPITPage = () => {
                                             <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 opacity-0 group-hover:opacity-5 transition-opacity duration-300"></div>
 
                                             <div className="relative z-10 flex flex-col items-center w-full h-full">
-                                                <img 
+                                                <Image 
                                                     src={recruiter.logo} 
                                                     alt={`${recruiter.name} logo`}
-                                                    className="max-w-full max-h-12 object-contain group-hover:scale-110 transition-transform duration-300"
+                                                    width={150} height={48} className="max-w-full max-h-12 object-contain group-hover:scale-110 transition-transform duration-300"
                                                     onError={(e) => {
                                                         const target = e.target as HTMLImageElement;
                                                         const nextSibling = target.nextSibling as HTMLElement;
@@ -1264,10 +1265,10 @@ const WhyBPITPage = () => {
                                             <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-600 opacity-0 group-hover:opacity-5 transition-opacity duration-300"></div>
 
                                             <div className="relative z-10 flex flex-col items-center w-full h-full">
-                                                <img 
+                                                <Image 
                                                     src={recruiter.logo} 
                                                     alt={`${recruiter.name} logo`}
-                                                    className="max-w-full max-h-12 object-contain group-hover:scale-110 transition-transform duration-300"
+                                                    width={150} height={48} className="max-w-full max-h-12 object-contain group-hover:scale-110 transition-transform duration-300"
                                                     onError={(e) => {
                                                         const target = e.target as HTMLImageElement;
                                                         const nextSibling = target.nextSibling as HTMLElement;
@@ -1303,10 +1304,10 @@ const WhyBPITPage = () => {
                                             <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-600 opacity-0 group-hover:opacity-5 transition-opacity duration-300"></div>
 
                                             <div className="relative z-10 flex flex-col items-center w-full h-full">
-                                                <img 
+                                                <Image 
                                                     src={recruiter.logo} 
                                                     alt={`${recruiter.name} logo`}
-                                                    className="max-w-full max-h-12 object-contain group-hover:scale-110 transition-transform duration-300"
+                                                    width={150} height={48} className="max-w-full max-h-12 object-contain group-hover:scale-110 transition-transform duration-300"
                                                     onError={(e) => {
                                                         const target = e.target as HTMLImageElement;
                                                         const nextSibling = target.nextSibling as HTMLElement;

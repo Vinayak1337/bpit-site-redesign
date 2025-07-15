@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import React, { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import Image from 'next/image';
 import {
     BookOpen,
     TrendingUp,
@@ -1047,10 +1048,11 @@ const ProgramDetailsPage = () => {
                                     {/* Faculty Photo */}
                                     <div className="relative h-64 bg-gray-100">
                                         {faculty.photo ? (
-                                            <img 
+                                            <Image 
                                                 src={faculty.photo} 
                                                 alt={faculty.name}
-                                                className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                                                fill
+                                                className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
                                                 onError={(e) => {
                                                     // Fallback to initials if image fails to load
                                                     e.currentTarget.style.display = 'none';

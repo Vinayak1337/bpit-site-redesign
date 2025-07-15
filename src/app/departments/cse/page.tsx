@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 import {
 	Code,
 	Users,
@@ -196,10 +197,11 @@ const DepartmentHighlightsCarousel = () => {
 			
 			{/* Image Section */}
 			<div className='relative h-48 bg-gray-200 overflow-hidden'>
-				<img 
+				<Image 
 					src={highlight.image} 
 					alt={highlight.title}
-					className='w-full h-full object-cover transition-transform duration-300 group-hover:scale-110'
+					fill
+					className='object-cover transition-transform duration-300 group-hover:scale-110'
 					onError={(e) => {
 						e.currentTarget.style.display = 'none';
 						(e.currentTarget.nextElementSibling as HTMLElement).style.display = 'flex';
@@ -421,10 +423,12 @@ const ShiningStarsSection = () => {
 					<div className='lg:col-span-1'>
 						<div className='text-center'>
 							<div className='relative w-40 h-40 mx-auto mb-4'>
-								<img
+								<Image
 									src={currentStudent.image}
 									alt={currentStudent.name}
-									className='w-full h-full object-cover rounded-full'
+									width={160}
+									height={160}
+									className="w-full h-full object-cover rounded-full"
 									onError={(e) => {
 										(e.target as HTMLImageElement).style.display = 'none';
 										(e.target as HTMLImageElement).nextElementSibling?.setAttribute('style', 'display: flex');
@@ -526,9 +530,11 @@ const ShiningStarsSection = () => {
 								? 'border-blue-500'
 								: 'border-blue-300 hover:border-blue-400'
 						}`}>
-							<img
+							<Image
 								src={student.image}
 								alt={student.name}
+								width={64}
+								height={64}
 								className='w-full h-full object-cover'
 								onError={(e) => {
 									(e.target as HTMLImageElement).style.display = 'none';
@@ -601,9 +607,11 @@ const RDLabGlimpsesCarousel = () => {
 							key={`glimpse-${index}`}
 							className='flex-shrink-0 w-80 h-64 rounded-lg overflow-hidden shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300'
 						>
-							<img 
+							<Image 
 								src={glimpse.image} 
 								alt={glimpse.alt}
+								width={320}
+								height={256}
 								className='w-full h-full object-cover transition-transform duration-300 hover:scale-105'
 								onError={(e) => {
 									const target = e.target as HTMLImageElement;
@@ -913,9 +921,11 @@ const CSEDepartmentPage = () => {
 						<AnimatedCard delay={0.1}>
 							<div className='bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-200'>
 								<div className='text-center mb-4'>
-									<div className='w-20 h-20 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full mx-auto mb-3 p-1'>                                        <img 
+									<div className='w-20 h-20 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full mx-auto mb-3 p-1'>                                        <Image 
                                             src="/achal-sir.png" 
                                             alt="Dr. ACHAL KAUSHIK"
+                                            width={80}
+                                            height={80}
                                             className='w-full h-full rounded-full object-cover'
                                             onError={(e) => {
                                                 e.currentTarget.style.display = 'none';
@@ -974,9 +984,11 @@ const CSEDepartmentPage = () => {
 						<AnimatedCard delay={0.2}>
 							<div className='bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border border-green-200'>
 								<div className='text-center mb-4'>
-									<div className='w-20 h-20 bg-gradient-to-br from-green-600 to-emerald-600 rounded-full mx-auto mb-3 p-1'>                                        <img 
+									<div className='w-20 h-20 bg-gradient-to-br from-green-600 to-emerald-600 rounded-full mx-auto mb-3 p-1'>                                        <Image 
                                             src="/faculty/faculty-2.jpg" 
                                             alt="Dr. Faculty Name"
+                                            width={80}
+                                            height={80}
                                             className='w-full h-full rounded-full object-cover'
                                             onError={(e) => {
                                                 e.currentTarget.style.display = 'none';
@@ -1034,9 +1046,11 @@ const CSEDepartmentPage = () => {
 						<AnimatedCard delay={0.3}>
 							<div className='bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4 border border-purple-200'>
 								<div className='text-center mb-4'>
-									<div className='w-20 h-20 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full mx-auto mb-3 p-1'>                                        <img 
+									<div className='w-20 h-20 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full mx-auto mb-3 p-1'>                                        <Image 
                                             src="/faculty/faculty-3.jpg" 
                                             alt="Dr. Faculty Name"
+                                            width={80}
+                                            height={80}
                                             className='w-full h-full rounded-full object-cover'
                                             onError={(e) => {
                                                 e.currentTarget.style.display = 'none';
@@ -1094,9 +1108,11 @@ const CSEDepartmentPage = () => {
 						<AnimatedCard delay={0.4}>
 							<div className='bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-4 border border-orange-200'>
 								<div className='text-center mb-4'>
-									<div className='w-20 h-20 bg-gradient-to-br from-orange-600 to-red-600 rounded-full mx-auto mb-3 p-1'>                                        <img 
+									<div className='w-20 h-20 bg-gradient-to-br from-orange-600 to-red-600 rounded-full mx-auto mb-3 p-1'>                                        <Image 
                                             src="/faculty/faculty-4.jpg" 
                                             alt="Prof. Faculty Name"
+                                            width={80}
+                                            height={80}
                                             className='w-full h-full rounded-full object-cover'
                                             onError={(e) => {
                                                 e.currentTarget.style.display = 'none';
@@ -1154,9 +1170,11 @@ const CSEDepartmentPage = () => {
 						<AnimatedCard delay={0.5}>
 							<div className='bg-gradient-to-br from-teal-50 to-cyan-50 rounded-xl p-4 border border-teal-200'>
 								<div className='text-center mb-4'>
-									<div className='w-20 h-20 bg-gradient-to-br from-teal-600 to-cyan-600 rounded-full mx-auto mb-3 p-1'>                                        <img 
+									<div className='w-20 h-20 bg-gradient-to-br from-teal-600 to-cyan-600 rounded-full mx-auto mb-3 p-1'>                                        <Image 
                                             src="/faculty/faculty-5.jpg" 
                                             alt="Dr. Faculty Name"
+                                            width={80}
+                                            height={80}
                                             className='w-full h-full rounded-full object-cover'
                                             onError={(e) => {
                                                 e.currentTarget.style.display = 'none';
@@ -1214,9 +1232,11 @@ const CSEDepartmentPage = () => {
 						<AnimatedCard delay={0.6}>
 							<div className='bg-gradient-to-br from-indigo-50 to-blue-50 rounded-xl p-4 border border-indigo-200'>
 								<div className='text-center mb-4'>
-									<div className='w-20 h-20 bg-gradient-to-br from-indigo-600 to-blue-600 rounded-full mx-auto mb-3 p-1'>                                        <img 
+									<div className='w-20 h-20 bg-gradient-to-br from-indigo-600 to-blue-600 rounded-full mx-auto mb-3 p-1'>                                        <Image 
                                             src="/faculty/faculty-6.jpg" 
                                             alt="Dr. Faculty Name"
+                                            width={80}
+                                            height={80}
                                             className='w-full h-full rounded-full object-cover'
                                             onError={(e) => {
                                                 e.currentTarget.style.display = 'none';
