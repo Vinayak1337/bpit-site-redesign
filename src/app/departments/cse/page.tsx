@@ -5328,7 +5328,7 @@ const CSEDepartmentPage = () => {
 									<div className='animate-carousel flex space-x-8'>
 										{/* Duplicate the images for infinite effect */}
 										{[...Array(3)].map((_, setIndex) => (
-											<>
+											<React.Fragment key={`carousel-set-${setIndex}`}>
 												<div key={`${setIndex}-1`} className='flex-shrink-0 w-80 h-48 bg-white rounded-lg shadow-lg flex items-center justify-center border border-gray-200'>
 													<div className='text-center'>
 														<div className='w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-3'>
@@ -5365,7 +5365,7 @@ const CSEDepartmentPage = () => {
 														<p className='text-sm text-gray-600'>Security System</p>
 													</div>
 												</div>
-											</>
+											</React.Fragment>
 										))}
 									</div>
 								</div>
