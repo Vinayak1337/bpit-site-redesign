@@ -37,22 +37,27 @@ const StatsSection = ({
 			initial={{ opacity: 0, y: 20 }}
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.6, delay }}
-			className='bg-white rounded-xl p-8 shadow-lg border border-gray-200'>
-			<div className='text-center mb-6'>
+			className='bg-white rounded-lg sm:rounded-xl p-4 sm:p-6 md:p-8 shadow-lg border border-gray-200'>
+			<div className='text-center mb-4 sm:mb-6'>
 				<div
-					className={`w-12 h-12 bg-gradient-to-r ${gradient} rounded-lg flex items-center justify-center mx-auto mb-4`}>
-					<IconComponent className='w-6 h-6 text-white' />
+					className={`w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r ${gradient} rounded-lg flex items-center justify-center mx-auto mb-3 sm:mb-4 aspect-square`}>
+					<IconComponent className='w-5 h-5 sm:w-6 sm:h-6 text-white' />
 				</div>
-				<h3 className='text-2xl font-bold text-gray-900 mb-4'>{title}</h3>
+				<h3 className='text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-3 sm:mb-4'>
+					{title}
+				</h3>
 			</div>
 
-			<div className='grid md:grid-cols-3 gap-6'>
+			<div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6'>
 				{stats.map((stat, index) => (
 					<div key={index} className='text-center'>
-						<div className={`text-3xl font-bold ${stat.color} mb-2`}>
+						<div
+							className={`text-2xl sm:text-3xl font-bold ${stat.color} mb-2`}>
 							{stat.number}
 						</div>
-						<p className='text-gray-700 font-medium'>{stat.label}</p>
+						<p className='text-gray-700 font-medium text-sm sm:text-base'>
+							{stat.label}
+						</p>
 					</div>
 				))}
 			</div>

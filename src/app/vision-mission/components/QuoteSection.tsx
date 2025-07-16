@@ -34,15 +34,17 @@ const QuoteSection = ({
 			initial={{ opacity: 0, y: 20 }}
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.6, delay }}
-			className='bg-white rounded-xl p-8 shadow-lg border border-gray-200'>
-			<div className='text-center mb-8'>
-				<div className='w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center mx-auto mb-4'>
-					<IconComponent className='w-6 h-6 text-white' />
+			className='bg-white rounded-lg sm:rounded-xl p-4 sm:p-6 md:p-8 shadow-lg border border-gray-200'>
+			<div className='text-center mb-6 sm:mb-8'>
+				<div className='w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center mx-auto mb-3 sm:mb-4 aspect-square'>
+					<IconComponent className='w-5 h-5 sm:w-6 sm:h-6 text-white' />
 				</div>
-				<h2 className='text-2xl font-bold text-gray-900 mb-6'>{title}</h2>
+				<h2 className='text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-4 sm:mb-6'>
+					{title}
+				</h2>
 				<div
-					className={`bg-gradient-to-r ${gradient} rounded-xl p-6 border ${borderColor}`}>
-					<p className='text-lg text-gray-800 leading-relaxed font-medium italic'>
+					className={`bg-gradient-to-r ${gradient} rounded-lg sm:rounded-xl p-4 sm:p-6 border ${borderColor}`}>
+					<p className='text-sm sm:text-base md:text-lg text-gray-800 leading-relaxed font-medium italic'>
 						&ldquo;{quote}&rdquo;
 					</p>
 				</div>

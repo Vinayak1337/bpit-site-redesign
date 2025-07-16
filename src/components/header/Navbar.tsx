@@ -59,6 +59,11 @@ const Navbar = () => {
 	const [activeMobileSection, setActiveMobileSection] = useState<string | null>(
 		null
 	);
+	const [isMounted, setIsMounted] = useState(false);
+
+	useEffect(() => {
+		setIsMounted(true);
+	}, []);
 
 	useEffect(() => {
 		const handleScroll = () => {
@@ -142,7 +147,7 @@ const Navbar = () => {
 	const admissionsItems = [
 		{
 			title: 'Why Choose BPIT?',
-			href: '/admissions/why-choose',
+			href: '/admissions/why-bpit',
 			description: 'Top placement records, accreditation, and excellence',
 			icon: <Star className='w-4 h-4 text-blue-600' />
 		},
@@ -160,7 +165,7 @@ const Navbar = () => {
 		},
 		{
 			title: 'Scholarships',
-			href: '/admissions/scholarships',
+			href: '/admissions/scholarship',
 			description: 'Financial assistance and merit scholarships',
 			icon: <GraduationCap className='w-4 h-4 text-blue-600' />
 		},
@@ -595,6 +600,27 @@ const Navbar = () => {
 					</div>
 				</div>
 			</motion.header>
+
+			{/* Floating Enquire Now Button - Mobile/Tablet Only */}
+			{isMounted && (
+				<AnimatePresence>
+					<motion.button
+						className='lg:hidden fixed bottom-4 left-4 sm:bottom-6 sm:left-6 z-50 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-3 sm:px-5 sm:py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 group flex items-center gap-2 text-sm sm:text-base'
+						initial={{ opacity: 0, scale: 0.8 }}
+						animate={{ opacity: 1, scale: 1 }}
+						exit={{ opacity: 0, scale: 0.8 }}
+						whileHover={{ scale: 1.1 }}
+						whileTap={{ scale: 0.9 }}
+						onClick={() => {
+							const event = new CustomEvent('openEnquiry');
+							window.dispatchEvent(event);
+						}}>
+						<GraduationCap className='w-4 h-4 sm:w-5 sm:h-5 group-hover:rotate-12 transition-transform' />
+						<span className='hidden sm:inline group-hover:translate-x-1 transition-transform'>Enquire Now</span>
+						<span className='sm:hidden group-hover:translate-x-1 transition-transform'>Enquiry</span>
+					</motion.button>
+				</AnimatePresence>
+			)}
 
 			{/* Mobile Menu */}
 			<AnimatePresence>

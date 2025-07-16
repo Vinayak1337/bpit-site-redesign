@@ -17,7 +17,10 @@ import {
 	homeTestimonialsData
 } from '@/data/home';
 
-export default function Home() {
+export default function Home()
+{
+	
+	
 	return (
 		<>
 			<Hero1 data={homeHeroData} />

@@ -50,13 +50,13 @@ interface AboutPageProps {
 
 const getIcon = (iconName: string) => {
 	const icons: { [key: string]: React.ReactNode } = {
-		GraduationCap: <GraduationCap className='w-5 h-5' />,
-		BookOpen: <BookOpen className='w-5 h-5' />,
-		Trophy: <Trophy className='w-6 h-6' />,
-		Lightbulb: <Lightbulb className='w-6 h-6' />,
-		Users: <Users className='w-6 h-6' />
+		GraduationCap: <GraduationCap className='w-4 h-4 sm:w-5 sm:h-5' />,
+		BookOpen: <BookOpen className='w-4 h-4 sm:w-5 sm:h-5' />,
+		Trophy: <Trophy className='w-5 h-5 sm:w-6 sm:h-6' />,
+		Lightbulb: <Lightbulb className='w-5 h-5 sm:w-6 sm:h-6' />,
+		Users: <Users className='w-5 h-5 sm:w-6 sm:h-6' />
 	};
-	return icons[iconName] || <Building2 className='w-5 h-5' />;
+	return icons[iconName] || <Building2 className='w-4 h-4 sm:w-5 sm:h-5' />;
 };
 
 const getColorClasses = (color: string) => {
@@ -74,57 +74,71 @@ const AboutPageWrapper = () => {
 
 const AboutPage = ({ data }: AboutPageProps) => {
 	return (
-		<div className='space-y-8'>
+		<div className='space-y-6 sm:space-y-8'>
 			<motion.div
 				initial={{ opacity: 0, y: 20 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.6 }}
-				className='bg-gradient-to-r from-blue-50 to-blue-100 rounded-2xl p-8 pt-25 border border-blue-200'>
-				<div className='flex items-center gap-4 mb-6'>
-					<div className='w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center'>
-						<Building2 className='w-8 h-8 text-white' />
+				className='bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 border border-blue-200'>
+				<div className='flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-6'>
+					<div className='w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-blue-600 rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0 aspect-square'>
+						<Building2 className='w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-white' />
 					</div>
-					<div>
-						<h1 className='text-3xl font-bold text-gray-900'>
+					<div className='flex-1'>
+						<h1 className='text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-1'>
 							{data.header.title}
 						</h1>
-						<p className='text-blue-600 font-medium'>
+						<p className='text-blue-600 font-medium text-sm sm:text-base'>
 							{data.header.subtitle}
 						</p>
 					</div>
 				</div>
 
-				<div className='grid md:grid-cols-2 gap-6'>
-					<div className='space-y-4'>
-						<div className='flex items-center gap-3'>
-							<Calendar className='w-5 h-5 text-blue-600' />
-							<span className='text-gray-700'>Established: {data.header.established}</span>
+				<div className='grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6'>
+					<div className='space-y-3 sm:space-y-4'>
+						<div className='flex items-center gap-2 sm:gap-3'>
+							<Calendar className='w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0' />
+							<span className='text-gray-700 text-sm sm:text-base'>
+								Established: {data.header.established}
+							</span>
 						</div>
-						<div className='flex items-center gap-3'>
-							<MapPin className='w-5 h-5 text-blue-600' />
-							<span className='text-gray-700'>Location: {data.header.location}</span>
+						<div className='flex items-center gap-2 sm:gap-3'>
+							<MapPin className='w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0' />
+							<span className='text-gray-700 text-sm sm:text-base'>
+								Location: {data.header.location}
+							</span>
 						</div>
-						<div className='flex items-center gap-3'>
-							<Award className='w-5 h-5 text-blue-600' />
-							<span className='text-gray-700'>Accreditation: {data.header.accreditation}</span>
+						<div className='flex items-center gap-2 sm:gap-3'>
+							<Award className='w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0' />
+							<span className='text-gray-700 text-sm sm:text-base'>
+								Accreditation: {data.header.accreditation}
+							</span>
 						</div>
-						<div className='flex items-center gap-3'>
-							<Users className='w-5 h-5 text-blue-600' />
-							<span className='text-gray-700'>Affiliation: {data.header.affiliation}</span>
+						<div className='flex items-center gap-2 sm:gap-3'>
+							<Users className='w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0' />
+							<span className='text-gray-700 text-sm sm:text-base'>
+								Affiliation: {data.header.affiliation}
+							</span>
 						</div>
 					</div>
-					<div className='space-y-4'>
+					<div className='space-y-3 sm:space-y-4'>
 						{data.stats.map((stat, index) => {
 							const colorClasses = getColorClasses(stat.color);
 							return (
-								<div key={index} className='bg-white rounded-lg p-4 shadow-sm'>
+								<div
+									key={index}
+									className='bg-white rounded-lg p-3 sm:p-4 shadow-sm'>
 									<div className='flex items-center gap-2 mb-2'>
 										<div className={colorClasses.text}>
 											{getIcon(stat.icon)}
 										</div>
-										<span className='font-semibold text-gray-900'>{stat.value}</span>
+										<span className='font-semibold text-gray-900 text-sm sm:text-base'>
+											{stat.value}
+										</span>
 									</div>
-									<p className='text-sm text-gray-600'>{stat.label}</p>
+									<p className='text-xs sm:text-sm text-gray-600'>
+										{stat.label}
+									</p>
 								</div>
 							);
 						})}
@@ -136,35 +150,38 @@ const AboutPage = ({ data }: AboutPageProps) => {
 				initial={{ opacity: 0, y: 20 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.6, delay: 0.2 }}
-				className='space-y-6'>
-				<h2 className='text-2xl font-bold text-gray-900 flex items-center gap-3'>
-					<Globe className='w-6 h-6 text-blue-600' />
+				className='space-y-4 sm:space-y-6'>
+				<h2 className='text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2 sm:gap-3'>
+					<Globe className='w-5 h-5 sm:w-6 sm:h-6 text-blue-600 flex-shrink-0' />
 					{data.legacy.title}
 				</h2>
 
-				<div className='prose prose-lg text-gray-700 leading-relaxed'>
+				<div className='prose prose-sm sm:prose-lg text-gray-700 leading-relaxed max-w-none'>
 					{data.legacy.paragraphs.map((paragraph, index) => (
-						<p key={index}>{paragraph}</p>
+						<p key={index} className='text-sm sm:text-base mb-3 sm:mb-4'>
+							{paragraph}
+						</p>
 					))}
 				</div>
 
-				<div className='grid md:grid-cols-3 gap-6 mt-8'>
+				<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mt-6 sm:mt-8'>
 					{data.features.map((feature, index) => {
 						const colorClasses = getColorClasses(feature.color);
 						return (
 							<motion.div
 								key={index}
-								whileHover={{ scale: 1.05 }}
-								className='bg-white rounded-xl p-6 shadow-lg border border-gray-200'>
-								<div className={`w-12 h-12 ${colorClasses.bg} rounded-lg flex items-center justify-center mb-4`}>
+								whileHover={{ scale: 1.02 }}
+								className='bg-white rounded-lg sm:rounded-xl p-4 sm:p-6 shadow-lg border border-gray-200'>
+								<div
+									className={`w-10 h-10 sm:w-12 sm:h-12 ${colorClasses.bg} rounded-lg flex items-center justify-center mb-3 sm:mb-4 aspect-square`}>
 									<div className={colorClasses.text}>
 										{getIcon(feature.icon)}
 									</div>
 								</div>
-								<h3 className='font-semibold text-gray-900 mb-2'>
+								<h3 className='font-semibold text-gray-900 mb-2 text-sm sm:text-base'>
 									{feature.title}
 								</h3>
-								<p className='text-gray-600 text-sm'>
+								<p className='text-gray-600 text-xs sm:text-sm leading-relaxed'>
 									{feature.description}
 								</p>
 							</motion.div>

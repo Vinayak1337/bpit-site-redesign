@@ -27,7 +27,7 @@ interface Hero1Props {
 
 const Hero1 = ({ data }: Hero1Props) => {
 	return (
-		<section className='relative min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 overflow-hidden'>
+		<section className='relative min-h-[70vh] sm:min-h-[80vh] lg:min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 overflow-hidden'>
 			{/* Background Elements */}
 			<div className='absolute inset-0'>
 				<div className='absolute top-10 sm:top-20 left-5 sm:left-10 w-48 sm:w-72 h-48 sm:h-72 bg-blue-100 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob' />
@@ -75,16 +75,16 @@ const Hero1 = ({ data }: Hero1Props) => {
 				/>
 			</div>
 
-			<div className='relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20'>
+			<div className='relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12 lg:py-20'>
 				<div className='max-w-6xl mx-auto'>
 					{/* Main Content */}
-					<div className='text-center space-y-6 sm:space-y-8'>
+					<div className='text-center space-y-4 sm:space-y-6 lg:space-y-8'>
 						{/* Main Value Proposition */}
 						<motion.div
 							initial={{ opacity: 0, y: 30 }}
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ duration: 0.8, delay: 0.1 }}
-							className='space-y-4 sm:space-y-6'>
+							className='space-y-3 sm:space-y-4 lg:space-y-6'>
 							<h1 className='text-2xl sm:text-3xl md:text-4xl lg:text-6xl xl:text-7xl font-bold bg-gradient-to-r from-blue-900 via-blue-700 to-blue-900 bg-clip-text text-transparent leading-tight'>
 								{data.mainTitle}
 								<br />

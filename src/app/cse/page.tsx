@@ -303,8 +303,8 @@ const CSEDepartmentPage = () => {
 							transition={{ duration: 0.6 }}
 							className='bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 rounded-2xl p-8 border border-blue-200'>
 							<div className='text-center mb-8'>
-								<div className='w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4'>
-									<Home className='w-8 h-8 text-white' />
+								<div className='w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-blue-600 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 aspect-square'>
+									<Home className='w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-white' />
 								</div>
 								<h1 className='text-3xl font-bold text-gray-900 mb-2'>
 									Welcome to CSE Department
@@ -441,8 +441,8 @@ const CSEDepartmentPage = () => {
 							transition={{ duration: 0.6 }}
 							className='bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-8 border border-blue-200'>
 							<div className='text-center mb-8'>
-								<div className='w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4'>
-									<Eye className='w-8 h-8 text-white' />
+								<div className='w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-blue-600 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 aspect-square'>
+									<Eye className='w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-white' />
 								</div>
 								<h1 className='text-3xl font-bold text-gray-900 mb-2'>
 									Vision & Mission
@@ -456,8 +456,8 @@ const CSEDepartmentPage = () => {
 						<div className='grid md:grid-cols-1 gap-8'>
 							<AnimatedCard delay={0.1}>
 								<div className='text-center'>
-									<div className='w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4'>
-										<Eye className='w-6 h-6 text-blue-600' />
+									<div className='w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3 sm:mb-4 aspect-square'>
+										<Eye className='w-5 h-5 sm:w-6 sm:h-6 text-blue-600' />
 									</div>
 									<h3 className='text-2xl font-bold text-gray-900 mb-4'>
 										Our Vision
@@ -474,8 +474,8 @@ const CSEDepartmentPage = () => {
 
 							<AnimatedCard delay={0.2}>
 								<div className='text-center'>
-									<div className='w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4'>
-										<Target className='w-6 h-6 text-green-600' />
+									<div className='w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3 sm:mb-4 aspect-square'>
+										<Target className='w-5 h-5 sm:w-6 sm:h-6 text-green-600' />
 									</div>
 									<h3 className='text-2xl font-bold text-gray-900 mb-4'>
 										Our Mission
@@ -729,8 +729,8 @@ const CSEDepartmentPage = () => {
 							].map((faculty, index) => (
 								<AnimatedCard key={faculty.name} delay={0.1 + index * 0.1}>
 									<div className='text-center'>
-										<div className='w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4'>
-											<User className='w-10 h-10 text-gray-400' />
+										<div className='w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 aspect-square'>
+											<User className='w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 text-gray-400' />
 										</div>
 										<h3 className='text-lg font-bold text-gray-900 mb-1'>
 											{faculty.name}
@@ -903,8 +903,8 @@ const CSEDepartmentPage = () => {
 
 						<AnimatedCard>
 							<div className='text-center py-12'>
-								<div className='w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6'>
-									<Zap className='w-12 h-12 text-blue-600' />
+								<div className='w-20 h-20 sm:w-22 sm:h-22 md:w-24 md:h-24 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6 aspect-square'>
+									<Zap className='w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 text-blue-600' />
 								</div>
 								<h3 className='text-xl font-bold text-gray-900 mb-4'>
 									Content Under Development
@@ -930,7 +930,7 @@ const CSEDepartmentPage = () => {
 					<div className='absolute bottom-20 right-10 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse'></div>
 				</div>
 
-				<div className='relative z-10 container mx-auto px-4 py-24'>
+				<div className='relative z-10 container mx-auto px-3 sm:px-4 py-16 sm:py-20 md:py-24'>
 					<motion.div
 						initial={{ opacity: 0, y: 30 }}
 						animate={{ opacity: 1, y: 0 }}
@@ -940,11 +940,11 @@ const CSEDepartmentPage = () => {
 							initial={{ scale: 0 }}
 							animate={{ scale: 1 }}
 							transition={{ duration: 0.6, delay: 0.2 }}
-							className='w-20 h-20 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-6 backdrop-blur-sm'>
-							<Code className='w-10 h-10 text-white' />
+							className='w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 bg-white/10 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6 backdrop-blur-sm aspect-square'>
+							<Code className='w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 text-white' />
 						</motion.div>
 
-						<h1 className='text-5xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-100'>
+						<h1 className='text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-100'>
 							Computer Science & Engineering
 						</h1>
 
@@ -975,8 +975,8 @@ const CSEDepartmentPage = () => {
 			</section>
 
 			{/* Main Content */}
-			<div className='container mx-auto px-4 py-12'>
-				<div className='flex flex-col lg:flex-row gap-8'>
+			<div className='container mx-auto px-3 sm:px-4 py-8 sm:py-12'>
+				<div className='flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8'>
 					{/* Advanced Sidebar Navigation */}
 					<motion.div
 						initial={{ opacity: 0, x: -50 }}

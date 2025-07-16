@@ -71,8 +71,13 @@ const PlacementCompanies = ({ data }: PlacementCompaniesProps) => {
 		if (!scope.current || !containerRef.current) return;
 
 		const containerWidth = containerRef.current.offsetWidth;
-
 		const startPosition = (containerWidth - cardWidth) / 2;
+
+		// Clean up any existing animation before starting new one
+		if (animationRef.current) {
+			animationRef.current.stop();
+			animationRef.current = null;
+		}
 
 		animate(scope.current, { x: startPosition }, { duration: 0 });
 		currentPositionRef.current = startPosition;
@@ -81,7 +86,6 @@ const PlacementCompanies = ({ data }: PlacementCompaniesProps) => {
 			if (isHovered || !scope.current) return;
 
 			const endPosition = -totalCardsWidth;
-
 			const remainingDistance = Math.abs(
 				endPosition - currentPositionRef.current
 			);
@@ -97,15 +101,19 @@ const PlacementCompanies = ({ data }: PlacementCompaniesProps) => {
 						currentPositionRef.current = latest;
 					},
 					onComplete: () => {
-						if (isHovered) return;
+						if (isHovered || !scope.current) return;
 
 						const resetPosition = containerWidth;
-						animate(scope.current, { x: resetPosition }, { duration: 0 });
-						currentPositionRef.current = resetPosition;
+						if (scope.current) {
+							animate(scope.current, { x: resetPosition }, { duration: 0 });
+							currentPositionRef.current = resetPosition;
 
-						setTimeout(() => {
-							runAnimation();
-						}, 100);
+							setTimeout(() => {
+								if (!isHovered && scope.current) {
+									runAnimation();
+								}
+							}, 100);
+						}
 					}
 				}
 			);
@@ -117,6 +125,7 @@ const PlacementCompanies = ({ data }: PlacementCompaniesProps) => {
 			clearTimeout(timer);
 			if (animationRef.current) {
 				animationRef.current.stop();
+				animationRef.current = null;
 			}
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -145,15 +154,19 @@ const PlacementCompanies = ({ data }: PlacementCompaniesProps) => {
 							currentPositionRef.current = latest;
 						},
 						onComplete: () => {
-							if (isHovered) return;
+							if (isHovered || !scope.current) return;
 
 							const resetPosition = containerWidth;
-							animate(scope.current, { x: resetPosition }, { duration: 0 });
-							currentPositionRef.current = resetPosition;
+							if (scope.current) {
+								animate(scope.current, { x: resetPosition }, { duration: 0 });
+								currentPositionRef.current = resetPosition;
 
-							setTimeout(() => {
-								continueAnimation();
-							}, 100);
+								setTimeout(() => {
+									if (!isHovered && scope.current) {
+										continueAnimation();
+									}
+								}, 100);
+							}
 						}
 					}
 				);
@@ -164,12 +177,21 @@ const PlacementCompanies = ({ data }: PlacementCompaniesProps) => {
 	}, [isHovered, scope, animate, totalCardsWidth, cardWidth, cardGap]);
 
 	useEffect(() => {
-		if (isHovered) {
-			if (animationRef.current) {
-				animationRef.current.stop();
-			}
+		if (isHovered && animationRef.current) {
+			animationRef.current.stop();
+			animationRef.current = null;
 		}
 	}, [isHovered]);
+
+	// Cleanup effect to prevent memory leaks
+	useEffect(() => {
+		return () => {
+			if (animationRef.current) {
+				animationRef.current.stop();
+				animationRef.current = null;
+			}
+		};
+	}, []);
 
 	const handleCardHover = (hovered: boolean) => {
 		setIsHovered(hovered);
@@ -220,7 +242,7 @@ const PlacementCompanies = ({ data }: PlacementCompaniesProps) => {
 										height={64}
 										className='object-contain filter grayscale hover:grayscale-0 transition-all duration-300 opacity-70 group-hover:opacity-100 max-w-[80px] sm:max-w-[100px] lg:max-w-[120px] max-h-[40px] lg:max-h-[50px]'
 										onError={() => {
-											console.log(`Failed to load logo for ${company.name}`);
+											// Handle image loading error silently
 										}}
 									/>
 								</motion.div>
