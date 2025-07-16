@@ -186,31 +186,31 @@ const Navbar = () => {
 	const academicsItems = [
 		{
 			title: 'Academic Calendar',
-			href: '/academics/calendar',
+			href: '/academia/academic-calendar',
 			description: 'Important academic dates and semester schedules',
 			icon: <Calendar className='w-4 h-4 text-blue-600' />
 		},
 		{
 			title: 'Examination & Results',
-			href: '/academics/examination',
+			href: '/academia/examination',
 			description: 'Exam schedules, results, and academic performance',
 			icon: <FileText className='w-4 h-4 text-blue-600' />
 		},
 		{
 			title: 'Syllabus & Ordinances',
-			href: '/academics/syllabus',
+			href: '/academia/syllabus-ordinance',
 			description: 'Course curriculum, syllabus, and academic ordinances',
 			icon: <BookOpen className='w-4 h-4 text-blue-600' />
 		},
 		{
 			title: 'Library / Resource Center',
-			href: '/academics/library',
+			href: '/library',
 			description: 'Library resources, digital collections, and services',
 			icon: <BookMarked className='w-4 h-4 text-blue-600' />
 		},
 		{
 			title: 'Notices & Circulars',
-			href: '/academics/notices',
+			href: '/academia/notices-circulars',
 			description: 'Important notices, circulars, and announcements',
 			icon: <Bell className='w-4 h-4 text-blue-600' />
 		}

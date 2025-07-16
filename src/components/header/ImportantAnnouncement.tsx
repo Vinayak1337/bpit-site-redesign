@@ -10,10 +10,7 @@ const importantAnnouncements = [
 		title: 'Admission 2024-25 Session Open - Apply Now',
 		href: '/admissions/apply'
 	},
-	{
-		title: 'Semester End Examinations Schedule Released',
-		href: '/academics/examination'
-	},
+
 	{
 		title: 'Placement Drive 2024 - Register Today',
 		href: '/placements/register'
@@ -24,7 +21,7 @@ const importantAnnouncements = [
 	},
 	{
 		title: 'Library New Books Collection Available',
-		href: '/academics/library'
+		href: '/library'
 	},
 	{
 		title: 'Scholarship Applications Open - Merit & Need Based',
