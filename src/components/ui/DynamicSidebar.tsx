@@ -55,8 +55,8 @@ const DynamicSidebar = ({ navItems, theme }: DynamicSidebarProps) => {
 			animate={{ opacity: 1, x: 0 }}
 			transition={{ duration: 0.6 }}
 			className='lg:w-80 flex-shrink-0'>
-			<div className='bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden sticky top-25'>
-				<div className='p-2'>
+			<div className='bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden sticky top-25 max-h-[75vh]'>
+				<div className='p-2 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400 max-h-[70vh]'>
 					{navItems.map((item, index) => (
 						<motion.div
 							key={item.id}

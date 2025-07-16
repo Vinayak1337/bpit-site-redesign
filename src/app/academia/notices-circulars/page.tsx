@@ -1,35 +1,31 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bell, Calendar, Clock, ArrowRight, Eye, Pin, ExternalLink, Filter, Download, Users, GraduationCap, BookOpen, Award } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import Image from 'next/image';
+import { 
+	Bell, 
+	Calendar, 
+	Clock, 
+	Eye, 
+	Pin, 
+	Search, 
+	ExternalLink,
+	GraduationCap,
+	Award,
+	Users,
+	Lightbulb,
+	Trophy,
+	Building2,
+	ChevronDown
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-type Priority = 'high' | 'medium' | 'low';
-type Category = 'Academic' | 'Financial Aid' | 'Admission' | 'Sports' | 'Library' | 'General' | 'Examination';
-
-interface Notice {
-	id: number;
-	category: Category;
-	title: string;
-	subtitle: string;
-	date: string;
-	time: string;
-	priority: Priority;
-	tags: string[];
-	description: string;
-	views: number;
-	pinned: boolean;
-	urgent: boolean;
-	fileSize?: string;
-	department?: string;
-}
-
 export default function NoticesCircularsPage() {
-	const [selectedCategory, setSelectedCategory] = useState<Category | 'all'>('all');
-	const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-
+	const [searchTerm, setSearchTerm] = useState('');
+	const [selectedCategory, setSelectedCategory] = useState<string>('all');
+	const [selectedPriority, setSelectedPriority] = useState<string>('all');
+	const [sortBy, setSortBy] = useState<'date' | 'priority' | 'views'>('date');
 	const notices: Notice[] = [
 		{
 			id: 1,
@@ -44,8 +40,7 @@ export default function NoticesCircularsPage() {
 			views: 1250,
 			pinned: true,
 			urgent: true,
-			fileSize: '450 KB',
-			department: 'Academic Section'
+			image: '/placeholder.svg?height=120&width=120'
 		},
 		{
 			id: 2,
@@ -60,8 +55,7 @@ export default function NoticesCircularsPage() {
 			views: 890,
 			pinned: true,
 			urgent: false,
-			fileSize: '320 KB',
-			department: 'Student Welfare'
+			image: '/placeholder.svg?height=120&width=120'
 		},
 		{
 			id: 3,
@@ -76,8 +70,7 @@ export default function NoticesCircularsPage() {
 			views: 2100,
 			pinned: false,
 			urgent: true,
-			fileSize: '280 KB',
-			department: 'Admission Office'
+			image: '/placeholder.svg?height=120&width=120'
 		},
 		{
 			id: 4,
@@ -92,8 +85,7 @@ export default function NoticesCircularsPage() {
 			views: 650,
 			pinned: false,
 			urgent: false,
-			fileSize: '180 KB',
-			department: 'Sports Department'
+			image: '/placeholder.svg?height=120&width=120'
 		},
 		{
 			id: 5,
@@ -108,12 +100,11 @@ export default function NoticesCircularsPage() {
 			views: 420,
 			pinned: false,
 			urgent: false,
-			fileSize: '150 KB',
-			department: 'Library'
+			image: '/placeholder.svg?height=120&width=120'
 		},
 		{
 			id: 6,
-			category: 'Examination',
+			category: 'Academic',
 			title: 'Online practical examination guidelines',
 			subtitle: 'Important instructions for practical exams',
 			date: '2024-12-12',
@@ -124,270 +115,537 @@ export default function NoticesCircularsPage() {
 			views: 1580,
 			pinned: true,
 			urgent: false,
-			fileSize: '540 KB',
-			department: 'Examination Cell'
+			image: '/placeholder.svg?height=120&width=120'
 		}
 	];
 
+	const announcements: Notice[] = [
+		{
+			id: 7,
+			category: 'General',
+			title: 'Campus maintenance schedule update',
+			subtitle: 'Important infrastructure maintenance notice',
+			date: '2024-12-10',
+			time: '8:00 AM',
+			priority: 'medium',
+			tags: ['Maintenance', 'Infrastructure', 'Schedule'],
+			description: 'Scheduled maintenance activities for campus infrastructure. Some facilities may be temporarily unavailable during maintenance hours.',
+			views: 320,
+			pinned: false,
+			urgent: false,
+			image: '/placeholder.svg?height=120&width=120'
+		},
+		{
+			id: 8,
+			category: 'Academic',
+			title: 'Research symposium call for papers',
+			subtitle: 'Submit your research papers for annual symposium',
+			date: '2024-12-08',
+			time: '3:00 PM',
+			priority: 'medium',
+			tags: ['Research', 'Symposium', 'Papers'],
+			description: 'Call for research papers for the annual academic symposium. Students and faculty are invited to submit their research work.',
+			views: 560,
+			pinned: false,
+			urgent: false,
+			image: '/placeholder.svg?height=120&width=120'
+		},
+		{
+			id: 9,
+			category: 'Innovation',
+			title: 'Annual Innovation Contest 2024',
+			subtitle: 'Showcase your innovative ideas and win prizes',
+			date: '2024-12-05',
+			time: '11:00 AM',
+			priority: 'high',
+			tags: ['Innovation', 'Contest', 'Technology'],
+			description: 'Participate in the annual innovation contest and present your groundbreaking ideas. Multiple categories and attractive prizes await.',
+			views: 890,
+			pinned: true,
+			urgent: false,
+			image: '/placeholder.svg?height=120&width=120'
+		},
+		{
+			id: 10,
+			category: 'Sports',
+			title: 'Annual sports day celebration',
+			subtitle: 'Join us for a day of sports and fun activities',
+			date: '2024-12-02',
+			time: '9:00 AM',
+			priority: 'medium',
+			tags: ['Sports Day', 'Celebration', 'Events'],
+			description: 'Annual sports day with various athletic competitions, cultural programs, and prize distributions for outstanding performers.',
+			views: 750,
+			pinned: false,
+			urgent: false,
+			image: '/placeholder.svg?height=120&width=120'
+		}
+	];
+
+	// Combined all notices and announcements
+	const allNotices = useMemo(() => [...notices, ...announcements], []);
+
+	// Categories with icons and colors
 	const categories = [
-		{ key: 'all', label: 'All Notices', icon: <Bell className="w-4 h-4" />, count: notices.length },
-		{ key: 'Academic', label: 'Academic', icon: <BookOpen className="w-4 h-4" />, count: notices.filter(n => n.category === 'Academic').length },
-		{ key: 'Examination', label: 'Examination', icon: <GraduationCap className="w-4 h-4" />, count: notices.filter(n => n.category === 'Examination').length },
-		{ key: 'Financial Aid', label: 'Financial Aid', icon: <Award className="w-4 h-4" />, count: notices.filter(n => n.category === 'Financial Aid').length },
-		{ key: 'Admission', label: 'Admission', icon: <Users className="w-4 h-4" />, count: notices.filter(n => n.category === 'Admission').length },
-		{ key: 'Sports', label: 'Sports', icon: <Award className="w-4 h-4" />, count: notices.filter(n => n.category === 'Sports').length },
-		{ key: 'Library', label: 'Library', icon: <BookOpen className="w-4 h-4" />, count: notices.filter(n => n.category === 'Library').length },
-		{ key: 'General', label: 'General', icon: <Bell className="w-4 h-4" />, count: notices.filter(n => n.category === 'General').length }
+		{ key: 'all', label: 'All', icon: <Bell className="w-4 h-4" />, color: 'bg-gray-100 text-gray-700' },
+		{ key: 'Academic', label: 'Academic', icon: <GraduationCap className="w-4 h-4" />, color: 'bg-blue-100 text-blue-700' },
+		{ key: 'Financial Aid', label: 'Financial Aid', icon: <Award className="w-4 h-4" />, color: 'bg-green-100 text-green-700' },
+		{ key: 'Admission', label: 'Admission', icon: <Users className="w-4 h-4" />, color: 'bg-purple-100 text-purple-700' },
+		{ key: 'Innovation', label: 'Innovation', icon: <Lightbulb className="w-4 h-4" />, color: 'bg-orange-100 text-orange-700' },
+		{ key: 'Sports', label: 'Sports', icon: <Trophy className="w-4 h-4" />, color: 'bg-red-100 text-red-700' },
+		{ key: 'General', label: 'General', icon: <Building2 className="w-4 h-4" />, color: 'bg-gray-100 text-gray-700' },
+		{ key: 'Library', label: 'Library', icon: <Bell className="w-4 h-4" />, color: 'bg-indigo-100 text-indigo-700' }
 	];
 
-	const filteredNotices = selectedCategory === 'all' 
-		? notices 
-		: notices.filter(notice => notice.category === selectedCategory);
+	// Filter and sort notices
+	const filteredNotices = useMemo(() => {
+		let filtered = allNotices;
 
-	const getPriorityColor = (priority: Priority) => {
-		switch (priority) {
-			case 'high': return 'bg-red-100 text-red-800 border-red-200';
-			case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-			case 'low': return 'bg-green-100 text-green-800 border-green-200';
+		// Filter by search term
+		if (searchTerm) {
+			filtered = filtered.filter(notice =>
+				notice.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+				notice.subtitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+				notice.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+				notice.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
+			);
 		}
-	};
 
-	const getCategoryColor = (category: Category) => {
-		const colors = {
-			Academic: 'bg-blue-50 border-blue-200 text-blue-700',
-			'Financial Aid': 'bg-green-50 border-green-200 text-green-700',
-			Admission: 'bg-purple-50 border-purple-200 text-purple-700',
-			Sports: 'bg-orange-50 border-orange-200 text-orange-700',
-			Library: 'bg-indigo-50 border-indigo-200 text-indigo-700',
-			General: 'bg-gray-50 border-gray-200 text-gray-700',
-			Examination: 'bg-red-50 border-red-200 text-red-700'
-		};
-		return colors[category];
-	};
+		// Filter by category
+		if (selectedCategory !== 'all') {
+			filtered = filtered.filter(notice => notice.category === selectedCategory);
+		}
+
+		// Filter by priority
+		if (selectedPriority !== 'all') {
+			filtered = filtered.filter(notice => notice.priority === selectedPriority);
+		}
+
+		// Sort notices
+		filtered.sort((a, b) => {
+			switch (sortBy) {
+				case 'date':
+					return new Date(b.date).getTime() - new Date(a.date).getTime();
+				case 'priority':
+					const priorityOrder = { high: 3, medium: 2, low: 1 };
+					return priorityOrder[b.priority] - priorityOrder[a.priority];
+				case 'views':
+					return b.views - a.views;
+				default:
+					return 0;
+			}
+		});
+
+		// Prioritize pinned and urgent notices
+		return filtered.sort((a, b) => {
+			if (a.pinned && !b.pinned) return -1;
+			if (!a.pinned && b.pinned) return 1;
+			if (a.urgent && !b.urgent) return -1;
+			if (!a.urgent && b.urgent) return 1;
+			return 0;
+		});
+	}, [allNotices, searchTerm, selectedCategory, selectedPriority, sortBy]);
 
 	const formatDate = (dateString: string) => {
-		const date = new Date(dateString);
-		return date.toLocaleDateString('en-US', { 
-			year: 'numeric', 
-			month: 'short', 
-			day: 'numeric' 
+		return new Date(dateString).toLocaleDateString('en-US', {
+			year: 'numeric',
+			month: 'short',
+			day: 'numeric'
 		});
 	};
 
 	return (
-		<div className="space-y-8">
-			{/* Header */}
+		<motion.div 
+			className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50"
+			initial={{ opacity: 0 }}
+			animate={{ opacity: 1 }}
+			transition={{ duration: 0.8 }}
+		>
+			{/* Header Section */}
 			<motion.div
-				initial={{ opacity: 0, y: 20 }}
+				initial={{ opacity: 0, y: 30 }}
 				animate={{ opacity: 1, y: 0 }}
-				transition={{ duration: 0.6 }}
-				className="text-center"
+				transition={{ duration: 0.8, delay: 0.1 }}
+				className="relative overflow-hidden bg-white text-gray-900"
 			>
-				<div className="flex justify-center mb-4">
-					<div className="p-4 bg-blue-100 rounded-full">
-						<Bell className="w-8 h-8 text-blue-600" />
-					</div>
-				</div>
-				<h1 className="text-4xl font-bold text-gray-900 mb-4">
-					Notices & Circulars
-				</h1>
-				<p className="text-lg text-gray-600 max-w-3xl mx-auto">
-					Stay informed with the latest announcements, circular updates, and important 
-					notices from BPIT administration, departments, and academic sections.
-				</p>
-			</motion.div>
-
-			{/* Filter Categories */}
-			<motion.div
-				initial={{ opacity: 0, y: 20 }}
-				animate={{ opacity: 1, y: 0 }}
-				transition={{ duration: 0.6, delay: 0.2 }}
-				className="flex flex-wrap gap-2 justify-center"
-			>
-				{categories.map((category) => (
-					<Button
-						key={category.key}
-						variant={selectedCategory === category.key ? "default" : "outline"}
-						size="sm"
-						onClick={() => setSelectedCategory(category.key as Category | 'all')}
-						className="h-10"
+				<div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+					<motion.div 
+						className="text-center"
+						initial={{ scale: 0.9, opacity: 0 }}
+						animate={{ scale: 1, opacity: 1 }}
+						transition={{ duration: 0.6, delay: 0.2 }}
 					>
-						{category.icon}
-						<span className="ml-2">{category.label}</span>
-						<span className="ml-2 bg-white/20 text-xs px-2 py-1 rounded-full">
-							{category.count}
-						</span>
-					</Button>
-				))}
+						<motion.div 
+							className="flex justify-center mb-4"
+							initial={{ scale: 0, rotate: -180 }}
+							animate={{ scale: 1, rotate: 0 }}
+							transition={{ duration: 0.6, delay: 0.3, type: "spring", stiffness: 100 }}
+						>
+							<div className="p-3 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full shadow-lg">
+								<Bell className="w-8 h-8 text-white" />
+							</div>
+						</motion.div>
+						<motion.h1 
+							className="text-3xl md:text-4xl font-bold mb-3 text-gray-900"
+							initial={{ y: 20, opacity: 0 }}
+							animate={{ y: 0, opacity: 1 }}
+							transition={{ duration: 0.6, delay: 0.4 }}
+						>
+							Notices & Circulars
+						</motion.h1>
+						<motion.p 
+							className="text-base md:text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed"
+							initial={{ y: 20, opacity: 0 }}
+							animate={{ y: 0, opacity: 1 }}
+							transition={{ duration: 0.6, delay: 0.5 }}
+						>						Stay informed with the latest announcements, circular updates, and important 
+						notices from BPIT administration, departments, and academic sections.
+						</motion.p>
+					</motion.div>
+				</div>
 			</motion.div>
 
-			{/* Notices Grid */}
-			<motion.div
-				initial={{ opacity: 0, y: 20 }}
-				animate={{ opacity: 1, y: 0 }}
-				transition={{ duration: 0.6, delay: 0.4 }}
+			{/* Filters and Search Section */}
+			<motion.div 
+				className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-200 shadow-sm"
+				initial={{ y: -100, opacity: 0 }}
+				animate={{ y: 0, opacity: 1 }}
+				transition={{ duration: 0.8, delay: 0.6 }}
 			>
-				<AnimatePresence mode="wait">
-					<motion.div
-						key={selectedCategory}
+				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+					<motion.div 
+						className="flex flex-col lg:flex-row gap-4 items-center justify-between"
 						initial={{ opacity: 0, y: 20 }}
 						animate={{ opacity: 1, y: 0 }}
-						exit={{ opacity: 0, y: -20 }}
-						transition={{ duration: 0.4 }}
-						className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8"
+						transition={{ duration: 0.6, delay: 0.7 }}
 					>
-						{filteredNotices.map((notice, index) => (
-							<motion.div
-								key={notice.id}
-								initial={{ opacity: 0, y: 20 }}
-								animate={{ opacity: 1, y: 0 }}
-								transition={{ duration: 0.4, delay: index * 0.1 }}
-								className="relative"
+						{/* Search */}
+						<div className="relative flex-1 max-w-md w-full">
+							<Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+							<input
+								type="text"
+								placeholder="Search notices..."
+								value={searchTerm}
+								onChange={(e) => setSearchTerm(e.target.value)}
+								className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white shadow-sm"
+							/>
+						</div>
+
+						{/* Filters */}
+						<div className="flex flex-wrap gap-3 items-center">
+							{/* Category Filter */}
+							<div className="relative">
+								<select
+									value={selectedCategory}
+									onChange={(e) => setSelectedCategory(e.target.value)}
+									className="appearance-none bg-white border border-gray-300 rounded-xl px-4 py-3 pr-10 focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
+								>
+									{categories.map((category) => (
+										<option key={category.key} value={category.key}>
+											{category.label}
+										</option>
+									))}
+								</select>
+								<ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 pointer-events-none" />
+							</div>
+
+							{/* Priority Filter */}
+							<div className="relative">
+								<select
+									value={selectedPriority}
+									onChange={(e) => setSelectedPriority(e.target.value)}
+									className="appearance-none bg-white border border-gray-300 rounded-xl px-4 py-3 pr-10 focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
+								>
+									<option value="all">All Priorities</option>
+									<option value="high">High Priority</option>
+									<option value="medium">Medium Priority</option>
+									<option value="low">Low Priority</option>
+								</select>
+								<ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 pointer-events-none" />
+							</div>
+
+							{/* Sort */}
+							<div className="relative">
+								<select
+									value={sortBy}
+									onChange={(e) => setSortBy(e.target.value as 'date' | 'priority' | 'views')}
+									className="appearance-none bg-white border border-gray-300 rounded-xl px-4 py-3 pr-10 focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
+								>
+									<option value="date">Sort by Date</option>
+									<option value="priority">Sort by Priority</option>
+									<option value="views">Sort by Views</option>
+								</select>
+								<ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 pointer-events-none" />
+							</div>
+						</div>
+					</motion.div>
+
+					{/* Category Pills */}
+					<motion.div 
+						className="flex flex-wrap gap-2 mt-4"
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.6, delay: 0.8 }}
+					>
+						{categories.map((category) => (
+							<Button
+								key={category.key}
+								variant={selectedCategory === category.key ? "default" : "outline"}
+								size="sm"
+								onClick={() => setSelectedCategory(category.key)}
+								className={`rounded-full transition-all duration-200 ${
+									selectedCategory === category.key 
+										? 'bg-blue-600 text-white shadow-lg transform scale-105' 
+										: 'hover:bg-blue-50 hover:border-blue-200'
+								}`}
 							>
-								<Card className={`border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer overflow-hidden ${getCategoryColor(notice.category)} border-l-4 h-full`}>
-									{notice.pinned && (
-										<div className="absolute top-3 right-3 z-10">
-											<Pin className="w-4 h-4 text-blue-600 fill-current" />
-										</div>
-									)}
-									
-									{notice.urgent && (
-										<div className="absolute top-0 left-0 bg-red-500 text-white text-xs px-2 py-1 rounded-br-lg">
-											Urgent
-										</div>
-									)}
-
-									<CardHeader className="pb-4">
-										<div className="flex items-start justify-between mb-3">
-											<span className={`text-xs px-3 py-1 rounded-full border ${getCategoryColor(notice.category)} font-medium`}>
-												{notice.category}
-											</span>
-											<span className={`text-xs px-3 py-1 rounded border ${getPriorityColor(notice.priority)} font-medium`}>
-												{notice.priority.charAt(0).toUpperCase() + notice.priority.slice(1)}
-											</span>
-										</div>
-										<CardTitle className="text-lg leading-tight text-gray-900 mb-2">
-											{notice.title}
-										</CardTitle>
-										<p className="text-sm text-gray-600 leading-relaxed">{notice.subtitle}</p>
-									</CardHeader>
-
-									<CardContent className="space-y-4">
-										<p className="text-sm text-gray-700 leading-relaxed line-clamp-3 mb-4">
-											{notice.description}
-										</p>
-
-										<div className="flex flex-wrap gap-2 mb-4">
-											{notice.tags.map((tag, tagIndex) => (
-												<span key={tagIndex} className="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full">
-													{tag}
-												</span>
-											))}
-										</div>
-
-										<div className="flex items-center justify-between text-xs text-gray-500 mb-4">
-											<div className="flex items-center space-x-4">
-												<div className="flex items-center space-x-1">
-													<Calendar className="w-3 h-3" />
-													<span>{formatDate(notice.date)}</span>
-												</div>
-												<div className="flex items-center space-x-1">
-													<Clock className="w-3 h-3" />
-													<span>{notice.time}</span>
-												</div>
-											</div>
-											<div className="flex items-center space-x-1">
-												<Eye className="w-3 h-3" />
-												<span>{notice.views}</span>
-											</div>
-										</div>
-
-										{notice.department && (
-											<div className="text-xs text-gray-500 italic mb-4">
-												From: {notice.department}
-											</div>
-										)}
-
-										<div className="flex items-center justify-between pt-2 border-t border-gray-100">
-											{notice.fileSize && (
-												<span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-													{notice.fileSize}
-												</span>
-											)}
-											<div className="flex space-x-2">
-												<Button size="sm" variant="outline" className="h-8 text-xs">
-													<Eye className="w-3 h-3 mr-1" />
-													View
-												</Button>
-												<Button size="sm" className="h-8 text-xs">
-													<Download className="w-3 h-3 mr-1" />
-													Download
-												</Button>
-											</div>
-										</div>
-									</CardContent>
-								</Card>
-							</motion.div>
+								{category.icon}
+								<span className="ml-2">{category.label}</span>
+								<span className="ml-2 bg-white/20 text-xs px-2 py-0.5 rounded-full">
+									{selectedCategory === category.key 
+										? filteredNotices.length 
+										: allNotices.filter(n => category.key === 'all' ? true : n.category === category.key).length
+									}
+								</span>
+							</Button>
 						))}
 					</motion.div>
-				</AnimatePresence>
-			</motion.div>
-
-			{/* Statistics */}
-			<motion.div
-				initial={{ opacity: 0, y: 20 }}
-				animate={{ opacity: 1, y: 0 }}
-				transition={{ duration: 0.6, delay: 0.6 }}
-				className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-8 text-white"
-			>
-				<h2 className="text-2xl font-bold mb-6 text-center">Notice Statistics</h2>
-				<div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
-					<div>
-						<Bell className="w-8 h-8 text-blue-200 mx-auto mb-2" />
-						<h3 className="text-2xl font-bold mb-1">{notices.length}</h3>
-						<p className="text-blue-100 text-sm">Total Notices</p>
-					</div>
-					<div>
-						<Pin className="w-8 h-8 text-blue-200 mx-auto mb-2" />
-						<h3 className="text-2xl font-bold mb-1">{notices.filter(n => n.pinned).length}</h3>
-						<p className="text-blue-100 text-sm">Pinned Notices</p>
-					</div>
-					<div>
-						<ExternalLink className="w-8 h-8 text-blue-200 mx-auto mb-2" />
-						<h3 className="text-2xl font-bold mb-1">{notices.filter(n => n.urgent).length}</h3>
-						<p className="text-blue-100 text-sm">Urgent Notices</p>
-					</div>
-					<div>
-						<Eye className="w-8 h-8 text-blue-200 mx-auto mb-2" />
-						<h3 className="text-2xl font-bold mb-1">{notices.reduce((sum, n) => sum + n.views, 0)}</h3>
-						<p className="text-blue-100 text-sm">Total Views</p>
-					</div>
 				</div>
 			</motion.div>
 
-			{/* Important Notice */}
-			<motion.div
-				initial={{ opacity: 0, y: 20 }}
-				animate={{ opacity: 1, y: 0 }}
-				transition={{ duration: 0.6, delay: 0.8 }}
-				className="bg-yellow-50 border border-yellow-200 rounded-lg p-6"
+			{/* Results Info */}
+			<motion.div 
+				className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"
+				initial={{ opacity: 0, x: -50 }}
+				animate={{ opacity: 1, x: 0 }}
+				transition={{ duration: 0.6, delay: 0.9 }}
 			>
-				<div className="flex items-start space-x-3">
-					<div className="flex-shrink-0">
-						<div className="p-2 bg-yellow-100 rounded-lg">
-							<Bell className="w-5 h-5 text-yellow-600" />
-						</div>
-					</div>
+				<div className="flex items-center justify-between">
 					<div>
-						<h3 className="text-lg font-semibold text-yellow-800 mb-2">Stay Updated</h3>
-						<p className="text-yellow-700 text-sm leading-relaxed">
-							All notices and circulars are published as soon as they are issued by the respective departments. 
-							Students and faculty are advised to check this section regularly for important updates. 
-							For any queries regarding specific notices, please contact the issuing department directly.
+						<h2 className="text-2xl font-bold text-gray-900">
+							{selectedCategory === 'all' ? 'All Notices' : `${selectedCategory} Notices`}
+						</h2>
+						<p className="text-gray-600 mt-1">
+							Showing {filteredNotices.length} of {allNotices.length} notices
 						</p>
 					</div>
 				</div>
 			</motion.div>
-		</div>
+
+			{/* Main Content */}
+			<motion.div 
+				className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16"
+				initial={{ opacity: 0, y: 50 }}
+				animate={{ opacity: 1, y: 0 }}
+				transition={{ duration: 0.8, delay: 1.0 }}
+			>
+				{filteredNotices.length > 0 ? (
+					<motion.div 
+						className="grid grid-cols-1 lg:grid-cols-2 gap-8"
+						initial="hidden"
+						animate="visible"
+						variants={{
+							hidden: { opacity: 0 },
+							visible: {
+								opacity: 1,
+								transition: {
+									staggerChildren: 0.1
+								}
+							}
+						}}
+					>
+						<AnimatePresence>
+							{filteredNotices.map((notice) => (
+								<motion.div
+									key={notice.id}
+									layout
+									variants={{
+										hidden: { opacity: 0, y: 20 },
+										visible: { opacity: 1, y: 0 }
+									}}
+									exit={{ opacity: 0, scale: 0.8 }}
+									transition={{ duration: 0.3 }}
+									className="group relative"
+								>
+									<div className="relative overflow-hidden rounded-2xl bg-white/90 backdrop-blur-xl border border-white/40 shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1 h-64">
+										{/* Priority Indicator */}
+										{notice.priority === 'high' && (
+											<div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500 to-rose-600" />
+										)}
+
+										{/* Pinned & Urgent Badges */}
+										<div className="absolute top-3 right-3 z-10 flex items-center gap-2">
+											{notice.pinned && (
+												<motion.div
+													initial={{ scale: 0 }}
+													animate={{ scale: 1 }}
+													transition={{ delay: 0.2, type: 'spring' }}
+												>
+													<div className="bg-gradient-to-r from-amber-400 to-orange-500 text-white p-1.5 rounded-full shadow-lg">
+														<Pin className="w-3 h-3" />
+													</div>
+												</motion.div>
+											)}
+											{notice.urgent && (
+												<motion.div
+													initial={{ opacity: 0 }}
+													animate={{ opacity: 1 }}
+													transition={{ delay: 0.3 }}
+												>
+													<div className="bg-gradient-to-r from-red-500 to-red-600 text-white px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+														<div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+														Urgent
+													</div>
+												</motion.div>
+											)}
+										</div>
+
+										<div className="p-4 h-full flex flex-col">
+											{/* Header */}
+											<div className="flex items-start gap-3 mb-3">
+												{/* Image */}
+												<div className="relative w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 border-2 border-white shadow-lg">									<Image
+										src={notice.image}
+										alt={notice.title}
+										fill
+										className="object-cover"
+									/>
+												</div>
+
+												{/* Content Header */}
+												<div className="flex-1 min-w-0">
+													<div className="flex flex-wrap items-center gap-1.5 mb-2">
+														<div className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium border ${
+															notice.category === 'Academic' ? 'bg-blue-50 border-blue-200 text-blue-700' :
+															notice.category === 'Financial Aid' ? 'bg-green-50 border-green-200 text-green-700' :
+															notice.category === 'Admission' ? 'bg-purple-50 border-purple-200 text-purple-700' :
+															notice.category === 'Innovation' ? 'bg-orange-50 border-orange-200 text-orange-700' :
+															notice.category === 'Sports' ? 'bg-pink-50 border-pink-200 text-pink-700' :
+															notice.category === 'Library' ? 'bg-indigo-50 border-indigo-200 text-indigo-700' :
+															'bg-gray-50 border-gray-200 text-gray-700'
+														}`}>
+															{notice.category === 'Academic' ? <GraduationCap className="w-3 h-3" /> :
+															notice.category === 'Financial Aid' ? <Award className="w-3 h-3" /> :
+															notice.category === 'Admission' ? <Users className="w-3 h-3" /> :
+															notice.category === 'Innovation' ? <Lightbulb className="w-3 h-3" /> :
+															notice.category === 'Sports' ? <Trophy className="w-3 h-3" /> :
+															notice.category === 'Library' ? <Bell className="w-3 h-3" /> :
+															<Bell className="w-3 h-3" />}
+															<span>{notice.category}</span>
+														</div>
+														<div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${
+															notice.priority === 'high' ? 'bg-red-50 border-red-200 text-red-700' :
+															notice.priority === 'medium' ? 'bg-yellow-50 border-yellow-200 text-yellow-700' :
+															'bg-green-50 border-green-200 text-green-700'
+														}`}>
+															{notice.priority}
+														</div>
+													</div>
+
+													<h3 className="font-bold text-gray-800 text-sm leading-tight mb-1 line-clamp-2 group-hover:text-gray-900 transition-colors duration-300">
+														{notice.title}
+													</h3>
+													<p className="text-xs text-gray-500 font-medium leading-relaxed line-clamp-1">
+														{notice.subtitle}
+													</p>
+												</div>
+											</div>
+
+											{/* Description */}
+											<p className="text-gray-600 text-xs leading-relaxed line-clamp-2 mb-3 flex-1">
+												{notice.description}
+											</p>
+
+											{/* Tags */}
+											<div className="flex flex-wrap gap-1 mb-3">
+												{notice.tags.slice(0, 3).map((tag, tagIndex) => (
+													<span
+														key={tagIndex}
+														className="px-2 py-1 bg-gray-100 text-gray-600 rounded-md text-xs font-medium hover:bg-gray-200 transition-colors duration-200"
+													>
+														{tag}
+													</span>
+												))}
+												{notice.tags.length > 3 && (
+													<span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-md text-xs font-medium">
+														+{notice.tags.length - 3} more
+													</span>
+												)}
+											</div>
+
+											{/* Footer */}
+											<div className="flex items-center justify-between pt-3 border-t border-gray-100 mt-auto">
+												<div className="flex items-center gap-3 text-xs text-gray-500">
+													<div className="flex items-center gap-1">
+														<Calendar className="w-3 h-3" />
+														<span>{formatDate(notice.date)}</span>
+													</div>
+													<div className="flex items-center gap-1">
+														<Clock className="w-3 h-3" />
+														<span>{notice.time}</span>
+													</div>
+													<div className="flex items-center gap-1">
+														<Eye className="w-3 h-3" />
+														<span>{notice.views}</span>
+													</div>
+												</div>
+
+												<motion.button
+													whileHover={{ scale: 1.05 }}
+													whileTap={{ scale: 0.95 }}
+													className="flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors duration-200"
+												>
+													View
+													<ExternalLink className="w-3 h-3" />
+												</motion.button>
+											</div>
+										</div>
+
+										{/* Hover Overlay */}
+										<motion.div
+											initial={{ opacity: 0 }}
+											animate={{ opacity: 0 }}
+											whileHover={{ opacity: 0.02 }}
+											transition={{ duration: 0.3 }}
+											className={`absolute inset-0 bg-gradient-to-br ${
+												notice.category === 'Academic' ? 'from-blue-500 to-indigo-600' :
+												notice.category === 'Financial Aid' ? 'from-green-500 to-emerald-600' :
+												notice.category === 'Admission' ? 'from-purple-500 to-violet-600' :
+												notice.category === 'Innovation' ? 'from-orange-500 to-red-600' :
+												notice.category === 'Sports' ? 'from-pink-500 to-rose-600' :
+												notice.category === 'Library' ? 'from-indigo-500 to-blue-600' :
+												'from-gray-500 to-slate-600'
+											}`}
+										/>
+									</div>
+								</motion.div>
+							))}
+						</AnimatePresence>
+					</motion.div>
+				) : (
+					<motion.div
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						className="text-center py-16"
+					>
+						<div className="w-24 h-24 mx-auto mb-6 text-gray-300">
+							<Search className="w-full h-full" />
+						</div>
+						<h3 className="text-2xl font-semibold text-gray-900 mb-4">No notices found</h3>
+						<p className="text-gray-500 text-lg mb-8">Try adjusting your search terms or filters to find what you're looking for.</p>
+						<Button
+							onClick={() => {
+								setSearchTerm('');
+								setSelectedCategory('all');
+								setSelectedPriority('all');
+							}}
+							className="bg-blue-600 hover:bg-blue-700 text-white"
+						>
+							Clear All Filters
+						</Button>
+					</motion.div>
+				)}
+			</motion.div>
+		</motion.div>
 	);
 }

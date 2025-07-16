@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-export default function MOOCsPage() {
+export default function ExaminationPage() {
 	return (
 		<motion.div 
 			className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6"
@@ -18,7 +18,7 @@ export default function MOOCsPage() {
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.8, delay: 0.1 }}
 				>
-					MOOCs (Massive Open Online Courses)
+					Examination
 				</motion.h1>
 				
 				<motion.div 
@@ -28,7 +28,7 @@ export default function MOOCsPage() {
 					transition={{ duration: 0.8, delay: 0.2 }}
 				>
 					<p className="text-gray-600 text-lg">
-						MOOCs and online learning resources will be available here soon.
+						Examination information and resources will be available here soon.
 					</p>
 				</motion.div>
 			</div>
