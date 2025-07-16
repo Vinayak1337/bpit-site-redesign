@@ -20,6 +20,10 @@ const nextConfig: NextConfig = {
 				hostname: 'plus.unsplash.com'
 			}
 		]
+	},
+	// Turbopack configuration (now stable)
+	turbopack: {
+		// Turbopack is now stable, no need for experimental options
 	}
 };
 

@@ -28,7 +28,7 @@ const importantAnnouncements = [
 	},
 	{
 		title: 'Scholarship Applications Open - Merit & Need Based',
-		href: '/admissions/scholarships'
+		href: '/admissions/scholarship'
 	}
 ];
 
