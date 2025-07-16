@@ -37,22 +37,24 @@ const IQACPage = () => {
 	} = iqacPageData;
 
 	return (
-		<div className='space-y-8'>
+		<div className='space-y-6 sm:space-y-8'>
 			{/* Header Section */}
 			<motion.div
 				initial={{ opacity: 0, y: 20 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.6 }}
-				className={`bg-gradient-to-r ${hero.gradient} rounded-2xl p-8 border ${hero.borderColor}`}>
-				<div className='text-center mb-6'>
+				className={`bg-gradient-to-r ${hero.gradient} rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 border ${hero.borderColor}`}>
+				<div className='text-center mb-4 sm:mb-6'>
 					<div
-						className={`w-16 h-16 ${hero.iconBg} rounded-2xl flex items-center justify-center mx-auto mb-4`}>
-						<CheckCircle className='w-8 h-8 text-white' />
+						className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 ${hero.iconBg} rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 aspect-square`}>
+						<CheckCircle className='w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-white' />
 					</div>
-					<h1 className='text-3xl font-bold text-gray-900 mb-2'>
+					<h1 className='text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-1 sm:mb-2'>
 						{hero.title}
 					</h1>
-					<p className='text-gray-600 max-w-2xl mx-auto'>{hero.description}</p>
+					<p className='text-gray-600 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed'>
+						{hero.description}
+					</p>
 				</div>
 			</motion.div>
 
@@ -61,9 +63,9 @@ const IQACPage = () => {
 				initial={{ opacity: 0, y: 20 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.6, delay: 0.2 }}
-				className='bg-white rounded-2xl p-8 border border-gray-200'>
-				<h2 className='text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3'>
-					<FileText className='w-6 h-6 text-blue-600' />
+				className='bg-white rounded-lg sm:rounded-2xl p-4 sm:p-6 md:p-8 border border-gray-200'>
+				<h2 className='text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2 sm:gap-3'>
+					<FileText className='w-5 h-5 sm:w-6 sm:h-6 text-blue-600 flex-shrink-0' />
 					{about.title}
 				</h2>
 				<div className='prose prose-gray max-w-none'>

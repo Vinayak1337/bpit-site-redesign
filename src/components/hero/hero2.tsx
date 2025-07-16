@@ -84,7 +84,7 @@ const Hero2 = ({ data }: Hero2Props) => {
 	};
 
 	return (
-		<section className='relative h-screen bg-gray-900 overflow-hidden'>
+		<section className='relative h-[75vh] sm:h-[85vh] lg:h-screen bg-gray-900 overflow-hidden'>
 			{/* Background Image Carousel */}
 			<AnimatePresence mode='wait'>
 				<motion.div
@@ -117,7 +117,7 @@ const Hero2 = ({ data }: Hero2Props) => {
 								animate={{ opacity: 1, y: 0 }}
 								exit={{ opacity: 0, y: -50 }}
 								transition={{ duration: 0.6 }}
-								className='space-y-4 sm:space-y-6'>
+								className='space-y-3 sm:space-y-4 lg:space-y-6'>
 								{/* Icon */}
 								<motion.div
 									initial={{ scale: 0 }}
@@ -143,7 +143,7 @@ const Hero2 = ({ data }: Hero2Props) => {
 									initial={{ opacity: 0, y: 30 }}
 									animate={{ opacity: 1, y: 0 }}
 									transition={{ delay: 0.4 }}
-									className='text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-3 sm:mb-4 leading-tight'>
+									className='text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-2 sm:mb-3 lg:mb-4 leading-tight'>
 									{slides[currentSlide].title}
 								</motion.h2>
 
@@ -152,7 +152,7 @@ const Hero2 = ({ data }: Hero2Props) => {
 									initial={{ opacity: 0, y: 20 }}
 									animate={{ opacity: 1, y: 0 }}
 									transition={{ delay: 0.5 }}
-									className='text-base sm:text-lg md:text-xl lg:text-2xl text-blue-200 font-medium mb-4 sm:mb-6'>
+									className='text-base sm:text-lg md:text-xl lg:text-2xl text-blue-200 font-medium mb-3 sm:mb-4 lg:mb-6'>
 									{slides[currentSlide].subtitle}
 								</motion.p>
 
@@ -161,7 +161,7 @@ const Hero2 = ({ data }: Hero2Props) => {
 									initial={{ opacity: 0, y: 20 }}
 									animate={{ opacity: 1, y: 0 }}
 									transition={{ delay: 0.6 }}
-									className='text-sm sm:text-base md:text-lg lg:text-xl text-gray-200 max-w-3xl mx-auto leading-relaxed mb-6 sm:mb-8 px-2 sm:px-0'>
+									className='text-sm sm:text-base md:text-lg lg:text-xl text-gray-200 max-w-3xl mx-auto leading-relaxed mb-4 sm:mb-6 lg:mb-8 px-2 sm:px-0'>
 									{slides[currentSlide].description}
 								</motion.p>
 

@@ -57,30 +57,38 @@ const LeadershipCard: React.FC<LeadershipCardProps> = ({ data }) => {
 	return (
 		<motion.div
 			whileHover={{ scale: 1.02 }}
-			className='bg-white rounded-xl p-6 shadow-lg border border-gray-200'>
-			<div className='flex items-center gap-4 mb-4'>
+			className='bg-white rounded-lg sm:rounded-xl p-4 sm:p-6 shadow-lg border border-gray-200'>
+			<div className='flex flex-col sm:flex-row items-center sm:items-center gap-3 sm:gap-4 mb-3 sm:mb-4'>
 				<div
-					className={`w-16 h-16 ${data.iconColor} rounded-full flex items-center justify-center`}>
-					<MainIconComponent className={`w-8 h-8 ${data.iconTextColor}`} />
+					className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 ${data.iconColor} rounded-full flex items-center justify-center aspect-square flex-shrink-0`}>
+					<MainIconComponent
+						className={`w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 ${data.iconTextColor}`}
+					/>
 				</div>
-				<div>
-					<h3 className='text-xl font-bold text-gray-900'>{data.name}</h3>
-					<p className={`${data.textColor} font-medium`}>{data.position}</p>
+				<div className='text-center sm:text-left'>
+					<h3 className='text-lg sm:text-xl font-bold text-gray-900'>
+						{data.name}
+					</h3>
+					<p className={`${data.textColor} font-medium text-sm sm:text-base`}>
+						{data.position}
+					</p>
 				</div>
 			</div>
-			<div className='space-y-2 text-sm text-gray-600'>
+			<div className='space-y-2 text-xs sm:text-sm text-gray-600'>
 				{data.details.map((detail, index) => {
 					const DetailIconComponent =
 						iconMap[detail.icon as keyof typeof iconMap];
 					return (
 						<div key={index} className='flex items-center gap-2'>
-							<DetailIconComponent className='w-4 h-4' />
+							<DetailIconComponent className='w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0' />
 							<span>{detail.text}</span>
 						</div>
 					);
 				})}
 			</div>
-			<p className='text-gray-700 mt-4 text-sm'>{data.description}</p>
+			<p className='text-gray-700 mt-3 sm:mt-4 text-xs sm:text-sm leading-relaxed'>
+				{data.description}
+			</p>
 		</motion.div>
 	);
 };
