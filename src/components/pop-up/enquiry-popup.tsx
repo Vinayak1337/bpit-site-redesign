@@ -73,7 +73,7 @@ const EnquiryPopup = () => {
 	return (
 		<Dialog open={isOpen} onOpenChange={handleClose}>
 			<DialogContent
-				className='sm:max-w-[600px] p-0 border-0 bg-transparent shadow-none overflow-visible'
+				className='max-w-[95vw] sm:max-w-[90vw] md:max-w-[600px] p-0 border-0 bg-transparent shadow-none overflow-visible max-h-[95vh] overflow-y-auto'
 				showCloseButton={false}>
 				<DialogTitle className='sr-only'>
 					Admission Enquiry Form - Bhagwan Parshuram Institute of Technology
@@ -85,26 +85,26 @@ const EnquiryPopup = () => {
 						animate={{ opacity: 1, scale: 1, y: 0 }}
 						exit={{ opacity: 0, scale: 0.96, y: 20 }}
 						transition={{ duration: 0.3, ease: [0.4, 0.0, 0.2, 1] }}
-						className='bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden relative'>
+						className='bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-gray-100 overflow-hidden relative mx-2 sm:mx-0'>
 						{/* Header Section */}
-						<div className='bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-6 relative'>
+						<div className='bg-gradient-to-r from-blue-600 to-blue-700 px-4 sm:px-6 md:px-8 py-4 sm:py-5 md:py-6 relative'>
 							<button
 								onClick={handleClose}
-								className='absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white focus:outline-none focus:ring-2 focus:ring-white/30'
+								className='absolute top-3 sm:top-4 right-3 sm:right-4 w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white focus:outline-none focus:ring-2 focus:ring-white/30'
 								aria-label='Close admission enquiry form'
 								type='button'>
-								<X className='w-4 h-4' />
+								<X className='w-4 h-4 sm:w-5 sm:h-5' />
 							</button>
 
-							<div className='flex items-center gap-3 mb-2'>
-								<div className='w-10 h-10 bg-white/20 rounded-full flex items-center justify-center'>
-									<GraduationCap className='w-5 h-5 text-white' />
+							<div className='flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2 pr-10 sm:pr-12'>
+								<div className='w-8 h-8 sm:w-10 sm:h-10 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0'>
+									<GraduationCap className='w-4 h-4 sm:w-5 sm:h-5 text-white' />
 								</div>
-								<div>
-									<h2 className='text-xl font-semibold text-white'>
+								<div className='min-w-0 flex-1'>
+									<h2 className='text-lg sm:text-xl font-semibold text-white truncate'>
 										Admission Enquiry
 									</h2>
-									<p className='text-blue-100 text-sm'>
+									<p className='text-blue-100 text-xs sm:text-sm truncate'>
 										Bhagwan Parshuram Institute of Technology
 									</p>
 								</div>
@@ -119,21 +119,23 @@ const EnquiryPopup = () => {
 									animate={{ opacity: 1, y: 0 }}
 									exit={{ opacity: 0, y: -20 }}
 									transition={{ duration: 0.3 }}
-									className='p-8'>
-									<div className='mb-6'>
-										<p className='text-gray-600 leading-relaxed'>
+									className='p-4 sm:p-6 md:p-8'>
+									<div className='mb-4 sm:mb-6'>
+										<p className='text-gray-600 leading-relaxed text-sm sm:text-base'>
 											Ready to shape your future in engineering and technology?
 											Fill out the form below and our admissions team will get
 											back to you within 24 hours.
 										</p>
 									</div>
 
-									<form onSubmit={handleSubmit} className='space-y-5'>
-										<div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
+									<form
+										onSubmit={handleSubmit}
+										className='space-y-4 sm:space-y-5'>
+										<div className='grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5'>
 											<div className='space-y-2'>
 												<label
 													htmlFor='enquiry-name'
-													className='text-sm font-medium text-gray-700'>
+													className='text-sm font-medium text-gray-700 block'>
 													Full Name *
 												</label>
 												<Input
@@ -147,7 +149,7 @@ const EnquiryPopup = () => {
 															name: e.target.value
 														}))
 													}
-													className='h-11 px-4 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all'
+													className='h-12 sm:h-11 px-4 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-base sm:text-sm'
 													required
 												/>
 											</div>
@@ -155,7 +157,7 @@ const EnquiryPopup = () => {
 											<div className='space-y-2'>
 												<label
 													htmlFor='enquiry-email'
-													className='text-sm font-medium text-gray-700'>
+													className='text-sm font-medium text-gray-700 block'>
 													Email Address *
 												</label>
 												<Input
@@ -169,17 +171,17 @@ const EnquiryPopup = () => {
 															email: e.target.value
 														}))
 													}
-													className='h-11 px-4 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all'
+													className='h-12 sm:h-11 px-4 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-base sm:text-sm'
 													required
 												/>
 											</div>
 										</div>
 
-										<div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
+										<div className='grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5'>
 											<div className='space-y-2'>
 												<label
 													htmlFor='enquiry-phone'
-													className='text-sm font-medium text-gray-700'>
+													className='text-sm font-medium text-gray-700 block'>
 													Phone Number
 												</label>
 												<Input
@@ -193,12 +195,12 @@ const EnquiryPopup = () => {
 															phone: e.target.value
 														}))
 													}
-													className='h-11 px-4 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all'
+													className='h-12 sm:h-11 px-4 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-base sm:text-sm'
 												/>
 											</div>
 
 											<div className='space-y-2'>
-												<label className='text-sm font-medium text-gray-700'>
+												<label className='text-sm font-medium text-gray-700 block'>
 													Course Interest
 												</label>
 												<Select
@@ -209,7 +211,7 @@ const EnquiryPopup = () => {
 															course: value
 														}))
 													}>
-													<SelectTrigger className='h-11 px-4 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all'>
+													<SelectTrigger className='h-12 sm:h-11 px-4 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-base sm:text-sm'>
 														<SelectValue placeholder='Select a course' />
 													</SelectTrigger>
 													<SelectContent>
@@ -236,7 +238,7 @@ const EnquiryPopup = () => {
 										<div className='space-y-2'>
 											<label
 												htmlFor='enquiry-message'
-												className='text-sm font-medium text-gray-700'>
+												className='text-sm font-medium text-gray-700 block'>
 												Message *
 											</label>
 											<Textarea
@@ -249,7 +251,7 @@ const EnquiryPopup = () => {
 														message: e.target.value
 													}))
 												}
-												className='min-h-[100px] px-4 py-3 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all resize-none'
+												className='min-h-[120px] sm:min-h-[100px] px-4 py-3 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all resize-none text-base sm:text-sm'
 												required
 											/>
 										</div>
@@ -257,7 +259,7 @@ const EnquiryPopup = () => {
 										<Button
 											type='submit'
 											disabled={!isFormValid || isSubmitting}
-											className='w-full h-12 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-300 disabled:to-gray-400 text-white font-medium rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl'>
+											className='w-full h-14 sm:h-12 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-300 disabled:to-gray-400 text-white font-medium rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl text-base sm:text-sm'>
 											{isSubmitting ? (
 												<div className='flex items-center justify-center gap-2'>
 													<div className='w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin' />
@@ -271,24 +273,24 @@ const EnquiryPopup = () => {
 											)}
 										</Button>
 
-										<p className='text-xs text-gray-500 text-center'>
+										<p className='text-xs text-gray-500 text-center leading-relaxed px-2'>
 											By submitting this form, you agree to receive
 											communications from BPIT regarding your enquiry.
 										</p>
 									</form>
 
 									{/* Contact Info */}
-									<div className='mt-8 pt-6 border-t border-gray-100'>
-										<div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+									<div className='mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-100'>
+										<div className='grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4'>
 											<a
 												href='tel:011-2757-1080'
-												className='flex items-center gap-3 p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors group'>
-												<div className='w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition-colors'>
-													<Phone className='w-4 h-4 text-blue-600' />
+												className='flex items-center gap-3 p-3 sm:p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors group'>
+												<div className='w-10 h-10 sm:w-8 sm:h-8 bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition-colors flex-shrink-0'>
+													<Phone className='w-5 h-5 sm:w-4 sm:h-4 text-blue-600' />
 												</div>
-												<div>
+												<div className='min-w-0 flex-1'>
 													<p className='text-xs text-gray-500'>Call us</p>
-													<p className='text-sm font-medium text-gray-900'>
+													<p className='text-sm font-medium text-gray-900 truncate'>
 														011-2757-1080
 													</p>
 												</div>
@@ -296,13 +298,13 @@ const EnquiryPopup = () => {
 
 											<a
 												href='mailto:bpitindia@yahoo.com'
-												className='flex items-center gap-3 p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors group'>
-												<div className='w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition-colors'>
-													<Mail className='w-4 h-4 text-blue-600' />
+												className='flex items-center gap-3 p-3 sm:p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors group'>
+												<div className='w-10 h-10 sm:w-8 sm:h-8 bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition-colors flex-shrink-0'>
+													<Mail className='w-5 h-5 sm:w-4 sm:h-4 text-blue-600' />
 												</div>
-												<div>
+												<div className='min-w-0 flex-1'>
 													<p className='text-xs text-gray-500'>Email us</p>
-													<p className='text-sm font-medium text-gray-900'>
+													<p className='text-sm font-medium text-gray-900 truncate'>
 														bpitindia@yahoo.com
 													</p>
 												</div>
@@ -317,14 +319,14 @@ const EnquiryPopup = () => {
 									animate={{ opacity: 1, scale: 1 }}
 									exit={{ opacity: 0, scale: 0.9 }}
 									transition={{ duration: 0.3 }}
-									className='p-8 text-center'>
-									<div className='w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6'>
-										<CheckCircle2 className='w-10 h-10 text-green-600' />
+									className='p-6 sm:p-8 text-center'>
+									<div className='w-16 h-16 sm:w-20 sm:h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6'>
+										<CheckCircle2 className='w-8 h-8 sm:w-10 sm:h-10 text-green-600' />
 									</div>
-									<h3 className='text-2xl font-semibold text-gray-900 mb-2'>
+									<h3 className='text-xl sm:text-2xl font-semibold text-gray-900 mb-2'>
 										Thank You!
 									</h3>
-									<p className='text-gray-600 mb-4'>
+									<p className='text-gray-600 mb-4 text-sm sm:text-base leading-relaxed px-2'>
 										Your enquiry has been successfully submitted. Our admissions
 										team will contact you within 24 hours.
 									</p>

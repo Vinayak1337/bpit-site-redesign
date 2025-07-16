@@ -176,7 +176,7 @@ const ScrollingSection = ({
 			<div className='flex flex-row items-center justify-between mb-6 lg:mb-8 gap-4'>
 				<div className='flex items-center gap-3'>
 					<div
-						className={`p-2 lg:p-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl shadow-lg`}>
+						className={`p-2 lg:p-3 bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-xl shadow-lg`}>
 						{icon}
 					</div>
 					<div>
@@ -198,7 +198,7 @@ const ScrollingSection = ({
 						<span className='hidden sm:inline'>Filter</span>
 					</Button>
 					<Button
-						className={`bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-90 rounded-xl border-0 text-xs lg:text-sm`}>
+						className={`bg-gradient-to-r from-blue-600 to-blue-800 hover:opacity-90 rounded-xl border-0 text-xs lg:text-sm`}>
 						<span className='hidden sm:inline'>View All</span>
 						<span className='sm:hidden'>All</span>
 						<ExternalLink className='w-3 h-3 lg:w-4 lg:h-4 ml-1 lg:ml-2' />
@@ -209,8 +209,8 @@ const ScrollingSection = ({
 			{/* Infinite Scrolling Container */}
 			<div ref={containerRef} className='relative overflow-hidden rounded-2xl'>
 				{/* Gradient masks for seamless edge effect - hidden on mobile */}
-				<div className='absolute left-0 top-0 bottom-0 w-0 sm:w-16 lg:w-20 bg-gradient-to-r from-indigo-50 via-indigo-50/80 to-transparent z-10 pointer-events-none' />
-				<div className='absolute right-0 top-0 bottom-0 w-0 sm:w-16 lg:w-20 bg-gradient-to-l from-indigo-50 via-indigo-50/80 to-transparent z-10 pointer-events-none' />
+				<div className='absolute left-0 top-0 bottom-0 w-0 sm:w-16 lg:w-20 bg-gradient-to-r from-blue-50 via-blue-50/80 to-transparent z-10 pointer-events-none' />
+				<div className='absolute right-0 top-0 bottom-0 w-0 sm:w-16 lg:w-20 bg-gradient-to-l from-blue-50 via-blue-50/80 to-transparent z-10 pointer-events-none' />
 
 				<div ref={scope} className='flex gap-3 sm:gap-4 lg:gap-6 w-max'>
 					{[...items, ...items].map((item, index) => (
@@ -232,7 +232,7 @@ export default function NoticesSection({ data }: NoticesSectionProps) {
 	const { notices, announcements } = data;
 
 	return (
-		<section className='relative py-20 bg-gradient-to-br from-indigo-50 via-white to-purple-50 overflow-hidden'>
+		<section className='relative py-20 bg-gradient-to-br from-blue-50 via-white to-blue-50 overflow-hidden'>
 			{/* Background Elements */}
 			<div className='absolute inset-0'>
 				<div className='absolute top-20 right-10 w-80 h-80 bg-indigo-200/20 rounded-full mix-blend-multiply filter blur-xl animate-blob' />
@@ -272,17 +272,17 @@ export default function NoticesSection({ data }: NoticesSectionProps) {
 						transition={{ duration: 0.8 }}
 						className='text-center space-y-6 mb-16'>
 						<div className='inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-md rounded-full border border-white/40 shadow-lg'>
-							<Bell className='w-5 h-5 text-indigo-600' />
-							<span className='text-indigo-700 font-semibold'>
+							<Bell className='w-5 h-5 text-blue-600' />
+							<span className='text-blue-700 font-semibold'>
 								Stay Updated
 							</span>
-							<Sparkles className='w-5 h-5 text-indigo-600' />
+							<Sparkles className='w-5 h-5 text-blue-600' />
 						</div>
 
-						<h2 className='text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-gray-900 via-indigo-800 to-purple-800 bg-clip-text text-transparent leading-tight'>
+						<h2 className='text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-gray-900 via-blue-600 to-blue-800 bg-clip-text text-transparent leading-tight'>
 							Notices &
 							<br />
-							<span className='bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent'>
+							<span className='bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent'>
 								Announcements
 							</span>
 						</h2>
@@ -294,7 +294,7 @@ export default function NoticesSection({ data }: NoticesSectionProps) {
 						</p>
 
 						<div className='flex justify-center'>
-							<div className='w-24 h-1 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full' />
+							<div className='w-24 h-1 bg-gradient-to-r from-blue-600 to-blue-800 rounded-full' />
 						</div>
 					</motion.div>
 

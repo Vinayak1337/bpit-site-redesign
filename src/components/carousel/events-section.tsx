@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, useAnimate } from 'framer-motion';
 import { ArrowRight, Calendar } from 'lucide-react';
 import EventCard from './event-card';
+import MobileEventsCarousel from './mobile-events-carousel';
 
 export default function EventsSection({ data }: EventsSectionProps) {
 	const [scope, animate] = useAnimate();
@@ -156,62 +157,70 @@ export default function EventsSection({ data }: EventsSectionProps) {
 	};
 
 	return (
-		<section className='relative py-20 lg:py-32 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 overflow-hidden'>
-			<div className='absolute inset-0'>
-				<div className='absolute top-20 left-10 w-[300px] h-[300px] bg-blue-300/10 rounded-full mix-blend-multiply filter blur-2xl' />
-				<div className='absolute top-40 right-10 w-[250px] h-[250px] bg-red-300/10 rounded-full mix-blend-multiply filter blur-2xl' />
+		<>
+			{/* Mobile Carousel - Show only on mobile devices */}
+			<div className='block sm:hidden'>
+				<MobileEventsCarousel events={events} />
 			</div>
 
-			<div className='relative z-10 container mx-auto px-4'>
-				<div className='max-w-7xl mx-auto'>
-					<div className='flex flex-row items-center justify-between mb-6 lg:mb-8 gap-4'>
-						<div className='flex items-center gap-3'>
-							<div className='p-2 lg:p-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl shadow-lg'>
-								<Calendar className='w-5 h-5 lg:w-6 lg:h-6' />
+			{/* Desktop/Tablet Horizontal Scrolling - Show on tablet and larger */}
+			<section className='relative py-20 lg:py-32 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 overflow-hidden hidden sm:block'>
+				<div className='absolute inset-0'>
+					<div className='absolute top-20 left-10 w-[300px] h-[300px] bg-blue-300/10 rounded-full mix-blend-multiply filter blur-2xl' />
+					<div className='absolute top-40 right-10 w-[250px] h-[250px] bg-red-300/10 rounded-full mix-blend-multiply filter blur-2xl' />
+				</div>
+
+				<div className='relative z-10 container mx-auto px-4'>
+					<div className='max-w-7xl mx-auto'>
+						<div className='flex flex-row items-center justify-between mb-6 lg:mb-8 gap-4'>
+							<div className='flex items-center gap-3'>
+								<div className='p-2 lg:p-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl shadow-lg'>
+									<Calendar className='w-5 h-5 lg:w-6 lg:h-6' />
+								</div>
+								<div>
+									<h3 className='text-xl lg:text-2xl font-bold text-gray-800'>
+										Official Events
+									</h3>
+									<p className='text-sm lg:text-base text-gray-600 hidden md:block'>
+										Latest campus events and activities
+									</p>
+								</div>
 							</div>
-							<div>
-								<h3 className='text-xl lg:text-2xl font-bold text-gray-800'>
-									Official Events
-								</h3>
-								<p className='text-sm lg:text-base text-gray-600 hidden md:block'>
-									Latest campus events and activities
-								</p>
-							</div>
+
+							<motion.button
+								className='group flex items-center space-x-2 px-4 lg:px-6 py-2 lg:py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl lg:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 text-sm lg:text-base'
+								whileHover={{ scale: 1.05, x: 5 }}
+								whileTap={{ scale: 0.95 }}>
+								<span className='font-semibold'>
+									<span className='hidden sm:inline'>View All Events</span>
+									<span className='sm:hidden'>View All</span>
+								</span>
+								<ArrowRight className='w-4 h-4 lg:w-5 lg:h-5 group-hover:translate-x-1 transition-transform' />
+							</motion.button>
 						</div>
 
-						<motion.button
-							className='group flex items-center space-x-2 px-4 lg:px-6 py-2 lg:py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl lg:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 text-sm lg:text-base'
-							whileHover={{ scale: 1.05, x: 5 }}
-							whileTap={{ scale: 0.95 }}>
-							<span className='font-semibold'>
-								<span className='hidden sm:inline'>View All Events</span>
-								<span className='sm:hidden'>View All</span>
-							</span>
-							<ArrowRight className='w-4 h-4 lg:w-5 lg:h-5 group-hover:translate-x-1 transition-transform' />
-						</motion.button>
-					</div>
+						<div
+							ref={containerRef}
+							className='relative overflow-hidden rounded-2xl'>
+							{/* Gradient masks for seamless edge effect - hidden on mobile */}
+							<div className='absolute left-0 top-0 bottom-0 w-0 sm:w-16 lg:w-20 bg-gradient-to-r from-slate-50 via-blue-50/80 to-transparent z-10 pointer-events-none' />
+							<div className='absolute right-0 top-0 bottom-0 w-0 sm:w-16 lg:w-20 bg-gradient-to-l from-indigo-50 via-blue-50/80 to-transparent z-10 pointer-events-none' />
 
-					<div
-						ref={containerRef}
-						className='relative overflow-hidden rounded-2xl'>
-						{/* Gradient masks for seamless edge effect - hidden on mobile */}
-						<div className='absolute left-0 top-0 bottom-0 w-0 sm:w-16 lg:w-20 bg-gradient-to-r from-slate-50 via-blue-50/80 to-transparent z-10 pointer-events-none' />
-						<div className='absolute right-0 top-0 bottom-0 w-0 sm:w-16 lg:w-20 bg-gradient-to-l from-indigo-50 via-blue-50/80 to-transparent z-10 pointer-events-none' />
-
-						<div ref={scope} className='flex gap-3 sm:gap-4 lg:gap-6 w-max'>
-							{[...events, ...events].map((event, index) => (
-								<div
-									key={`${event.id}-${index}`}
-									className='w-[280px] sm:w-[300px] lg:w-[360px] flex-shrink-0'
-									onMouseEnter={() => handleCardHover(true)}
-									onMouseLeave={() => handleCardHover(false)}>
-									<EventCard event={event} index={index} />
-								</div>
-							))}
+							<div ref={scope} className='flex gap-3 sm:gap-4 lg:gap-6 w-max'>
+								{[...events, ...events].map((event, index) => (
+									<div
+										key={`${event.id}-${index}`}
+										className='w-[280px] sm:w-[300px] lg:w-[360px] flex-shrink-0'
+										onMouseEnter={() => handleCardHover(true)}
+										onMouseLeave={() => handleCardHover(false)}>
+										<EventCard event={event} index={index} />
+									</div>
+								))}
+							</div>
 						</div>
 					</div>
 				</div>
-			</div>
-		</section>
+			</section>
+		</>
 	);
 }
