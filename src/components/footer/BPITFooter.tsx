@@ -33,10 +33,25 @@ const BPITFooter = () => {
 	const [showScrollTop, setShowScrollTop] = useState(false);
 	const [isMobile, setIsMobile] = useState(false);
 	const [isClient, setIsClient] = useState(false);
+	const [particles, setParticles] = useState<Array<{
+		id: number;
+		left: number;
+		top: number;
+		duration: number;
+		delay: number;
+	}>>([]);
 
-	// Check if we're on client side
+	// Generate particles only on client side
 	useEffect(() => {
 		setIsClient(true);
+		const generatedParticles = [...Array(20)].map((_, i) => ({
+			id: i,
+			left: Math.random() * 100,
+			top: Math.random() * 100,
+			duration: 3 + Math.random() * 2,
+			delay: Math.random() * 2
+		}));
+		setParticles(generatedParticles);
 	}, []);
 
 	// Check screen size only on client side
@@ -228,22 +243,22 @@ const BPITFooter = () => {
 				{/* Floating Particles */}
 				<div className='absolute inset-0 overflow-hidden pointer-events-none'>
 					{isClient &&
-						[...Array(20)].map((_, i) => (
+						particles.map((particle) => (
 							<motion.div
-								key={i}
+								key={particle.id}
 								className='absolute w-1 h-1 bg-white/20 rounded-full'
 								style={{
-									left: `${Math.random() * 100}%`,
-									top: `${Math.random() * 100}%`
+									left: `${particle.left}%`,
+									top: `${particle.top}%`
 								}}
 								animate={{
 									y: [0, -30, 0],
 									opacity: [0.2, 1, 0.2]
 								}}
 								transition={{
-									duration: 3 + Math.random() * 2,
+									duration: particle.duration,
 									repeat: Infinity,
-									delay: Math.random() * 2
+									delay: particle.delay
 								}}
 							/>
 						))}

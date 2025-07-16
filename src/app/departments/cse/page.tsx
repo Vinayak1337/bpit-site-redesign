@@ -59,7 +59,9 @@ import {
 	Rocket,
 	Heart,
 	Link,
-	Mail
+	Mail,
+	Cpu,
+	Brain
 } from 'lucide-react';
 
 interface SubSection {
@@ -5283,6 +5285,288 @@ const CSEDepartmentPage = () => {
 											<p className='text-gray-700 leading-relaxed'>{pso.description}</p>
 										</div>
 									))}
+								</div>
+							</div>
+						</div>
+					</AnimatedCard>
+				</div>
+			);
+		}
+
+		// If student-corner section is selected with prototype-product-development subsection
+		if (activeSection === 'student-corner' && activeSubSection === 'prototype-product-development') {
+			return (
+				<div className='space-y-8'>
+					{/* Prototype Product Development Header */}
+					<motion.div
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.6 }}
+						className='bg-gradient-to-r from-orange-50 to-red-50 rounded-2xl p-8 border border-orange-200'>
+						<div className='text-center'>
+							<div className='w-16 h-16 bg-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-4'>
+								<Wrench className='w-8 h-8 text-white' />
+							</div>
+							<h1 className='text-3xl font-bold text-gray-900 mb-2'>Prototype Product Development</h1>
+							<p className='text-orange-600 font-medium'>Innovative Student Projects and Prototypes</p>
+						</div>
+					</motion.div>
+
+					{/* Infinite Carousel Header */}
+					<AnimatedCard delay={0.1}>
+						<div className='bg-white rounded-xl p-6 border border-gray-200 overflow-hidden'>
+							<div className='flex items-center mb-4'>
+								<div className='w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mr-3'>
+									<Camera className='w-6 h-6 text-white' />
+								</div>
+								<h2 className='text-2xl font-bold text-gray-900'>Project Showcase</h2>
+							</div>
+							
+							{/* Carousel Container */}
+							<div className='relative h-64 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl overflow-hidden'>
+								<div className='absolute inset-0 flex items-center justify-center'>
+									<div className='animate-carousel flex space-x-8'>
+										{/* Duplicate the images for infinite effect */}
+										{[...Array(3)].map((_, setIndex) => (
+											<>
+												<div key={`${setIndex}-1`} className='flex-shrink-0 w-80 h-48 bg-white rounded-lg shadow-lg flex items-center justify-center border border-gray-200'>
+													<div className='text-center'>
+														<div className='w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-3'>
+															<Code className='w-8 h-8 text-white' />
+														</div>
+														<h3 className='text-lg font-semibold text-gray-800 mb-1'>Attendance App</h3>
+														<p className='text-sm text-gray-600'>Mobile Application Development</p>
+													</div>
+												</div>
+												<div key={`${setIndex}-2`} className='flex-shrink-0 w-80 h-48 bg-white rounded-lg shadow-lg flex items-center justify-center border border-gray-200'>
+													<div className='text-center'>
+														<div className='w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-3'>
+															<GraduationCap className='w-8 h-8 text-white' />
+														</div>
+														<h3 className='text-lg font-semibold text-gray-800 mb-1'>Brainchant</h3>
+														<p className='text-sm text-gray-600'>Educational Platform</p>
+													</div>
+												</div>
+												<div key={`${setIndex}-3`} className='flex-shrink-0 w-80 h-48 bg-white rounded-lg shadow-lg flex items-center justify-center border border-gray-200'>
+													<div className='text-center'>
+														<div className='w-16 h-16 bg-yellow-600 rounded-full flex items-center justify-center mx-auto mb-3'>
+															<Zap className='w-8 h-8 text-white' />
+														</div>
+														<h3 className='text-lg font-semibold text-gray-800 mb-1'>Solar Tracker</h3>
+														<p className='text-sm text-gray-600'>IoT & Automation</p>
+													</div>
+												</div>
+												<div key={`${setIndex}-4`} className='flex-shrink-0 w-80 h-48 bg-white rounded-lg shadow-lg flex items-center justify-center border border-gray-200'>
+													<div className='text-center'>
+														<div className='w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-3'>
+															<Shield className='w-8 h-8 text-white' />
+														</div>
+														<h3 className='text-lg font-semibold text-gray-800 mb-1'>TagGuard</h3>
+														<p className='text-sm text-gray-600'>Security System</p>
+													</div>
+												</div>
+											</>
+										))}
+									</div>
+								</div>
+							</div>
+						</div>
+					</AnimatedCard>
+
+					{/* Projects Table */}
+					<AnimatedCard delay={0.2}>
+						<div className='bg-white rounded-xl p-6 border border-gray-200'>
+							<div className='flex items-center mb-6'>
+								<div className='w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center mr-3'>
+									<FolderOpen className='w-6 h-6 text-white' />
+								</div>
+								<h2 className='text-2xl font-bold text-gray-900'>Project Details</h2>
+							</div>
+
+							<div className='overflow-x-auto'>
+								<table className='w-full border-collapse'>
+									<thead>
+										<tr className='bg-gray-50 border-b border-gray-200'>
+											<th className='px-6 py-4 text-left text-sm font-semibold text-gray-900 border-r border-gray-200'>S. No.</th>
+											<th className='px-6 py-4 text-left text-sm font-semibold text-gray-900 border-r border-gray-200'>Title</th>
+											<th className='px-6 py-4 text-left text-sm font-semibold text-gray-900 border-r border-gray-200'>Details</th>
+											<th className='px-6 py-4 text-left text-sm font-semibold text-gray-900'>Student Names</th>
+										</tr>
+									</thead>
+									<tbody className='divide-y divide-gray-200'>
+										{[
+											{
+												sno: 1,
+												title: "Attendance App",
+												details: "The objective of this project to maintain the attendance details of students.",
+												students: "Shubham, Mohak, Rajat"
+											},
+											{
+												sno: 2,
+												title: "Brainchant: one stop solution for B.Tech Students",
+												details: "Brainchant's website, brainchant.in, serves as the central hub for accessing its innovative educational platform. Here, students can find a wealth of high-quality content, including interactive live sessions, video lectures, and detailed subject analyses. Through this platform, Brainchant addresses the pressing issue of unreliable educational resources, providing undergrad and postgrad students with a reliable and effective learning solution. With its freemium SaaS model, Brainchant offers both free and premium subscription options, ensuring accessibility for all learners. Led by CEO Ayush Garg and COO Mayank Nailwal, Brainchant is poised to transform the educational landscape with its commitment to quality, affordability, and scalability.",
+												students: "Ayush Garg, Ayush Saini, Aarti, Akansha Mittal"
+											},
+											{
+												sno: 3,
+												title: "Automated Solar Tracker",
+												details: "New solar tracker maximizes sunlight exposure with the help of LDR sensors operated by Arduino UNO and can be programmed using the Arduino Integrated Development Environment (IDE).",
+												students: "Syed Nameer Ibraheem, Afaque Ahmad, Md Zahin Ahmad, Parvesh Kumar"
+											},
+											{
+												sno: 4,
+												title: "Digital Government Scheme",
+												details: "This product aims to access the central and state schemes without going to the block office or district office by using an aadhar card.",
+												students: "Diwakar Kumar, Vishesh, Gaurav"
+											},
+											{
+												sno: 5,
+												title: "TagGuard",
+												details: "TagGuard is a comprehensive security system designed to protect Near Field Communication (NFC) and Radio Frequency Identification (RFID) technology from cyber threats, utilizing advanced encryption, authentication, and access control mechanisms. By integrating robust encryption algorithms, dynamic authentication protocols, and tamper-resistant tags, TagGuard enhances data security, user privacy, and resilience against unauthorized access in NFC and RFID systems.",
+												students: "Akriti Ajit, Bhavya Malhotra, Manika"
+											},
+											{
+												sno: 6,
+												title: "KeyKatcher- The simplified keylogger",
+												details: "it's a keylogger, once installed in a system, starts capturing all the keystrokes entered by any user. Later, those keystrokes are stored in a Txt file and are sent over in the mail to any specific email address. Also, after the mail is sent, the Txt file is deleted automatically. Hence, leaving no trace.",
+												students: "Himank Jain, Shaurya Dhingra, Saksham Batra, Pratyaksh Khurana"
+											},
+											{
+												sno: 7,
+												title: "BusKaro",
+												details: "\"BusKaro!\" is a Bus Tracking and Management System aimed at improving public transportation by providing real-time bus tracking, route information, and AI-driven assistance. Leveraging modern technologies, it enhances user experience, ensures route adherence, and contributes to more efficient and environmentally friendly travel.",
+												students: "Ujjawal Sharma, Pratham Gupta, Ekta Bansal, Vasu Dandona"
+											},
+											{
+												sno: 8,
+												title: "Gesture Control",
+												details: "This product aims to develop a robust and versatile gesture control library built using TensorFlow vision models. This library will serve as a valuable resource for developers looking to seamlessly integrate gesture-based interactions into their web applications. By offering a streamlined and customizable solution, it empowers developers to create immersive, interactive, and user-friendly web experiences.",
+												students: "Rahul Paul, Akshat Gupta, Yash Bhardwaj"
+											},
+											{
+												sno: 9,
+												title: "Malware Detection & Analysis using AI",
+												details: "The main task is to distinguish malware present statically utilizing AI calculations with the assistance of the compact executable (PE file format).",
+												students: "Kartik Malik, Manish Kumar, Mehul Kumar Soni, Radha Mukhraiya"
+											},
+											{
+												sno: 10,
+												title: "ConfMan",
+												details: "The objective of this product to manage the conference details.",
+												students: "Ankit Gaur, Akash Samal, Ramit Batra and Ayush Mangla"
+											}
+										].map((project, index) => (
+											<tr key={index} className='hover:bg-gray-50 transition-colors'>
+												<td className='px-6 py-4 text-sm text-gray-900 border-r border-gray-200 font-medium'>
+													{project.sno}
+												</td>
+												<td className='px-6 py-4 text-sm font-semibold text-gray-900 border-r border-gray-200'>
+													{project.title}
+												</td>
+												<td className='px-6 py-4 text-sm text-gray-700 border-r border-gray-200 leading-relaxed'>
+													{project.details}
+												</td>
+												<td className='px-6 py-4 text-sm text-gray-700 font-medium'>
+													{project.students}
+												</td>
+											</tr>
+										))}
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</AnimatedCard>
+
+					{/* Project Categories */}
+					<AnimatedCard delay={0.3}>
+						<div className='bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 border border-blue-200'>
+							<div className='flex items-center mb-6'>
+								<div className='w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mr-3'>
+									<BarChart className='w-6 h-6 text-white' />
+								</div>
+								<h2 className='text-2xl font-bold text-gray-900'>Project Categories</h2>
+							</div>
+
+							<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+								{[
+									{
+										category: 'Mobile Applications',
+										count: 2,
+										color: 'from-blue-100 to-blue-200',
+										icon: <Monitor className='w-6 h-6 text-blue-600' />
+									},
+									{
+										category: 'Web Platforms',
+										count: 3,
+										color: 'from-green-100 to-green-200',
+										icon: <Globe className='w-6 h-6 text-green-600' />
+									},
+									{
+										category: 'IoT & Hardware',
+										count: 1,
+										color: 'from-yellow-100 to-yellow-200',
+										icon: <Cpu className='w-6 h-6 text-yellow-600' />
+									},
+									{
+										category: 'Security Systems',
+										count: 2,
+										color: 'from-purple-100 to-purple-200',
+										icon: <Shield className='w-6 h-6 text-purple-600' />
+									},
+									{
+										category: 'AI & Machine Learning',
+										count: 2,
+										color: 'from-indigo-100 to-indigo-200',
+										icon: <Brain className='w-6 h-6 text-indigo-600' />
+									}
+								].map((category, index) => (
+									<div key={index} className={`bg-gradient-to-br ${category.color} rounded-lg p-4 border border-gray-200`}>
+										<div className='flex items-center justify-between mb-2'>
+											<div className='flex items-center'>
+												{category.icon}
+												<span className='ml-2 font-semibold text-gray-900'>{category.category}</span>
+											</div>
+											<span className='bg-white px-2 py-1 rounded-full text-sm font-bold text-gray-700'>
+												{category.count}
+											</span>
+										</div>
+									</div>
+								))}
+							</div>
+						</div>
+					</AnimatedCard>
+
+					{/* Innovation Impact */}
+					<AnimatedCard delay={0.4}>
+						<div className='bg-white rounded-xl p-6 border border-gray-200'>
+							<div className='flex items-center mb-6'>
+								<div className='w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center mr-3'>
+									<TrendingUp className='w-6 h-6 text-white' />
+								</div>
+								<h2 className='text-2xl font-bold text-gray-900'>Innovation Impact</h2>
+							</div>
+
+							<div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+								<div className='text-center'>
+									<div className='w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4'>
+										<Users className='w-8 h-8 text-blue-600' />
+									</div>
+									<h3 className='text-2xl font-bold text-gray-900 mb-2'>28</h3>
+									<p className='text-gray-600'>Students Involved</p>
+								</div>
+								<div className='text-center'>
+									<div className='w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4'>
+										<FolderOpen className='w-8 h-8 text-green-600' />
+									</div>
+									<h3 className='text-2xl font-bold text-gray-900 mb-2'>10</h3>
+									<p className='text-gray-600'>Active Projects</p>
+								</div>
+								<div className='text-center'>
+									<div className='w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4'>
+										<Trophy className='w-8 h-8 text-purple-600' />
+									</div>
+									<h3 className='text-2xl font-bold text-gray-900 mb-2'>5</h3>
+									<p className='text-gray-600'>Technology Domains</p>
 								</div>
 							</div>
 						</div>
