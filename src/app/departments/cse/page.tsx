@@ -52,7 +52,14 @@ import {
 	TreePine,
 	BarChart3,
 	Computer,
-	Package
+	Package,
+	GitBranch,
+	Terminal,
+	Layers,
+	Rocket,
+	Heart,
+	Link,
+	Mail
 } from 'lucide-react';
 
 interface SubSection {
@@ -810,7 +817,7 @@ const CSEDepartmentPage = () => {
 				{
 					id: 'foss-cell',
 					title: 'FOSS Cell',
-					icon: <Code className='w-4 h-4' />
+					icon: <GitBranch className='w-4 h-4' />
 				}
 			]
 		},
@@ -3882,6 +3889,341 @@ const CSEDepartmentPage = () => {
             );
         }
         
+        // If facilities section is selected with foss-cell subsection
+        if (activeSection === 'facilities' && activeSubSection === 'foss-cell') {
+            return (
+                <div className='space-y-8'>
+                    {/* FOSS Cell Header */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6 }}
+                        className='bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-8 border border-green-200'>
+                        <div className='text-center'>
+                            <div className='w-16 h-16 bg-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4'>
+                                <GitBranch className='w-8 h-8 text-white' />
+                            </div>
+                            <h1 className='text-3xl font-bold text-gray-900 mb-2'>FOSS Cell - Free & Open Source Software</h1>
+                            <p className='text-green-600 font-medium'>Promoting open-source culture and collaboration</p>
+                        </div>
+                    </motion.div>
+
+                    {/* Introduction */}
+                    <AnimatedCard delay={0.1}>
+                        <div className='bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200'>
+                            <div className='flex items-center mb-4'>
+                                <div className='w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mr-3'>
+                                    <GitBranch className='w-6 h-6 text-white' />
+                                </div>
+                                <h2 className='text-2xl font-bold text-gray-900'>What is FOSS Cell?</h2>
+                            </div>
+                            <p className='text-gray-700 leading-relaxed'>
+                                The Free and Open Source Software (FOSS) Cell is a dedicated initiative within our Computer Science & Engineering department that promotes the use, development, and contribution to open-source software projects. Our cell serves as a hub for students and faculty to collaborate on open-source projects, learn modern development practices, and contribute to the global open-source community.
+                            </p>
+                        </div>
+                    </AnimatedCard>
+
+                    {/* Objectives */}
+                    <AnimatedCard delay={0.2}>
+                        <div className='bg-white rounded-xl p-6 border border-gray-200'>
+                            <div className='flex items-center mb-4'>
+                                <div className='w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center mr-3'>
+                                    <Target className='w-6 h-6 text-white' />
+                                </div>
+                                <h2 className='text-2xl font-bold text-gray-900'>Our Objectives</h2>
+                            </div>
+                            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                                {[
+                                    "Promote awareness about Free and Open Source Software",
+                                    "Encourage students to contribute to open-source projects",
+                                    "Develop coding skills through collaborative projects",
+                                    "Foster a culture of knowledge sharing and community building",
+                                    "Organize workshops and seminars on open-source technologies",
+                                    "Support students in participating in global open-source programs"
+                                ].map((objective, index) => (
+                                    <div key={index} className='flex items-start'>
+                                        <div className='w-2 h-2 bg-green-500 rounded-full mt-2 mr-3 flex-shrink-0'></div>
+                                        <span className='text-gray-700'>{objective}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </AnimatedCard>
+
+                    {/* Activities */}
+                    <AnimatedCard delay={0.3}>
+                        <div className='bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-200'>
+                            <div className='flex items-center mb-4'>
+                                <div className='w-12 h-12 bg-purple-600 rounded-xl flex items-center justify-center mr-3'>
+                                    <Rocket className='w-6 h-6 text-white' />
+                                </div>
+                                <h2 className='text-2xl font-bold text-gray-900'>Our Activities</h2>
+                            </div>
+                            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+                                {[
+                                    {
+                                        title: "Code Contribution Drives",
+                                        description: "Regular sessions where students contribute to popular open-source projects",
+                                        color: "from-blue-100 to-blue-200"
+                                    },
+                                    {
+                                        title: "Technical Workshops",
+                                        description: "Hands-on workshops on Git, GitHub, and modern development tools",
+                                        color: "from-green-100 to-green-200"
+                                    },
+                                    {
+                                        title: "Hackathons",
+                                        description: "Organizing and participating in open-source hackathons",
+                                        color: "from-purple-100 to-purple-200"
+                                    },
+                                    {
+                                        title: "Guest Lectures",
+                                        description: "Industry experts sharing insights on open-source development",
+                                        color: "from-orange-100 to-orange-200"
+                                    },
+                                    {
+                                        title: "Project Mentoring",
+                                        description: "Guidance for students starting their open-source journey",
+                                        color: "from-teal-100 to-teal-200"
+                                    },
+                                    {
+                                        title: "Community Building",
+                                        description: "Creating a supportive network of open-source enthusiasts",
+                                        color: "from-pink-100 to-pink-200"
+                                    }
+                                ].map((activity, index) => (
+                                    <div key={index} className={`bg-gradient-to-br ${activity.color} rounded-lg p-4 border border-gray-200`}>
+                                        <h4 className='font-semibold text-gray-900 mb-2'>{activity.title}</h4>
+                                        <p className='text-gray-700 text-sm'>{activity.description}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </AnimatedCard>
+
+                    {/* Training Programs */}
+                    <AnimatedCard delay={0.4}>
+                        <div className='bg-white rounded-xl p-6 border border-gray-200'>
+                            <div className='flex items-center mb-4'>
+                                <div className='w-12 h-12 bg-orange-600 rounded-xl flex items-center justify-center mr-3'>
+                                    <BookOpen className='w-6 h-6 text-white' />
+                                </div>
+                                <h2 className='text-2xl font-bold text-gray-900'>Training Programs</h2>
+                            </div>
+                            <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+                                <div className='space-y-4'>
+                                    <h4 className='font-semibold text-gray-900'>Beginner Level</h4>
+                                    <div className='space-y-2'>
+                                        {[
+                                            "Introduction to Open Source",
+                                            "Git and GitHub Basics",
+                                            "Linux Fundamentals",
+                                            "Command Line Interface",
+                                            "Version Control Systems"
+                                        ].map((program, index) => (
+                                            <div key={index} className='flex items-center p-3 bg-blue-50 rounded-lg'>
+                                                <Terminal className='w-4 h-4 text-blue-600 mr-3' />
+                                                <span className='text-gray-700'>{program}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className='space-y-4'>
+                                    <h4 className='font-semibold text-gray-900'>Advanced Level</h4>
+                                    <div className='space-y-2'>
+                                        {[
+                                            "Contributing to Large Projects",
+                                            "Code Review Best Practices",
+                                            "Open Source Licensing",
+                                            "Community Management",
+                                            "Project Maintenance"
+                                        ].map((program, index) => (
+                                            <div key={index} className='flex items-center p-3 bg-green-50 rounded-lg'>
+                                                <Layers className='w-4 h-4 text-green-600 mr-3' />
+                                                <span className='text-gray-700'>{program}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </AnimatedCard>
+
+                    {/* Technologies */}
+                    <AnimatedCard delay={0.5}>
+                        <div className='bg-gradient-to-r from-gray-50 to-slate-50 rounded-xl p-6 border border-gray-200'>
+                            <div className='flex items-center mb-4'>
+                                <div className='w-12 h-12 bg-gray-600 rounded-xl flex items-center justify-center mr-3'>
+                                    <Code className='w-6 h-6 text-white' />
+                                </div>
+                                <h2 className='text-2xl font-bold text-gray-900'>Technologies We Work With</h2>
+                            </div>
+                            <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3'>
+                                {[
+                                    "Python", "JavaScript", "React", "Node.js", "Django", "Flutter",
+                                    "Docker", "Kubernetes", "Linux", "Git", "PostgreSQL", "MongoDB",
+                                    "TensorFlow", "PyTorch", "OpenCV", "Apache", "Nginx", "Redis",
+                                    "Elasticsearch", "Grafana", "Jenkins", "Ansible", "Terraform", "AWS"
+                                ].map((tech, index) => (
+                                    <div key={index} className='bg-white rounded-lg p-3 text-center border border-gray-200 hover:shadow-md transition-shadow'>
+                                        <span className='text-gray-800 font-medium text-sm'>{tech}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </AnimatedCard>
+
+                    {/* Achievements */}
+                    <AnimatedCard delay={0.6}>
+                        <div className='bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-6 border border-yellow-200'>
+                            <div className='flex items-center mb-4'>
+                                <div className='w-12 h-12 bg-yellow-600 rounded-xl flex items-center justify-center mr-3'>
+                                    <Trophy className='w-6 h-6 text-white' />
+                                </div>
+                                <h2 className='text-2xl font-bold text-gray-900'>Our Achievements</h2>
+                            </div>
+                            <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+                                {[
+                                    {
+                                        title: "100+ Students Engaged",
+                                        description: "Successfully onboarded over 100 students into open-source development",
+                                        icon: <Users className='w-6 h-6 text-blue-600' />
+                                    },
+                                    {
+                                        title: "50+ Contributions",
+                                        description: "Our students have made significant contributions to various open-source projects",
+                                        icon: <GitBranch className='w-6 h-6 text-green-600' />
+                                    },
+                                    {
+                                        title: "10+ Workshops Conducted",
+                                        description: "Regular workshops on Git, GitHub, and open-source development practices",
+                                        icon: <BookOpen className='w-6 h-6 text-purple-600' />
+                                    },
+                                    {
+                                        title: "5+ Industry Partnerships",
+                                        description: "Collaborations with tech companies for mentorship and project guidance",
+                                        icon: <Building2 className='w-6 h-6 text-orange-600' />
+                                    }
+                                ].map((achievement, index) => (
+                                    <div key={index} className='bg-white rounded-lg p-4 border border-gray-200'>
+                                        <div className='flex items-center mb-3'>
+                                            <div className='w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center mr-3'>
+                                                {achievement.icon}
+                                            </div>
+                                            <h4 className='font-semibold text-gray-900'>{achievement.title}</h4>
+                                        </div>
+                                        <p className='text-gray-700 text-sm'>{achievement.description}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </AnimatedCard>
+
+                    {/* Get Involved */}
+                    <AnimatedCard delay={0.7}>
+                        <div className='bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200'>
+                            <div className='flex items-center mb-4'>
+                                <div className='w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center mr-3'>
+                                    <Heart className='w-6 h-6 text-white' />
+                                </div>
+                                <h2 className='text-2xl font-bold text-gray-900'>Get Involved</h2>
+                            </div>
+                            <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+                                <div>
+                                    <h4 className='font-semibold text-gray-900 mb-3'>For Students</h4>
+                                    <div className='space-y-2'>
+                                        {[
+                                            "Join our weekly coding sessions",
+                                            "Participate in open-source projects",
+                                            "Attend workshops and seminars",
+                                            "Contribute to our GitHub organization",
+                                            "Mentor junior students"
+                                        ].map((item, index) => (
+                                            <div key={index} className='flex items-center'>
+                                                <div className='w-2 h-2 bg-green-500 rounded-full mr-3'></div>
+                                                <span className='text-gray-700'>{item}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4 className='font-semibold text-gray-900 mb-3'>For Faculty</h4>
+                                    <div className='space-y-2'>
+                                        {[
+                                            "Guide student projects",
+                                            "Conduct technical workshops",
+                                            "Collaborate on research projects",
+                                            "Connect with industry partners",
+                                            "Promote open-source culture"
+                                        ].map((item, index) => (
+                                            <div key={index} className='flex items-center'>
+                                                <div className='w-2 h-2 bg-green-500 rounded-full mr-3'></div>
+                                                <span className='text-gray-700'>{item}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </AnimatedCard>
+
+                    {/* Contact & Resources */}
+                    <AnimatedCard delay={0.8}>
+                        <div className='bg-white rounded-xl p-6 border border-gray-200'>
+                            <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+                                {/* Contact Information */}
+                                <div>
+                                    <div className='flex items-center mb-4'>
+                                        <div className='w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mr-3'>
+                                            <Mail className='w-6 h-6 text-white' />
+                                        </div>
+                                        <h3 className='text-xl font-bold text-gray-900'>Contact Us</h3>
+                                    </div>
+                                    <div className='space-y-3'>
+                                        <div className='flex items-center'>
+                                            <Mail className='w-4 h-4 text-gray-500 mr-3' />
+                                            <span className='text-gray-700'>fosscel@bpitindia.com</span>
+                                        </div>
+                                        <div className='flex items-center'>
+                                            <MapPin className='w-4 h-4 text-gray-500 mr-3' />
+                                            <span className='text-gray-700'>Computer Science Department, BPIT</span>
+                                        </div>
+                                        <div className='flex items-center'>
+                                            <Clock className='w-4 h-4 text-gray-500 mr-3' />
+                                            <span className='text-gray-700'>Mon-Fri, 9:00 AM - 5:00 PM</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Quick Links */}
+                                <div>
+                                    <div className='flex items-center mb-4'>
+                                        <div className='w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center mr-3'>
+                                            <Link className='w-6 h-6 text-white' />
+                                        </div>
+                                        <h3 className='text-xl font-bold text-gray-900'>Quick Links</h3>
+                                    </div>
+                                    <div className='space-y-2'>
+                                        {[
+                                            'GitHub Organization',
+                                            'Discord Community',
+                                            'Project Repository',
+                                            'Contribution Guidelines',
+                                            'Event Calendar'
+                                        ].map((link, index) => (
+                                            <a key={index} href="#" className='block text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200'>
+                                                {link}
+                                            </a>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </AnimatedCard>
+                </div>
+            );
+        }
+        
         // If facilities section is selected with industry-supported-labs subsection
         if (activeSection === 'facilities' && activeSubSection === 'industry-supported-labs') {
             return (
@@ -4593,7 +4935,363 @@ const CSEDepartmentPage = () => {
 		// For subsections, get the current key
 		const currentKey = activeSection === 'home' ? activeSubSection : activeSection;
 
-		// Add basic content for different sections
+		// Handle specific subsections
+		if (activeSection === 'home' && activeSubSection === 'vision-mission') {
+			return (
+				<div className='space-y-8'>
+					{/* Header Section */}
+					<motion.div
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.6 }}
+						className='bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white'>
+						<div className='text-center'>
+							<div className='w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-4'>
+								<Eye className='w-8 h-8 text-white' />
+							</div>
+							<h1 className='text-3xl font-bold mb-2'>Vision & Mission</h1>
+							<p className='text-blue-100 font-medium'>
+								Our guiding principles for excellence in Computer Science & Engineering
+							</p>
+						</div>
+					</motion.div>
+
+					{/* Vision Section */}
+					<AnimatedCard delay={0.1}>
+						<div className='bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-8 border border-blue-200'>
+							<div className='flex items-center mb-6'>
+								<div className='w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mr-4'>
+									<Eye className='w-6 h-6 text-white' />
+								</div>
+								<h2 className='text-2xl font-bold text-gray-900'>Our Vision</h2>
+							</div>
+							<div className='bg-white/80 rounded-lg p-6 border border-blue-100'>
+								<p className='text-lg text-gray-700 leading-relaxed'>
+									To emerge as a center of excellence, in the field of Computer Science and Engineering & Research, 
+									by grooming our pupils with strong conceptual knowledge to enable them as a professional and 
+									researcher for the benefit of society.
+								</p>
+							</div>
+						</div>
+					</AnimatedCard>
+
+					{/* Mission Section */}
+					<AnimatedCard delay={0.2}>
+						<div className='bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-8 border border-purple-200'>
+							<div className='flex items-center mb-6'>
+								<div className='w-12 h-12 bg-purple-600 rounded-xl flex items-center justify-center mr-4'>
+									<Target className='w-6 h-6 text-white' />
+								</div>
+								<h2 className='text-2xl font-bold text-gray-900'>Our Mission</h2>
+							</div>
+							<div className='bg-white/80 rounded-lg p-6 border border-purple-100'>
+								<div className='space-y-4'>
+									<div className='flex items-start'>
+										<div className='w-2 h-2 bg-purple-600 rounded-full mt-2 mr-3 flex-shrink-0'></div>
+										<p className='text-gray-700 leading-relaxed'>
+											To inculcate self-motivation among the students, who can find and understand the need of the day.
+										</p>
+									</div>
+									<div className='flex items-start'>
+										<div className='w-2 h-2 bg-purple-600 rounded-full mt-2 mr-3 flex-shrink-0'></div>
+										<p className='text-gray-700 leading-relaxed'>
+											To produce best quality professionals with strong conceptual knowledge and hands-on experience.
+										</p>
+									</div>
+									<div className='flex items-start'>
+										<div className='w-2 h-2 bg-purple-600 rounded-full mt-2 mr-3 flex-shrink-0'></div>
+										<p className='text-gray-700 leading-relaxed'>
+											To enable the students to be technically competent among their peers and serve as ethical software professionals.
+										</p>
+									</div>
+									<div className='flex items-start'>
+										<div className='w-2 h-2 bg-purple-600 rounded-full mt-2 mr-3 flex-shrink-0'></div>
+										<p className='text-gray-700 leading-relaxed'>
+											To facilitate industry interaction exposure for the benefit of the stakeholders.
+										</p>
+									</div>
+									<div className='flex items-start'>
+										<div className='w-2 h-2 bg-purple-600 rounded-full mt-2 mr-3 flex-shrink-0'></div>
+										<p className='text-gray-700 leading-relaxed'>
+											To motivate faculties and students for continuous improvement of their academic standards with qualitative research.
+										</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</AnimatedCard>
+
+					{/* Impact Section */}
+					<AnimatedCard delay={0.3}>
+						<div className='bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-8 border border-green-200'>
+							<div className='flex items-center mb-6'>
+								<div className='w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center mr-4'>
+									<Trophy className='w-6 h-6 text-white' />
+								</div>
+								<h2 className='text-2xl font-bold text-gray-900'>Our Impact</h2>
+							</div>
+							<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+								<div className='bg-white/80 rounded-lg p-6 border border-green-100 text-center'>
+									<div className='w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mx-auto mb-3'>
+										<GraduationCap className='w-6 h-6 text-white' />
+									</div>
+									<h3 className='text-lg font-bold text-gray-900 mb-2'>Quality Education</h3>
+									<p className='text-gray-600 text-sm'>
+										Comprehensive curriculum with hands-on learning approach
+									</p>
+								</div>
+								<div className='bg-white/80 rounded-lg p-6 border border-green-100 text-center'>
+									<div className='w-12 h-12 bg-purple-600 rounded-xl flex items-center justify-center mx-auto mb-3'>
+										<Users className='w-6 h-6 text-white' />
+									</div>
+									<h3 className='text-lg font-bold text-gray-900 mb-2'>Industry Ready</h3>
+									<p className='text-gray-600 text-sm'>
+										Students prepared for professional challenges
+									</p>
+								</div>
+								<div className='bg-white/80 rounded-lg p-6 border border-green-100 text-center'>
+									<div className='w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center mx-auto mb-3'>
+										<Lightbulb className='w-6 h-6 text-white' />
+									</div>
+									<h3 className='text-lg font-bold text-gray-900 mb-2'>Innovation</h3>
+									<p className='text-gray-600 text-sm'>
+										Fostering research and innovation culture
+									</p>
+								</div>
+							</div>
+						</div>
+					</AnimatedCard>
+				</div>
+			);
+		}
+
+		// Handle POs / PEOs / PSOs subsection
+		if (activeSection === 'home' && activeSubSection === 'pos-peos-psos') {
+			return (
+				<div className='space-y-8'>
+					{/* Header Section */}
+					<motion.div
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.6 }}
+						className='bg-gradient-to-r from-green-600 to-blue-600 rounded-2xl p-8 text-white'>
+						<div className='text-center'>
+							<div className='w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-4'>
+								<Target className='w-8 h-8 text-white' />
+							</div>
+							<h1 className='text-3xl font-bold mb-2'>Program Outcomes & Objectives</h1>
+							<p className='text-green-100 font-medium'>
+								Comprehensive learning outcomes and educational objectives for CSE program
+							</p>
+						</div>
+					</motion.div>
+
+					{/* Program Outcomes (POs) Section */}
+					<AnimatedCard delay={0.1}>
+						<div className='bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-8 border border-blue-200'>
+							<div className='flex items-center mb-6'>
+								<div className='w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mr-4'>
+									<BookOpen className='w-6 h-6 text-white' />
+								</div>
+								<h2 className='text-2xl font-bold text-gray-900'>Program Outcomes (POs)</h2>
+							</div>
+							<div className='bg-white/80 rounded-lg p-6 border border-blue-100'>
+								<p className='text-lg font-semibold text-gray-800 mb-6'>Engineering Graduates will be able to:</p>
+								<div className='space-y-4'>
+									{[
+										{
+											title: 'Engineering knowledge',
+											description: 'Apply knowledge of mathematics, science, engineering fundamentals, and an engineering specialization to the solution of complex engineering problems.'
+										},
+										{
+											title: 'Problem analysis',
+											description: 'Identify, formulate, review research literature, and analyze complex engineering problems reaching substantiated conclusions using first principles of mathematics, natural sciences, and engineering sciences.'
+										},
+										{
+											title: 'Design/development of solutions',
+											description: 'Design solutions for complex engineering problems and design system components or processes that meet specified needs with appropriate consideration for public health and safety, and the cultural, societal, and environmental considerations.'
+										},
+										{
+											title: 'Conduct investigations of complex problems',
+											description: 'Use research-based knowledge and research methods including design of experiments, analysis and interpretation of data, and synthesis of the information to provide valid conclusions.'
+										},
+										{
+											title: 'Modern tool usage',
+											description: 'Create, select, and apply appropriate techniques, resources, and modern engineering and IT tools including prediction and modeling to complex engineering activities with an understanding of the limitations.'
+										},
+										{
+											title: 'The engineer and society',
+											description: 'Apply reasoning informed by the contextual knowledge to assess societal, health, safety, legal and cultural issues and the consequent responsibilities relevant to the professional engineering practice.'
+										},
+										{
+											title: 'Environment and sustainability',
+											description: 'Understand the impact of the professional engineering solutions in societal and environmental contexts, and demonstrate the knowledge of, and need for sustainable development.'
+										},
+										{
+											title: 'Ethics',
+											description: 'Apply ethical principles and commit to professional ethics and responsibilities and norms of the engineering practice.'
+										},
+										{
+											title: 'Individual and team work',
+											description: 'Function effectively as an individual, and as a member or leader in diverse teams, and in multi-disciplinary settings.'
+										},
+										{
+											title: 'Communication',
+											description: 'Communicate effectively on complex engineering activities with the engineering community and with society at large, such as, being able to comprehend and write effective reports and design documentation, make effective presentations, and give and receive clear instructions.'
+										},
+										{
+											title: 'Project management and finance',
+											description: 'Demonstrate knowledge and understanding of the engineering and management principles and apply these to one\'s own work, as a member and leader in a team, to manage projects and in multi-disciplinary environments.'
+										},
+										{
+											title: 'Life-long learning',
+											description: 'Recognize the need for, and have the preparation and ability to engage in independent and life-long learning in the broadest context of technological change.'
+										}
+									].map((po, index) => (
+										<div key={index} className='flex items-start'>
+											<div className='w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold mr-3 mt-1 flex-shrink-0'>
+												{index + 1}
+											</div>
+											<div>
+												<h3 className='font-semibold text-gray-800 mb-1'>{po.title}:</h3>
+												<p className='text-gray-700 leading-relaxed'>{po.description}</p>
+											</div>
+										</div>
+									))}
+								</div>
+							</div>
+						</div>
+					</AnimatedCard>
+
+					{/* Program Educational Objectives (PEOs) Section */}
+					<AnimatedCard delay={0.2}>
+						<div className='bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-8 border border-purple-200'>
+							<div className='flex items-center mb-6'>
+								<div className='w-12 h-12 bg-purple-600 rounded-xl flex items-center justify-center mr-4'>
+									<GraduationCap className='w-6 h-6 text-white' />
+								</div>
+								<h2 className='text-2xl font-bold text-gray-900'>Program Educational Objectives (PEOs)</h2>
+							</div>
+							<div className='bg-white/80 rounded-lg p-6 border border-purple-100'>
+								<div className='space-y-4'>
+									{[
+										{
+											code: 'PEO1',
+											description: 'To promulgate strong foundation in Applied Sciences, Mathematics and Engineering fundamentals.'
+										},
+										{
+											code: 'PEO2',
+											description: 'To be able to comprehend, analyze and map the computational logics with real time problems.'
+										},
+										{
+											code: 'PEO3',
+											description: 'To provide extensive knowledge to design and build products with innovative solutions for problems using their skills in Computer Science and Engineering field and other related domains.'
+										},
+										{
+											code: 'PEO4',
+											description: 'To inculcate attributes such as self-confidence, ethics, teamwork, leadership skills, communication skills for life-long learning.'
+										},
+										{
+											code: 'PEO5',
+											description: 'To succeed with excellence as computer professional/successful entrepreneurs or pursue higher studies through quality education.'
+										}
+									].map((peo, index) => (
+										<div key={index} className='flex items-start'>
+											<div className='w-12 h-8 bg-purple-600 rounded-lg flex items-center justify-center text-white text-sm font-bold mr-3 mt-1 flex-shrink-0'>
+												{peo.code}
+											</div>
+											<p className='text-gray-700 leading-relaxed'>{peo.description}</p>
+										</div>
+									))}
+								</div>
+							</div>
+						</div>
+					</AnimatedCard>
+
+					{/* Program Specific Outcomes (PSOs) Section */}
+					<AnimatedCard delay={0.3}>
+						<div className='bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-8 border border-green-200'>
+							<div className='flex items-center mb-6'>
+								<div className='w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center mr-4'>
+									<Trophy className='w-6 h-6 text-white' />
+								</div>
+								<h2 className='text-2xl font-bold text-gray-900'>Program Specific Outcomes (PSOs)</h2>
+							</div>
+							
+							{/* PSOs for Batch 2020 */}
+							<div className='bg-white/80 rounded-lg p-6 border border-green-100 mb-6'>
+								<h3 className='text-lg font-semibold text-gray-800 mb-4 flex items-center'>
+									<Calendar className='w-5 h-5 mr-2' />
+									Applicable Upto Batch 2020
+								</h3>
+								<div className='space-y-4'>
+									{[
+										{
+											code: 'PSO1',
+											title: 'Foundation of Computer System',
+											description: 'Ability to comprehend mathematical science principles, coupled with engineering specialization to analyze & design solutions to real world problems.'
+										},
+										{
+											code: 'PSO2',
+											title: 'Proficiency in Software Development Skills',
+											description: 'Applying the concepts for building new innovations with a wide range of programming languages and recent open source platforms, by upgrading with new skills and techniques.'
+										},
+										{
+											code: 'PSO3',
+											title: 'Successful Career and Entrepreneurship',
+											description: 'Ability to excel in his/her innovative career ethically and engaging himself/herself professionally as an entrepreneur, software professional, pursue higher studies with good communication and leadership skills, for the benefit of the society.'
+										}
+									].map((pso, index) => (
+										<div key={index} className='flex items-start'>
+											<div className='w-12 h-8 bg-green-600 rounded-lg flex items-center justify-center text-white text-sm font-bold mr-3 mt-1 flex-shrink-0'>
+												{pso.code}
+											</div>
+											<div>
+												<h4 className='font-semibold text-gray-800 mb-1'>{pso.title}:</h4>
+												<p className='text-gray-700 leading-relaxed'>{pso.description}</p>
+											</div>
+										</div>
+									))}
+								</div>
+							</div>
+
+							{/* PSOs for Batch 2021 onwards */}
+							<div className='bg-white/80 rounded-lg p-6 border border-green-100'>
+								<h3 className='text-lg font-semibold text-gray-800 mb-4 flex items-center'>
+									<Calendar className='w-5 h-5 mr-2' />
+									W.E.F. Batch 2021
+								</h3>
+								<div className='space-y-4'>
+									{[
+										{
+											code: 'PSO1',
+											description: 'To develop and integrate knowledge of different disciplines- Computer Science, Electronics, Economics, Mathematics and Statistics to analyze and design computing solutions to solve the problems in different domains.'
+										},
+										{
+											code: 'PSO2',
+											description: 'To demonstrate research and technical skills for emerging areas to produce solutions to problems through open source and proprietary platforms.'
+										},
+										{
+											code: 'PSO3',
+											description: 'To exhibit the ability to ethically excel in life-long professional career, higher studies and entrepreneurship with good communication, writing and leadership skills for the benefit of society.'
+										}
+									].map((pso, index) => (
+										<div key={index} className='flex items-start'>
+											<div className='w-12 h-8 bg-green-600 rounded-lg flex items-center justify-center text-white text-sm font-bold mr-3 mt-1 flex-shrink-0'>
+												{pso.code}
+											</div>
+											<p className='text-gray-700 leading-relaxed'>{pso.description}</p>
+										</div>
+									))}
+								</div>
+							</div>
+						</div>
+					</AnimatedCard>
+				</div>
+			);
+		}
+
+		// Add basic content for other sections
 		return (
 			<div className='space-y-8'>
 				<motion.div
