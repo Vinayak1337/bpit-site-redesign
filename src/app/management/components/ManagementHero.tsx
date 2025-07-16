@@ -4,9 +4,21 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Users, Star } from 'lucide-react';
 
-const ManagementHero = () => {
+interface ManagementHeroData {
+	title: string;
+	subtitle: string;
+	gradient: string;
+	badges: string[];
+}
+
+interface ManagementHeroProps {
+	data: ManagementHeroData;
+}
+
+const ManagementHero = ({ data }: ManagementHeroProps) => {
 	return (
-		<section className='relative bg-gradient-to-br from-blue-900 via-blue-800 to-purple-900 text-white overflow-hidden'>
+		<section
+			className={`relative bg-gradient-to-br ${data.gradient} text-white overflow-hidden`}>
 			<div className='absolute inset-0 bg-black/20'></div>
 			<div className='absolute inset-0'>
 				<div className='absolute top-20 left-10 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl'></div>
@@ -28,12 +40,11 @@ const ManagementHero = () => {
 					</motion.div>
 
 					<h1 className='text-5xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-100'>
-						Administration & Management
+						{data.title}
 					</h1>
 
 					<p className='text-xl md:text-2xl text-blue-100 mb-8 leading-relaxed'>
-						Leadership Excellence Driving Institutional Growth and Academic
-						Achievement
+						{data.subtitle}
 					</p>
 
 					<motion.div
@@ -41,18 +52,14 @@ const ManagementHero = () => {
 						animate={{ opacity: 1 }}
 						transition={{ duration: 0.6, delay: 0.4 }}
 						className='flex flex-wrap justify-center gap-4 text-sm'>
-						<div className='flex items-center gap-2 bg-white/10 rounded-full px-4 py-2 backdrop-blur-sm'>
-							<Star className='w-4 h-4 text-yellow-300' />
-							<span>Strategic Leadership</span>
-						</div>
-						<div className='flex items-center gap-2 bg-white/10 rounded-full px-4 py-2 backdrop-blur-sm'>
-							<Star className='w-4 h-4 text-yellow-300' />
-							<span>Quality Governance</span>
-						</div>
-						<div className='flex items-center gap-2 bg-white/10 rounded-full px-4 py-2 backdrop-blur-sm'>
-							<Star className='w-4 h-4 text-yellow-300' />
-							<span>Student-Centric Approach</span>
-						</div>
+						{data.badges.map((badge, index) => (
+							<div
+								key={index}
+								className='flex items-center gap-2 bg-white/10 rounded-full px-4 py-2 backdrop-blur-sm'>
+								<Star className='w-4 h-4 text-yellow-300' />
+								<span>{badge}</span>
+							</div>
+						))}
 					</motion.div>
 				</motion.div>
 			</div>

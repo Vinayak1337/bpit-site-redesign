@@ -1,8 +1,11 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import ManagementHero from '@/app/management/components/ManagementHero';
-import ManagementSidebar from '@/app/management/components/ManagementSidebar';
+import DynamicSidebar from '@/components/ui/DynamicSidebar';
 import ManagementContentWrapper from '@/app/management/components/ManagementContentWrapper';
+
+import { managementHeroData } from '@/data/management';
+import { managementSidebarData } from '@/data/sidebar';
 
 export const metadata: Metadata = {
 	title: 'Management - Bhagwan Parshuram Institute of Technology',
@@ -30,13 +33,16 @@ const ManagementLayout = ({
 	return (
 		<main className='min-h-screen bg-gray-50'>
 			{/* Hero Section */}
-			<ManagementHero />
+			<ManagementHero data={managementHeroData} />
 
 			{/* Main Content with Sidebar */}
 			<div className='container mx-auto px-4 py-12'>
 				<div className='flex flex-col lg:flex-row gap-8'>
 					{/* Sidebar Navigation */}
-					<ManagementSidebar />
+					<DynamicSidebar
+						navItems={managementSidebarData.navItems}
+						theme={managementSidebarData.theme}
+					/>
 
 					{/* Content Area */}
 					<ManagementContentWrapper>{children}</ManagementContentWrapper>

@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import Header from '@/components/header/header';
-import Footer from '@/components/footer/ModernBPITFooter';
+import Footer from '@/components/footer/BPITFooter';
 import EnquiryPopup from '@/components/pop-up/enquiry-popup';
 
 const geistSans = Geist({
