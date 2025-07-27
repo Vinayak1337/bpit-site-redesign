@@ -15,6 +15,16 @@
 	animation: carousel 20s linear infinite;
 }
 
+/* Hide Scrollbar */
+.scrollbar-hide {
+	-ms-overflow-style: none;  /* Internet Explorer 10+ */
+	scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar { 
+	display: none;  /* Safari and Chrome */
+}
+
 @keyframes carousel {
 	0% {
 		transform: translateX(0);
