@@ -2,12 +2,10 @@
 
 import React, { useState } from 'react';
 import { motion, type Variants } from 'framer-motion';
-import Image from 'next/image';
 import {
 	Users,
 	Star,
 	MapPin,
-	Calendar,
 	Briefcase,
 	GraduationCap,
 	Trophy,
@@ -15,20 +13,13 @@ import {
 	TrendingUp,
 	Award,
 	MessageSquare,
-	ChevronRight,
 	Heart,
 	Network,
 	UserCheck,
 	BookOpen,
-	Target,
 	Linkedin,
-	Mail,
-	Phone,
-	Building2,
 	Search,
-	Filter,
 	ArrowRight,
-	ExternalLink,
 	UserPlus,
 	Share2
 } from 'lucide-react';
@@ -63,15 +54,6 @@ const AlumniNetworkPage = () => {
 			opacity: 1,
 			scale: 1,
 			transition: { duration: 0.5, ease: [0.4, 0, 0.2, 1] }
-		}
-	};
-
-	const slideInLeft: Variants = {
-		hidden: { opacity: 0, x: -50 },
-		visible: {
-			opacity: 1,
-			x: 0,
-			transition: { duration: 0.6, ease: [0.4, 0, 0.2, 1] }
 		}
 	};
 
@@ -610,7 +592,7 @@ const AlumniNetworkPage = () => {
 							Why Join Our Alumni Network?
 						</h2>
 						<p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-							Our alumni network is more than just connections—it's a community 
+							Our alumni network is more than just connections—it&apos;s a community 
 							that empowers, supports, and celebrates success together
 						</p>
 						<div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 mx-auto rounded-full mt-6"></div>
@@ -675,7 +657,7 @@ const AlumniNetworkPage = () => {
 										<button
 											key={tab.key}
 											onClick={() => {
-												setActiveTab(tab.key as any);
+												setActiveTab(tab.key as 'featured' | 'international' | 'industry' | 'achievements');
 												setSearchTerm(''); // Clear search when switching tabs
 											}}
 											className={`flex items-center gap-2 px-6 py-3 rounded-full font-medium transition-all duration-300 ${
@@ -841,7 +823,7 @@ const AlumniNetworkPage = () => {
 							Join Our Alumni Network
 						</h2>
 						<p className="text-xl mb-8 opacity-90">
-							Whether you're a recent graduate or a seasoned professional, 
+							Whether you&apos;re a recent graduate or a seasoned professional, 
 							connect with fellow BPIT alumni and be part of our success story.
 						</p>
 						

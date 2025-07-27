@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { motion, type Variants } from 'framer-motion';
-import Image from 'next/image';
 import {
 	Briefcase,
 	Calendar,
@@ -17,29 +16,18 @@ import {
 	Building2,
 	Globe,
 	BookOpen,
-	Lightbulb,
-	ArrowRight,
 	Search,
-	Filter,
 	ExternalLink,
 	FileText,
 	Send,
 	Phone,
-	Mail,
 	ChevronRight,
 	Zap,
 	Trophy,
 	GraduationCap,
 	Heart,
 	Code,
-	PieChart,
-	Settings,
-	Shield,
-	Rocket,
-	BarChart3,
-	DollarSign,
-	Network,
-	Laptop
+	PieChart
 } from 'lucide-react';
 
 const InternshipOpportunityPage = () => {
@@ -476,7 +464,7 @@ const InternshipOpportunityPage = () => {
 									].map((tab) => (
 										<button
 											key={tab.key}
-											onClick={() => setActiveTab(tab.key as any)}
+											onClick={() => setActiveTab(tab.key as 'current' | 'summer' | 'winter' | 'corporate')}
 											className={`flex items-center gap-2 px-6 py-3 rounded-full font-medium transition-all duration-300 ${
 												activeTab === tab.key
 													? 'bg-gradient-to-r from-green-500 to-teal-500 text-white shadow-lg'
@@ -499,7 +487,7 @@ const InternshipOpportunityPage = () => {
 									].map((domain) => (
 										<button
 											key={domain.key}
-											onClick={() => setSelectedDomain(domain.key as any)}
+											onClick={() => setSelectedDomain(domain.key as 'all' | 'tech' | 'management' | 'research')}
 											className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
 												selectedDomain === domain.key
 													? 'bg-gradient-to-r from-teal-500 to-blue-500 text-white'
@@ -537,7 +525,7 @@ const InternshipOpportunityPage = () => {
 					</motion.div>
 
 					<div className="grid lg:grid-cols-2 gap-8">
-						{filteredInternships.map((internship, index) => (
+						{filteredInternships.map((internship) => (
 							<motion.div
 								key={internship.id}
 								variants={scaleIn}
@@ -781,7 +769,7 @@ const InternshipOpportunityPage = () => {
 							Ready to Start Your Journey?
 						</h2>
 						<p className="text-xl mb-8 opacity-90">
-							Don't wait for opportunities, create them. Apply for internships today 
+							Don&apos;t wait for opportunities, create them. Apply for internships today 
 							and take the first step towards your dream career.
 						</p>
 						

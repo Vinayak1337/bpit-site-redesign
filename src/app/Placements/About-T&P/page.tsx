@@ -293,7 +293,7 @@ const TrainingAndPlacementPage = () => {
 							transition={{ duration: 0.8, delay: 0.6 }}
 							className="text-xl md:text-2xl text-gray-200 mb-8 leading-relaxed"
 						>
-							Empowering students with comprehensive skill development for tomorrow's challenges
+							Empowering students with comprehensive skill development for tomorrow&apos;s challenges
 						</motion.p>
 						
 						<motion.div

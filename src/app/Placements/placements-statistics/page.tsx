@@ -18,14 +18,9 @@ import {
 	ChevronDown,
 	ChevronUp,
 	ArrowUpDown,
-	Star,
-	Target,
 	Briefcase,
 	GraduationCap,
-	Calendar,
-	MapPin,
 	ExternalLink,
-	Download,
 	BarChart3
 } from 'lucide-react';
 
@@ -327,7 +322,7 @@ const PlacementStatisticsPage = () => {
 		]
 	};
 
-	const placementData: Record<Year, Record<Branch, Student[]>> = {
+	const placementData: Record<Year, Record<Branch, Student[]>> = useMemo(() => ({
 		'2025': {
 			'CSE': [
 				{
@@ -718,7 +713,7 @@ const PlacementStatisticsPage = () => {
 			'BBA': [],
 			'MBA': []
 		}
-	};
+	}), []);
 
 	// Filter and sort functions
 	const filteredStudents = useMemo(() => {
@@ -767,7 +762,7 @@ const PlacementStatisticsPage = () => {
 		}
 
 		return students;
-	}, [selectedYear, selectedBranch, packageFilter, companySearch, roleSearch, sortConfig]);
+	}, [selectedYear, selectedBranch, packageFilter, companySearch, roleSearch, sortConfig, placementData]);
 
 	const topEngineeringStudents = useMemo(() => {
 		const engineeringBranches: Branch[] = ['CSE', 'IT', 'ECE', 'EEE'];
@@ -777,7 +772,7 @@ const PlacementStatisticsPage = () => {
 		return allEngStudents
 			.sort((a, b) => b.package - a.package)
 			.slice(0, 10);
-	}, [selectedYear]);
+	}, [selectedYear, placementData]);
 
 	const topBusinessStudents = useMemo(() => {
 		const businessBranches: Branch[] = ['BBA', 'MBA'];
@@ -787,7 +782,7 @@ const PlacementStatisticsPage = () => {
 		return allBizStudents
 			.sort((a, b) => b.package - a.package)
 			.slice(0, 10);
-	}, [selectedYear]);
+	}, [selectedYear, placementData]);
 
 	const handleSort = (key: keyof Student) => {
 		setSortConfig(current => ({
@@ -820,7 +815,7 @@ const PlacementStatisticsPage = () => {
 							Placement Statistics
 						</h1>
 						<p className="text-xl text-blue-100 max-w-3xl mx-auto">
-							Comprehensive placement data showcasing our students' achievements and industry partnerships
+							Comprehensive placement data showcasing our students&apos; achievements and industry partnerships
 						</p>
 					</motion.div>
 				</div>

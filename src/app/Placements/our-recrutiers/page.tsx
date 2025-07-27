@@ -12,18 +12,11 @@ import {
 	Award,
 	Globe,
 	Star,
-	ChevronRight,
-	Briefcase,
-	GraduationCap,
-	MapPin,
 	Calendar,
 	ArrowRight,
-	Filter,
 	Search,
 	ExternalLink,
 	CheckCircle2,
-	Clock,
-	IndianRupee,
 	Zap,
 	Shield,
 	Heart,
@@ -564,7 +557,7 @@ const OurRecruitersPage = () => {
 								</span>
 								{searchTerm && (
 									<span className="px-3 py-1 bg-yellow-100 text-yellow-600 rounded-full font-medium">
-										Search: "{searchTerm}"
+										Search: &quot;{searchTerm}&quot;
 									</span>
 								)}
 							</div>
@@ -676,7 +669,7 @@ const OurRecruitersPage = () => {
 							</div>
 							<h3 className="text-2xl font-bold text-gray-800 mb-4">No companies found</h3>
 							<p className="text-gray-600 mb-6">
-								No companies match your search for "<span className="font-semibold text-purple-600">{searchTerm}</span>"
+								No companies match your search for &quot;<span className="font-semibold text-purple-600">{searchTerm}</span>&quot;
 							</p>
 							<button
 								onClick={() => setSearchTerm('')}

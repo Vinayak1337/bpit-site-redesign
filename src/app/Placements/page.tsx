@@ -8,25 +8,16 @@ import {
 	Building2,
 	Users,
 	Trophy,
-	Target,
 	TrendingUp,
 	Award,
-	Globe,
-	Star,
 	ChevronRight,
 	Briefcase,
 	GraduationCap,
-	MapPin,
-	Calendar,
 	ArrowRight,
 	BarChart3,
 	Network,
 	BookOpen,
-	UserCheck,
-	PieChart,
-	LineChart,
-	BrainCircuit,
-	Handshake
+	PieChart
 } from 'lucide-react';
 
 const PlacementsPage = () => {

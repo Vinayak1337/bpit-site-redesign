@@ -15,39 +15,22 @@ import {
 	Star,
 	CheckCircle2,
 	ArrowRight,
-	Calendar,
-	MapPin,
 	Mail,
 	Phone,
 	Linkedin,
 	Trophy,
 	BarChart3,
-	PieChart,
 	Briefcase,
 	GraduationCap,
-	Heart,
-	Lightbulb,
-	Zap,
 	Globe,
-	Shield,
-	Clock,
-	UserCheck,
 	ChevronRight,
 	Quote,
-	Play,
 	Download,
-	ExternalLink,
-	Handshake,
-	NetworkIcon,
-	Presentation,
-	FileText,
-	Settings,
 	Rocket
 } from 'lucide-react';
 
 const PlacementCellOverviewPage = () => {
 	const [activeObjective, setActiveObjective] = useState(0);
-	const [selectedTeamMember, setSelectedTeamMember] = useState(null);
 
 	const fadeInUp: Variants = {
 		hidden: { opacity: 0, y: 30 },
@@ -470,8 +453,8 @@ const PlacementCellOverviewPage = () => {
 												
 												<div className="bg-blue-50 p-6 rounded-xl border-l-4 border-blue-500">
 													<p className="italic">
-														"T&P cell has a well defined placement policy which is circulated to the students one year in advance 
-														in order to avoid any confusion. The placement policy is followed strictly so that our objectives may be fulfilled."
+														&quot;T&P cell has a well defined placement policy which is circulated to the students one year in advance 
+														in order to avoid any confusion. The placement policy is followed strictly so that our objectives may be fulfilled.&quot;
 													</p>
 												</div>
 												
@@ -636,7 +619,7 @@ const PlacementCellOverviewPage = () => {
 					</motion.div>
 
 					<div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-						{tpTeam.map((member, index) => (
+						{tpTeam.map((member) => (
 							<motion.div
 								key={member.id}
 								variants={scaleIn}
@@ -829,7 +812,7 @@ const PlacementCellOverviewPage = () => {
 							Ready to Launch Your Career?
 						</h2>
 						<p className="text-xl mb-8 opacity-90">
-							Join BPIT's legacy of successful placements and take the first step 
+							Join BPIT&apos;s legacy of successful placements and take the first step 
 							towards your dream career with industry-leading companies.
 						</p>
 						
