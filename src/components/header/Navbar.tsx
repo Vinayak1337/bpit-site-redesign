@@ -267,38 +267,38 @@ const Navbar = () => {
 
 	const placementsItems = [
 		{
+			title: 'About Training & Placement',
+			href: '/Placements/About-T&P',
+			description: 'Comprehensive training and placement program overview',
+			icon: <MessageSquare className='w-4 h-4 text-blue-600' />
+		},
+		{
 			title: 'Placement Cell Overview',
-			href: '/placements/overview',
+			href: '/Placements/placement-cell-overview',
 			description: 'About our placement cell and career services',
 			icon: <TrendingUp className='w-4 h-4 text-blue-600' />
 		},
 		{
-			title: 'About T&P',
-			href: '/placements/training-placement',
-			description: 'Message from T&P, T&P team, and department details',
-			icon: <MessageSquare className='w-4 h-4 text-blue-600' />
-		},
-		{
 			title: 'Our Recruiters',
-			href: '/placements/recruiters',
+			href: '/Placements/our-recrutiers',
 			description: 'Industry partners and recruiting companies',
 			icon: <Briefcase className='w-4 h-4 text-blue-600' />
 		},
 		{
 			title: 'Placement Statistics',
-			href: '/placements/statistics',
-			description: 'Placement records, packages, and success stories',
+			href: '/Placements/placements-statistics',
+			description: 'Comprehensive placement data and analytics',
 			icon: <BarChart3 className='w-4 h-4 text-blue-600' />
 		},
 		{
 			title: 'Internship Opportunities',
-			href: '/placements/internships',
+			href: '/Placements/internship-opportunity',
 			description: 'Industry internships and training programs',
 			icon: <Users2 className='w-4 h-4 text-blue-600' />
 		},
 		{
 			title: 'Alumni Network',
-			href: '/placements/alumni',
+			href: '/Placements/Alumni-network',
 			description: 'Connect with our successful alumni network',
 			icon: <Network className='w-4 h-4 text-blue-600' />
 		}
