@@ -1,9 +1,9 @@
 import React from 'react';
 import type { Metadata } from 'next';
-import { LibraryCarousel } from '@/app/library/components/library-carousel';
-import DynamicSidebar from '@/components/ui/DynamicSidebar';
-import LibraryContentWrapper from '@/app/library/components/library-content-wrapper';
-import LibraryQuotes from '@/app/library/components/library-quotes';
+import { LibraryCarousel } from './academia/library/components/library-carousel';
+import DynamicSidebar from '../../components/ui/DynamicSidebar';
+import LibraryContentWrapper from './academia/library/components/library-content-wrapper';
+import LibraryQuotes from './academia/library/components/library-quotes';
 
 // Library navigation items with icon names as strings
 const libraryNavItems = [
@@ -11,133 +11,133 @@ const libraryNavItems = [
 		id: 'overview',
 		title: 'Library Overview',
 		icon: 'BookOpen',
-		href: '/library'
+		href: '/academia/library'
 	},
 	{
 		id: 'information',
 		title: 'Library Information',
 		icon: 'Info',
-		href: '/library/information'
+		href: '/academia/library/information'
 	},
 	{
 		id: 'collection',
 		title: 'Collection',
 		icon: 'BookMarked',
-		href: '/library/collection'
+		href: '/academia/library/collection'
 	},
 	{
 		id: 'services',
 		title: 'Library Services',
 		icon: 'Headphones',
-		href: '/library/services'
+		href: '/academia/library/services'
 	},
 	{
 		id: 'advisory-committee',
 		title: 'Advisory Committee',
 		icon: 'Users',
-		href: '/library/advisory-committee'
+		href: '/academia/library/advisory-committee'
 	},
 	{
 		id: 'staff',
 		title: 'Library Staff',
 		icon: 'UserCheck',
-		href: '/library/staff'
+		href: '/academia/library/staff'
 	},
 	{
 		id: 'rules',
 		title: 'Library Rules',
 		icon: 'FileText',
-		href: '/library/rules'
+		href: '/academia/library/rules'
 	},
 	{
 		id: 'timings',
 		title: 'Library Timings',
 		icon: 'Clock',
-		href: '/library/timings'
+		href: '/academia/library/timings'
 	},
 	{
 		id: 'self-learning',
 		title: 'Self Learning',
 		icon: 'GraduationCap',
-		href: '/library/self-learning'
+		href: '/academia/library/self-learning'
 	},
 	{
 		id: 'digital-library',
 		title: 'Digital Library',
 		icon: 'Globe',
-		href: '/library/digital-library'
+		href: '/academia/library/digital-library'
 	},
 	{
 		id: 'delnet',
 		title: 'DELNET',
 		icon: 'Network',
-		href: '/library/delnet'
+		href: '/academia/library/delnet'
 	},
 	{
 		id: 'ndli',
 		title: 'NDLI',
 		icon: 'School',
-		href: '/library/ndli'
+		href: '/academia/library/ndli'
 	},
 	{
 		id: 'moocs',
 		title: 'MOOCs',
 		icon: 'BookOpenCheck',
-		href: '/library/moocs'
+		href: '/academia/library/moocs'
 	},
 	{
 		id: 'newspapers',
 		title: 'Newspapers',
 		icon: 'Newspaper',
-		href: '/library/newspapers'
+		href: '/academia/library/newspapers'
 	},
 	{
 		id: 'photocopy-service',
 		title: 'Photocopy Service',
 		icon: 'Copy',
-		href: '/library/photocopy-service'
+		href: '/academia/library/photocopy-service'
 	},
 	{
 		id: 'book-acquisition',
 		title: 'Book Acquisition',
 		icon: 'ShoppingCart',
-		href: '/library/book-acquisition'
+		href: '/academia/library/book-acquisition'
 	},
 	{
 		id: 'weeding-out',
 		title: 'Weeding Out',
 		icon: 'Trash2',
-		href: '/library/weeding-out'
+		href: '/academia/library/weeding-out'
 	},
 	{
 		id: 'e-resources',
 		title: 'E-Resources',
 		icon: 'Database',
-		href: '/library/e-resources'
+		href: '/academia/library/e-resources'
 	},
 	{
 		id: 'book-bank',
 		title: 'Book Bank',
 		icon: 'Bookmark',
-		href: '/library/book-bank'
+		href: '/academia/library/book-bank'
 	},
 	{
 		id: 'downloads',
 		title: 'Downloads',
 		icon: 'Download',
-		href: '/library/downloads'
+		href: '/academia/library/downloads'
 	},
 	{
 		id: 'useful-links',
 		title: 'Useful Links',
 		icon: 'ExternalLink',
-		href: '/library/useful-links'
+		href: '/academia/library/useful-links'
 	},
 	{
 		id: 'contact',
 		title: 'Contact Us',
 		icon: 'Phone',
-		href: '/library/contact'
+		href: '/academia/library/contact'
 	}
 ];
 

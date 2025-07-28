@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { BookOpen, Users, Database, Clock, Download, Globe } from 'lucide-react';
+import { BookOpen, Users, Database, Clock, Globe } from 'lucide-react';
 
 const LibraryOverview = () => {
 	const stats = [
