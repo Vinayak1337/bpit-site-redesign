@@ -301,7 +301,7 @@ const StatisticsPage = () => {
               </div>
               
               {/* Filter Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                     <Calendar className="w-4 h-4 text-blue-600" />
@@ -385,7 +385,7 @@ const StatisticsPage = () => {
               </div>
               
               {/* Action Buttons */}
-              <div className="flex flex-wrap gap-3 justify-center">
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Button
                   onClick={() => {
                     setStudentFilters({ year: 'All', department: 'All', company: 'All', minSalary: 0 });
@@ -446,7 +446,7 @@ const StatisticsPage = () => {
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
+                <div className="grid grid-cols-1 gap-6 mb-16">
                   <AnimatePresence>
                     {currentStudents.map((student, index) => {
                       const globalIndex = startIndex + index;
@@ -459,7 +459,7 @@ const StatisticsPage = () => {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -30 }}
                           transition={{ duration: 0.4, delay: index * 0.05 }}
-                          className={`relative bg-white rounded-3xl p-8 shadow-xl border-2 hover:shadow-2xl transition-all duration-300 ${
+                          className={`relative bg-white rounded-3xl p-4 sm:p-6 lg:p-8 shadow-xl border-2 hover:shadow-2xl transition-all duration-300 ${
                             isTopThree && currentPage === 1 
                               ? globalIndex === 0 
                                 ? 'border-yellow-300 bg-gradient-to-br from-yellow-50 to-yellow-100' 
@@ -476,9 +476,9 @@ const StatisticsPage = () => {
                             </div>
                           )}
                           
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-6">
-                              <div className={`w-20 h-20 bg-gradient-to-r ${
+                          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                            <div className="flex items-center space-x-4 flex-1">
+                              <div className={`w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r ${
                                 isTopThree && currentPage === 1
                                   ? globalIndex === 0 
                                     ? 'from-yellow-500 to-yellow-600' 
@@ -486,29 +486,34 @@ const StatisticsPage = () => {
                                     ? 'from-gray-500 to-gray-600'
                                     : 'from-orange-500 to-orange-600'
                                   : 'from-blue-500 to-blue-700'
-                              } rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg`}>
+                              } rounded-2xl flex items-center justify-center text-white text-lg sm:text-2xl font-bold shadow-lg flex-shrink-0`}>
                                 {student.name.split(' ').map(n => n[0]).join('')}
                               </div>
-                              <div>
-                                <h4 className="text-xl font-bold text-gray-900 mb-2">{student.name}</h4>
-                                <div className="space-y-2">
-                                  <div className="flex items-center space-x-3 text-gray-600">
-                                    <GraduationCap className="w-5 h-5" />
-                                    <span className="font-semibold">{student.department}</span>
-                                    <span className="text-gray-400">•</span>
-                                    <span>Batch {student.batch}</span>
+                              <div className="min-w-0 flex-1">
+                                <h4 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 truncate">{student.name}</h4>
+                                <div className="space-y-1 sm:space-y-2">
+                                  <div className="flex items-center space-x-2 text-gray-600 text-sm sm:text-base">
+                                    <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                                    <span className="font-semibold truncate">{student.department}</span>
+                                    <span className="text-gray-400 hidden sm:inline">•</span>
+                                    <span className="truncate hidden sm:inline">Batch {student.batch}</span>
                                   </div>
-                                  <div className="flex items-center space-x-3 text-gray-600">
-                                    <Building2 className="w-5 h-5" />
-                                    <span className="font-semibold">{student.company}</span>
+                                  <div className="flex items-center space-x-2 text-gray-600 text-sm sm:text-base">
+                                    <Building2 className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                                    <span className="font-semibold truncate">{student.company}</span>
+                                    <span className="text-gray-400 hidden sm:inline">•</span>
+                                    <span className="truncate hidden sm:inline">{student.role}</span>
+                                  </div>
+                                  <div className="flex items-center space-x-2 text-gray-600 text-sm sm:hidden">
+                                    <span>Batch {student.batch}</span>
                                     <span className="text-gray-400">•</span>
-                                    <span>{student.role}</span>
+                                    <span className="truncate">{student.role}</span>
                                   </div>
                                 </div>
                               </div>
                             </div>
-                            <div className="text-right">
-                              <div className="text-3xl font-bold text-green-600 mb-1">₹{student.package}</div>
+                            <div className="text-right flex-shrink-0">
+                              <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-1">₹{student.package}</div>
                               <div className="text-sm text-gray-500 font-semibold">LPA</div>
                             </div>
                           </div>
@@ -520,18 +525,18 @@ const StatisticsPage = () => {
 
                 {/* Enhanced Pagination */}
                 {totalPages > 1 && (
-                  <div className="flex items-center justify-center space-x-3">
+                  <div className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-3">
                     <Button
                       onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                       disabled={currentPage === 1}
                       variant="outline"
-                      className="px-8 py-4 font-semibold rounded-2xl border-2 disabled:opacity-50"
+                      className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 font-semibold rounded-2xl border-2 disabled:opacity-50"
                     >
-                      <ChevronLeft className="w-5 h-5 mr-2" />
+                      <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                       Previous
                     </Button>
                     
-                    <div className="flex space-x-2">
+                    <div className="flex space-x-1 sm:space-x-2 overflow-x-auto pb-2 sm:pb-0">
                       {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
                         let pageNum;
                         if (totalPages <= 5) {
@@ -549,9 +554,9 @@ const StatisticsPage = () => {
                             key={pageNum}
                             onClick={() => setCurrentPage(pageNum)}
                             variant={currentPage === pageNum ? "default" : "outline"}
-                            className={`w-14 h-14 p-0 font-bold text-lg rounded-2xl border-2 transition-all duration-200 ${
+                            className={`w-10 h-10 sm:w-14 sm:h-14 p-0 font-bold text-sm sm:text-lg rounded-xl sm:rounded-2xl border-2 transition-all duration-200 flex-shrink-0 ${
                               currentPage === pageNum 
-                                ? 'bg-blue-600 text-white shadow-lg scale-110' 
+                                ? 'bg-blue-600 text-white shadow-lg scale-105 sm:scale-110' 
                                 : 'text-gray-600 hover:bg-blue-50 hover:border-blue-300'
                             }`}
                           >
@@ -565,10 +570,10 @@ const StatisticsPage = () => {
                       onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                       disabled={currentPage === totalPages}
                       variant="outline"
-                      className="px-8 py-4 font-semibold rounded-2xl border-2 disabled:opacity-50"
+                      className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 font-semibold rounded-2xl border-2 disabled:opacity-50"
                     >
                       Next
-                      <ChevronRight className="w-5 h-5 ml-2" />
+                      <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
                     </Button>
                   </div>
                 )}
