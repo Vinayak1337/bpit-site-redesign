@@ -151,3 +151,46 @@ export const visionMissionSidebarData = {
 		activeChevron: 'text-blue-600'
 	}
 };
+
+export const studentLifeSidebarData = {
+	navItems: [
+		{
+			id: 'campus-facilities',
+			title: 'Campus Facilities',
+			icon: 'Home',
+			href: '/student-life/campus-facilities'
+		},
+		{
+			id: 'clubs-and-societies',
+			title: 'Clubs & Societies',
+			icon: 'Users',
+			href: '/student-life/clubs-and-societies'
+		},
+		{
+			id: 'events-and-festivals',
+			title: 'Events & Festivals',
+			icon: 'Music',
+			href: '/student-life/events-and-festivals'
+		},
+		{
+			id: 'student-grievance-cell',
+			title: 'Student Grievance Cell',
+			icon: 'UserX',
+			href: '/student-life/student-grievance-cell'
+		},
+		{
+			id: 'code-of-conduct',
+			title: 'Code of Conduct',
+			icon: 'Scale',
+			href: '/student-life/code-of-conduct'
+		}
+	],
+	theme: {
+		primary: 'blue',
+		activeGradient: 'from-blue-50 to-blue-100',
+		activeBorder: 'border-blue-200',
+		activeText: 'text-blue-700',
+		activeIcon: 'text-blue-600',
+		activeChevron: 'text-blue-600'
+	}
+};

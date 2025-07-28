@@ -312,32 +312,32 @@ const Navbar = () => {
 	const studentLifeItems = [
 		{
 			title: 'Campus Facilities',
-			href: '/student-life/facilities',
-			description: 'Hostel, canteen, sports, and modern amenities',
+			href: '/student-life/campus-facilities',
+			description: 'Modern infrastructure and amenities',
 			icon: <Home className='w-4 h-4 text-blue-600' />
 		},
 		{
 			title: 'Clubs & Societies',
-			href: '/student-life/clubs',
-			description: 'Student clubs, cultural groups, and professional societies',
+			href: '/student-life/clubs-and-societies',
+			description: 'Join vibrant student communities',
 			icon: <Users className='w-4 h-4 text-blue-600' />
 		},
 		{
 			title: 'Events & Festivals',
-			href: '/student-life/events',
-			description: 'Cultural festivals, tech fests, and campus events',
+			href: '/student-life/events-and-festivals',
+			description: 'Celebrate culture and achievements',
 			icon: <Music className='w-4 h-4 text-blue-600' />
 		},
 		{
 			title: 'Student Grievance Cell',
-			href: '/student-life/grievance',
-			description: 'Student support and grievance redressal system',
+			href: '/student-life/student-grievance-cell',
+			description: 'Support and guidance services',
 			icon: <UserX className='w-4 h-4 text-blue-600' />
 		},
 		{
 			title: 'Code of Conduct',
 			href: '/student-life/code-of-conduct',
-			description: 'Student code of conduct and disciplinary guidelines',
+			description: 'Guidelines for student behavior',
 			icon: <Scale className='w-4 h-4 text-blue-600' />
 		}
 	];
