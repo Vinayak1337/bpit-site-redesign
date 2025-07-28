@@ -242,17 +242,17 @@ const TrainingPlacementPage = () => {
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 className="bg-white rounded-2xl p-8 shadow-lg h-full"
               >
-                <div className="flex items-start space-x-8 h-full">
-                  <div className="flex-shrink-0">
-                    <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-blue-700 rounded-full flex items-center justify-center text-white text-xl font-bold">
+                <div className="flex flex-col sm:flex-row items-start space-y-4 sm:space-y-0 sm:space-x-6 h-full">
+                  <div className="flex-shrink-0 self-center sm:self-start">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r from-blue-500 to-blue-700 rounded-full flex items-center justify-center text-white text-lg sm:text-xl font-bold">
                       {member.name.split(' ').map(n => n[0]).join('')}
                     </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-2 break-words">{member.name}</h3>
-                    <p className="text-blue-600 font-semibold mb-3 break-words">{member.position}</p>
+                  <div className="flex-1 min-w-0 text-center sm:text-left">
+                    <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 break-words">{member.name}</h3>
+                    <p className="text-blue-600 font-semibold mb-3 break-words text-sm sm:text-base">{member.position}</p>
                     <p className="text-gray-600 mb-3 text-sm leading-relaxed">{member.qualifications}</p>
-                    <div className="flex items-start space-x-2">
+                    <div className="flex items-start space-x-2 justify-center sm:justify-start">
                       <Star className="w-4 h-4 text-yellow-500 mt-0.5 flex-shrink-0" />
                       <span className="text-sm text-gray-700 font-medium break-words">{member.specialization}</span>
                     </div>

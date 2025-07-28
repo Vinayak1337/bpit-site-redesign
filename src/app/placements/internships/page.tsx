@@ -478,30 +478,30 @@ const InternshipsPage = () => {
               Our placement team is here to help you find the perfect internship opportunity
             </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-              <div className="flex flex-col items-center">
-                <div className="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-4">
-                  <Phone className="w-8 h-8" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 mb-8 sm:mb-12">
+              <div className="flex flex-col items-center text-center">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-3 sm:mb-4">
+                  <Phone className="w-6 h-6 sm:w-8 sm:h-8" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Call Us</h3>
-                <p className="text-blue-200">+91-11-27850086 (Ext: 245)</p>
+                <h3 className="text-lg sm:text-xl font-semibold mb-2">Call Us</h3>
+                <p className="text-blue-200 text-sm sm:text-base">+91-11-27850086 (Ext: 245)</p>
               </div>
-              <div className="flex flex-col items-center">
-                <div className="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-4">
-                  <Mail className="w-8 h-8" />
+              <div className="flex flex-col items-center text-center">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-3 sm:mb-4">
+                  <Mail className="w-6 h-6 sm:w-8 sm:h-8" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Email Us</h3>
-                <p className="text-blue-200">internships@bpit.ac.in</p>
+                <h3 className="text-lg sm:text-xl font-semibold mb-2">Email Us</h3>
+                <p className="text-blue-200 text-sm sm:text-base break-all">internships@bpit.ac.in</p>
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-white text-blue-900 hover:bg-blue-50 px-8 py-4 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center">
-                <BookOpen className="mr-2 w-5 h-5" />
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+              <button className="bg-white text-blue-900 hover:bg-blue-50 px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center text-sm sm:text-base">
+                <BookOpen className="mr-2 w-4 h-4 sm:w-5 sm:h-5" />
                 Internship Guidelines
               </button>
-              <button className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-blue-900 px-8 py-4 rounded-full font-semibold transition-all duration-300 flex items-center justify-center">
-                <Calendar className="mr-2 w-5 h-5" />
+              <button className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-blue-900 px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold transition-all duration-300 flex items-center justify-center text-sm sm:text-base">
+                <Calendar className="mr-2 w-4 h-4 sm:w-5 sm:h-5" />
                 Schedule Meeting
               </button>
             </div>
