@@ -1,4 +1,3 @@
-import Hero1 from '@/components/hero/hero1';
 import Hero2 from '@/components/hero/hero2';
 import PlacementCompanies from '@/components/placement/placement-companies';
 
@@ -8,7 +7,6 @@ import NoticesSection from '@/components/carousel/notices-section';
 import TopPlacedStudents from '@/components/placement/top-placed-students';
 
 import {
-	homeHeroData,
 	homeHero2Data,
 	homeNoticesData,
 	homeEventsData,
@@ -23,8 +21,6 @@ export default function Home()
 	
 	return (
 		<>
-			<Hero1 data={homeHeroData} />
-
 			<Hero2 data={homeHero2Data} />
 
 			<NoticesSection data={homeNoticesData} />

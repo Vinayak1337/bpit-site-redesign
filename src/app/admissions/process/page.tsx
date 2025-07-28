@@ -14,7 +14,7 @@ import {
     TrendingUp,
     Award
 } from 'lucide-react';
-import AdmissionsSidebar from '@/components/admissions/AdmissionsSidebar';
+import AdmissionsSidebar from '../components/AdmissionSidebar';
 
 interface Program {
     id: string;

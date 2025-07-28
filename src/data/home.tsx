@@ -1,3 +1,6 @@
+import React from 'react';
+import { Award, BookOpen } from 'lucide-react';
+
 export const homeHeroData = {
 	mainTitle: 'Engineering Excellence',
 	subTitle: "Shaping Tomorrow's Innovators",
@@ -30,17 +33,49 @@ export const homeHeroData = {
 export const homeHero2Data = {
 	slides: [
 		{
+			title: 'Welcome to BPIT',
+			subtitle: "Shaping Tomorrow's Innovators",
+			description: (
+				<>
+					<span className='font-semibold bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent'>
+						A Unit of Bhartiya Brahmin Charitable Trust (Regd.).
+					</span>
+					<br />
+					<span>(Approved by AICTE, Ministry of Education (MoE))</span>
+					<br />
+					<span>
+						Affiliated to{' '}
+						<span className='font-semibold bg-gradient-to-r from-blue-500 to-blue-700 bg-clip-text text-transparent'>
+							Guru Gobind Singh Indraprastha University, Delhi
+						</span>
+					</span>
+				</>
+			),
+			image:
+				'https://images.unsplash.com/photo-1562774053-701939374585?w=1200&q=80',
+			icon: <Award className='w-8 h-8' />,
+			stats: 'NBA Accredited Institution',
+			cta: {
+				label: 'Apply Now',
+				isEnquiry: true
+			},
+			secondary_cta: {
+				label: 'Explore Programs',
+				href: '/admissions'
+			}
+		},
+		{
 			title: 'Engineering Excellence',
 			subtitle: 'NBA Accredited Programs',
 			description:
 				"Discover our world-class engineering programs in Computer Science, Information Technology, Electronics, and Electrical Engineering designed to shape tomorrow's innovators.",
 			image:
 				'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=1200&q=80',
-			icon: 'BookOpen',
+			icon: <BookOpen className='w-8 h-8' />,
 			stats: '1000+ Students',
 			cta: {
-				label: 'Learn More',
-				href: '/admissions'
+				label: 'View Programs',
+				href: '/departments'
 			}
 		},
 		{
@@ -51,7 +86,11 @@ export const homeHero2Data = {
 			image:
 				'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1200&q=80',
 			icon: 'Users',
-			stats: '50+ Clubs'
+			stats: '50+ Clubs',
+			cta: {
+				label: 'Student Life',
+				href: '/student-life'
+			}
 		},
 		{
 			title: 'Placement Success',
@@ -61,7 +100,11 @@ export const homeHero2Data = {
 			image:
 				'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=1200&q=80',
 			icon: 'Trophy',
-			stats: '100% Placement'
+			stats: '100% Placement',
+			cta: {
+				label: 'View Placements',
+				href: '/placements/overview'
+			}
 		},
 		{
 			title: 'Modern Infrastructure',
@@ -71,7 +114,11 @@ export const homeHero2Data = {
 			image:
 				'https://images.unsplash.com/photo-1562774053-701939374585?w=1200&q=80',
 			icon: 'Building',
-			stats: 'Modern Facilities'
+			stats: 'Modern Facilities',
+			cta: {
+				label: 'About BPIT',
+				href: '/about'
+			}
 		}
 	]
 };

@@ -204,7 +204,7 @@ const Navbar = () => {
 		},
 		{
 			title: 'Library / Resource Center',
-			href: '/library',
+			href: '/academia/library',
 			description: 'Library resources, digital collections, and services',
 			icon: <BookMarked className='w-4 h-4 text-blue-600' />
 		},
