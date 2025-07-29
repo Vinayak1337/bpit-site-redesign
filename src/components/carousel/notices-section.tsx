@@ -335,11 +335,14 @@ const ScrollingSection = ({
 
 		const startPosition = (containerWidth - cardWidth) / 2;
 
-		animate(scope.current, { x: startPosition }, { duration: 0 });
-		currentPositionRef.current = startPosition;
+		// Check if scope.current is a valid DOM element
+		if (scope.current instanceof Element) {
+			animate(scope.current, { x: startPosition }, { duration: 0 });
+			currentPositionRef.current = startPosition;
+		}
 
 		const runAnimation = () => {
-			if (isHovered || !scope.current) return;
+			if (isHovered || !scope.current || !(scope.current instanceof Element)) return;
 
 			const endPosition = -totalCardsWidth;
 
@@ -358,7 +361,7 @@ const ScrollingSection = ({
 						currentPositionRef.current = latest;
 					},
 					onComplete: () => {
-						if (isHovered) return;
+						if (isHovered || !scope.current || !(scope.current instanceof Element)) return;
 
 						const resetPosition = containerWidth;
 						animate(scope.current, { x: resetPosition }, { duration: 0 });
@@ -384,11 +387,11 @@ const ScrollingSection = ({
 	}, [scope, animate, items.length, totalCardsWidth, cardWidth, cardGap]);
 
 	useEffect(() => {
-		if (!isHovered && scope.current && containerRef.current) {
+		if (!isHovered && scope.current && containerRef.current && scope.current instanceof Element) {
 			const containerWidth = containerRef.current.offsetWidth;
 
 			const continueAnimation = () => {
-				if (isHovered || !scope.current) return;
+				if (isHovered || !scope.current || !(scope.current instanceof Element)) return;
 
 				const endPosition = -totalCardsWidth;
 				const remainingDistance = Math.abs(
@@ -406,7 +409,7 @@ const ScrollingSection = ({
 							currentPositionRef.current = latest;
 						},
 						onComplete: () => {
-							if (isHovered) return;
+							if (isHovered || !scope.current || !(scope.current instanceof Element)) return;
 
 							const resetPosition = containerWidth;
 							animate(scope.current, { x: resetPosition }, { duration: 0 });

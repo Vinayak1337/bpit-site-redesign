@@ -79,11 +79,14 @@ const PlacementCompanies = ({ data }: PlacementCompaniesProps) => {
 			animationRef.current = null;
 		}
 
-		animate(scope.current, { x: startPosition }, { duration: 0 });
-		currentPositionRef.current = startPosition;
+		// Check if scope.current is a valid DOM element
+		if (scope.current instanceof Element) {
+			animate(scope.current, { x: startPosition }, { duration: 0 });
+			currentPositionRef.current = startPosition;
+		}
 
 		const runAnimation = () => {
-			if (isHovered || !scope.current) return;
+			if (isHovered || !scope.current || !(scope.current instanceof Element)) return;
 
 			const endPosition = -totalCardsWidth;
 			const remainingDistance = Math.abs(
@@ -101,15 +104,15 @@ const PlacementCompanies = ({ data }: PlacementCompaniesProps) => {
 						currentPositionRef.current = latest;
 					},
 					onComplete: () => {
-						if (isHovered || !scope.current) return;
+						if (isHovered || !scope.current || !(scope.current instanceof Element)) return;
 
 						const resetPosition = containerWidth;
-						if (scope.current) {
+						if (scope.current instanceof Element) {
 							animate(scope.current, { x: resetPosition }, { duration: 0 });
 							currentPositionRef.current = resetPosition;
 
 							setTimeout(() => {
-								if (!isHovered && scope.current) {
+								if (!isHovered && scope.current instanceof Element) {
 									runAnimation();
 								}
 							}, 100);

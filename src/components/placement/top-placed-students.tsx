@@ -83,11 +83,14 @@ const TopPlacedStudents = ({ data }: TopPlacedStudentsProps) => {
 
 		const startPosition = (containerWidth - cardWidth) / 2;
 
-		animate(scope.current, { x: startPosition }, { duration: 0 });
-		currentPositionRef.current = startPosition;
+		// Check if scope.current is a valid DOM element
+		if (scope.current instanceof Element) {
+			animate(scope.current, { x: startPosition }, { duration: 0 });
+			currentPositionRef.current = startPosition;
+		}
 
 		const runAnimation = () => {
-			if (isHovered || !scope.current) return;
+			if (isHovered || !scope.current || !(scope.current instanceof Element)) return;
 
 			const endPosition = -totalCardsWidth;
 
@@ -106,7 +109,7 @@ const TopPlacedStudents = ({ data }: TopPlacedStudentsProps) => {
 						currentPositionRef.current = latest;
 					},
 					onComplete: () => {
-						if (isHovered) return;
+						if (isHovered || !scope.current || !(scope.current instanceof Element)) return;
 
 						const resetPosition = containerWidth;
 						animate(scope.current, { x: resetPosition }, { duration: 0 });
