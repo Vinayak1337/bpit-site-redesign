@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Download, FileText, GraduationCap, Calendar, ExternalLink, RefreshCw, AlertCircle } from 'lucide-react';
+import { Download, FileText, GraduationCap, Calendar, ExternalLink, RefreshCw } from 'lucide-react';
 
 interface BrochureInfo {
     id: string;
@@ -310,104 +310,6 @@ export default function BrochurePage() {
                         </motion.div>
                     ))}
                 </div>
-
-                {/* URL Pattern Information */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.3 }}
-                    className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8"
-                >
-                    <div className="flex flex-col sm:flex-row sm:items-center mb-4 sm:mb-6">
-                        <AlertCircle className="w-6 h-6 sm:w-8 sm:h-8 text-orange-600 mb-2 sm:mb-0 sm:mr-3 flex-shrink-0" />
-                        <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-orange-800">Auto-Detection System</h3>
-                    </div>
-                    <div className="space-y-3 sm:space-y-4 text-gray-700">
-                        <p className="text-sm sm:text-base lg:text-lg">
-                            <strong>Automatic Detection:</strong> Our system now automatically scans the IPU admissions page for the latest brochures:
-                        </p>
-                        <div className="bg-green-50 border border-green-200 rounded-lg p-3 sm:p-4">
-                            <h4 className="font-semibold text-green-800 mb-2 text-sm sm:text-base">✓ Smart Auto-Detection</h4>
-                            <p className="text-xs sm:text-sm text-green-700">
-                                The system automatically scans <a href="http://www.ipu.ac.in/admission2025main2.php" target="_blank" rel="noopener noreferrer" className="underline break-all">IPU&apos;s admission page</a> to find the latest undergraduate and postgraduate brochures. When you click &quot;Refresh from IPU&quot;, it will scan the page and automatically detect new brochure links.
-                            </p>
-                        </div>
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                            <div className="bg-white p-3 sm:p-4 rounded-lg border">
-                                <h4 className="font-semibold text-gray-800 mb-2 flex flex-col sm:flex-row sm:items-center gap-2 text-sm sm:text-base">
-                                    <span>Current Undergraduate URL</span>
-                                    {brochures.find(b => b.id === 'undergraduate')?.isAutoDetected && (
-                                        <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded self-start">Auto-detected</span>
-                                    )}
-                                </h4>
-                                <p className="text-xs sm:text-sm text-gray-600 font-mono break-all">
-                                    {brochures.find(b => b.id === 'undergraduate')?.url}
-                                </p>
-                            </div>
-                            <div className="bg-white p-3 sm:p-4 rounded-lg border">
-                                <h4 className="font-semibold text-gray-800 mb-2 flex flex-col sm:flex-row sm:items-center gap-2 text-sm sm:text-base">
-                                    <span>Current Postgraduate URL</span>
-                                    {brochures.find(b => b.id === 'postgraduate')?.isAutoDetected && (
-                                        <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded self-start">Auto-detected</span>
-                                    )}
-                                </h4>
-                                <p className="text-xs sm:text-sm text-gray-600 font-mono break-all">
-                                    {brochures.find(b => b.id === 'postgraduate')?.url}
-                                </p>
-                            </div>
-                        </div>
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
-                            <h4 className="font-semibold text-blue-800 mb-2 text-sm sm:text-base">How Auto-Detection Works</h4>
-                            <ul className="text-xs sm:text-sm text-blue-700 space-y-1">
-                                <li>• Scans the official IPU admission page: <span className="font-mono break-all">admission2025main2.php</span></li>
-                                <li>• Looks for PDF links containing keywords like &quot;undergraduate&quot;, &quot;postgraduate&quot;, &quot;brochure&quot;</li>
-                                <li>• Matches URL patterns like &quot;brug&quot; (undergraduate) and &quot;brPG&quot; (postgraduate)</li>
-                                <li>• Falls back to known URLs if auto-detection fails</li>
-                                <li>• Updates automatically when IPU publishes new brochures</li>
-                            </ul>
-                        </div>
-                    </div>
-                </motion.div>
-
-                {/* Important Notes */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.4 }}
-                    className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8"
-                >
-                    <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 mb-4 sm:mb-6">Important Notes</h3>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 text-gray-700">
-                        <div className="space-y-3">
-                            <p className="flex items-start text-sm sm:text-base">
-                                <span className="text-blue-600 mr-2 flex-shrink-0">•</span>
-                                <span>Brochures are updated annually by the university administration</span>
-                            </p>
-                            <p className="flex items-start text-sm sm:text-base">
-                                <span className="text-blue-600 mr-2 flex-shrink-0">•</span>
-                                <span>Download the latest version before applying for admissions</span>
-                            </p>
-                            <p className="flex items-start text-sm sm:text-base">
-                                <span className="text-blue-600 mr-2 flex-shrink-0">•</span>
-                                <span>All information in the brochure is official and authoritative</span>
-                            </p>
-                        </div>
-                        <div className="space-y-3">
-                            <p className="flex items-start text-sm sm:text-base">
-                                <span className="text-blue-600 mr-2 flex-shrink-0">•</span>
-                                <span>For any discrepancies, refer to the official university website</span>
-                            </p>
-                            <p className="flex items-start text-sm sm:text-base">
-                                <span className="text-blue-600 mr-2 flex-shrink-0">•</span>
-                                <span>Brochures contain the most current admission requirements</span>
-                            </p>
-                            <p className="flex items-start text-sm sm:text-base">
-                                <span className="text-blue-600 mr-2 flex-shrink-0">•</span>
-                                <span>Contact admissions office for clarification on any information</span>
-                            </p>
-                        </div>
-                    </div>
-                </motion.div>
 
                 {/* Contact Information */}
                 <motion.div

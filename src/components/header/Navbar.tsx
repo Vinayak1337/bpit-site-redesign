@@ -59,6 +59,11 @@ const Navbar = () => {
 	const [activeMobileSection, setActiveMobileSection] = useState<string | null>(
 		null
 	);
+	const [isMounted, setIsMounted] = useState(false);
+
+	useEffect(() => {
+		setIsMounted(true);
+	}, []);
 
 	useEffect(() => {
 		const handleScroll = () => {
@@ -181,31 +186,31 @@ const Navbar = () => {
 	const academicsItems = [
 		{
 			title: 'Academic Calendar',
-			href: '/academics/calendar',
+			href: '/academia/academic-calendar',
 			description: 'Important academic dates and semester schedules',
 			icon: <Calendar className='w-4 h-4 text-blue-600' />
 		},
 		{
 			title: 'Examination & Results',
-			href: '/academics/examination',
+			href: '/academia/examination',
 			description: 'Exam schedules, results, and academic performance',
 			icon: <FileText className='w-4 h-4 text-blue-600' />
 		},
 		{
 			title: 'Syllabus & Ordinances',
-			href: '/academics/syllabus',
+			href: '/academia/syllabus-ordinance',
 			description: 'Course curriculum, syllabus, and academic ordinances',
 			icon: <BookOpen className='w-4 h-4 text-blue-600' />
 		},
 		{
 			title: 'Library / Resource Center',
-			href: '/academics/library',
+			href: '/academia/library',
 			description: 'Library resources, digital collections, and services',
 			icon: <BookMarked className='w-4 h-4 text-blue-600' />
 		},
 		{
 			title: 'Notices & Circulars',
-			href: '/academics/notices',
+			href: '/academia/notices-circulars',
 			description: 'Important notices, circulars, and announcements',
 			icon: <Bell className='w-4 h-4 text-blue-600' />
 		}
@@ -317,32 +322,32 @@ const Navbar = () => {
 	const studentLifeItems = [
 		{
 			title: 'Campus Facilities',
-			href: '/student-life/facilities',
-			description: 'Hostel, canteen, sports, and modern amenities',
+			href: '/student-life/campus-facilities',
+			description: 'Modern infrastructure and amenities',
 			icon: <Home className='w-4 h-4 text-blue-600' />
 		},
 		{
 			title: 'Clubs & Societies',
-			href: '/student-life/clubs',
-			description: 'Student clubs, cultural groups, and professional societies',
+			href: '/student-life/clubs-and-societies',
+			description: 'Join vibrant student communities',
 			icon: <Users className='w-4 h-4 text-blue-600' />
 		},
 		{
 			title: 'Events & Festivals',
-			href: '/student-life/events',
-			description: 'Cultural festivals, tech fests, and campus events',
+			href: '/student-life/events-and-festivals',
+			description: 'Celebrate culture and achievements',
 			icon: <Music className='w-4 h-4 text-blue-600' />
 		},
 		{
 			title: 'Student Grievance Cell',
-			href: '/student-life/grievance',
-			description: 'Student support and grievance redressal system',
+			href: '/student-life/student-grievance-cell',
+			description: 'Support and guidance services',
 			icon: <UserX className='w-4 h-4 text-blue-600' />
 		},
 		{
 			title: 'Code of Conduct',
 			href: '/student-life/code-of-conduct',
-			description: 'Student code of conduct and disciplinary guidelines',
+			description: 'Guidelines for student behavior',
 			icon: <Scale className='w-4 h-4 text-blue-600' />
 		}
 	];
@@ -605,6 +610,27 @@ const Navbar = () => {
 					</div>
 				</div>
 			</motion.header>
+
+			{/* Floating Enquire Now Button - Mobile/Tablet Only */}
+			{isMounted && (
+				<AnimatePresence>
+					<motion.button
+						className='lg:hidden fixed bottom-4 left-4 sm:bottom-6 sm:left-6 z-50 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-3 sm:px-5 sm:py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 group flex items-center gap-2 text-sm sm:text-base'
+						initial={{ opacity: 0, scale: 0.8 }}
+						animate={{ opacity: 1, scale: 1 }}
+						exit={{ opacity: 0, scale: 0.8 }}
+						whileHover={{ scale: 1.1 }}
+						whileTap={{ scale: 0.9 }}
+						onClick={() => {
+							const event = new CustomEvent('openEnquiry');
+							window.dispatchEvent(event);
+						}}>
+						<GraduationCap className='w-4 h-4 sm:w-5 sm:h-5 group-hover:rotate-12 transition-transform' />
+						<span className='hidden sm:inline group-hover:translate-x-1 transition-transform'>Enquire Now</span>
+						<span className='sm:hidden group-hover:translate-x-1 transition-transform'>Enquiry</span>
+					</motion.button>
+				</AnimatePresence>
+			)}
 
 			{/* Mobile Menu */}
 			<AnimatePresence>

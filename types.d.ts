@@ -1,4 +1,3 @@
-
 type Priority = 'high' | 'medium' | 'low';
 type Category =
 	| 'Academic'
@@ -48,4 +47,34 @@ interface NoticesSectionData {
 
 interface NoticesSectionProps {
 	data: NoticesSectionData;
+}
+
+interface EventItem {
+	id: number;
+	title: string;
+	subtitle: string;
+	description: string;
+	image: string;
+	date: string;
+	time: string;
+	location: string;
+	category: string;
+	attendees: number;
+	featured: boolean;
+	status: string;
+	tags: string[];
+	organizer: string;
+	registrationOpen: boolean;
+	price: string;
+	highlights: string[];
+	rating: number;
+	totalRatings: number;
+}
+
+interface EventsSectionData {
+	events: EventItem[];
+}
+
+interface EventsSectionProps {
+	data: EventsSectionData;
 }

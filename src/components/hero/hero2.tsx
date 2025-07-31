@@ -10,19 +10,26 @@ import {
 	Users,
 	BookOpen,
 	Trophy,
-	Building
+	Building,
+	Award
 } from 'lucide-react';
 
 interface Slide {
 	title: string;
 	subtitle: string;
-	description: string;
+	description: string | React.ReactNode;
 	image: string;
-	icon: string;
+	icon: string | React.ReactNode;
 	stats: string;
 	cta?: {
 		label: string;
-		href: string;
+		href?: string;
+		isEnquiry?: boolean;
+	};
+	secondary_cta?: {
+		label: string;
+		href?: string;
+		isEnquiry?: boolean;
 	};
 }
 
@@ -39,13 +46,15 @@ const getIcon = (iconName: string) => {
 		BookOpen: <BookOpen className='w-6 h-6 sm:w-8 sm:h-8' />,
 		Users: <Users className='w-6 h-6 sm:w-8 sm:h-8' />,
 		Trophy: <Trophy className='w-6 h-6 sm:w-8 sm:h-8' />,
-		Building: <Building className='w-6 h-6 sm:w-8 sm:h-8' />
+		Building: <Building className='w-6 h-6 sm:w-8 sm:h-8' />,
+		Award: <Award className='w-6 h-6 sm:w-8 sm:h-8' />
 	};
 	return icons[iconName] || <BookOpen className='w-6 h-6 sm:w-8 sm:h-8' />;
 };
 
 const Hero2 = ({ data }: Hero2Props) => {
 	const [currentSlide, setCurrentSlide] = useState(0);
+	const [isPaused, setIsPaused] = useState(false);
 	const timerRef = useRef<NodeJS.Timeout | null>(null);
 
 	const slides = data.slides;
@@ -54,10 +63,12 @@ const Hero2 = ({ data }: Hero2Props) => {
 		if (timerRef.current) {
 			clearInterval(timerRef.current);
 		}
-		timerRef.current = setInterval(() => {
-			setCurrentSlide((prev: number) => (prev + 1) % slides.length);
-		}, 5000);
-	}, [slides.length]);
+		if (!isPaused) {
+			timerRef.current = setInterval(() => {
+				setCurrentSlide((prev: number) => (prev + 1) % slides.length);
+			}, 5000);
+		}
+	}, [slides.length, isPaused]);
 
 	useEffect(() => {
 		resetTimer();
@@ -67,6 +78,17 @@ const Hero2 = ({ data }: Hero2Props) => {
 			}
 		};
 	}, [resetTimer]);
+
+	const handleMouseEnter = () => {
+		setIsPaused(true);
+		if (timerRef.current) {
+			clearInterval(timerRef.current);
+		}
+	};
+
+	const handleMouseLeave = () => {
+		setIsPaused(false);
+	};
 
 	const nextSlide = () => {
 		setCurrentSlide(prev => (prev + 1) % slides.length);
@@ -84,7 +106,7 @@ const Hero2 = ({ data }: Hero2Props) => {
 	};
 
 	return (
-		<section className='relative h-screen bg-gray-900 overflow-hidden'>
+		<section className='relative h-[75vh] sm:h-[85vh] lg:h-screen bg-gray-900 overflow-hidden'>
 			{/* Background Image Carousel */}
 			<AnimatePresence mode='wait'>
 				<motion.div
@@ -117,7 +139,7 @@ const Hero2 = ({ data }: Hero2Props) => {
 								animate={{ opacity: 1, y: 0 }}
 								exit={{ opacity: 0, y: -50 }}
 								transition={{ duration: 0.6 }}
-								className='space-y-4 sm:space-y-6'>
+								className='space-y-3 sm:space-y-4 lg:space-y-6'>
 								{/* Icon */}
 								<motion.div
 									initial={{ scale: 0 }}
@@ -125,7 +147,10 @@ const Hero2 = ({ data }: Hero2Props) => {
 									transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
 									className='flex justify-center mb-4 sm:mb-6'>
 									<div className='p-3 sm:p-4 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20'>
-										{getIcon(slides[currentSlide].icon)}
+										{typeof slides[currentSlide].icon === 'string' 
+											? getIcon(slides[currentSlide].icon as string)
+											: slides[currentSlide].icon
+										}
 									</div>
 								</motion.div>
 
@@ -143,7 +168,7 @@ const Hero2 = ({ data }: Hero2Props) => {
 									initial={{ opacity: 0, y: 30 }}
 									animate={{ opacity: 1, y: 0 }}
 									transition={{ delay: 0.4 }}
-									className='text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-3 sm:mb-4 leading-tight'>
+									className='text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-2 sm:mb-3 lg:mb-4 leading-tight'>
 									{slides[currentSlide].title}
 								</motion.h2>
 
@@ -152,7 +177,7 @@ const Hero2 = ({ data }: Hero2Props) => {
 									initial={{ opacity: 0, y: 20 }}
 									animate={{ opacity: 1, y: 0 }}
 									transition={{ delay: 0.5 }}
-									className='text-base sm:text-lg md:text-xl lg:text-2xl text-blue-200 font-medium mb-4 sm:mb-6'>
+									className='text-base sm:text-lg md:text-xl lg:text-2xl text-blue-200 font-medium mb-3 sm:mb-4 lg:mb-6'>
 									{slides[currentSlide].subtitle}
 								</motion.p>
 
@@ -161,7 +186,7 @@ const Hero2 = ({ data }: Hero2Props) => {
 									initial={{ opacity: 0, y: 20 }}
 									animate={{ opacity: 1, y: 0 }}
 									transition={{ delay: 0.6 }}
-									className='text-sm sm:text-base md:text-lg lg:text-xl text-gray-200 max-w-3xl mx-auto leading-relaxed mb-6 sm:mb-8 px-2 sm:px-0'>
+									className='text-sm sm:text-base md:text-lg lg:text-xl text-gray-200 max-w-3xl mx-auto leading-relaxed mb-4 sm:mb-6 lg:mb-8 px-2 sm:px-0'>
 									{slides[currentSlide].description}
 								</motion.p>
 
@@ -171,12 +196,42 @@ const Hero2 = ({ data }: Hero2Props) => {
 									animate={{ opacity: 1, y: 0 }}
 									transition={{ delay: 0.7 }}
 									className='flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center'>
-									<Button
-										size='lg'
-										className='bg-white text-blue-900 hover:bg-blue-50 px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 group text-sm sm:text-base'>
-										Learn More
-										<ArrowRight className='ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform' />
-									</Button>
+									{slides[currentSlide].cta && (
+										<Button
+											size='lg'
+											className='bg-white text-blue-900 hover:bg-blue-50 px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 group text-sm sm:text-base'
+											onMouseEnter={handleMouseEnter}
+											onMouseLeave={handleMouseLeave}
+											onClick={() => {
+												if (slides[currentSlide].cta?.isEnquiry) {
+													const event = new CustomEvent('openEnquiry');
+													window.dispatchEvent(event);
+												} else if (slides[currentSlide].cta?.href) {
+													window.location.href = slides[currentSlide].cta.href as string;
+												}
+											}}>
+											{slides[currentSlide].cta.label}
+											<ArrowRight className='ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform' />
+										</Button>
+									)}
+									{slides[currentSlide].secondary_cta && (
+										<Button
+											variant='outline'
+											size='lg'
+											className='border-2 border-white/80 text-white bg-white/10 backdrop-blur-sm hover:bg-white hover:text-blue-900 hover:border-white px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold transition-all duration-300 text-sm sm:text-base shadow-lg'
+											onMouseEnter={handleMouseEnter}
+											onMouseLeave={handleMouseLeave}
+											onClick={() => {
+												if (slides[currentSlide].secondary_cta?.isEnquiry) {
+													const event = new CustomEvent('openEnquiry');
+													window.dispatchEvent(event);
+												} else if (slides[currentSlide].secondary_cta?.href) {
+													window.location.href = slides[currentSlide].secondary_cta.href as string;
+												}
+											}}>
+											{slides[currentSlide].secondary_cta.label}
+										</Button>
+									)}
 								</motion.div>
 							</motion.div>
 						</AnimatePresence>
@@ -187,12 +242,16 @@ const Hero2 = ({ data }: Hero2Props) => {
 			{/* Navigation Arrows */}
 			<button
 				onClick={prevSlide}
+				onMouseEnter={handleMouseEnter}
+				onMouseLeave={handleMouseLeave}
 				aria-label='Previous slide'
 				className='absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 z-20 p-2 sm:p-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 text-white hover:bg-white/20 transition-all duration-300 group'>
 				<ChevronLeft className='w-5 h-5 sm:w-6 sm:h-6 group-hover:-translate-x-1 transition-transform' />
 			</button>
 			<button
 				onClick={nextSlide}
+				onMouseEnter={handleMouseEnter}
+				onMouseLeave={handleMouseLeave}
 				aria-label='Next slide'
 				className='absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 z-20 p-2 sm:p-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 text-white hover:bg-white/20 transition-all duration-300 group'>
 				<ChevronRight className='w-5 h-5 sm:w-6 sm:h-6 group-hover:translate-x-1 transition-transform' />
@@ -204,6 +263,8 @@ const Hero2 = ({ data }: Hero2Props) => {
 					<button
 						key={index}
 						onClick={() => goToSlide(index)}
+						onMouseEnter={handleMouseEnter}
+						onMouseLeave={handleMouseLeave}
 						aria-label={`Go to slide ${index + 1}`}
 						className={`h-2 sm:h-3 transition-all duration-300 ${
 							index === currentSlide
@@ -219,13 +280,13 @@ const Hero2 = ({ data }: Hero2Props) => {
 				<motion.div
 					className='h-full bg-white'
 					initial={{ width: '0%' }}
-					animate={{ width: '100%' }}
+					animate={{ width: isPaused ? '0%' : '100%' }}
 					transition={{
-						duration: 5,
-						repeat: Infinity,
+						duration: isPaused ? 0 : 5,
+						repeat: isPaused ? 0 : Infinity,
 						ease: 'linear'
 					}}
-					key={currentSlide}
+					key={`${currentSlide}-${isPaused}`}
 				/>
 			</div>
 

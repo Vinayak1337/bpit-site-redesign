@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -13,6 +14,16 @@
 /* Infinite Carousel Animation */
 .animate-carousel {
 	animation: carousel 20s linear infinite;
+}
+
+/* Hide Scrollbar */
+.scrollbar-hide {
+	-ms-overflow-style: none;  /* Internet Explorer 10+ */
+	scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar { 
+	display: none;  /* Safari and Chrome */
 }
 
 @keyframes carousel {
@@ -179,6 +190,60 @@
 	body {
 		@apply bg-background text-foreground;
 	}
+}
+
+/* Custom scrollbar styles */
+.sidebar-scroll {
+	scrollbar-width: thin;
+	scrollbar-color: #3b82f6 #e0f2fe;
+}
+
+.sidebar-scroll::-webkit-scrollbar {
+	width: 6px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-track {
+	background: #e0f2fe;
+	border-radius: 3px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb {
+	background: #3b82f6;
+	border-radius: 3px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb:hover {
+	background: #2563eb;
+}
+
+.scrollbar-thin {
+	scrollbar-width: thin;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+	width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+	background: #e0f2fe;
+	border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+	background: #3b82f6;
+	border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+	background: #2563eb;
+}
+
+.scrollbar-thumb-gray-300::-webkit-scrollbar-thumb {
+	background: #d1d5db;
+}
+
+.scrollbar-track-gray-100::-webkit-scrollbar-track {
+	background: #f3f4f6;
 }
 
 
