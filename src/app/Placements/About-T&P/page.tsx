@@ -71,7 +71,7 @@ const TrainingAndPlacementPage = () => {
 		{
 			category: 'Core Technical Skills',
 			icon: <Code className="w-6 h-6" />,
-			color: 'from-blue-500 to-cyan-400',
+			color: 'from-blue-600 to-blue-400',
 			skills: [
 				'Data Structures & Algorithms',
 				'Programming Languages',
@@ -83,7 +83,7 @@ const TrainingAndPlacementPage = () => {
 		{
 			category: 'Aptitude & Reasoning',
 			icon: <Brain className="w-6 h-6" />,
-			color: 'from-purple-500 to-pink-400',
+			color: 'from-blue-500 to-blue-300',
 			skills: [
 				'Quantitative Aptitude',
 				'Logical Reasoning',
@@ -95,7 +95,7 @@ const TrainingAndPlacementPage = () => {
 		{
 			category: 'Soft Skills & Communication',
 			icon: <MessageSquare className="w-6 h-6" />,
-			color: 'from-green-500 to-emerald-400',
+			color: 'from-blue-700 to-blue-500',
 			skills: [
 				'Group Discussion & Interviews',
 				'Guesstimates',
@@ -107,7 +107,7 @@ const TrainingAndPlacementPage = () => {
 		{
 			category: 'Specialized Technologies',
 			icon: <Cpu className="w-6 h-6" />,
-			color: 'from-orange-500 to-red-400',
+			color: 'from-blue-800 to-blue-600',
 			skills: [
 				'Digital Hardware Design and Implementation on FPGA',
 				'Physical Design Flow in CMOS Technology',
@@ -119,7 +119,7 @@ const TrainingAndPlacementPage = () => {
 		{
 			category: 'Advanced Engineering',
 			icon: <Zap className="w-6 h-6" />,
-			color: 'from-indigo-500 to-purple-400',
+			color: 'from-blue-400 to-blue-200',
 			skills: [
 				'PCB Board Design',
 				'Microstrip Patch Antenna Design Using HFSS',
@@ -131,7 +131,7 @@ const TrainingAndPlacementPage = () => {
 		{
 			category: 'Research & Analysis',
 			icon: <Database className="w-6 h-6" />,
-			color: 'from-teal-500 to-blue-400',
+			color: 'from-blue-900 to-blue-700',
 			skills: [
 				'MATLAB Programming Techniques',
 				'Signal Processing with MATLAB',
@@ -147,19 +147,19 @@ const TrainingAndPlacementPage = () => {
 			icon: <Building2 className="w-8 h-8" />,
 			title: 'Industry Partnerships',
 			description: 'Technical training from renowned institutions',
-			color: 'bg-blue-500'
+			color: 'bg-blue-600'
 		},
 		{
 			icon: <Users className="w-8 h-8" />,
 			title: 'Expert Sessions',
 			description: 'Guest lectures by industry personnel',
-			color: 'bg-green-500'
+			color: 'bg-blue-700'
 		},
 		{
 			icon: <Briefcase className="w-8 h-8" />,
 			title: 'Industry Exposure',
 			description: 'Regular industrial visits and internships',
-			color: 'bg-purple-500'
+			color: 'bg-blue-800'
 		}
 	];
 
@@ -177,7 +177,7 @@ const TrainingAndPlacementPage = () => {
 			modules: ['Data Structures & Algorithms', 'System Design', 'Database Management', 'Web Technologies'],
 			description: 'Comprehensive technical training covering core programming concepts and industry-relevant technologies.',
 			icon: <Code className="w-8 h-8" />,
-			color: 'from-blue-500 to-cyan-500'
+			color: 'from-blue-600 to-blue-400'
 		},
 		{
 			title: 'Soft Skills & Communication',
@@ -185,7 +185,7 @@ const TrainingAndPlacementPage = () => {
 			modules: ['Public Speaking', 'Team Leadership', 'Professional Etiquette', 'Presentation Skills'],
 			description: 'Essential soft skills training to enhance professional communication and interpersonal abilities.',
 			icon: <MessageSquare className="w-8 h-8" />,
-			color: 'from-green-500 to-emerald-500'
+			color: 'from-blue-700 to-blue-500'
 		},
 		{
 			title: 'Industry Certification Programs',
@@ -193,7 +193,7 @@ const TrainingAndPlacementPage = () => {
 			modules: ['AWS Cloud Practitioner', 'Google Analytics', 'Microsoft Azure', 'Oracle Database'],
 			description: 'Industry-recognized certification programs to boost technical credentials and market value.',
 			icon: <Award className="w-8 h-8" />,
-			color: 'from-purple-500 to-pink-500'
+			color: 'from-blue-800 to-blue-600'
 		},
 		{
 			title: 'Aptitude & Reasoning',
@@ -201,7 +201,7 @@ const TrainingAndPlacementPage = () => {
 			modules: ['Quantitative Aptitude', 'Logical Reasoning', 'Verbal Ability', 'Data Interpretation'],
 			description: 'Intensive aptitude training to excel in placement tests and competitive examinations.',
 			icon: <Brain className="w-8 h-8" />,
-			color: 'from-orange-500 to-red-500'
+			color: 'from-blue-500 to-blue-300'
 		}
 	];
 
@@ -256,7 +256,7 @@ const TrainingAndPlacementPage = () => {
 				initial="hidden"
 				animate="visible"
 				variants={fadeInUp}
-				className="relative overflow-hidden bg-gradient-to-r from-blue-900 via-purple-900 to-indigo-900 text-white"
+				className="relative overflow-hidden bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white"
 			>
 				<div 
 					className="absolute inset-0 opacity-20"
@@ -274,7 +274,7 @@ const TrainingAndPlacementPage = () => {
 							className="mb-6"
 						>
 							<div className="inline-flex items-center justify-center w-20 h-20 bg-white/10 backdrop-blur-sm rounded-full mb-6">
-								<Target className="w-10 h-10 text-cyan-300" />
+								<Target className="w-10 h-10 text-blue-300" />
 							</div>
 						</motion.div>
 						
@@ -282,7 +282,7 @@ const TrainingAndPlacementPage = () => {
 							initial={{ opacity: 0, y: 30 }}
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ duration: 0.8, delay: 0.4 }}
-							className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white via-cyan-200 to-blue-200 bg-clip-text text-transparent"
+							className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white via-blue-200 to-blue-100 bg-clip-text text-transparent"
 						>
 							Training & Placement Cell
 						</motion.h1>
@@ -303,13 +303,13 @@ const TrainingAndPlacementPage = () => {
 							className="flex flex-wrap justify-center gap-4"
 						>
 							<div className="bg-white/10 backdrop-blur-sm px-6 py-3 rounded-full border border-white/20">
-								<span className="flex items-center gap-2 text-cyan-200">
+								<span className="flex items-center gap-2 text-blue-200">
 									<Award className="w-5 h-5" />
 									Excellence in Training
 								</span>
 							</div>
 							<div className="bg-white/10 backdrop-blur-sm px-6 py-3 rounded-full border border-white/20">
-								<span className="flex items-center gap-2 text-cyan-200">
+								<span className="flex items-center gap-2 text-blue-200">
 									<TrendingUp className="w-5 h-5" />
 									Industry-Ready Skills
 								</span>
@@ -367,7 +367,7 @@ const TrainingAndPlacementPage = () => {
 							<motion.div variants={slideInLeft} className="space-y-6">
 								<div className="bg-white rounded-2xl p-8 shadow-xl border border-gray-100">
 									<div className="flex items-start gap-4 mb-6">
-										<div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-400 rounded-xl flex items-center justify-center flex-shrink-0">
+										<div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-blue-400 rounded-xl flex items-center justify-center flex-shrink-0">
 											<Lightbulb className="w-6 h-6 text-white" />
 										</div>
 										<div>
@@ -383,7 +383,7 @@ const TrainingAndPlacementPage = () => {
 
 								<div className="bg-white rounded-2xl p-8 shadow-xl border border-gray-100">
 									<div className="flex items-start gap-4">
-										<div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-400 rounded-xl flex items-center justify-center flex-shrink-0">
+										<div className="w-12 h-12 bg-gradient-to-r from-blue-700 to-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
 											<Target className="w-6 h-6 text-white" />
 										</div>
 										<div>
@@ -401,7 +401,7 @@ const TrainingAndPlacementPage = () => {
 							<motion.div variants={slideInRight} className="space-y-6">
 								<div className="bg-white rounded-2xl p-8 shadow-xl border border-gray-100">
 									<div className="flex items-start gap-4">
-										<div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-400 rounded-xl flex items-center justify-center flex-shrink-0">
+										<div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-blue-400 rounded-xl flex items-center justify-center flex-shrink-0">
 											<Users className="w-6 h-6 text-white" />
 										</div>
 										<div>
@@ -415,7 +415,7 @@ const TrainingAndPlacementPage = () => {
 									</div>
 								</div>
 
-								<div className="bg-gradient-to-r from-orange-500 to-red-400 rounded-2xl p-8 text-white shadow-xl">
+								<div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl p-8 text-white shadow-xl">
 									<div className="flex items-center gap-3 mb-4">
 										<Award className="w-8 h-8" />
 										<h3 className="text-xl font-bold">Excellence Promise</h3>
@@ -500,7 +500,7 @@ const TrainingAndPlacementPage = () => {
 				whileInView="visible"
 				viewport={{ once: true, margin: "-100px" }}
 				variants={staggerContainer}
-				className="py-20 bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 text-white relative overflow-hidden"
+				className="py-20 bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 text-white relative overflow-hidden"
 			>
 				<div 
 					className="absolute inset-0 opacity-30"
@@ -514,7 +514,7 @@ const TrainingAndPlacementPage = () => {
 						<h2 className="text-4xl md:text-5xl font-bold mb-6">
 							Why Choose Our Training Program?
 						</h2>
-						<div className="w-24 h-1 bg-gradient-to-r from-cyan-400 to-blue-400 mx-auto rounded-full"></div>
+						<div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-blue-200 mx-auto rounded-full"></div>
 					</motion.div>
 
 					<div className="grid md:grid-cols-3 gap-8">
@@ -529,7 +529,7 @@ const TrainingAndPlacementPage = () => {
 										{highlight.icon}
 									</div>
 									
-									<h3 className="text-2xl font-bold mb-4 group-hover:text-cyan-300 transition-colors">
+									<h3 className="text-2xl font-bold mb-4 group-hover:text-blue-300 transition-colors">
 										{highlight.title}
 									</h3>
 									
@@ -537,7 +537,7 @@ const TrainingAndPlacementPage = () => {
 										{highlight.description}
 									</p>
 									
-									<div className="mt-6 flex items-center text-cyan-300 font-medium">
+									<div className="mt-6 flex items-center text-blue-300 font-medium">
 										<span>Explore</span>
 										<ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
 									</div>
@@ -551,7 +551,7 @@ const TrainingAndPlacementPage = () => {
 						className="mt-16 text-center"
 					>
 						<div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 max-w-4xl mx-auto">
-							<Star className="w-12 h-12 text-yellow-400 mx-auto mb-6" />
+							<Star className="w-12 h-12 text-blue-300 mx-auto mb-6" />
 							<h3 className="text-2xl font-bold mb-4">
 								Technical training from renowned institutions, guest lectures by industry personnel 
 								and industrial visits are key attributes of our training programme.
@@ -584,47 +584,47 @@ const TrainingAndPlacementPage = () => {
 						<div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto rounded-full mt-6"></div>
 					</motion.div>
 
-					<div className="grid lg:grid-cols-2 gap-8">
+					<div className="grid lg:grid-cols-2 xl:grid-cols-2 gap-6">
 						{trainingPrograms.map((program, index) => (
 							<motion.div
 								key={index}
 								variants={fadeInUp}
 								className="group"
 							>
-								<div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-500 group-hover:-translate-y-2">
-									<div className={`h-2 bg-gradient-to-r ${program.color}`}></div>
+								<div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 group-hover:-translate-y-1">
+									<div className={`h-1.5 bg-gradient-to-r ${program.color}`}></div>
 									
-									<div className="p-8">
-										<div className="flex items-center gap-4 mb-6">
-											<div className={`w-16 h-16 bg-gradient-to-r ${program.color} rounded-xl flex items-center justify-center text-white shadow-lg`}>
-												{program.icon}
+									<div className="p-6">
+										<div className="flex items-center gap-3 mb-4">
+											<div className={`w-12 h-12 bg-gradient-to-r ${program.color} rounded-lg flex items-center justify-center text-white shadow-md`}>
+												<div className="scale-75">{program.icon}</div>
 											</div>
 											<div>
-												<h3 className="text-2xl font-bold text-gray-800 group-hover:text-blue-600 transition-colors">
+												<h3 className="text-lg font-bold text-gray-800 group-hover:text-blue-600 transition-colors">
 													{program.title}
 												</h3>
-												<p className="text-blue-600 font-medium">Duration: {program.duration}</p>
+												<p className="text-blue-600 font-medium text-sm">Duration: {program.duration}</p>
 											</div>
 										</div>
 
-										<p className="text-gray-600 mb-6 leading-relaxed">
+										<p className="text-gray-600 mb-4 text-sm leading-relaxed">
 											{program.description}
 										</p>
 
-										<div className="space-y-3">
-											<h4 className="font-semibold text-gray-800 mb-3">Key Modules:</h4>
+										<div className="space-y-2">
+											<h4 className="font-semibold text-gray-800 mb-2 text-sm">Key Modules:</h4>
 											{program.modules.map((module, moduleIndex) => (
-												<div key={moduleIndex} className="flex items-start gap-3">
-													<CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-													<span className="text-gray-600">{module}</span>
+												<div key={moduleIndex} className="flex items-start gap-2">
+													<CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+													<span className="text-gray-600 text-sm">{module}</span>
 												</div>
 											))}
 										</div>
 
-										<div className="mt-6 pt-6 border-t border-gray-100">
-											<div className="flex items-center text-blue-600 font-medium group-hover:text-blue-700 transition-colors cursor-pointer">
+										<div className="mt-4 pt-4 border-t border-gray-100">
+											<div className="flex items-center text-blue-600 font-medium group-hover:text-blue-700 transition-colors cursor-pointer text-sm">
 												<span>View Curriculum</span>
-												<ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+												<ArrowRight className="w-3 h-3 ml-2 group-hover:translate-x-1 transition-transform" />
 											</div>
 										</div>
 									</div>
@@ -772,7 +772,7 @@ const TrainingAndPlacementPage = () => {
 				whileInView="visible"
 				viewport={{ once: true, margin: "-100px" }}
 				variants={fadeInUp}
-				className="py-20 bg-gradient-to-r from-blue-600 to-purple-600"
+				className="py-20 bg-gradient-to-r from-blue-700 to-blue-900"
 			>
 				<div className="container mx-auto px-6 text-center">
 					<div className="max-w-3xl mx-auto text-white">
@@ -785,11 +785,11 @@ const TrainingAndPlacementPage = () => {
 						</p>
 						
 						<div className="flex flex-col sm:flex-row gap-4 justify-center">
-							<button className="bg-white text-blue-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition-colors flex items-center justify-center gap-2 shadow-lg">
+							<button className="bg-white text-blue-700 px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition-colors flex items-center justify-center gap-2 shadow-lg">
 								<GraduationCap className="w-6 h-6" />
 								Start Your Journey
 							</button>
-							<button className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white hover:text-blue-600 transition-colors flex items-center justify-center gap-2">
+							<button className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white hover:text-blue-700 transition-colors flex items-center justify-center gap-2">
 								<Globe className="w-6 h-6" />
 								Learn More
 							</button>
