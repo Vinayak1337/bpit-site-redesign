@@ -219,7 +219,7 @@ const Navbar = () => {
 				'Software development, algorithms, and programming expertise',
 			icon: (
 				<div className='w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center'>
-					<span className='text-blue-600 font-semibold text-xs'>CS</span>
+					<span className='text-blue-600 font-semibold text-xs'>CSE</span>
 				</div>
 			)
 		},
@@ -239,7 +239,7 @@ const Navbar = () => {
 			description: 'Circuit design, telecommunications, and embedded systems',
 			icon: (
 				<div className='w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center'>
-					<span className='text-purple-600 font-semibold text-xs'>EC</span>
+					<span className='text-purple-600 font-semibold text-xs'>ECE</span>
 				</div>
 			)
 		},
@@ -249,17 +249,27 @@ const Navbar = () => {
 			description: 'Power systems, automation, and electrical machinery',
 			icon: (
 				<div className='w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center'>
-					<span className='text-orange-600 font-semibold text-xs'>EE</span>
+					<span className='text-orange-600 font-semibold text-xs'>EEE</span>
 				</div>
 			)
 		},
 		{
-			title: 'Management Programs',
+			title: 'Bachelor of Business Administration',
+			href: '/departments/bba',
+			description: 'Business administration and management studies',
+			icon: (
+				<div className='w-8 h-8 bg-rose-100 rounded-lg flex items-center justify-center'>
+					<span className='text-rose-600 font-semibold text-xs'>BBA</span>
+				</div>
+			)
+		},
+		{
+			title: 'Master of Business Administration',
 			href: '/departments/mba',
 			description: 'Business administration and management studies',
 			icon: (
 				<div className='w-8 h-8 bg-rose-100 rounded-lg flex items-center justify-center'>
-					<span className='text-rose-600 font-semibold text-xs'>MG</span>
+					<span className='text-rose-600 font-semibold text-xs'>MBA</span>
 				</div>
 			)
 		}
