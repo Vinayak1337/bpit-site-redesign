@@ -523,8 +523,8 @@ export default function FeesPage() {
                     transition={{ duration: 0.6 }}
                     className="mb-12"
                 >
-                    <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">Select Program</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6 sm:mb-8 text-center">Select Program</h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                         {programFees.map((program) => (
                             <motion.button
                                 key={program.id}
@@ -532,29 +532,30 @@ export default function FeesPage() {
                                     setSelectedProgram(program.id);
                                     setExpandedYear(null);
                                 }}
-                                className={`${program.color} text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ${
+                                className={`${program.color} text-white p-4 sm:p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ${
                                     selectedProgram === program.id ? 'ring-4 ring-white scale-105' : 'hover:scale-105'
                                 }`}
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                             >
-                                <div className="flex items-center justify-center mb-4">
+                                <div className="flex items-center justify-center mb-3 sm:mb-4">
                                     {program.icon}
                                 </div>
-                                <h3 className="text-lg font-semibold mb-2">{program.name}</h3>
-                                <p className="text-sm opacity-90">{program.duration}</p>
-                                <p className="text-xl font-bold mt-4">{formatCurrency(program.totalProgramFee)}</p>
-                                <p className="text-xs opacity-75 mb-4">Total Program Fee</p>
+                                <h3 className="text-base sm:text-lg font-semibold mb-2">{program.name}</h3>
+                                <p className="text-xs sm:text-sm opacity-90">{program.duration}</p>
+                                <p className="text-lg sm:text-xl font-bold mt-3 sm:mt-4">{formatCurrency(program.totalProgramFee)}</p>
+                                <p className="text-xs opacity-75 mb-3 sm:mb-4">Total Program Fee</p>
                                 <div className="flex gap-2">
                                     <div
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             downloadFeeStructure(program);
                                         }}
-                                        className="bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded text-xs flex items-center gap-1 transition-colors duration-200 cursor-pointer"
+                                        className="bg-white/20 hover:bg-white/30 text-white px-2 sm:px-3 py-1 rounded text-xs flex items-center gap-1 transition-colors duration-200 cursor-pointer"
                                     >
                                         <Download className="w-3 h-3" />
-                                        Download
+                                        <span className="hidden sm:inline">Download</span>
+                                        <span className="sm:hidden">PDF</span>
                                     </div>
                                 </div>
                             </motion.button>
@@ -571,29 +572,30 @@ export default function FeesPage() {
                         transition={{ duration: 0.5 }}
                         className="bg-white rounded-2xl shadow-xl overflow-hidden"
                     >
-                        <div className={`${currentProgram.color} text-white p-8`}>
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <h3 className="text-3xl font-bold mb-2">{currentProgram.name}</h3>
-                                    <p className="text-xl opacity-90">{currentProgram.duration} Program</p>
+                        <div className={`${currentProgram.color} text-white p-4 sm:p-6 lg:p-8`}>
+                            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                                <div className="min-w-0 flex-1">
+                                    <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2 truncate">{currentProgram.name}</h3>
+                                    <p className="text-sm sm:text-lg lg:text-xl opacity-90">{currentProgram.duration} Program</p>
                                 </div>
-                                <div className="text-right">
-                                    <p className="text-3xl font-bold">{formatCurrency(currentProgram.totalProgramFee)}</p>
-                                    <p className="text-lg opacity-75">Total Program Fee</p>
+                                <div className="text-left lg:text-right">
+                                    <p className="text-xl sm:text-2xl lg:text-3xl font-bold">{formatCurrency(currentProgram.totalProgramFee)}</p>
+                                    <p className="text-sm sm:text-base lg:text-lg opacity-75">Total Program Fee</p>
                                     <button
                                         onClick={() => downloadFeeStructure(currentProgram)}
-                                        className="mt-4 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors duration-200"
+                                        className="mt-2 sm:mt-4 bg-white/20 hover:bg-white/30 text-white px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 transition-colors duration-200 text-sm sm:text-base"
                                     >
                                         <Download className="w-4 h-4" />
-                                        Download Complete Structure
+                                        <span className="hidden sm:inline">Download Complete Structure</span>
+                                        <span className="sm:hidden">Download</span>
                                     </button>
                                 </div>
                             </div>
                         </div>
 
                         {/* Year-wise Breakdown */}
-                        <div className="p-8">
-                            <div className="space-y-6">
+                        <div className="p-4 sm:p-6 lg:p-8">
+                            <div className="space-y-4 sm:space-y-6">
                                 {currentProgram.years.map((yearData, index) => (
                                     <motion.div
                                         key={yearData.year}
@@ -604,38 +606,39 @@ export default function FeesPage() {
                                     >
                                         <button
                                             onClick={() => toggleYearExpansion(yearData.year)}
-                                            className="w-full bg-gray-50 p-6 text-left hover:bg-gray-100 transition-colors duration-200"
+                                            className="w-full bg-gray-50 p-4 sm:p-6 text-left hover:bg-gray-100 transition-colors duration-200"
                                         >
-                                            <div className="flex items-center justify-between">
-                                                <div>
-                                                    <h4 className="text-xl font-semibold text-gray-800">
+                                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                                                <div className="min-w-0 flex-1">
+                                                    <h4 className="text-lg sm:text-xl font-semibold text-gray-800">
                                                         Year {yearData.year}
                                                     </h4>
-                                                    <p className="text-gray-600">
+                                                    <p className="text-sm sm:text-base text-gray-600">
                                                         {yearData.semester1.length + yearData.semester2.length} fee components
                                                     </p>
                                                 </div>
-                                                <div className="flex items-center gap-4">
-                                                    <div className="text-right">
-                                                        <p className="text-2xl font-bold text-gray-800">
+                                                <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4">
+                                                    <div className="text-left sm:text-right">
+                                                        <p className="text-lg sm:text-2xl font-bold text-gray-800">
                                                             {formatCurrency(yearData.totalYearFee)}
                                                         </p>
-                                                        <p className="text-sm text-gray-600">Annual Fee</p>
+                                                        <p className="text-xs sm:text-sm text-gray-600">Annual Fee</p>
                                                     </div>
                                                     <div
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             downloadFeeStructure(currentProgram, yearData.year);
                                                         }}
-                                                        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg flex items-center gap-2 text-sm transition-colors duration-200 cursor-pointer"
+                                                        className="bg-blue-500 hover:bg-blue-600 text-white px-2 sm:px-3 py-1 sm:py-2 rounded-lg flex items-center gap-1 sm:gap-2 text-xs sm:text-sm transition-colors duration-200 cursor-pointer flex-shrink-0"
                                                     >
-                                                        <Download className="w-4 h-4" />
-                                                        Download
+                                                        <Download className="w-3 h-3 sm:w-4 sm:h-4" />
+                                                        <span className="hidden sm:inline">Download</span>
+                                                        <span className="sm:hidden">PDF</span>
                                                     </div>
                                                     {expandedYear === yearData.year ? (
-                                                        <ChevronUp className="w-6 h-6 text-gray-500" />
+                                                        <ChevronUp className="w-5 h-5 sm:w-6 sm:h-6 text-gray-500 flex-shrink-0" />
                                                     ) : (
-                                                        <ChevronDown className="w-6 h-6 text-gray-500" />
+                                                        <ChevronDown className="w-5 h-5 sm:w-6 sm:h-6 text-gray-500 flex-shrink-0" />
                                                     )}
                                                 </div>
                                             </div>
@@ -650,28 +653,28 @@ export default function FeesPage() {
                                                     transition={{ duration: 0.3 }}
                                                     className="bg-white"
                                                 >
-                                                    <div className="p-6 border-t border-gray-200">
-                                                        <div className="grid md:grid-cols-2 gap-8">
+                                                    <div className="p-4 sm:p-6 border-t border-gray-200">
+                                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
                                                             {/* Semester 1 */}
                                                             <div>
-                                                                <h5 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                                                                    <Calculator className="w-5 h-5 mr-2" />
+                                                                <h5 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4 flex items-center">
+                                                                    <Calculator className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                                                                     Semester 1
                                                                 </h5>
-                                                                <div className="space-y-3">
+                                                                <div className="space-y-2 sm:space-y-3">
                                                                     {yearData.semester1.map((fee, feeIndex) => (
-                                                                        <div key={feeIndex} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                                                                            <div>
-                                                                                <p className="font-medium text-gray-800">{fee.name}</p>
+                                                                        <div key={feeIndex} className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-3 bg-gray-50 rounded-lg gap-1 sm:gap-3">
+                                                                            <div className="min-w-0 flex-1">
+                                                                                <p className="font-medium text-gray-800 text-sm sm:text-base">{fee.name}</p>
                                                                                 {fee.description && (
-                                                                                    <p className="text-sm text-gray-600">{fee.description}</p>
+                                                                                    <p className="text-xs sm:text-sm text-gray-600 mt-1">{fee.description}</p>
                                                                                 )}
                                                                             </div>
-                                                                            <p className="font-semibold text-gray-800">{formatCurrency(fee.amount)}</p>
+                                                                            <p className="font-semibold text-gray-800 text-sm sm:text-base flex-shrink-0">{formatCurrency(fee.amount)}</p>
                                                                         </div>
                                                                     ))}
-                                                                    <div className="pt-3 border-t border-gray-300">
-                                                                        <div className="flex justify-between items-center font-semibold text-lg">
+                                                                    <div className="pt-2 sm:pt-3 border-t border-gray-300">
+                                                                        <div className="flex justify-between items-center font-semibold text-base sm:text-lg">
                                                                             <span>Semester 1 Total</span>
                                                                             <span className="text-green-600">
                                                                                 {formatCurrency(yearData.semester1.reduce((sum, fee) => sum + fee.amount, 0))}
@@ -683,24 +686,24 @@ export default function FeesPage() {
 
                                                             {/* Semester 2 */}
                                                             <div>
-                                                                <h5 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                                                                    <Calculator className="w-5 h-5 mr-2" />
+                                                                <h5 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4 flex items-center">
+                                                                    <Calculator className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                                                                     Semester 2
                                                                 </h5>
-                                                                <div className="space-y-3">
+                                                                <div className="space-y-2 sm:space-y-3">
                                                                     {yearData.semester2.map((fee, feeIndex) => (
-                                                                        <div key={feeIndex} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                                                                            <div>
-                                                                                <p className="font-medium text-gray-800">{fee.name}</p>
+                                                                        <div key={feeIndex} className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-3 bg-gray-50 rounded-lg gap-1 sm:gap-3">
+                                                                            <div className="min-w-0 flex-1">
+                                                                                <p className="font-medium text-gray-800 text-sm sm:text-base">{fee.name}</p>
                                                                                 {fee.description && (
-                                                                                    <p className="text-sm text-gray-600">{fee.description}</p>
+                                                                                    <p className="text-xs sm:text-sm text-gray-600 mt-1">{fee.description}</p>
                                                                                 )}
                                                                             </div>
-                                                                            <p className="font-semibold text-gray-800">{formatCurrency(fee.amount)}</p>
+                                                                            <p className="font-semibold text-gray-800 text-sm sm:text-base flex-shrink-0">{formatCurrency(fee.amount)}</p>
                                                                         </div>
                                                                     ))}
-                                                                    <div className="pt-3 border-t border-gray-300">
-                                                                        <div className="flex justify-between items-center font-semibold text-lg">
+                                                                    <div className="pt-2 sm:pt-3 border-t border-gray-300">
+                                                                        <div className="flex justify-between items-center font-semibold text-base sm:text-lg">
                                                                             <span>Semester 2 Total</span>
                                                                             <span className="text-green-600">
                                                                                 {formatCurrency(yearData.semester2.reduce((sum, fee) => sum + fee.amount, 0))}

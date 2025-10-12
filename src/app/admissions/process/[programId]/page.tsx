@@ -883,19 +883,19 @@ const ProgramDetailsPage = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5 }}
                     >
-                        <h2 className="text-2xl font-bold text-gray-900 mb-6">Content Offering Statement</h2>
+                        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6">Content Offering Statement</h2>
                         <div className="space-y-6">
-                            <p className="text-gray-700 leading-relaxed text-lg">
+                            <p className="text-gray-700 leading-relaxed text-base sm:text-lg">
                                 {currentProgram.details.contentOffering.statement}
                             </p>
                             
                             <div>
-                                <h3 className="text-xl font-semibold text-gray-900 mb-4">Key Areas of Study</h3>
-                                <div className="grid grid-cols-2 gap-4">
+                                <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Key Areas of Study</h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                     {currentProgram.details.contentOffering.keyAreas.map((area: string, index: number) => (
                                         <div key={index} className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
-                                            <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-                                            <span className="text-gray-700">{area}</span>
+                                            <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />
+                                            <span className="text-gray-700 text-sm sm:text-base">{area}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -911,7 +911,7 @@ const ProgramDetailsPage = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5 }}
                     >
-                        <h2 className="text-2xl font-bold text-gray-900 mb-6">Eligibility Criteria & Selection Process</h2>
+                        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6">Eligibility Criteria & Selection Process</h2>
                         <div className="space-y-6">
                             <div className="bg-white rounded-lg p-6 border border-gray-200">
                                 <h3 className="text-lg font-semibold text-gray-900 mb-3">Academic Qualification</h3>
@@ -952,49 +952,49 @@ const ProgramDetailsPage = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5 }}
                     >
-                        <h2 className="text-2xl font-bold text-gray-900 mb-6">Programme Structure</h2>
+                        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6">Programme Structure</h2>
                         <div className="space-y-6">
-                            <div className="grid grid-cols-3 gap-6">
-                                <div className="bg-white rounded-lg p-6 border border-gray-200 text-center">
-                                    <h3 className="text-3xl font-bold text-blue-600 mb-2">{currentProgram.details.programStructure.semesters}</h3>
-                                    <p className="text-gray-600">Total Semesters</p>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                                <div className="bg-white rounded-lg p-4 sm:p-6 border border-gray-200 text-center">
+                                    <h3 className="text-2xl sm:text-3xl font-bold text-blue-600 mb-2">{currentProgram.details.programStructure.semesters}</h3>
+                                    <p className="text-sm sm:text-base text-gray-600">Total Semesters</p>
                                 </div>
-                                <div className="bg-white rounded-lg p-6 border border-gray-200 text-center">
-                                    <h3 className="text-3xl font-bold text-blue-600 mb-2">{currentProgram.details.programStructure.totalCredits}</h3>
-                                    <p className="text-gray-600">Total Credits</p>
+                                <div className="bg-white rounded-lg p-4 sm:p-6 border border-gray-200 text-center">
+                                    <h3 className="text-2xl sm:text-3xl font-bold text-blue-600 mb-2">{currentProgram.details.programStructure.totalCredits}</h3>
+                                    <p className="text-sm sm:text-base text-gray-600">Total Credits</p>
                                 </div>
-                                <div className="bg-white rounded-lg p-6 border border-gray-200 text-center">
-                                    <h3 className="text-3xl font-bold text-blue-600 mb-2">{currentProgram.duration}</h3>
-                                    <p className="text-gray-600">Duration</p>
+                                <div className="bg-white rounded-lg p-4 sm:p-6 border border-gray-200 text-center sm:col-span-2 lg:col-span-1">
+                                    <h3 className="text-2xl sm:text-3xl font-bold text-blue-600 mb-2">{currentProgram.duration}</h3>
+                                    <p className="text-sm sm:text-base text-gray-600">Duration</p>
                                 </div>
                             </div>
                             
                             {currentProgram.details.programStructure.semesterDetails && (
                                 <div>
                                     <h3 className="text-xl font-semibold text-gray-900 mb-6">Semester-wise Curriculum</h3>
-                                    <div className="grid grid-cols-2 gap-6">
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
                                         {currentProgram.details.programStructure.semesterDetails.map((semester: { semester: number; title: string; subjects: string[] }, index: number) => (
                                             <motion.div 
                                                 key={index} 
-                                                className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-md transition-shadow"
+                                                className="bg-white rounded-lg p-4 sm:p-6 border border-gray-200 hover:shadow-md transition-shadow"
                                                 initial={{ opacity: 0, y: 20 }}
                                                 animate={{ opacity: 1, y: 0 }}
                                                 transition={{ duration: 0.3, delay: index * 0.1 }}
                                             >
-                                                <div className="flex items-center gap-4 mb-4">
-                                                    <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                                                        <span className="text-blue-600 font-bold">S{semester.semester}</span>
+                                                <div className="flex items-center gap-3 sm:gap-4 mb-4">
+                                                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                                        <span className="text-blue-600 font-bold text-sm sm:text-base">S{semester.semester}</span>
                                                     </div>
-                                                    <div>
-                                                        <h4 className="font-semibold text-gray-900">{semester.title}</h4>
-                                                        <p className="text-sm text-gray-600">{semester.subjects.length} Subjects</p>
+                                                    <div className="min-w-0 flex-1">
+                                                        <h4 className="font-semibold text-gray-900 text-sm sm:text-base truncate">{semester.title}</h4>
+                                                        <p className="text-xs sm:text-sm text-gray-600">{semester.subjects.length} Subjects</p>
                                                     </div>
                                                 </div>
                                                 <div className="space-y-2">
                                                     {semester.subjects.map((subject: string, subIndex: number) => (
-                                                        <div key={subIndex} className="flex items-center gap-2">
-                                                            <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></div>
-                                                            <span className="text-sm text-gray-700">{subject}</span>
+                                                        <div key={subIndex} className="flex items-start gap-2">
+                                                            <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-1.5"></div>
+                                                            <span className="text-xs sm:text-sm text-gray-700 leading-relaxed">{subject}</span>
                                                         </div>
                                                     ))}
                                                 </div>
@@ -1014,13 +1014,13 @@ const ProgramDetailsPage = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5 }}
                     >
-                        <h2 className="text-2xl font-bold text-gray-900 mb-6">Career Opportunities</h2>
-                        <div className="grid grid-cols-2 gap-4">
+                        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6">Career Opportunities</h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {currentProgram.details.careerOpportunities.map((career: string, index: number) => (
-                                <div key={index} className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-md transition-shadow">
+                                <div key={index} className="bg-white rounded-lg p-4 sm:p-6 border border-gray-200 hover:shadow-md transition-shadow">
                                     <div className="flex items-center gap-3">
-                                        <Briefcase className="w-6 h-6 text-blue-500" />
-                                        <span className="font-medium text-gray-900">{career}</span>
+                                        <Briefcase className="w-5 h-5 sm:w-6 sm:h-6 text-blue-500 flex-shrink-0" />
+                                        <span className="font-medium text-gray-900 text-sm sm:text-base">{career}</span>
                                     </div>
                                 </div>
                             ))}
@@ -1035,8 +1035,8 @@ const ProgramDetailsPage = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5 }}
                     >
-                        <h2 className="text-2xl font-bold text-gray-900 mb-6">Faculty Members</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6">Faculty Members</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                             {currentProgram.details.faculty.map((faculty: { name: string; designation: string; specialization: string; experience: string; photo: string }, index: number) => (
                                 <motion.div 
                                     key={index} 
@@ -1046,7 +1046,7 @@ const ProgramDetailsPage = () => {
                                     transition={{ duration: 0.5, delay: index * 0.1 }}
                                 >
                                     {/* Faculty Photo */}
-                                    <div className="relative h-64 bg-gray-100">
+                                    <div className="relative h-48 sm:h-64 bg-gray-100">
                                         {faculty.photo ? (
                                             <Image 
                                                 src={faculty.photo} 
@@ -1072,17 +1072,17 @@ const ProgramDetailsPage = () => {
                                     </div>
                                     
                                     {/* Faculty Information */}
-                                    <div className="p-6 text-center">
-                                        <h3 className="text-xl font-bold text-gray-900 mb-2">
+                                    <div className="p-4 sm:p-6 text-center">
+                                        <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">
                                             {faculty.name}
                                         </h3>
-                                        <p className="text-gray-600 text-sm mb-1">
+                                        <p className="text-gray-600 text-xs sm:text-sm mb-1">
                                             {faculty.designation}
                                         </p>
-                                        <p className="text-gray-500 text-sm mb-2">
+                                        <p className="text-gray-500 text-xs sm:text-sm mb-2 leading-relaxed">
                                             {faculty.specialization}
                                         </p>
-                                        <p className="text-gray-900 text-sm font-medium mb-4">
+                                        <p className="text-gray-900 text-xs sm:text-sm font-medium mb-4">
                                             Engineering and Technology
                                         </p>
                                         

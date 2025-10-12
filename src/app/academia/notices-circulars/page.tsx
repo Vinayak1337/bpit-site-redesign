@@ -415,7 +415,7 @@ export default function NoticesCircularsPage() {
 
 			{/* Results Info */}
 			<motion.div 
-				className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"
+				className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-6"
 				initial={{ opacity: 0, x: -50 }}
 				animate={{ opacity: 1, x: 0 }}
 				transition={{ duration: 0.6, delay: 0.9 }}
@@ -434,14 +434,14 @@ export default function NoticesCircularsPage() {
 
 			{/* Main Content */}
 			<motion.div 
-				className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16"
+				className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 pb-16"
 				initial={{ opacity: 0, y: 50 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.8, delay: 1.0 }}
 			>
 				{filteredNotices.length > 0 ? (
-					<motion.div 
-						className="grid grid-cols-1 lg:grid-cols-2 gap-8"
+					<motion.div
+						className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-6 lg:gap-8"
 						initial="hidden"
 						animate="visible"
 						variants={{
@@ -467,137 +467,322 @@ export default function NoticesCircularsPage() {
 									transition={{ duration: 0.3 }}
 									className="group relative"
 								>
-									<div className="relative overflow-hidden rounded-2xl bg-white/90 backdrop-blur-xl border border-white/40 shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1 h-64">
+									{/* Mobile Layout - Different structure for small devices */}
+									<div className="sm:hidden">
+										<div className="relative overflow-hidden rounded-xl bg-white/95 backdrop-blur-xl border border-white/60 shadow-sm hover:shadow-lg transition-all duration-300 p-4">
+											{/* Mobile Priority Indicator */}
+											{notice.priority === 'high' && (
+												<div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500 to-rose-600" />
+											)}
+											
+											{/* Mobile Header Row */}
+											<div className="flex items-center gap-2 mb-3">
+												<div className="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 border border-gray-200">
+													<Image
+														src={notice.image}
+														alt={notice.title}
+														fill
+														className="object-cover"
+													/>
+												</div>
+												<div className="flex-1 min-w-0">
+													<span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
+														notice.category === 'Academic' ? 'bg-blue-100 text-blue-700' :
+														notice.category === 'Financial Aid' ? 'bg-green-100 text-green-700' :
+														notice.category === 'Admission' ? 'bg-purple-100 text-purple-700' :
+														notice.category === 'Innovation' ? 'bg-orange-100 text-orange-700' :
+														notice.category === 'Sports' ? 'bg-pink-100 text-pink-700' :
+														notice.category === 'Library' ? 'bg-indigo-100 text-indigo-700' :
+														'bg-gray-100 text-gray-700'
+													}`}>
+														{notice.category === 'Academic' ? <GraduationCap className="w-2.5 h-2.5" /> :
+														notice.category === 'Financial Aid' ? <Award className="w-2.5 h-2.5" /> :
+														notice.category === 'Admission' ? <Users className="w-2.5 h-2.5" /> :
+														notice.category === 'Innovation' ? <Lightbulb className="w-2.5 h-2.5" /> :
+														notice.category === 'Sports' ? <Trophy className="w-2.5 h-2.5" /> :
+														notice.category === 'Library' ? <Bell className="w-2.5 h-2.5" /> :
+														<Bell className="w-2.5 h-2.5" />}
+														{notice.category}
+													</span>
+												</div>
+											</div>
+											
+											{/* Mobile Badges - Below category/image, above title */}
+											<div className="flex flex-wrap gap-2 mb-3">
+												{notice.pinned && (
+													<div className="bg-amber-100 text-amber-700 px-2 py-1 rounded-md flex items-center gap-1">
+														<Pin className="w-3 h-3" />
+														<span className="text-xs font-medium">Pinned</span>
+													</div>
+												)}
+												{notice.urgent && (
+													<div className="bg-red-100 text-red-700 px-2 py-1 rounded-md text-xs font-medium">
+														Urgent
+													</div>
+												)}
+												<span className={`px-2 py-1 rounded-md text-xs font-medium ${
+													notice.priority === 'high' ? 'bg-red-100 text-red-700' :
+													notice.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+													'bg-green-100 text-green-700'
+												}`}>
+													{notice.priority} priority
+												</span>
+											</div>
+
+											{/* Mobile Title and Description */}
+											<div className="mb-3">
+												<h3 className="font-bold text-gray-900 text-sm leading-tight mb-2">
+													{notice.title}
+												</h3>
+												<p className="text-xs text-gray-600 leading-relaxed mb-2">
+													{notice.subtitle}
+												</p>
+												<p className="text-xs text-gray-500 leading-relaxed">
+													{notice.description}
+												</p>
+											</div>
+
+											{/* Mobile Tags */}
+											<div className="flex flex-wrap gap-1 mb-3">
+												{notice.tags.slice(0, 4).map((tag, tagIndex) => (
+													<span
+														key={tagIndex}
+														className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs"
+													>
+														{tag}
+													</span>
+												))}
+											</div>
+
+											{/* Mobile Footer */}
+											<div className="flex items-center justify-between pt-2 border-t border-gray-100">
+												<div className="flex flex-col gap-1.5 text-xs text-gray-500 flex-1">
+													{/* First row - Date and Time */}
+													<div className="flex items-center gap-4">
+														<div className="flex items-center gap-1">
+															<Calendar className="w-3 h-3" />
+															<span>{formatDate(notice.date)}</span>
+														</div>
+														<div className="flex items-center gap-1">
+															<Clock className="w-3 h-3" />
+															<span>{notice.time}</span>
+														</div>
+													</div>
+													{/* Second row - Views */}
+													<div className="flex items-center gap-1">
+														<Eye className="w-3 h-3" />
+														<span>{notice.views} views</span>
+													</div>
+												</div>
+												<motion.button
+													whileHover={{ scale: 1.05 }}
+													whileTap={{ scale: 0.95 }}
+													className="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-blue-700 transition-colors ml-3"
+												>
+													View
+												</motion.button>
+											</div>
+										</div>
+									</div>
+
+									{/* Desktop/Tablet Layout - Consistent height with optimized content */}
+									<div className="hidden sm:block">
+										<div className="relative overflow-hidden rounded-2xl bg-white/90 backdrop-blur-xl border border-white/40 shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1 h-[26rem] lg:h-[28rem] flex flex-col">
 										{/* Priority Indicator */}
 										{notice.priority === 'high' && (
 											<div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500 to-rose-600" />
 										)}
 
-										{/* Pinned & Urgent Badges */}
-										<div className="absolute top-3 right-3 z-10 flex items-center gap-2">
-											{notice.pinned && (
-												<motion.div
-													initial={{ scale: 0 }}
-													animate={{ scale: 1 }}
-													transition={{ delay: 0.2, type: 'spring' }}
-												>
-													<div className="bg-gradient-to-r from-amber-400 to-orange-500 text-white p-1.5 rounded-full shadow-lg">
-														<Pin className="w-3 h-3" />
+										<div className="p-4 lg:p-5 h-full flex flex-col">
+											{/* Header Row - Image and Category */}
+											<div className="flex items-center gap-3 mb-3 flex-shrink-0">
+												<div className="relative w-12 h-12 lg:w-14 lg:h-14 rounded-xl overflow-hidden flex-shrink-0 border-2 border-white shadow-lg">
+													<Image
+														src={notice.image}
+														alt={notice.title}
+														fill
+														className="object-cover"
+													/>
+												</div>
+												<div className="flex-1">
+													<div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium border ${
+														notice.category === 'Academic' ? 'bg-blue-50 border-blue-200 text-blue-700' :
+														notice.category === 'Financial Aid' ? 'bg-green-50 border-green-200 text-green-700' :
+														notice.category === 'Admission' ? 'bg-purple-50 border-purple-200 text-purple-700' :
+														notice.category === 'Innovation' ? 'bg-orange-50 border-orange-200 text-orange-700' :
+														notice.category === 'Sports' ? 'bg-pink-50 border-pink-200 text-pink-700' :
+														notice.category === 'Library' ? 'bg-indigo-50 border-indigo-200 text-indigo-700' :
+														'bg-gray-50 border-gray-200 text-gray-700'
+													}`}>
+														{notice.category === 'Academic' ? <GraduationCap className="w-4 h-4" /> :
+														notice.category === 'Financial Aid' ? <Award className="w-4 h-4" /> :
+														notice.category === 'Admission' ? <Users className="w-4 h-4" /> :
+														notice.category === 'Innovation' ? <Lightbulb className="w-4 h-4" /> :
+														notice.category === 'Sports' ? <Trophy className="w-4 h-4" /> :
+														notice.category === 'Library' ? <Bell className="w-4 h-4" /> :
+														<Bell className="w-4 h-4" />}
+														<span>{notice.category}</span>
 													</div>
-												</motion.div>
-											)}
-											{notice.urgent && (
-												<motion.div
-													initial={{ opacity: 0 }}
-													animate={{ opacity: 1 }}
-													transition={{ delay: 0.3 }}
-												>
-													<div className="bg-gradient-to-r from-red-500 to-red-600 text-white px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+												</div>
+											</div>
+											
+											{/* Badges Row - Below image/category, above title */}
+											<div className="flex flex-wrap gap-2 mb-3 flex-shrink-0">
+												{notice.pinned && (
+													<motion.div
+														initial={{ scale: 0 }}
+														animate={{ scale: 1 }}
+														transition={{ delay: 0.2, type: 'spring' }}
+														className="bg-gradient-to-r from-amber-400 to-orange-500 text-white px-3 py-1 rounded-lg flex items-center gap-1.5 text-sm font-medium"
+													>
+														<Pin className="w-4 h-4" />
+														<span>Pinned</span>
+													</motion.div>
+												)}
+												{notice.urgent && (
+													<motion.div
+														initial={{ opacity: 0 }}
+														animate={{ opacity: 1 }}
+														transition={{ delay: 0.3 }}
+														className="bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1 rounded-lg text-sm font-medium flex items-center gap-1"
+													>
 														<div className="w-2 h-2 bg-white rounded-full animate-pulse" />
 														Urgent
-													</div>
-												</motion.div>
-											)}
-										</div>
-
-										<div className="p-4 h-full flex flex-col">
-											{/* Header */}
-											<div className="flex items-start gap-3 mb-3">
-												{/* Image */}
-												<div className="relative w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 border-2 border-white shadow-lg">									<Image
-										src={notice.image}
-										alt={notice.title}
-										fill
-										className="object-cover"
-									/>
-												</div>
-
-												{/* Content Header */}
-												<div className="flex-1 min-w-0">
-													<div className="flex flex-wrap items-center gap-1.5 mb-2">
-														<div className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium border ${
-															notice.category === 'Academic' ? 'bg-blue-50 border-blue-200 text-blue-700' :
-															notice.category === 'Financial Aid' ? 'bg-green-50 border-green-200 text-green-700' :
-															notice.category === 'Admission' ? 'bg-purple-50 border-purple-200 text-purple-700' :
-															notice.category === 'Innovation' ? 'bg-orange-50 border-orange-200 text-orange-700' :
-															notice.category === 'Sports' ? 'bg-pink-50 border-pink-200 text-pink-700' :
-															notice.category === 'Library' ? 'bg-indigo-50 border-indigo-200 text-indigo-700' :
-															'bg-gray-50 border-gray-200 text-gray-700'
-														}`}>
-															{notice.category === 'Academic' ? <GraduationCap className="w-3 h-3" /> :
-															notice.category === 'Financial Aid' ? <Award className="w-3 h-3" /> :
-															notice.category === 'Admission' ? <Users className="w-3 h-3" /> :
-															notice.category === 'Innovation' ? <Lightbulb className="w-3 h-3" /> :
-															notice.category === 'Sports' ? <Trophy className="w-3 h-3" /> :
-															notice.category === 'Library' ? <Bell className="w-3 h-3" /> :
-															<Bell className="w-3 h-3" />}
-															<span>{notice.category}</span>
-														</div>
-														<div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${
-															notice.priority === 'high' ? 'bg-red-50 border-red-200 text-red-700' :
-															notice.priority === 'medium' ? 'bg-yellow-50 border-yellow-200 text-yellow-700' :
-															'bg-green-50 border-green-200 text-green-700'
-														}`}>
-															{notice.priority}
-														</div>
-													</div>
-
-													<h3 className="font-bold text-gray-800 text-sm leading-tight mb-1 line-clamp-2 group-hover:text-gray-900 transition-colors duration-300">
-														{notice.title}
-													</h3>
-													<p className="text-xs text-gray-500 font-medium leading-relaxed line-clamp-1">
-														{notice.subtitle}
-													</p>
+													</motion.div>
+												)}
+												<div className={`px-3 py-1 rounded-lg text-sm font-medium border ${
+													notice.priority === 'high' ? 'bg-red-50 border-red-200 text-red-700' :
+													notice.priority === 'medium' ? 'bg-yellow-50 border-yellow-200 text-yellow-700' :
+													'bg-green-50 border-green-200 text-green-700'
+												}`}>
+													{notice.priority} priority
 												</div>
 											</div>
 
-											{/* Description */}
-											<p className="text-gray-600 text-xs leading-relaxed line-clamp-2 mb-3 flex-1">
-												{notice.description}
-											</p>
+											{/* Title and Subtitle Section */}
+											<div className="mb-3 flex-shrink-0">
+												<h3 className="font-bold text-gray-800 text-base lg:text-lg leading-tight mb-2 line-clamp-2 group-hover:text-gray-900 transition-colors duration-300">
+													{notice.title}
+												</h3>
+												<p className="text-sm text-gray-500 font-medium leading-relaxed line-clamp-1">
+													{notice.subtitle}
+												</p>
+											</div>
 
-											{/* Tags */}
-											<div className="flex flex-wrap gap-1 mb-3">
-												{notice.tags.slice(0, 3).map((tag, tagIndex) => (
-													<span
-														key={tagIndex}
-														className="px-2 py-1 bg-gray-100 text-gray-600 rounded-md text-xs font-medium hover:bg-gray-200 transition-colors duration-200"
-													>
+											{/* Main Content - Description and Tags */}
+											<div className="flex-1 flex flex-col min-h-0 mb-3">
+												<div className="flex-1 mb-3">
+													<p className="text-gray-600 text-sm leading-relaxed line-clamp-3">
+														{notice.description}
+													</p>
+												</div>
+
+												{/* Tags */}
+												<div className="flex flex-wrap gap-1.5 flex-shrink-0">
+													{notice.tags.slice(0, 2).map((tag, tagIndex) => (
+														<span
+															key={tagIndex}
+															className="px-2 py-1 bg-gray-100 text-gray-600 rounded-md text-xs font-medium hover:bg-gray-200 transition-colors duration-200"
+														>
 														{tag}
 													</span>
 												))}
-												{notice.tags.length > 3 && (
+												{notice.tags.length > 2 && (
 													<span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-md text-xs font-medium">
-														+{notice.tags.length - 3} more
+														+{notice.tags.length - 2}
 													</span>
 												)}
 											</div>
+											</div>
 
-											{/* Footer */}
-											<div className="flex items-center justify-between pt-3 border-t border-gray-100 mt-auto">
-												<div className="flex items-center gap-3 text-xs text-gray-500">
-													<div className="flex items-center gap-1">
-														<Calendar className="w-3 h-3" />
-														<span>{formatDate(notice.date)}</span>
+											{/* Footer - Reorganized for better spacing */}
+											<div className="pt-2 sm:pt-3 border-t border-gray-100 mt-auto flex-shrink-0">
+												{/* Desktop Footer Layout */}
+												<div className="hidden lg:flex items-center justify-between">
+													<div className="flex items-center gap-4 text-xs text-gray-500">
+														<div className="flex items-center gap-1">
+															<Calendar className="w-3 h-3" />
+															<span>{formatDate(notice.date)}</span>
+														</div>
+														<div className="flex items-center gap-1">
+															<Clock className="w-3 h-3" />
+															<span>{notice.time}</span>
+														</div>
+														<div className="flex items-center gap-1">
+															<Eye className="w-3 h-3" />
+															<span>{notice.views} views</span>
+														</div>
 													</div>
-													<div className="flex items-center gap-1">
-														<Clock className="w-3 h-3" />
-														<span>{notice.time}</span>
+
+													<motion.button
+														whileHover={{ scale: 1.05 }}
+														whileTap={{ scale: 0.95 }}
+														className="flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors duration-200 px-3 py-1.5 rounded-lg hover:bg-blue-50"
+													>
+														<span>View Details</span>
+														<ExternalLink className="w-3 h-3" />
+													</motion.button>
+												</div>
+
+												{/* Tablet Footer Layout */}
+												<div className="hidden sm:flex lg:hidden flex-col gap-2">
+													<div className="flex items-center justify-between">
+														<div className="flex items-center gap-3 text-xs text-gray-500">
+															<div className="flex items-center gap-1">
+																<Calendar className="w-3 h-3" />
+																<span>{formatDate(notice.date)}</span>
+															</div>
+															<div className="flex items-center gap-1">
+																<Clock className="w-3 h-3" />
+																<span>{notice.time}</span>
+															</div>
+														</div>
+														<div className="flex items-center gap-1 text-xs text-gray-500">
+															<Eye className="w-3 h-3" />
+															<span>{notice.views}</span>
+														</div>
 													</div>
-													<div className="flex items-center gap-1">
-														<Eye className="w-3 h-3" />
-														<span>{notice.views}</span>
+													<div className="flex justify-end">
+														<motion.button
+															whileHover={{ scale: 1.05 }}
+															whileTap={{ scale: 0.95 }}
+															className="flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors duration-200 px-3 py-1.5 rounded-lg hover:bg-blue-50"
+														>
+															<span>View</span>
+															<ExternalLink className="w-3 h-3" />
+														</motion.button>
 													</div>
 												</div>
 
-												<motion.button
-													whileHover={{ scale: 1.05 }}
-													whileTap={{ scale: 0.95 }}
-													className="flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors duration-200"
-												>
-													View
-													<ExternalLink className="w-3 h-3" />
-												</motion.button>
+												{/* Mobile Footer Layout */}
+												<div className="flex sm:hidden flex-col gap-2">
+													<div className="flex items-center justify-between text-xs text-gray-500">
+														<div className="flex items-center gap-2">
+															<div className="flex items-center gap-1">
+																<Calendar className="w-2.5 h-2.5" />
+																<span>{formatDate(notice.date).slice(0, 8)}</span>
+															</div>
+															<div className="flex items-center gap-1">
+																<Clock className="w-2.5 h-2.5" />
+																<span>{notice.time}</span>
+															</div>
+														</div>
+														<div className="flex items-center gap-1">
+															<Eye className="w-2.5 h-2.5" />
+															<span>{notice.views}</span>
+														</div>
+													</div>
+													<div className="flex justify-end">
+														<motion.button
+															whileHover={{ scale: 1.05 }}
+															whileTap={{ scale: 0.95 }}
+															className="flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors duration-200 px-2 py-1 rounded-lg hover:bg-blue-50"
+														>
+															<span>View</span>
+															<ExternalLink className="w-2.5 h-2.5" />
+														</motion.button>
+													</div>
+												</div>
 											</div>
 										</div>
 
@@ -617,6 +802,7 @@ export default function NoticesCircularsPage() {
 												'from-gray-500 to-slate-600'
 											}`}
 										/>
+										</div>
 									</div>
 								</motion.div>
 							))}

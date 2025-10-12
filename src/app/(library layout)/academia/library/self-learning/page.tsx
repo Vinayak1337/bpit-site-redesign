@@ -53,16 +53,16 @@ export default function SelfLearning() {
       className='space-y-8'>
       
       {/* Header Section */}
-      <div className='bg-gradient-to-r from-blue-50 to-indigo-100 rounded-2xl p-8 border border-blue-200'>
-        <div className='flex items-start gap-6 mb-8'>
-          <div className='w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center flex-shrink-0'>
-            <BookOpen className='w-10 h-10 text-white' />
+      <div className='bg-gradient-to-r from-blue-50 to-indigo-100 rounded-2xl p-4 sm:p-6 lg:p-8 border border-blue-200'>
+        <div className='flex flex-col sm:flex-row items-start gap-4 sm:gap-6 mb-6 sm:mb-8'>
+          <div className='w-16 h-16 sm:w-20 sm:h-20 bg-blue-600 rounded-2xl flex items-center justify-center flex-shrink-0'>
+            <BookOpen className='w-8 h-8 sm:w-10 sm:h-10 text-white' />
           </div>
-          <div>
-            <h1 className='text-3xl font-bold text-gray-900 mb-2'>
+          <div className='text-center sm:text-left'>
+            <h1 className='text-2xl sm:text-3xl font-bold text-gray-900 mb-2'>
               Self Learning Resources
             </h1>
-            <p className='text-blue-600 font-medium'>
+            <p className='text-blue-600 font-medium text-sm sm:text-base'>
               Empowering Independent Study and Research
             </p>
           </div>
@@ -70,7 +70,7 @@ export default function SelfLearning() {
       </div>
 
       {/* Resource Cards */}
-      <div className='grid md:grid-cols-2 gap-6'>
+      <div className='grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6'>
         {resources.map((resource, index) => {
           const Icon = resource.icon;
           const colorClasses: Record<string, string> = {
@@ -86,14 +86,14 @@ export default function SelfLearning() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 + index * 0.1 }}
-              className='bg-white rounded-2xl p-8 shadow-lg border border-gray-200 hover:shadow-xl transition-shadow'>
+              className='bg-white rounded-2xl p-4 sm:p-6 lg:p-8 shadow-lg border border-gray-200 hover:shadow-xl transition-shadow'>
               
-              <div className='flex items-center gap-4 mb-6'>
-                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${colorClasses[resource.color]}`}>
-                  <Icon className='w-8 h-8' />
+              <div className='flex flex-col sm:flex-row items-start gap-3 sm:gap-4 mb-4 sm:mb-6'>
+                <div className={`w-12 h-12 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center flex-shrink-0 ${colorClasses[resource.color]}`}>
+                  <Icon className='w-6 h-6 sm:w-8 sm:h-8' />
                 </div>
-                <div>
-                  <h3 className='text-xl font-bold text-gray-900'>{resource.title}</h3>
+                <div className='text-center sm:text-left'>
+                  <h3 className='text-lg sm:text-xl font-bold text-gray-900 mb-1'>{resource.title}</h3>
                   <p className='text-gray-600 text-sm'>{resource.description}</p>
                 </div>
               </div>
@@ -121,26 +121,26 @@ export default function SelfLearning() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.6 }}
-        className='bg-white rounded-2xl p-8 shadow-lg border border-gray-200'>
-        <div className='flex items-center gap-4 mb-6'>
-          <div className='w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center'>
-            <Lightbulb className='w-8 h-8 text-white' />
+        className='bg-white rounded-2xl p-4 sm:p-6 lg:p-8 shadow-lg border border-gray-200'>
+        <div className='flex flex-col sm:flex-row items-start gap-3 sm:gap-4 mb-4 sm:mb-6'>
+          <div className='w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center flex-shrink-0'>
+            <Lightbulb className='w-6 h-6 sm:w-8 sm:h-8 text-white' />
           </div>
-          <div>
-            <h3 className='text-2xl font-bold text-gray-900'>Study Tips</h3>
-            <p className='text-gray-600'>Maximize your learning experience</p>
+          <div className='text-center sm:text-left'>
+            <h3 className='text-xl sm:text-2xl font-bold text-gray-900 mb-1'>Study Tips</h3>
+            <p className='text-gray-600 text-sm sm:text-base'>Maximize your learning experience</p>
           </div>
         </div>
         
-        <div className='grid md:grid-cols-2 gap-4'>
+        <div className='grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4'>
           {tips.map((tip, index) => (
             <motion.div
               key={tip}
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.4, delay: 0.8 + index * 0.1 }}
-              className='flex items-start gap-3 p-4 bg-yellow-50 rounded-xl'>
-              <div className='w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5'>
+              className='flex items-start gap-3 p-3 sm:p-4 bg-yellow-50 rounded-xl'>
+              <div className='w-5 h-5 sm:w-6 sm:h-6 bg-yellow-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5'>
                 <span className='text-white text-xs font-bold'>{index + 1}</span>
               </div>
               <p className='text-gray-700 text-sm leading-relaxed'>{tip}</p>
@@ -154,18 +154,18 @@ export default function SelfLearning() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 1.0 }}
-        className='bg-gradient-to-r from-green-50 to-emerald-100 rounded-2xl p-8 border border-green-200'>
-        <div className='flex items-center gap-4 mb-6'>
-          <div className='w-16 h-16 bg-green-600 rounded-2xl flex items-center justify-center'>
-            <Clock className='w-8 h-8 text-white' />
+        className='bg-gradient-to-r from-green-50 to-emerald-100 rounded-2xl p-4 sm:p-6 lg:p-8 border border-green-200'>
+        <div className='flex flex-col sm:flex-row items-start gap-3 sm:gap-4 mb-4 sm:mb-6'>
+          <div className='w-12 h-12 sm:w-16 sm:h-16 bg-green-600 rounded-2xl flex items-center justify-center flex-shrink-0'>
+            <Clock className='w-6 h-6 sm:w-8 sm:h-8 text-white' />
           </div>
-          <div>
-            <h3 className='text-2xl font-bold text-gray-900'>Optimal Study Hours</h3>
-            <p className='text-green-600 font-medium'>Best times for focused learning</p>
+          <div className='text-center sm:text-left'>
+            <h3 className='text-xl sm:text-2xl font-bold text-gray-900 mb-1'>Optimal Study Hours</h3>
+            <p className='text-green-600 font-medium text-sm sm:text-base'>Best times for focused learning</p>
           </div>
         </div>
         
-        <div className='grid md:grid-cols-3 gap-6'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6'>
           {[
             { time: 'Morning (9-12 PM)', benefit: 'Peak concentration', icon: '🌅' },
             { time: 'Afternoon (2-5 PM)', benefit: 'Group discussions', icon: '☀️' },
@@ -176,10 +176,10 @@ export default function SelfLearning() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 1.2 + index * 0.1 }}
-              className='text-center p-6 bg-white rounded-xl shadow-sm'>
-              <div className='text-4xl mb-3'>{period.icon}</div>
-              <h4 className='font-bold text-gray-900 mb-2'>{period.time}</h4>
-              <p className='text-green-600 text-sm font-medium'>{period.benefit}</p>
+              className='text-center p-4 sm:p-6 bg-white rounded-xl shadow-sm'>
+              <div className='text-3xl sm:text-4xl mb-2 sm:mb-3'>{period.icon}</div>
+              <h4 className='font-bold text-gray-900 mb-1 sm:mb-2 text-sm sm:text-base'>{period.time}</h4>
+              <p className='text-green-600 text-xs sm:text-sm font-medium'>{period.benefit}</p>
             </motion.div>
           ))}
         </div>

@@ -462,7 +462,7 @@ export default function AcademicCalendarPage() {
 		// Empty cells for days before the first day of the month
 		for (let i = 0; i < firstDay; i++) {
 			days.push(
-				<div key={`empty-${i}`} className="h-24 border border-gray-100 bg-gray-50/50"></div>
+				<div key={`empty-${i}`} className="h-16 sm:h-20 lg:h-24 border border-gray-100 bg-gray-50/50"></div>
 			);
 		}
 
@@ -476,22 +476,23 @@ export default function AcademicCalendarPage() {
 				<motion.div
 					key={day}
 					whileHover={{ scale: 1.02 }}
-					className={`h-24 border border-gray-100 p-2 cursor-pointer transition-all duration-200 hover:bg-blue-50 relative overflow-hidden ${
+					className={`h-16 sm:h-20 lg:h-24 border border-gray-100 p-1 sm:p-2 cursor-pointer transition-all duration-200 hover:bg-blue-50 relative overflow-hidden ${
 						isToday ? 'bg-blue-50 border-blue-300' : 'bg-white hover:shadow-sm'
 					}`}
 				>
-					<div className={`text-sm font-medium mb-1 ${
+					<div className={`text-xs sm:text-sm font-medium mb-1 ${
 						isToday ? 'text-blue-600' : 'text-gray-700'
 					}`}>
 						{day}
 						{isToday && (
-							<span className="ml-1 w-2 h-2 bg-blue-600 rounded-full inline-block"></span>
+							<span className="ml-1 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-600 rounded-full inline-block"></span>
 						)}
 					</div>
 					
 					{/* Event indicators */}
-					<div className="space-y-1">
-						{dayEvents.slice(0, 2).map((event, idx) => (
+					<div className="space-y-0.5 sm:space-y-1">
+						{/* Show first event on all screens */}
+						{dayEvents.slice(0, 1).map((event, idx) => (
 							<motion.div
 								key={event.id}
 								initial={{ opacity: 0, y: 5 }}
@@ -501,7 +502,29 @@ export default function AcademicCalendarPage() {
 									e.stopPropagation();
 									setSelectedEvent(event);
 								}}
-								className={`text-xs px-2 py-1 rounded-md cursor-pointer hover:opacity-80 transition-opacity ${
+								className={`text-xs px-1 sm:px-2 py-0.5 sm:py-1 rounded-md cursor-pointer hover:opacity-80 transition-opacity ${
+									eventTypeColors[event.type].badge
+								} truncate`}
+							>
+								<span className="hidden sm:inline">{event.title}</span>
+								<span className="sm:hidden">
+									{event.title.length > 8 ? event.title.substring(0, 8) + '...' : event.title}
+								</span>
+							</motion.div>
+						))}
+						
+						{/* Show second event only on larger screens */}
+						{dayEvents.slice(1, 2).map((event, idx) => (
+							<motion.div
+								key={event.id}
+								initial={{ opacity: 0, y: 5 }}
+								animate={{ opacity: 1, y: 0 }}
+								transition={{ delay: (idx + 1) * 0.1 }}
+								onClick={(e) => {
+									e.stopPropagation();
+									setSelectedEvent(event);
+								}}
+								className={`hidden sm:block text-xs px-2 py-1 rounded-md cursor-pointer hover:opacity-80 transition-opacity ${
 									eventTypeColors[event.type].badge
 								} truncate`}
 							>
@@ -509,9 +532,15 @@ export default function AcademicCalendarPage() {
 							</motion.div>
 						))}
 						
+						{/* More events indicator */}
 						{dayEvents.length > 2 && (
-							<div className="text-xs text-gray-500 px-2">
+							<div className="text-xs text-gray-500 px-1 sm:px-2 hidden sm:block">
 								+{dayEvents.length - 2} more
+							</div>
+						)}
+						{dayEvents.length > 1 && (
+							<div className="text-xs text-gray-500 px-1 sm:hidden">
+								+{dayEvents.length - 1} more
 							</div>
 						)}
 					</div>
@@ -549,7 +578,7 @@ export default function AcademicCalendarPage() {
 
 	return (
 		<motion.div 
-			className="space-y-6"
+			className="space-y-4 sm:space-y-6"
 			initial={{ opacity: 0 }}
 			animate={{ opacity: 1 }}
 			transition={{ duration: 0.8 }}
@@ -559,16 +588,16 @@ export default function AcademicCalendarPage() {
 				initial={{ opacity: 0, y: 30 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.8, delay: 0.1 }}
-				className="flex flex-col lg:flex-row lg:items-center lg:justify-between"
+				className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4"
 			>
 				<motion.div 
-					className="mb-4 lg:mb-0"
+					className="flex-1"
 					initial={{ x: -50, opacity: 0 }}
 					animate={{ x: 0, opacity: 1 }}
 					transition={{ duration: 0.6, delay: 0.2 }}
 				>
 					<motion.h1 
-						className="text-3xl font-bold text-gray-900 mb-2"
+						className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2"
 						initial={{ y: 20, opacity: 0 }}
 						animate={{ y: 0, opacity: 1 }}
 						transition={{ duration: 0.6, delay: 0.3 }}
@@ -576,7 +605,7 @@ export default function AcademicCalendarPage() {
 						Academic Calendar 2025-26
 					</motion.h1>
 					<motion.p 
-						className="text-gray-600"
+						className="text-sm sm:text-base text-gray-600"
 						initial={{ y: 20, opacity: 0 }}
 						animate={{ y: 0, opacity: 1 }}
 						transition={{ duration: 0.6, delay: 0.4 }}
@@ -587,33 +616,35 @@ export default function AcademicCalendarPage() {
 				
 				{/* View Toggle */}
 				<motion.div 
-					className="flex items-center gap-2"
+					className="flex items-center gap-2 w-full sm:w-auto"
 					initial={{ x: 50, opacity: 0 }}
 					animate={{ x: 0, opacity: 1 }}
 					transition={{ duration: 0.6, delay: 0.5 }}
 				>
-					<div className="bg-gray-100 rounded-lg p-1 flex">
+					<div className="bg-gray-100 rounded-lg p-1 flex w-full sm:w-auto">
 						<button
 							onClick={() => setViewMode('month')}
-							className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+							className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-all ${
 								viewMode === 'month' 
 									? 'bg-white text-gray-900 shadow-sm' 
 									: 'text-gray-600 hover:text-gray-900'
 							}`}
 						>
-							<Calendar className="w-4 h-4 mr-2 inline" />
-							Calendar
+							<Calendar className="w-4 h-4 mr-1 sm:mr-2 inline" />
+							<span className="hidden sm:inline">Calendar</span>
+							<span className="sm:hidden">Cal</span>
 						</button>
 						<button
 							onClick={() => setViewMode('agenda')}
-							className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+							className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-all ${
 								viewMode === 'agenda' 
 									? 'bg-white text-gray-900 shadow-sm' 
 									: 'text-gray-600 hover:text-gray-900'
 							}`}
 						>
-							<Eye className="w-4 h-4 mr-2 inline" />
-							Agenda
+							<Eye className="w-4 h-4 mr-1 sm:mr-2 inline" />
+							<span className="hidden sm:inline">Agenda</span>
+							<span className="sm:hidden">List</span>
 						</button>
 					</div>
 				</motion.div>
@@ -624,20 +655,20 @@ export default function AcademicCalendarPage() {
 				initial={{ opacity: 0, y: 30 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.8, delay: 0.6 }}
-				className="flex flex-wrap gap-2"
+				className="flex flex-wrap gap-2 sm:gap-3"
 			>
 				{filterButtons.map((filter) => (
 					<button
 						key={filter.key}
 						onClick={() => setSelectedFilter(filter.key as EventType | 'all')}
-						className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+						className={`px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 flex items-center gap-1 sm:gap-2 ${
 							selectedFilter === filter.key 
 								? `${filter.color} shadow-md scale-105` 
 								: 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
 						}`}
 					>
-						{filter.label}
-						<span className={`text-xs px-2 py-0.5 rounded-full ${
+						<span className="truncate">{filter.label}</span>
+						<span className={`text-xs px-1.5 sm:px-2 py-0.5 rounded-full flex-shrink-0 ${
 							selectedFilter === filter.key ? 'bg-white/30' : 'bg-gray-100'
 						}`}>
 							{filter.count}
@@ -653,16 +684,16 @@ export default function AcademicCalendarPage() {
 						initial={{ opacity: 0, y: 20 }}
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.6, delay: 0.2 }}
-						className="flex items-center justify-between bg-white rounded-xl shadow-sm border border-gray-200 p-4"
+						className="flex items-center justify-between bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-4"
 					>
 						<button
 							onClick={() => navigateMonth('prev')}
 							className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
 						>
-							<ChevronLeft className="w-5 h-5 text-gray-600" />
+							<ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
 						</button>
 						
-						<h2 className="text-xl font-bold text-gray-900">
+						<h2 className="text-lg sm:text-xl font-bold text-gray-900 text-center">
 							{monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
 						</h2>
 						
@@ -670,7 +701,7 @@ export default function AcademicCalendarPage() {
 							onClick={() => navigateMonth('next')}
 							className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
 						>
-							<ChevronRight className="w-5 h-5 text-gray-600" />
+							<ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
 						</button>
 					</motion.div>
 
@@ -684,8 +715,9 @@ export default function AcademicCalendarPage() {
 						{/* Day Headers */}
 						<div className="grid grid-cols-7 bg-gray-50">
 							{['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-								<div key={day} className="p-4 text-center text-sm font-medium text-gray-700 border-r border-gray-200 last:border-r-0">
-									{day}
+								<div key={day} className="p-2 sm:p-4 text-center text-xs sm:text-sm font-medium text-gray-700 border-r border-gray-200 last:border-r-0">
+									<span className="hidden sm:inline">{day}</span>
+									<span className="sm:hidden">{day.charAt(0)}</span>
 								</div>
 							))}
 						</div>
@@ -702,7 +734,7 @@ export default function AcademicCalendarPage() {
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.6, delay: 0.2 }}
-					className="space-y-4"
+					className="space-y-3 sm:space-y-4"
 				>
 					{filteredEvents
 						.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
@@ -717,50 +749,50 @@ export default function AcademicCalendarPage() {
 									animate={{ opacity: 1, x: 0 }}
 									transition={{ duration: 0.4, delay: index * 0.05 }}
 									onClick={() => setSelectedEvent(event)}
-									className={`${colorScheme.bg} ${colorScheme.border} border-l-4 rounded-lg p-6 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer`}
+									className={`${colorScheme.bg} ${colorScheme.border} border-l-4 rounded-lg p-4 sm:p-6 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer`}
 								>
-									<div className="flex items-center justify-between mb-4">
-										<div className="flex items-center gap-3">
-											<div className={`p-2 ${colorScheme.icon} rounded-lg ${colorScheme.text}`}>
+									<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4 gap-3">
+										<div className="flex items-center gap-3 min-w-0">
+											<div className={`p-2 ${colorScheme.icon} rounded-lg ${colorScheme.text} flex-shrink-0`}>
 												{icon}
 											</div>
-											<div>
-												<h3 className={`text-lg font-semibold ${colorScheme.text}`}>
+											<div className="min-w-0 flex-1">
+												<h3 className={`text-base sm:text-lg font-semibold ${colorScheme.text} truncate`}>
 													{event.title}
 												</h3>
-												<p className={`text-sm ${colorScheme.text} opacity-80`}>
+												<p className={`text-xs sm:text-sm ${colorScheme.text} opacity-80`}>
 													{formatDate(event.date, event.endDate)}
 												</p>
 											</div>
 										</div>
 										
-										<div className="flex items-center gap-2">
+										<div className="flex items-center gap-2 flex-wrap">
 											{event.priority === 'high' && (
-												<span className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full font-medium">
+												<span className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full font-medium flex-shrink-0">
 													High Priority
 												</span>
 											)}
-											<span className={`text-xs px-3 py-1 rounded-full capitalize font-medium ${colorScheme.badge}`}>
+											<span className={`text-xs px-2 sm:px-3 py-1 rounded-full capitalize font-medium ${colorScheme.badge} flex-shrink-0`}>
 												{event.type}
 											</span>
 										</div>
 									</div>
 									
-									<p className={`text-sm ${colorScheme.text} mb-3`}>
+									<p className={`text-xs sm:text-sm ${colorScheme.text} mb-3`}>
 										{event.description}
 									</p>
 									
 									{(event.time || event.location) && (
-										<div className="flex flex-wrap gap-4 text-xs">
+										<div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 sm:gap-4 text-xs">
 											{event.time && (
 												<div className="flex items-center gap-1">
-													<Clock className={`w-3 h-3 ${colorScheme.text}`} />
+													<Clock className={`w-3 h-3 ${colorScheme.text} flex-shrink-0`} />
 													<span className={colorScheme.text}>{event.time}</span>
 												</div>
 											)}
 											{event.location && (
 												<div className="flex items-center gap-1">
-													<MapPin className={`w-3 h-3 ${colorScheme.text}`} />
+													<MapPin className={`w-3 h-3 ${colorScheme.text} flex-shrink-0`} />
 													<span className={colorScheme.text}>{event.location}</span>
 												</div>
 											)}
@@ -787,18 +819,18 @@ export default function AcademicCalendarPage() {
 							animate={{ scale: 1, opacity: 1 }}
 							exit={{ scale: 0.95, opacity: 0 }}
 							onClick={(e) => e.stopPropagation()}
-							className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6"
+							className="bg-white rounded-2xl shadow-xl max-w-md w-full p-4 sm:p-6 max-h-[90vh] overflow-y-auto"
 						>
-							<div className="flex items-center justify-between mb-4">
-								<div className="flex items-center gap-3">
-									<div className={`p-3 ${eventTypeColors[selectedEvent.type].icon} rounded-lg ${eventTypeColors[selectedEvent.type].text}`}>
+							<div className="flex items-start justify-between mb-4 gap-3">
+								<div className="flex items-start gap-3 min-w-0 flex-1">
+									<div className={`p-2 sm:p-3 ${eventTypeColors[selectedEvent.type].icon} rounded-lg ${eventTypeColors[selectedEvent.type].text} flex-shrink-0`}>
 										{eventTypeIcons[selectedEvent.type]}
 									</div>
-									<div>
-										<h3 className="text-xl font-bold text-gray-900">
+									<div className="min-w-0 flex-1">
+										<h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">
 											{selectedEvent.title}
 										</h3>
-										<span className={`text-xs px-3 py-1 rounded-full ${eventTypeColors[selectedEvent.type].badge} capitalize`}>
+										<span className={`text-xs px-2 sm:px-3 py-1 rounded-full ${eventTypeColors[selectedEvent.type].badge} capitalize`}>
 											{selectedEvent.type}
 										</span>
 									</div>
@@ -806,19 +838,19 @@ export default function AcademicCalendarPage() {
 								
 								<button
 									onClick={() => setSelectedEvent(null)}
-									className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+									className="p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
 								>
-									<X className="w-5 h-5 text-gray-500" />
+									<X className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500" />
 								</button>
 							</div>
 							
-							<p className="text-gray-700 mb-6">
+							<p className="text-sm sm:text-base text-gray-700 mb-6">
 								{selectedEvent.description}
 							</p>
 							
 							<div className="space-y-3">
 								<div className="flex items-center gap-3">
-									<Calendar className="w-4 h-4 text-gray-500" />
+									<Calendar className="w-4 h-4 text-gray-500 flex-shrink-0" />
 									<span className="text-sm text-gray-700">
 										{formatDate(selectedEvent.date, selectedEvent.endDate)}
 									</span>
@@ -826,21 +858,21 @@ export default function AcademicCalendarPage() {
 								
 								{selectedEvent.time && (
 									<div className="flex items-center gap-3">
-										<Clock className="w-4 h-4 text-gray-500" />
+										<Clock className="w-4 h-4 text-gray-500 flex-shrink-0" />
 										<span className="text-sm text-gray-700">{selectedEvent.time}</span>
 									</div>
 								)}
 								
 								{selectedEvent.location && (
 									<div className="flex items-center gap-3">
-										<MapPin className="w-4 h-4 text-gray-500" />
+										<MapPin className="w-4 h-4 text-gray-500 flex-shrink-0" />
 										<span className="text-sm text-gray-700">{selectedEvent.location}</span>
 									</div>
 								)}
 								
 								{selectedEvent.semester && (
 									<div className="flex items-center gap-3">
-										<GraduationCap className="w-4 h-4 text-gray-500" />
+										<GraduationCap className="w-4 h-4 text-gray-500 flex-shrink-0" />
 										<span className="text-sm text-gray-700">{selectedEvent.semester}</span>
 									</div>
 								)}
