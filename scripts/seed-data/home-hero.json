@@ -1,0 +1,17 @@
+{
+  "slides": [
+    {
+      "title": "Welcome to BPIT",
+      "subtitle": "Shaping Tomorrow's Innovators",
+      "description": "A Unit of Bhartiya Brahmin Charitable Trust (Regd.). Approved by AICTE, MoE. Affiliated to GGSIPU, Delhi.",
+      "image": "https://images.unsplash.com/photo-1562774053-701939374585?w=1200&q=80",
+      "icon": "Award",
+      "stats": "NBA Accredited Institution",
+      "cta": { "label": "Apply Now", "isEnquiry": true },
+      "secondary_cta": { "label": "Explore Programs", "href": "/admissions" }
+    }
+  ]
+}
+
+
+
