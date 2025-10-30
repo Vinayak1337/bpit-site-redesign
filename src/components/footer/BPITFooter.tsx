@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -27,7 +27,13 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
-const BPITFooter = () => {
+const BPITFooter = ({
+  contactInfoData,
+  bottomLeftContent,
+}: {
+  contactInfoData: FooterContactInfoData;
+  bottomLeftContent: FooterBottomLeftContent;
+}) => {
 	const [expandedSection, setExpandedSection] = useState<string | null>(null);
 	const [isVisible, setIsVisible] = useState(false);
 	const [showScrollTop, setShowScrollTop] = useState(false);
@@ -167,29 +173,13 @@ const BPITFooter = () => {
 		}
 	];
 
-	const contactInfo = [
-		{
-			icon: MapPin,
-			title: 'Campus Address',
-			text: 'Bhagwan Parshuram Institute of Technology, Rohini Sector-17, New Delhi - 110089',
-			href: 'https://www.google.com/maps/place/Bhagwan+Parshuram+Institute+of+Technology/@28.7366529,77.1097591,17z',
-			type: 'link'
-		},
-		{
-			icon: Phone,
-			title: 'Phone Numbers',
-			text: '011-2757 1080, 011-2757 2900',
-			href: 'tel:01127571080',
-			type: 'link'
-		},
-		{
-			icon: Mail,
-			title: 'Email Address',
-			text: 'bpitindia@yahoo.com',
-			href: 'mailto:bpitindia@yahoo.com',
-			type: 'link'
-		}
-	];
+    const contactInfo = contactInfoData.items.map((item) => ({
+      icon: item.key === 'address' ? MapPin : item.key === 'phone' ? Phone : Mail,
+      title: item.title,
+      text: item.text,
+      href: item.href,
+      type: 'link',
+    }));
 
 	const achievements = [
 		{
@@ -563,11 +553,10 @@ const BPITFooter = () => {
 						<div className='flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6'>
 							<div className='text-center sm:text-left'>
 								<p className='text-white/80 text-xs sm:text-sm'>
-									© 2024 Bhagwan Parshuram Institute of Technology. All rights
-									reserved.
+									{bottomLeftContent.copyright}
 								</p>
 								<p className='text-white/60 text-xs mt-1'>
-									Affiliated to GGSIPU | NBA Accredited | NAAC Certified
+									{bottomLeftContent.accreditation}
 								</p>
 							</div>
 

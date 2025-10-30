@@ -2,58 +2,60 @@
 import { motion } from 'framer-motion';
 import { GraduationCap, Target, MapPin, Phone } from 'lucide-react';
 
-const FinalCTA = () => {
-    return (
-        <section className="py-16 bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 text-white">
-            <div className="container mx-auto px-4">
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8 }}
-                    className="text-center"
-                >
-                    <div className="w-24 h-24 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-8 backdrop-blur-sm">
-                        <GraduationCap className="w-12 h-12" />
-                    </div>
-                    <h2 className="text-4xl md:text-5xl font-bold mb-6">
-                        Ready to become a part of the BPIT family?
-                    </h2>
-                    <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
-                        Join thousands of successful engineers who started their journey at BPIT
-                    </p>
+type CTAButton = { label: string; href: string; icon?: 'target' | 'map' | 'phone' };
+type FinalCTAData = { title: string; subtitle: string; ctas: CTAButton[] };
 
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-4 rounded-2xl font-semibold transition-all duration-300 shadow-2xl flex items-center gap-3 justify-center"
-                        >
-                            <Target className="w-5 h-5" />
-                            Apply Now
-                        </motion.button>
+const iconFor = (icon?: CTAButton['icon']) => {
+  switch (icon) {
+    case 'target':
+      return <Target className="w-5 h-5" />;
+    case 'map':
+      return <MapPin className="w-5 h-5" />;
+    case 'phone':
+      return <Phone className="w-5 h-5" />;
+    default:
+      return null;
+  }
+};
 
-                        <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white border border-white/20 px-8 py-4 rounded-2xl font-semibold transition-all duration-300 flex items-center gap-3 justify-center"
-                        >
-                            <MapPin className="w-5 h-5" />
-                            Book Campus Visit
-                        </motion.button>
+const FinalCTA = ({ data }: { data: FinalCTAData }) => {
+  return (
+    <section className="py-16 bg-gradient-to-br from-blue-700 to-blue-900 text-white">
+      <div className="container mx-auto px-4">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center"
+        >
+          <div className="w-20 h-20 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-6 backdrop-blur-sm">
+            <GraduationCap className="w-10 h-10" />
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">{data.title}</h2>
+          <p className="text-base md:text-lg text-blue-100 mb-6 max-w-3xl mx-auto">{data.subtitle}</p>
 
-                        <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white border border-white/20 px-8 py-4 rounded-2xl font-semibold transition-all duration-300 flex items-center gap-3 justify-center"
-                        >
-                            <Phone className="w-5 h-5" />
-                            Talk to a Counselor
-                        </motion.button>
-                    </div>
-                </motion.div>
-            </div>
-        </section>
-    );
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            {data.ctas.map((cta, idx) => (
+              <motion.a
+                key={`${cta.label}-${idx}`}
+                href={cta.href}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                className={
+                  idx === 0
+                    ? 'bg-white text-blue-900 px-6 py-3 rounded-xl font-semibold shadow-sm flex items-center gap-2 justify-center'
+                    : 'bg-white/10 backdrop-blur-sm hover:bg-white/15 text-white border border-white/20 px-6 py-3 rounded-xl font-semibold flex items-center gap-2 justify-center'
+                }
+              >
+                {iconFor(cta.icon)}
+                {cta.label}
+              </motion.a>
+            ))}
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  );
 };
 
 export default FinalCTA;

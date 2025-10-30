@@ -78,3 +78,42 @@ interface EventsSectionData {
 interface EventsSectionProps {
 	data: EventsSectionData;
 }
+
+// Header contact bar data shape
+interface HeaderContactUsData {
+	phone: { tel: string; display: string };
+	email: string;
+	address: string;
+	mapUrl: string;
+	accreditation: { mobile: string; desktop: string };
+}
+
+// Header important announcements bar data shape
+interface HeaderAnnouncementItem {
+	title: string;
+	href: string;
+}
+
+interface HeaderAnnouncementsData {
+	items: HeaderAnnouncementItem[];
+	labels: { desktop: string; mobile: string };
+}
+
+// Footer data shapes
+type FooterContactType = 'address' | 'phone' | 'email';
+
+interface FooterContactInfoItem {
+	key: FooterContactType;
+	title: string;
+	text: string;
+	href: string;
+}
+
+interface FooterContactInfoData {
+	items: FooterContactInfoItem[];
+}
+
+interface FooterBottomLeftContent {
+	copyright: string;
+	accreditation: string;
+}

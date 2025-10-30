@@ -5,31 +5,11 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Bell } from 'lucide-react';
 
-const importantAnnouncements = [
-	{
-		title: 'Admission 2024-25 Session Open - Apply Now',
-		href: '/admissions/apply'
-	},
-
-	{
-		title: 'Placement Drive 2024 - Register Today',
-		href: '/placements/register'
-	},
-	{
-		title: 'Annual Tech Fest "INNOVATE 2024" - March 15-17',
-		href: '/events/tech-fest'
-	},
-	{
-		title: 'Library New Books Collection Available',
-		href: '/library'
-	},
-	{
-		title: 'Scholarship Applications Open - Merit & Need Based',
-		href: '/admissions/scholarship'
-	}
-];
-
-const ImportantAnnouncement = () => {
+const ImportantAnnouncement = ({
+  data,
+}: {
+  data: HeaderAnnouncementsData;
+}) => {
 	const desktopLabelRef = useRef<HTMLDivElement>(null);
 	const mobileLabelRef = useRef<HTMLDivElement>(null);
 
@@ -147,8 +127,8 @@ const ImportantAnnouncement = () => {
 						className='flex-shrink-0 px-4 lg:px-6 font-semibold text-sm border-r border-blue-400'>
 						<span className='flex items-center gap-2'>
 							<Bell className='w-4 h-4' />
-							<span className='hidden lg:inline'>Important Announcements:</span>
-							<span className='lg:hidden'>News:</span>
+							<span className='hidden lg:inline'>{data.labels.desktop}</span>
+							<span className='lg:hidden'>{data.labels.mobile}</span>
 						</span>
 					</div>
 					<div className='flex-1 overflow-hidden' ref={desktopContainerRef}>
@@ -164,7 +144,7 @@ const ImportantAnnouncement = () => {
 									  }
 									: {}
 							}>
-							{importantAnnouncements.map((announcement, index) => (
+							{data.items.map((announcement, index) => (
 								<Link
 									key={index}
 									href={announcement.href}
@@ -172,7 +152,7 @@ const ImportantAnnouncement = () => {
 									{announcement.title}
 								</Link>
 							))}
-							{importantAnnouncements.map((announcement, index) => (
+							{data.items.map((announcement, index) => (
 								<Link
 									key={`desktop-clone-${index}`}
 									href={announcement.href}
@@ -200,7 +180,7 @@ const ImportantAnnouncement = () => {
 						className='flex-shrink-0 px-3 sm:px-4 font-semibold text-xs sm:text-sm border-r border-blue-400'>
 						<span className='flex items-center gap-1 sm:gap-2'>
 							<Bell className='w-3 h-3 sm:w-4 sm:h-4' />
-							<span className='hidden sm:inline'>News:</span>
+							<span className='hidden sm:inline'>{data.labels.mobile}</span>
 							<span className='sm:hidden'>📢</span>
 						</span>
 					</div>
@@ -217,7 +197,7 @@ const ImportantAnnouncement = () => {
 									  }
 									: {}
 							}>
-							{importantAnnouncements.map((announcement, index) => (
+							{data.items.map((announcement, index) => (
 								<Link
 									key={index}
 									href={announcement.href}
@@ -225,7 +205,7 @@ const ImportantAnnouncement = () => {
 									{announcement.title}
 								</Link>
 							))}
-							{importantAnnouncements.map((announcement, index) => (
+							{data.items.map((announcement, index) => (
 								<Link
 									key={`mobile-clone-${index}`}
 									href={announcement.href}

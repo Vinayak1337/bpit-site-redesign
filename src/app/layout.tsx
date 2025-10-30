@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import Header from '@/components/header/header';
+import { getHeaderData } from '@/app/actions/header';
+import { getFooterData } from '@/app/actions/footer';
 import Footer from '@/components/footer/BPITFooter';
 import EnquiryPopup from '@/components/pop-up/enquiry-popup';
 
@@ -96,11 +98,15 @@ const structuredData = {
 	description: 'Development version - not for public use'
 };
 
-export default function RootLayout({
+export default async function RootLayout({
 	children
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
+	const [{ contactData, announcementsData }, { contactInfoData, bottomLeftContent }] = await Promise.all([
+		getHeaderData(),
+		getFooterData()
+	]);
 	return (
 		<html lang='en'>
 			<head>
@@ -113,9 +119,9 @@ export default function RootLayout({
 			</head>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}>
-				<Header />
+				<Header contactData={contactData} announcementsData={announcementsData} />
 				{children}
-				<Footer />
+				<Footer contactInfoData={contactInfoData} bottomLeftContent={bottomLeftContent} />
 				<EnquiryPopup />
 			</body>
 		</html>

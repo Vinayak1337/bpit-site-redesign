@@ -219,7 +219,7 @@ const Navbar = () => {
 	const departmentItems = [
 		{
 			title: 'Computer Science & Engineering',
-			href: '/departments/cse',
+			href: 'https://cse.bpitindia.ac.in',
 			description:
 				'Software development, algorithms, and programming expertise',
 			icon: (
@@ -228,9 +228,21 @@ const Navbar = () => {
 				</div>
 			)
 		},
+		// CSE-DS
+		{
+			title: 'Computer Science & Engineering - Data Science',
+			href: 'https://cse-ds.bpitindia.ac.in',
+			description:
+				'Data science, machine learning, and artificial intelligence',
+			icon: (
+				<div className='w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center'>
+					<span className='text-blue-600 font-semibold text-xs'>CSE-DS</span>
+				</div>
+			)
+		},
 		{
 			title: 'Information Technology',
-			href: '/departments/it',
+			href: 'https://it.bpitindia.ac.in',
 			description: 'Network systems, cybersecurity, and IT infrastructure',
 			icon: (
 				<div className='w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center'>
@@ -240,7 +252,7 @@ const Navbar = () => {
 		},
 		{
 			title: 'Electronics & Communication',
-			href: '/departments/ece',
+			href: 'https://ece.bpitindia.ac.in',
 			description: 'Circuit design, telecommunications, and embedded systems',
 			icon: (
 				<div className='w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center'>
@@ -250,7 +262,7 @@ const Navbar = () => {
 		},
 		{
 			title: 'Electrical & Electronics',
-			href: '/departments/eee',
+			href: 'https://eee.bpitindia.ac.in',
 			description: 'Power systems, automation, and electrical machinery',
 			icon: (
 				<div className='w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center'>
@@ -258,9 +270,20 @@ const Navbar = () => {
 				</div>
 			)
 		},
+		// Applied Sciences
+		{
+			title: 'Applied Sciences',
+			href: 'https://applied-sciences.bpitindia.ac.in',
+			description: 'Applied sciences and mathematics',
+			icon: (
+				<div className='w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center'>
+					<span className='text-gray-600 font-semibold text-xs'>AS</span>
+				</div>
+			)
+		},
 		{
 			title: 'Management Programs',
-			href: '/departments/mba',
+			href: 'https://sba.bpitindia.ac.in',
 			description: 'Business administration and management studies',
 			icon: (
 				<div className='w-8 h-8 bg-rose-100 rounded-lg flex items-center justify-center'>
@@ -418,7 +441,7 @@ const Navbar = () => {
 													<ListItem
 														key={item.title}
 														title={item.title}
-														href={item.href}
+														href={item.href ?? '/'}
 														icon={item.icon}>
 														{item.description}
 													</ListItem>
@@ -441,7 +464,7 @@ const Navbar = () => {
 													<ListItem
 														key={item.title}
 														title={item.title}
-														href={item.href}
+														href={item.href ?? '/'}
 														icon={item.icon}>
 														{item.description}
 													</ListItem>
@@ -464,7 +487,7 @@ const Navbar = () => {
 													<ListItem
 														key={item.title}
 														title={item.title}
-														href={item.href}
+														href={item.href ?? '/'}
 														icon={item.icon}>
 														{item.description}
 													</ListItem>
@@ -487,7 +510,7 @@ const Navbar = () => {
 													<ListItem
 														key={item.title}
 														title={item.title}
-														href={item.href}
+														href={item.href ?? '/'}
 														icon={item.icon}>
 														{item.description}
 													</ListItem>
@@ -515,7 +538,7 @@ const Navbar = () => {
 													<ListItem
 														key={item.title}
 														title={item.title}
-														href={item.href}
+														href={item.href ?? '/'}
 														icon={item.icon}>
 														{item.description}
 													</ListItem>
@@ -538,7 +561,7 @@ const Navbar = () => {
 													<ListItem
 														key={item.title}
 														title={item.title}
-														href={item.href}
+														href={item.href ?? '/'}
 														icon={item.icon}>
 														{item.description}
 													</ListItem>
@@ -561,7 +584,7 @@ const Navbar = () => {
 													<ListItem
 														key={item.title}
 														title={item.title}
-														href={item.href}
+														href={item.href ?? '/'}
 														icon={item.icon}>
 														{item.description}
 													</ListItem>
@@ -616,8 +639,12 @@ const Navbar = () => {
 							window.dispatchEvent(event);
 						}}>
 						<GraduationCap className='w-4 h-4 sm:w-5 sm:h-5 group-hover:rotate-12 transition-transform' />
-						<span className='hidden sm:inline group-hover:translate-x-1 transition-transform'>Enquire Now</span>
-						<span className='sm:hidden group-hover:translate-x-1 transition-transform'>Enquiry</span>
+						<span className='hidden sm:inline group-hover:translate-x-1 transition-transform'>
+							Enquire Now
+						</span>
+						<span className='sm:hidden group-hover:translate-x-1 transition-transform'>
+							Enquiry
+						</span>
 					</motion.button>
 				</AnimatePresence>
 			)}
