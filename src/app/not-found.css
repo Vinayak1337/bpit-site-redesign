@@ -2,7 +2,8 @@
 	box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
 	margin: 0;
 	padding: 0;
 }
@@ -13,7 +14,8 @@ html, body {
 	align-items: center;
 	justify-content: center;
 	background: linear-gradient(135deg, #0b1f63 0%, #123386 50%, #0b1f63 100%);
-	font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+	font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial,
+		sans-serif;
 	line-height: 1.5;
 	isolation: isolate;
 }
@@ -60,5 +62,3 @@ html, body {
 	background: #f3f4f6;
 	color: #0a1b55;
 }
-
-
