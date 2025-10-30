@@ -5,6 +5,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
+import { createAuditLog } from '@/lib/audit';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 
@@ -118,7 +119,27 @@ const { email, name, password, role } = parsed.data;
     }
 
     const passwordHash = await bcrypt.hash(password, 12);
-    await prisma.adminUser.create({ data: { email, name, passwordHash, role } });
+    const created = await prisma.adminUser.create({ data: { email, name, passwordHash, role } });
+
+    // audit log: user creation
+    await createAuditLog({
+        actorId: current.id,
+        action: 'CREATE',
+        resourceType: 'USER',
+        summary: `Created user ${email} (${role})`,
+        changes: [
+            {
+                resourceId: created.id,
+                resourceType: 'USER',
+                newData: {
+                    id: created.id,
+                    email: created.email,
+                    name: created.name ?? null,
+                    role: created.role
+                }
+            }
+        ]
+    });
 
     redirect('/admin?created=1');
 }
@@ -147,7 +168,30 @@ export async function deleteAdminUser(formData: FormData): Promise<void> {
 		}
 	}
 
-	await prisma.adminUser.delete({ where: { id: userId } });
+    const toDelete = await prisma.adminUser.findUnique({ where: { id: userId } });
+    await prisma.adminUser.delete({ where: { id: userId } });
+
+    if (toDelete) {
+        // audit log: user deletion
+        await createAuditLog({
+            actorId: current.id,
+            action: 'DELETE',
+            resourceType: 'USER',
+            summary: `Deleted user ${toDelete.email} (${toDelete.role})`,
+            changes: [
+                {
+                    resourceId: toDelete.id,
+                    resourceType: 'USER',
+                    previousData: {
+                        id: toDelete.id,
+                        email: toDelete.email,
+                        name: toDelete.name ?? null,
+                        role: toDelete.role
+                    }
+                }
+            ]
+        });
+    }
 	redirect('/admin?deleted=1');
 }
 

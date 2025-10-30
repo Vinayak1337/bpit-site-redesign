@@ -21,9 +21,9 @@ import {
 } from 'lucide-react';
 
 const ProgramDetailsPage = () => {
-    const params = useParams();
+    const params = useParams<{ programId?: string }>();
     const router = useRouter();
-    const programId = params.programId as string;
+    const programId = (params?.programId ?? '').toString();
     
     const [activeSection, setActiveSection] = useState('offering');
 

@@ -165,7 +165,7 @@ const LibrarySidebar = () => {
 		if (href === '/library') {
 			return pathname === '/library';
 		}
-		return pathname.startsWith(href);
+		return pathname?.startsWith(href) ?? false;
 	};
 
 	return (

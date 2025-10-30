@@ -46,7 +46,7 @@ const AcademiaSidebar = () => {
 		if (href === '/academia') {
 			return pathname === '/academia';
 		}
-		return pathname.startsWith(href);
+		return pathname?.startsWith(href) ?? false;
 	};
 
 	return (
