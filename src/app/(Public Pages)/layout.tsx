@@ -103,10 +103,10 @@ export default async function RootLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const [{ contactData, announcementsData }, { contactInfoData, bottomLeftContent }] = await Promise.all([
-		getHeaderData(),
-		getFooterData()
-	]);
+	const [
+		{ contactData, announcementsData },
+		{ contactInfoData, bottomLeftContent }
+	] = await Promise.all([getHeaderData(), getFooterData()]);
 	return (
 		<html lang='en'>
 			<head>
@@ -119,9 +119,15 @@ export default async function RootLayout({
 			</head>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}>
-				<Header contactData={contactData} announcementsData={announcementsData} />
+				<Header
+					contactData={contactData}
+					announcementsData={announcementsData}
+				/>
 				{children}
-				<Footer contactInfoData={contactInfoData} bottomLeftContent={bottomLeftContent} />
+				<Footer
+					contactInfoData={contactInfoData}
+					bottomLeftContent={bottomLeftContent}
+				/>
 				<EnquiryPopup />
 			</body>
 		</html>
