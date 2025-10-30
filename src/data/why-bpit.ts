@@ -22,5 +22,5 @@ export const whyBpitFinalCta = {
     { label: 'Book Campus Visit', href: '/admissions/campus-tour', icon: 'map' },
     { label: 'Talk to a Counselor', href: '/contact', icon: 'phone' },
   ],
-};
+} as const;
 
