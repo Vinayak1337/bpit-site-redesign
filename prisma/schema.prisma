@@ -18,27 +18,27 @@ enum PageStatus {
 }
 
 model Page {
-  id        String       @id @default(auto()) @map("_id") @db.ObjectId
-  slug      String       @unique
-  title     String
-  kind      PageKind
-  status    PageStatus
-  seo       Json?
-  metadata  Json?
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
+  id         String      @id @default(auto()) @map("_id") @db.ObjectId
+  slug       String      @unique
+  title      String
+  kind       PageKind
+  status     PageStatus
+  seo        Json?
+  metadata   Json?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
   components Component[]
 }
 
 model Component {
-  id        String        @id @default(auto()) @map("_id") @db.ObjectId
-  pageId    String        @db.ObjectId
-  page      Page          @relation(fields: [pageId], references: [id])
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  pageId    String   @db.ObjectId
+  page      Page     @relation(fields: [pageId], references: [id])
   data      Json
   order     Int
   key       String?
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([pageId, order])
   @@index([pageId])
@@ -50,15 +50,15 @@ enum AdminRole {
 }
 
 model AdminUser {
-  id           String       @id @default(auto()) @map("_id") @db.ObjectId
-  email        String       @unique
+  id           String         @id @default(auto()) @map("_id") @db.ObjectId
+  email        String         @unique
   name         String?
   passwordHash String
-  role         AdminRole    @default(ADMIN)
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+  role         AdminRole      @default(ADMIN)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
   sessions     AdminSession[]
-  logs         AuditLog[]   @relation("AdminUserToAuditLog")
+  logs         AuditLog[]     @relation("AdminUserToAuditLog")
 }
 
 model AdminSession {
@@ -82,24 +82,24 @@ enum AuditAction {
 }
 
 model AuditLog {
-  id           String          @id @default(auto()) @map("_id") @db.ObjectId
-  actorId      String          @db.ObjectId
-  actor        AdminUser       @relation("AdminUserToAuditLog", fields: [actorId], references: [id])
+  id           String           @id @default(auto()) @map("_id") @db.ObjectId
+  actorId      String           @db.ObjectId
+  actor        AdminUser        @relation("AdminUserToAuditLog", fields: [actorId], references: [id])
   action       AuditAction
   resourceType String
   summary      String?
   count        Int?
   metadata     Json?
-  createdAt    DateTime        @default(now())
+  createdAt    DateTime         @default(now())
   changes      AuditLogChange[]
 
   @@index([actorId, createdAt])
 }
 
 model AuditLogChange {
-  id           String    @id @default(auto()) @map("_id") @db.ObjectId
-  logId        String    @db.ObjectId
-  log          AuditLog  @relation(fields: [logId], references: [id])
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  logId        String   @db.ObjectId
+  log          AuditLog @relation(fields: [logId], references: [id])
   resourceId   String
   resourceType String?
   field        String?

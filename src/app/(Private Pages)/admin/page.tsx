@@ -1,93 +1,160 @@
-import { requireAdmin, logoutAdmin, createAdminUser, deleteAdminUser } from '@/app/(Private Pages)/admin/actions/admin-auth';
 import { prisma } from '@/lib/prisma';
+import {
+	requireAdmin,
+	logoutAdmin,
+	createAdminUser,
+	deleteAdminUser
+} from '@/app/(Private Pages)/actions/admin-auth';
 
 export default async function AdminDashboardPage() {
-    const admin = await requireAdmin();
-    const users = await prisma.adminUser.findMany({ select: { id: true, email: true, role: true, createdAt: true }, orderBy: { createdAt: 'desc' } });
-    return (
-        <div className='min-h-screen p-8 bg-gradient-to-br from-blue-50 to-white'>
-            <div className='max-w-5xl mx-auto bg-white rounded-2xl shadow-md border border-blue-100 p-6'>
-                <div className='flex items-center justify-between'>
-                    <div>
-                        <h1 className='text-2xl font-semibold text-blue-900'>Admin Dashboard</h1>
-                        <p className='text-sm text-blue-600'>Signed in as {admin.email} ({admin.role})</p>
-                    </div>
-                    <form action={logoutAdmin}>
-                        <button type='submit' className='px-3 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium'>Logout</button>
-                    </form>
-                </div>
+	const admin = await requireAdmin();
+	const users = await prisma.adminUser.findMany({
+		select: { id: true, email: true, role: true, createdAt: true },
+		orderBy: { createdAt: 'desc' }
+	});
+	return (
+		<div className='min-h-screen p-8 bg-gradient-to-br from-blue-50 to-white'>
+			<div className='max-w-5xl mx-auto bg-white rounded-2xl shadow-md border border-blue-100 p-6'>
+				<div className='flex items-center justify-between'>
+					<div>
+						<h1 className='text-2xl font-semibold text-blue-900'>
+							Admin Dashboard
+						</h1>
+						<p className='text-sm text-blue-600'>
+							Signed in as {admin.email} ({admin.role})
+						</p>
+					</div>
+					<form action={logoutAdmin}>
+						<button
+							type='submit'
+							className='px-3 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium'>
+							Logout
+						</button>
+					</form>
+				</div>
 
-                <div className='mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8'>
-                    {admin.role === 'ADMIN' ? (
-                        <div>
-                            <h2 className='text-lg font-semibold text-blue-900 mb-3'>Create User</h2>
-                            <form action={createAdminUser} className='space-y-3'>
-                                <div>
-                                    <label htmlFor='email' className='block text-sm font-medium text-blue-900'>Email</label>
-                                    <input id='email' name='email' type='email' required className='mt-1 w-full border border-blue-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500' />
-                                </div>
-                                <div>
-                                    <label htmlFor='name' className='block text-sm font-medium text-blue-900'>Name</label>
-                                    <input id='name' name='name' type='text' className='mt-1 w-full border border-blue-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500' />
-                                </div>
-                                <div>
-                                    <label htmlFor='password' className='block text-sm font-medium text-blue-900'>Password</label>
-                                    <input id='password' name='password' type='password' required className='mt-1 w-full border border-blue-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500' />
-                                </div>
-                                <div>
-                                    <label htmlFor='role' className='block text-sm font-medium text-blue-900'>Role</label>
-                                    <select id='role' name='role' defaultValue='EDITOR' className='mt-1 w-full border border-blue-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500'>
-                                        <option value='EDITOR'>EDITOR</option>
-                                        <option value='ADMIN'>ADMIN</option>
-                                    </select>
-                                </div>
-                                <button type='submit' className='px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold'>Create</button>
-                            </form>
-                        </div>
-                    ) : null}
-                    <div>
-                        <h2 className='text-lg font-semibold text-blue-900 mb-3'>Users</h2>
-                        <div className='overflow-x-auto border border-blue-100 rounded-md'>
-                            <table className='min-w-full text-sm'>
-                                <thead className='bg-blue-50 text-blue-900'>
-                                    <tr>
-                                        <th className='text-left px-3 py-2'>Email</th>
-                                        <th className='text-left px-3 py-2'>Role</th>
-                                        <th className='text-left px-3 py-2'>Created</th>
-                                        {admin.role === 'ADMIN' ? <th className='text-left px-3 py-2'>Actions</th> : null}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {users.map(u => (
-                                        <tr key={u.id} className='border-t border-blue-100'>
-                                            <td className='px-3 py-2'>{u.email}</td>
-                                            <td className='px-3 py-2'>{u.role}</td>
-                                            <td className='px-3 py-2'>{new Date(u.createdAt).toLocaleString()}</td>
-                                            {admin.role === 'ADMIN' ? (
-                                                <td className='px-3 py-2'>
-                                                    {u.id !== admin.id ? (
-                                                        <form action={deleteAdminUser}>
-                                                            <input type='hidden' name='userId' value={u.id} />
-                                                            <button type='submit' className='px-2 py-1 rounded-md bg-red-600 hover:bg-red-700 text-white text-xs font-semibold'>Delete</button>
-                                                        </form>
-                                                    ) : (
-                                                        <span className='text-xs text-slate-400'>You</span>
-                                                    )}
-                                                </td>
-                                            ) : null}
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+				<div className='mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8'>
+					{admin.role === 'ADMIN' ? (
+						<div>
+							<h2 className='text-lg font-semibold text-blue-900 mb-3'>
+								Create User
+							</h2>
+							<form action={createAdminUser} className='space-y-3'>
+								<div>
+									<label
+										htmlFor='email'
+										className='block text-sm font-medium text-blue-900'>
+										Email
+									</label>
+									<input
+										id='email'
+										name='email'
+										type='email'
+										required
+										className='mt-1 w-full border border-blue-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+									/>
+								</div>
+								<div>
+									<label
+										htmlFor='name'
+										className='block text-sm font-medium text-blue-900'>
+										Name
+									</label>
+									<input
+										id='name'
+										name='name'
+										type='text'
+										className='mt-1 w-full border border-blue-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+									/>
+								</div>
+								<div>
+									<label
+										htmlFor='password'
+										className='block text-sm font-medium text-blue-900'>
+										Password
+									</label>
+									<input
+										id='password'
+										name='password'
+										type='password'
+										required
+										className='mt-1 w-full border border-blue-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+									/>
+								</div>
+								<div>
+									<label
+										htmlFor='role'
+										className='block text-sm font-medium text-blue-900'>
+										Role
+									</label>
+									<select
+										id='role'
+										name='role'
+										defaultValue='EDITOR'
+										className='mt-1 w-full border border-blue-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500'>
+										<option value='EDITOR'>EDITOR</option>
+										<option value='ADMIN'>ADMIN</option>
+									</select>
+								</div>
+								<button
+									type='submit'
+									className='px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold'>
+									Create
+								</button>
+							</form>
+						</div>
+					) : null}
 
-                <div className='mt-6 text-blue-800'>
-                    <p>Welcome! Your admin CMS will render pages here.</p>
-                </div>
-            </div>
-        </div>
-    );
+					<div>
+						<h2 className='text-lg font-semibold text-blue-900 mb-3'>Users</h2>
+						<div className='overflow-x-auto border border-blue-100 rounded-md'>
+							<table className='min-w-full text-sm'>
+								<thead className='bg-blue-50 text-blue-900'>
+									<tr>
+										<th className='text-left px-3 py-2'>Email</th>
+										<th className='text-left px-3 py-2'>Role</th>
+										<th className='text-left px-3 py-2'>Created</th>
+										{admin.role === 'ADMIN' ? (
+											<th className='text-left px-3 py-2'>Actions</th>
+										) : null}
+									</tr>
+								</thead>
+								<tbody>
+									{users.map(u => (
+										<tr key={u.id} className='border-t border-blue-100'>
+											<td className='px-3 py-2'>{u.email}</td>
+											<td className='px-3 py-2'>{u.role}</td>
+											<td className='px-3 py-2'>
+												{new Date(u.createdAt).toLocaleString()}
+											</td>
+											{admin.role === 'ADMIN' ? (
+												<td className='px-3 py-2'>
+													{u.id !== admin.id ? (
+														<form action={deleteAdminUser}>
+															<input type='hidden' name='userId' value={u.id} />
+															<button
+																type='submit'
+																className='px-2 py-1 rounded-md bg-red-600 hover:bg-red-700 text-white text-xs font-semibold'>
+																Delete
+															</button>
+														</form>
+													) : (
+														<span className='text-xs text-slate-400'>You</span>
+													)}
+												</td>
+											) : null}
+										</tr>
+									))}
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+
+				<div className='mt-6 text-blue-800'>
+					<p>Welcome! Your admin CMS will render pages here.</p>
+				</div>
+			</div>
+		</div>
+	);
 }
-

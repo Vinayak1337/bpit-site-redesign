@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import React from 'react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -15,7 +16,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 						</nav>
 					</div>
 					<div className='flex items-center gap-2'>
-						<a href='/' className='text-sm text-slate-600 hover:text-slate-900'>View Site</a>
+						<Link href='/' className='text-sm text-slate-600 hover:text-slate-900'>View Site</Link>
 					</div>
 				</header>
 				<main className='p-4 md:p-6'>{children}</main>
