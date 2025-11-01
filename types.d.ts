@@ -67,8 +67,8 @@ interface EventItem {
 	registrationOpen: boolean;
 	price: string;
 	highlights: string[];
-	rating: number;
-	totalRatings: number;
+	ctaLabel: string;
+	ctaLink: string;
 }
 
 interface EventsSectionData {
@@ -77,6 +77,41 @@ interface EventsSectionData {
 
 interface EventsSectionProps {
 	data: EventsSectionData;
+}
+
+interface PlacementCompany {
+	name: string;
+	logo: string;
+}
+
+interface PlacementStatistic {
+	value: string;
+	label: string;
+}
+
+interface PlacementCompaniesData {
+	title: string;
+	subtitle: string;
+	companies: PlacementCompany[];
+	statistics: PlacementStatistic[];
+}
+
+interface TopPlacedStudent {
+	id: number;
+	name: string;
+	company: string;
+	package: string;
+	branch: string;
+	year: string;
+	image: string;
+	companyLogo: string;
+}
+
+interface TopPlacedStudentsData {
+	title: string;
+	subtitle: string;
+	students: TopPlacedStudent[];
+	statistics: PlacementStatistic[];
 }
 
 // Header contact bar data shape

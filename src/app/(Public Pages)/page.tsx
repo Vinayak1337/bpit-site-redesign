@@ -10,9 +10,6 @@ import TopPlacedStudents from '@/components/placement/top-placed-students';
 import {
 	homeHero2Data,
 	homeNoticesData,
-	homeEventsData,
-	homePlacementData,
-	homeTopPlacedStudentsData,
 	homeTestimonialsData
 } from '@/data/home';
 import {
@@ -21,6 +18,10 @@ import {
 } from '@/app/(Private Pages)/actions/hero';
 import { getNoticesSection } from '@/app/(Private Pages)/actions/notices';
 import { getEventsSection } from '@/app/(Private Pages)/actions/events';
+import {
+	getPlacementCompanies,
+	getTopPlacedStudents
+} from '@/app/(Private Pages)/actions/placement';
 
 type HeroCarouselData = ComponentProps<typeof Hero2>['data'];
 type HeroCarouselSlide = HeroCarouselData['slides'][number];
@@ -58,14 +59,20 @@ const hasNoticesContent = (data: NoticesSectionData): boolean => {
 	return data.notices.length > 0 || data.announcements.length > 0;
 };
 
-const hasEventsContent = (data: EventsSectionData): boolean => data.events.length > 0;
-
 export default async function Home() {
 	const pageSlug = 'main';
-	const [heroSlides, noticesSection, eventsSection] = await Promise.all([
+	const [
+		heroSlides,
+		noticesSection,
+		eventsSection,
+		placementCompanies,
+		topPlacedStudents
+	] = await Promise.all([
 		getHeroSlides(pageSlug),
 		getNoticesSection(pageSlug),
-		getEventsSection(pageSlug)
+		getEventsSection(pageSlug),
+		getPlacementCompanies(pageSlug),
+		getTopPlacedStudents(pageSlug)
 	]);
 
 	const heroData: HeroCarouselData =
@@ -77,21 +84,17 @@ export default async function Home() {
 		? noticesSection
 		: homeNoticesData;
 
-	const eventsData = hasEventsContent(eventsSection)
-		? eventsSection
-		: homeEventsData;
-
 	return (
 		<>
 			<Hero2 data={heroData} />
 
 			<NoticesSection data={noticesData} />
 
-			<EventsSection data={eventsData} />
+			<EventsSection data={eventsSection} />
 
-			<PlacementCompanies data={homePlacementData} />
+			<PlacementCompanies data={placementCompanies} />
 
-			<TopPlacedStudents data={homeTopPlacedStudentsData} />
+			<TopPlacedStudents data={topPlacedStudents} />
 
 			<Testimonial data={homeTestimonialsData} />
 		</>

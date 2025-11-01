@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
+import Link from 'next/link';
 import {
 	Clock,
 	MapPin,
@@ -11,9 +12,7 @@ import {
 	ArrowRight,
 	Calendar,
 	Star,
-	Bookmark,
 	Zap,
-	Heart,
 	Globe,
 	Target,
 	Lightbulb,
@@ -39,12 +38,12 @@ const formatDate = (dateString: string) => {
 };
 
 const EventCard = ({ event, index }: { event: EventItem; index: number }) => {
-	const [isLiked, setIsLiked] = useState(false);
-	const [isBookmarked, setIsBookmarked] = useState(false);
 	const cardRef = useRef(null);
 	const isInView = useInView(cardRef, { once: true, margin: '-100px' });
 
 	const dateObj = formatDate(event.date);
+	const ctaLabel = event.ctaLabel?.trim().length ? event.ctaLabel : 'Register Now';
+	const isExternalLink = event.ctaLink.startsWith('http');
 
 	return (
 		<motion.div
@@ -80,34 +79,9 @@ const EventCard = ({ event, index }: { event: EventItem; index: number }) => {
 				)}
 
 				<div className='absolute top-3 right-3 lg:top-4 lg:right-4 z-20 flex gap-1 lg:gap-2'>
-					<button
-						onClick={() => setIsLiked(!isLiked)}
-						aria-label='Like event'
-						className={`p-1.5 lg:p-2 rounded-full backdrop-blur-md transition-all duration-300 ${
-							isLiked
-								? 'bg-blue-500 text-white shadow-lg'
-								: 'bg-white/80 text-gray-600 hover:bg-white'
-						}`}>
-						<Heart
-							className={`w-3 h-3 lg:w-4 lg:h-4 ${
-								isLiked ? 'fill-current' : ''
-							}`}
-						/>
-					</button>
-					<button
-						onClick={() => setIsBookmarked(!isBookmarked)}
-						aria-label='Bookmark event'
-						className={`p-1.5 lg:p-2 rounded-full backdrop-blur-md transition-all duration-300 ${
-							isBookmarked
-								? 'bg-blue-500 text-white shadow-lg'
-								: 'bg-white/80 text-gray-600 hover:bg-white'
-						}`}>
-						<Bookmark
-							className={`w-3 h-3 lg:w-4 lg:h-4 ${
-								isBookmarked ? 'fill-current' : ''
-							}`}
-						/>
-					</button>
+					<div className='px-2 lg:px-3 py-1 lg:py-1.5 rounded-full bg-white/80 text-xs lg:text-sm font-medium text-gray-700 shadow-md backdrop-blur-md'>
+						{event.organizer || 'Event'}
+					</div>
 				</div>
 
 				<div className='relative h-48 lg:h-64 overflow-hidden'>
@@ -135,17 +109,14 @@ const EventCard = ({ event, index }: { event: EventItem; index: number }) => {
 						</div>
 					</div>
 
-					<div className='absolute bottom-3 right-3 lg:bottom-4 lg:right-4'>
-						<div className='flex items-center gap-1 px-2 lg:px-3 py-1 lg:py-1.5 bg-white/95 backdrop-blur-md rounded-full shadow-xl border border-white/40'>
-							<Star className='w-3 h-3 lg:w-4 lg:h-4 text-yellow-500 fill-current' />
-							<span className='text-xs lg:text-sm font-bold text-gray-800'>
-								{event.rating}
-							</span>
-							<span className='text-xs text-gray-500 hidden sm:inline'>
-								({event.totalRatings})
-							</span>
-						</div>
+				<div className='absolute bottom-3 right-3 lg:bottom-4 lg:right-4'>
+					<div className='flex items-center gap-1 px-2 lg:px-3 py-1 lg:py-1.5 bg-white/95 backdrop-blur-md rounded-full shadow-xl border border-white/40'>
+						<Star className='w-3 h-3 lg:w-4 lg:h-4 text-blue-500' />
+						<span className='text-xs lg:text-sm font-semibold text-gray-800'>
+							{event.status === 'upcoming' ? 'Upcoming' : event.status}
+						</span>
 					</div>
+				</div>
 				</div>
 
 				<div className='relative p-4 lg:p-6 space-y-3 lg:space-y-4'>
@@ -203,30 +174,32 @@ const EventCard = ({ event, index }: { event: EventItem; index: number }) => {
 						)}
 					</div>
 
-					<div className='pt-3 lg:pt-4'>
+				<div className='pt-3 lg:pt-4'>
+					{event.registrationOpen ? (
 						<motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
 							<Button
-								className='w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:shadow-xl text-white border-0 rounded-xl lg:rounded-2xl py-2 lg:py-3 text-xs lg:text-sm font-bold transition-all duration-300'
-								disabled={!event.registrationOpen}>
-								{event.registrationOpen ? (
-									<>
-										<Calendar className='w-3 h-3 lg:w-4 lg:h-4 mr-2' />
-										<span className='hidden sm:inline'>Register Now</span>
-										<span className='sm:hidden'>Register</span>
-										<ArrowRight className='w-3 h-3 lg:w-4 lg:h-4 ml-2' />
-									</>
-								) : (
-									<>
-										<Clock className='w-3 h-3 lg:w-4 lg:h-4 mr-2' />
-										<span className='hidden sm:inline'>
-											Registration Closed
-										</span>
-										<span className='sm:hidden'>Closed</span>
-									</>
-								)}
+								asChild
+								className='w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:shadow-xl text-white border-0 rounded-xl lg:rounded-2xl py-2 lg:py-3 text-xs lg:text-sm font-bold transition-all duration-300'>
+								<Link
+									href={event.ctaLink}
+									target={isExternalLink ? '_blank' : undefined}
+									rel={isExternalLink ? 'noopener noreferrer' : undefined}>
+									<Calendar className='w-3 h-3 lg:w-4 lg:h-4' />
+									<span>{ctaLabel}</span>
+									<ArrowRight className='w-3 h-3 lg:w-4 lg:h-4' />
+								</Link>
 							</Button>
 						</motion.div>
-					</div>
+					) : (
+						<Button
+							disabled
+							className='w-full bg-gray-100 text-gray-500 border-0 rounded-xl lg:rounded-2xl py-2 lg:py-3 text-xs lg:text-sm font-semibold transition-all duration-300'>
+							<Clock className='w-3 h-3 lg:w-4 lg:h-4 mr-2' />
+							<span className='hidden sm:inline'>Registration Closed</span>
+							<span className='sm:hidden'>Closed</span>
+						</Button>
+					)}
+				</div>
 				</div>
 			</div>
 		</motion.div>

@@ -3,6 +3,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 import {
 	Calendar,
 	MapPin,
@@ -41,6 +43,8 @@ interface MobileEventCardProps {
 
 const MobileEventCard = ({ event, isActive }: MobileEventCardProps) => {
 	const dateObj = formatDate(event.date);
+	const ctaLabel = event.ctaLabel?.trim().length ? event.ctaLabel : 'Register Now';
+	const isExternalLink = event.ctaLink.startsWith('http');
 
 	return (
 		<motion.div
@@ -101,15 +105,15 @@ const MobileEventCard = ({ event, isActive }: MobileEventCardProps) => {
 						</div>
 					</div>
 
-					{/* Rating Badge */}
-					<div className='absolute bottom-4 right-4'>
-						<div className='flex items-center gap-1 px-3 py-1.5 bg-white/95 backdrop-blur-sm rounded-full shadow-lg border border-white/30'>
-							<Star className='w-3 h-3 text-yellow-500 fill-current' />
-							<span className='text-xs font-bold text-gray-800'>
-								{event.rating}
-							</span>
-						</div>
+				{/* Status Badge */}
+				<div className='absolute bottom-4 right-4'>
+					<div className='flex items-center gap-1 px-3 py-1.5 bg-white/95 backdrop-blur-sm rounded-full shadow-lg border border-white/30'>
+						<Star className='w-3 h-3 text-blue-500' />
+						<span className='text-xs font-semibold text-gray-800'>
+							{event.status === 'upcoming' ? 'Upcoming' : event.status}
+						</span>
 					</div>
+				</div>
 				</div>
 
 				{/* Content Section */}
@@ -159,27 +163,32 @@ const MobileEventCard = ({ event, isActive }: MobileEventCardProps) => {
 						)}
 					</div>
 
-					{/* Registration Button */}
-					<motion.button
-						whileTap={{ scale: 0.95 }}
-						className={`w-full py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 shadow-lg ${
-							event.registrationOpen
-								? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white hover:shadow-xl'
-								: 'bg-gray-100 text-gray-500 cursor-not-allowed'
-						}`}
-						disabled={!event.registrationOpen}>
-						{event.registrationOpen ? (
-							<div className='flex items-center justify-center gap-2'>
+				{/* Registration Button */}
+				{event.registrationOpen ? (
+					<motion.div whileTap={{ scale: 0.95 }}>
+						<Button
+							asChild
+							className='w-full py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 shadow-lg bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white border-0'>
+							<Link
+								href={event.ctaLink}
+								target={isExternalLink ? '_blank' : undefined}
+								rel={isExternalLink ? 'noopener noreferrer' : undefined}
+								className='flex items-center justify-center gap-2'>
 								<Calendar className='w-4 h-4' />
-								<span>Register Now</span>
-							</div>
-						) : (
-							<div className='flex items-center justify-center gap-2'>
-								<Clock className='w-4 h-4' />
-								<span>Registration Closed</span>
-							</div>
-						)}
-					</motion.button>
+								<span>{ctaLabel}</span>
+							</Link>
+						</Button>
+					</motion.div>
+				) : (
+					<Button
+						className='w-full py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 shadow-lg bg-gray-100 text-gray-500 cursor-not-allowed'
+						disabled>
+						<div className='flex items-center justify-center gap-2'>
+							<Clock className='w-4 h-4' />
+							<span>Registration Closed</span>
+						</div>
+					</Button>
+				)}
 				</div>
 
 				{/* Decorative Elements */}

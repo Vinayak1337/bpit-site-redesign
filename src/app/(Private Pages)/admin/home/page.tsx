@@ -1,7 +1,5 @@
 import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
 import BPITFooter from '@/components/footer/BPITFooter';
-import PlacementCompanies from '@/components/placement/placement-companies';
-import TopPlacedStudents from '@/components/placement/top-placed-students';
 import Testimonial from '@/components/carousel/testimonial';
 import Editable from '@/components/ui/Editable';
 
@@ -11,16 +9,18 @@ import HeaderAnnouncementsEditor from '@/app/(Private Pages)/admin/home/componen
 import HeroSlidesEditor from '@/app/(Private Pages)/admin/components/HeroSlidesEditor';
 import NoticesSectionEditor from '@/app/(Private Pages)/admin/components/NoticesSectionEditor';
 import EventsSectionEditor from '@/app/(Private Pages)/admin/components/EventsSectionEditor';
+import PlacementCompaniesEditor from '@/app/(Private Pages)/admin/components/PlacementCompaniesEditor';
+import TopPlacedStudentsEditor from '@/app/(Private Pages)/admin/components/TopPlacedStudentsEditor';
 import { getHeaderAnnouncements } from '@/app/(Private Pages)/actions/announcements';
 import { getHeroSlides } from '@/app/(Private Pages)/actions/hero';
 import { getNoticesSection } from '@/app/(Private Pages)/actions/notices';
 import { getEventsSection } from '@/app/(Private Pages)/actions/events';
-
 import {
-	homePlacementData,
-	homeTopPlacedStudentsData,
-	homeTestimonialsData
-} from '@/data/home';
+	getPlacementCompanies,
+	getTopPlacedStudents
+} from '@/app/(Private Pages)/actions/placement';
+
+import { homeTestimonialsData } from '@/data/home';
 
 export default async function AdminHomePage() {
 	await requireAdmin();
@@ -30,13 +30,17 @@ export default async function AdminHomePage() {
 		initialAnnouncementItems,
 		heroSlides,
 		noticesSection,
-		eventsSection
+		eventsSection,
+		placementCompanies,
+		topPlacedStudents
 	] = await Promise.all([
 		getContacts(),
 		getHeaderAnnouncements(pageSlug),
 		getHeroSlides(pageSlug),
 		getNoticesSection(pageSlug),
-		getEventsSection(pageSlug)
+		getEventsSection(pageSlug),
+		getPlacementCompanies(pageSlug),
+		getTopPlacedStudents(pageSlug)
 	]);
 
 	const announcementsData: HeaderAnnouncementsData = {
@@ -62,24 +66,14 @@ export default async function AdminHomePage() {
 					pageSlug={pageSlug}
 				/>
 				<EventsSectionEditor initialData={eventsSection} pageSlug={pageSlug} />
-				<Editable
-					label='Placement Companies'
-					formContent={
-						<div className='text-sm text-slate-700'>
-							Upload/update company logos and stats here.
-						</div>
-					}>
-					<PlacementCompanies data={homePlacementData} />
-				</Editable>
-				<Editable
-					label='Top Placed Students'
-					formContent={
-						<div className='text-sm text-slate-700'>
-							Edit student entries, company and package.
-						</div>
-					}>
-					<TopPlacedStudents data={homeTopPlacedStudentsData} />
-				</Editable>
+				<PlacementCompaniesEditor
+					initialData={placementCompanies}
+					pageSlug={pageSlug}
+				/>
+				<TopPlacedStudentsEditor
+					initialData={topPlacedStudents}
+					pageSlug={pageSlug}
+				/>
 				<Editable
 					label='Testimonials'
 					formContent={

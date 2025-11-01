@@ -100,7 +100,12 @@ export type FeaturesBlock = {
 	type: 'features';
 	title?: string;
 	subtitle?: string;
-	items: { title: string; description: string; icon?: IconName; color?: string }[];
+	items: {
+		title: string;
+		description: string;
+		icon?: IconName;
+		color?: string;
+	}[];
 };
 
 export type ParagraphsBlock = {
@@ -124,7 +129,14 @@ export type CardsGridBlock = {
 export type StepsBlock = {
 	type: 'steps';
 	title?: string;
-	steps: { id?: string; title: string; description: string; icon?: IconName; iconColor?: string; iconTextColor?: string }[];
+	steps: {
+		id?: string;
+		title: string;
+		description: string;
+		icon?: IconName;
+		iconColor?: string;
+		iconTextColor?: string;
+	}[];
 };
 
 export type LogosGridBlock = {
@@ -193,8 +205,8 @@ export type EventsBlock = {
 		registrationOpen?: boolean;
 		price?: string;
 		highlights?: string[];
-		rating?: number;
-		totalRatings?: number;
+		ctaLabel?: string;
+		ctaLink?: string;
 	}[];
 };
 
@@ -309,7 +321,11 @@ export const linkZ = z.object({
 
 export const ctaZ = z.discriminatedUnion('kind', [
 	linkZ.extend({ kind: z.literal('link') }),
-	z.object({ kind: z.literal('action'), action: z.string().min(1), label: z.string().min(1) })
+	z.object({
+		kind: z.literal('action'),
+		action: z.string().min(1),
+		label: z.string().min(1)
+	})
 ]);
 
 export const seoZ = z.object({
@@ -326,7 +342,9 @@ export const heroBlockZ = z.object({
 	description: z.string().optional(),
 	badgeText: z.string().optional(),
 	gradient: z.string().optional(),
-	tags: z.array(z.object({ text: z.string(), icon: iconNameZ.optional() })).optional(),
+	tags: z
+		.array(z.object({ text: z.string(), icon: iconNameZ.optional() }))
+		.optional(),
 	ctas: z.array(ctaZ).optional()
 });
 
@@ -349,14 +367,32 @@ export const carouselBlockZ = z.object({
 export const statsBlockZ = z.object({
 	type: z.literal('stats'),
 	title: z.string().optional(),
-	items: z.array(z.object({ value: z.string(), label: z.string(), icon: iconNameZ.optional(), color: z.string().optional() })).min(1)
+	items: z
+		.array(
+			z.object({
+				value: z.string(),
+				label: z.string(),
+				icon: iconNameZ.optional(),
+				color: z.string().optional()
+			})
+		)
+		.min(1)
 });
 
 export const featuresBlockZ = z.object({
 	type: z.literal('features'),
 	title: z.string().optional(),
 	subtitle: z.string().optional(),
-	items: z.array(z.object({ title: z.string(), description: z.string(), icon: iconNameZ.optional(), color: z.string().optional() })).min(1)
+	items: z
+		.array(
+			z.object({
+				title: z.string(),
+				description: z.string(),
+				icon: iconNameZ.optional(),
+				color: z.string().optional()
+			})
+		)
+		.min(1)
 });
 
 export const paragraphsBlockZ = z.object({
@@ -368,21 +404,34 @@ export const paragraphsBlockZ = z.object({
 export const cardsGridBlockZ = z.object({
 	type: z.literal('cardsGrid'),
 	title: z.string().optional(),
-	cards: z.array(
-		z.object({
-			title: z.string(),
-			bgColor: z.string().optional(),
-			textColor: z.string().optional(),
-			listColor: z.string().optional(),
-			items: z.array(z.string()).min(1)
-		})
-	).min(1)
+	cards: z
+		.array(
+			z.object({
+				title: z.string(),
+				bgColor: z.string().optional(),
+				textColor: z.string().optional(),
+				listColor: z.string().optional(),
+				items: z.array(z.string()).min(1)
+			})
+		)
+		.min(1)
 });
 
 export const stepsBlockZ = z.object({
 	type: z.literal('steps'),
 	title: z.string().optional(),
-	steps: z.array(z.object({ id: z.string().optional(), title: z.string(), description: z.string(), icon: iconNameZ.optional(), iconColor: z.string().optional(), iconTextColor: z.string().optional() })).min(1)
+	steps: z
+		.array(
+			z.object({
+				id: z.string().optional(),
+				title: z.string(),
+				description: z.string(),
+				icon: iconNameZ.optional(),
+				iconColor: z.string().optional(),
+				iconTextColor: z.string().optional()
+			})
+		)
+		.min(1)
 });
 
 export const logosGridBlockZ = z.object({
@@ -396,21 +445,23 @@ export const testimonialsBlockZ = z.object({
 	type: z.literal('testimonials'),
 	title: z.string().optional(),
 	subtitle: z.string().optional(),
-	testimonials: z.array(
-		z.object({
-			id: z.union([z.number(), z.string()]).optional(),
-			name: z.string(),
-			batch: z.string().optional(),
-			company: z.string().optional(),
-			position: z.string().optional(),
-			image: z.string().optional(),
-			video: z.string().optional(),
-			testimonial: z.string(),
-			rating: z.number().optional(),
-			achievement: z.string().optional(),
-			tags: z.array(z.string()).optional()
-		})
-	).min(1)
+	testimonials: z
+		.array(
+			z.object({
+				id: z.union([z.number(), z.string()]).optional(),
+				name: z.string(),
+				batch: z.string().optional(),
+				company: z.string().optional(),
+				position: z.string().optional(),
+				image: z.string().optional(),
+				video: z.string().optional(),
+				testimonial: z.string(),
+				rating: z.number().optional(),
+				achievement: z.string().optional(),
+				tags: z.array(z.string()).optional()
+			})
+		)
+		.min(1)
 });
 
 export const noticesItemZ = z.object({
@@ -452,8 +503,8 @@ export const eventsItemZ = z.object({
 	registrationOpen: z.boolean().optional(),
 	price: z.string().optional(),
 	highlights: z.array(z.string()).optional(),
-	rating: z.number().optional(),
-	totalRatings: z.number().optional()
+	ctaLabel: z.string().optional(),
+	ctaLink: z.string().optional()
 });
 
 export const eventsBlockZ = z.object({
@@ -470,7 +521,16 @@ export const ctaSectionBlockZ = z.object({
 
 export const sidebarNavBlockZ = z.object({
 	type: z.literal('sidebarNav'),
-	navItems: z.array(z.object({ id: z.string(), title: z.string(), icon: iconNameZ.optional(), href: z.string() })).min(1),
+	navItems: z
+		.array(
+			z.object({
+				id: z.string(),
+				title: z.string(),
+				icon: iconNameZ.optional(),
+				href: z.string()
+			})
+		)
+		.min(1),
 	theme: z
 		.object({
 			primary: z.string().optional(),
@@ -524,5 +584,3 @@ export const pageZ = z.object({
 
 export type ComponentBlockZod = z.infer<typeof componentBlockZ>;
 export type PageZod = z.infer<typeof pageZ>;
-
-

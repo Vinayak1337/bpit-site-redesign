@@ -25,8 +25,18 @@ const eventSchema = z.object({
 	registrationOpen: z.boolean().default(true),
 	price: z.string().default(''),
 	highlights: z.array(z.string()).default([]),
-	rating: z.number().nonnegative().default(0),
-	totalRatings: z.number().int().nonnegative().default(0)
+	ctaLabel: z.string().min(1).default('Register Now'),
+	ctaLink: z
+		.string()
+		.min(1)
+		.default('/')
+		.refine(
+			value =>
+				value.startsWith('/') ||
+				value.startsWith('https://') ||
+				value.startsWith('http://'),
+			'CTA link must start with "/" or "http(s)://"'
+		)
 });
 
 const eventsSectionSchema = z.object({
@@ -35,33 +45,6 @@ const eventsSectionSchema = z.object({
 
 type EventItemInput = z.infer<typeof eventSchema>;
 type EventsSectionInput = z.infer<typeof eventsSectionSchema>;
-
-const defaultEventsSection: EventsSectionInput = {
-	events: [
-		{
-			id: 1,
-			title: 'BPIT TechFest 2024',
-			subtitle: 'Innovation Summit & Tech Showcase',
-			description:
-				'Join us for the most spectacular tech festival featuring AI/ML workshops, robotics competitions, startup showcases, and industry expert keynotes.',
-			image: '/events/img1.png',
-			date: '2024-03-15',
-			time: '9:00 AM - 8:00 PM',
-			location: 'BPIT Main Auditorium',
-			category: 'Technology',
-			attendees: 1200,
-			featured: true,
-			status: 'upcoming',
-			tags: ['AI/ML', 'Robotics', 'Startups', 'Innovation'],
-			organizer: 'Technical Society BPIT',
-			registrationOpen: true,
-			price: 'Free',
-			highlights: ['Industry Leaders', '48+ Hours', '₹50K+ Prizes'],
-			rating: 4.9,
-			totalRatings: 847
-		}
-	]
-};
 
 const toEvent = (event: EventItemInput): EventItem => ({
 	id: typeof event.id === 'number' ? event.id : Number(event.id ?? 0) || 0,
@@ -81,8 +64,8 @@ const toEvent = (event: EventItemInput): EventItem => ({
 	registrationOpen: event.registrationOpen ?? true,
 	price: event.price ?? '',
 	highlights: event.highlights ?? [],
-	rating: event.rating ?? 0,
-	totalRatings: event.totalRatings ?? 0
+	ctaLabel: event.ctaLabel ?? 'Register Now',
+	ctaLink: event.ctaLink ?? '/'
 });
 
 const fromEvent = (event: EventItem): EventItemInput => ({
@@ -103,12 +86,14 @@ const fromEvent = (event: EventItem): EventItemInput => ({
 	registrationOpen: event.registrationOpen,
 	price: event.price,
 	highlights: event.highlights,
-	rating: Number.isFinite(event.rating) ? event.rating : 0,
-	totalRatings: Number.isFinite(event.totalRatings) ? event.totalRatings : 0
+	ctaLabel: event.ctaLabel,
+	ctaLink: event.ctaLink
 });
 
-const normalizeEvents = (section: EventsSectionInput): EventsSectionData => ({
-	events: section.events.map(toEvent)
+const normalizeEvents = (
+	section: EventsSectionInput | null | undefined
+): EventsSectionData => ({
+	events: section?.events.map(toEvent) ?? []
 });
 
 export async function getEventsSection(
@@ -116,19 +101,19 @@ export async function getEventsSection(
 ): Promise<EventsSectionData> {
 	const page = await prisma.page.findUnique({ where: { slug: pageSlug } });
 	if (!page) {
-		return normalizeEvents(defaultEventsSection);
+		return normalizeEvents({ events: [] });
 	}
 
 	const component = await prisma.component.findFirst({
 		where: { pageId: page.id, key: 'EVENTS_SECTION' }
 	});
 	if (!component) {
-		return normalizeEvents(defaultEventsSection);
+		return normalizeEvents({ events: [] });
 	}
 
 	const parsed = eventsSectionSchema.safeParse(component.data);
 	if (!parsed.success) {
-		return normalizeEvents(defaultEventsSection);
+		return normalizeEvents({ events: [] });
 	}
 
 	return normalizeEvents(parsed.data);

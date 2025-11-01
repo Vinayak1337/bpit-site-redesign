@@ -41,8 +41,8 @@ type EventFormValue = {
 	registrationOpen: 'true' | 'false';
 	price: string;
 	highlights: string;
-	rating: string;
-	totalRatings: string;
+	ctaLabel: string;
+	ctaLink: string;
 };
 
 type FormValues = {
@@ -73,8 +73,8 @@ const createEmptyEvent = (): EventFormValue => ({
 	registrationOpen: 'true',
 	price: '',
 	highlights: '',
-	rating: '0',
-	totalRatings: '0'
+	ctaLabel: 'Register Now',
+	ctaLink: '/'
 });
 
 const toEvent = (value: EventFormValue): EventItem | null => {
@@ -87,8 +87,6 @@ const toEvent = (value: EventFormValue): EventItem | null => {
 	const parsedId = Number(value.id);
 	const id = Number.isFinite(parsedId) ? parsedId : Date.now();
 	const attendees = Number(value.attendees);
-	const rating = Number(value.rating);
-	const totalRatings = Number(value.totalRatings);
 	const tags = value.tags
 		.split(',')
 		.map(tag => tag.trim())
@@ -116,14 +114,19 @@ const toEvent = (value: EventFormValue): EventItem | null => {
 		registrationOpen: value.registrationOpen === 'true',
 		price: value.price.trim(),
 		highlights,
-		rating: Number.isFinite(rating) ? rating : 0,
-		totalRatings: Number.isFinite(totalRatings) ? totalRatings : 0
+		ctaLabel:
+			value.ctaLabel.trim().length > 0 ? value.ctaLabel.trim() : 'Register Now',
+		ctaLink: value.ctaLink.trim().length > 0 ? value.ctaLink.trim() : '/'
 	};
 };
 
-const normalizeFormValues = (values: Partial<FormValues>): EventsSectionData => ({
+const normalizeFormValues = (
+	values: Partial<FormValues>
+): EventsSectionData => ({
 	events:
-		values.events?.map(toEvent).filter((event): event is EventItem => event !== null) ?? []
+		values.events
+			?.map(toEvent)
+			.filter((event): event is EventItem => event !== null) ?? []
 });
 
 const toCsv = (items: string[]): string => items.join(', ');
@@ -146,8 +149,8 @@ const toFormValue = (event: EventItem): EventFormValue => ({
 	registrationOpen: event.registrationOpen ? 'true' : 'false',
 	price: event.price,
 	highlights: toCsv(event.highlights),
-	rating: event.rating.toString(),
-	totalRatings: event.totalRatings.toString()
+	ctaLabel: event.ctaLabel,
+	ctaLink: event.ctaLink
 });
 
 const ensureMinimumEvents = (values: FormValues): FormValues => ({
@@ -159,12 +162,18 @@ export default function EventsSectionForm({
 	pageSlug,
 	onChange
 }: EventsSectionFormProps) {
-	const defaults = useMemo(() => ensureMinimumEvents(initialValues), [initialValues]);
+	const defaults = useMemo(
+		() => ensureMinimumEvents(initialValues),
+		[initialValues]
+	);
 	const form = useForm<FormValues>({ defaultValues: defaults });
 	const [isPending, startTransition] = useTransition();
 	const [message, setMessage] = useState<string | null>(null);
 
-	const eventsFieldArray = useFieldArray({ control: form.control, name: 'events' });
+	const eventsFieldArray = useFieldArray({
+		control: form.control,
+		name: 'events'
+	});
 
 	useEffect(() => {
 		onChange?.(normalizeFormValues(form.getValues()));
@@ -265,7 +274,10 @@ export default function EventsSectionForm({
 										<FormItem>
 											<FormLabel>Subtitle</FormLabel>
 											<FormControl>
-												<Input placeholder='Innovation Summit' {...subtitleField} />
+												<Input
+													placeholder='Innovation Summit'
+													{...subtitleField}
+												/>
 											</FormControl>
 										</FormItem>
 									)}
@@ -306,7 +318,10 @@ export default function EventsSectionForm({
 										<FormItem>
 											<FormLabel>Location</FormLabel>
 											<FormControl>
-												<Input placeholder='BPIT Main Auditorium' {...locationField} />
+												<Input
+													placeholder='BPIT Main Auditorium'
+													{...locationField}
+												/>
 											</FormControl>
 										</FormItem>
 									)}
@@ -394,7 +409,10 @@ export default function EventsSectionForm({
 										<FormItem>
 											<FormLabel>Organizer</FormLabel>
 											<FormControl>
-												<Input placeholder='Training & Placement Cell' {...organizerField} />
+												<Input
+													placeholder='Training & Placement Cell'
+													{...organizerField}
+												/>
 											</FormControl>
 										</FormItem>
 									)}
@@ -438,38 +456,56 @@ export default function EventsSectionForm({
 
 								<FormField
 									control={form.control}
+									name={`events.${index}.ctaLabel` as const}
+									rules={{ required: 'CTA label is required' }}
+									render={({ field: ctaLabelField }) => (
+										<FormItem>
+											<FormLabel>CTA Button Label</FormLabel>
+											<FormControl>
+												<Input placeholder='Register Now' {...ctaLabelField} />
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+
+								<FormField
+									control={form.control}
+									name={`events.${index}.ctaLink` as const}
+									rules={{
+										required: 'CTA link is required',
+										validate: value =>
+											value.startsWith('/') ||
+											value.startsWith('http://') ||
+											value.startsWith('https://')
+												? true
+												: 'Link must start with "/" or "http(s)://"'
+									}}
+									render={({ field: ctaLinkField }) => (
+										<FormItem>
+											<FormLabel>CTA Link</FormLabel>
+											<FormControl>
+												<Input
+													placeholder='/events/register'
+													{...ctaLinkField}
+												/>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+
+								<FormField
+									control={form.control}
 									name={`events.${index}.highlights` as const}
 									render={({ field: highlightsField }) => (
 										<FormItem>
 											<FormLabel>Highlights (comma separated)</FormLabel>
 											<FormControl>
-												<Input placeholder='Industry Leaders, Workshops' {...highlightsField} />
-											</FormControl>
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`events.${index}.rating` as const}
-									render={({ field: ratingField }) => (
-										<FormItem>
-											<FormLabel>Rating</FormLabel>
-											<FormControl>
-												<Input type='number' step='0.1' min={0} max={5} {...ratingField} />
-											</FormControl>
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`events.${index}.totalRatings` as const}
-									render={({ field: totalRatingsField }) => (
-										<FormItem>
-											<FormLabel>Total Ratings</FormLabel>
-											<FormControl>
-												<Input type='number' min={0} {...totalRatingsField} />
+												<Input
+													placeholder='Industry Leaders, Workshops'
+													{...highlightsField}
+												/>
 											</FormControl>
 										</FormItem>
 									)}
@@ -506,7 +542,11 @@ export default function EventsSectionForm({
 										<div className='flex gap-2 pt-2'>
 											<CloudinaryUploadButton
 												buttonText='Upload image'
-												onUpload={url => form.setValue(`events.${index}.image` as const, url, { shouldDirty: true })}
+												onUpload={url =>
+													form.setValue(`events.${index}.image` as const, url, {
+														shouldDirty: true
+													})
+												}
 											/>
 											<Button
 												type='button'
@@ -533,4 +573,3 @@ export const toFormValuesFromEventsSection = (
 ): FormValues => ({
 	events: section.events.map(toFormValue)
 });
-
