@@ -85,7 +85,6 @@ interface HeaderContactUsData {
 	email: string;
 	address: string;
 	mapUrl: string;
-	accreditation: { mobile: string; desktop: string };
 }
 
 // Header important announcements bar data shape

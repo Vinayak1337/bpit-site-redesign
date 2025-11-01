@@ -2,15 +2,22 @@ import React from 'react';
 import HeaderContactUs from './HeaderContactUs';
 import ImportantAnnouncement from './ImportantAnnouncement';
 import Navbar from './Navbar';
+import { ContactType } from '@prisma/client';
 
-type HeaderProps = {
-  contactData: HeaderContactUsData;
-  announcementsData: HeaderAnnouncementsData;
+type ContactDTO = {
+	type: ContactType;
+	value: string;
+	displayValue: string | null;
 };
 
-const Header = ({ contactData, announcementsData }: HeaderProps) => (
+type HeaderProps = {
+	contacts: ContactDTO[];
+	announcementsData: HeaderAnnouncementsData;
+};
+
+const Header = ({ contacts, announcementsData }: HeaderProps) => (
 	<>
-		<HeaderContactUs data={contactData} />
+		<HeaderContactUs contacts={contacts} />
 		<ImportantAnnouncement data={announcementsData} />
 		<Navbar />
 	</>

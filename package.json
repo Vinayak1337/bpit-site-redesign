@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "prisma:push": "prisma db push"
+    "prebuild": "npx prisma generate",
+    "prisma:push": "prisma db push",
+    "seed:contacts": "node scripts/seed-contacts.cjs",
+    "seed:home": "node scripts/seed-homepage.cjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",
@@ -37,6 +40,7 @@
     "mongoose": "^8.19.2",
     "motion": "^12.19.2",
     "next": "15.3.4",
+    "next-cloudinary": "^6.17.0",
     "qss": "^3.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

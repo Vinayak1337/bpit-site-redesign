@@ -48,7 +48,9 @@ export async function loginAdmin(formData: FormData): Promise<void> {
 	const tokenHash = hashToken(rawToken);
 	const expiresAt = new Date(Date.now() + SESSION_DAYS * 24 * 60 * 60 * 1000);
 
-	await prisma.adminSession.create({ data: { token: tokenHash, expiresAt, user: { connect: { id: user.id } } } });
+	await prisma.adminSession.create({
+		data: { token: tokenHash, expiresAt, user: { connect: { id: user.id } } }
+	});
 
 	const cookieStore = await cookies();
 	cookieStore.set(SESSION_COOKIE, rawToken, {
@@ -66,24 +68,41 @@ export async function logoutAdmin(): Promise<void> {
 	const cookieStore = await cookies();
 	const rawToken = cookieStore.get(SESSION_COOKIE)?.value;
 	if (rawToken) {
-		await prisma.adminSession.deleteMany({ where: { token: hashToken(rawToken) } });
+		await prisma.adminSession.deleteMany({
+			where: { token: hashToken(rawToken) }
+		});
 	}
 	cookieStore.delete(SESSION_COOKIE);
 	redirect('/admin/login');
 }
 
-export async function getCurrentAdmin(): Promise<{ id: string; email: string; role: string } | null> {
+export async function getCurrentAdmin(): Promise<{
+	id: string;
+	email: string;
+	role: string;
+} | null> {
 	const cookieStore = await cookies();
 	const rawToken = cookieStore.get(SESSION_COOKIE)?.value;
 	if (!rawToken) return null;
 
 	const tokenHash = hashToken(rawToken);
-	const session = await prisma.adminSession.findFirst({ where: { token: tokenHash, expiresAt: { gt: new Date() } }, include: { user: true } });
+	const session = await prisma.adminSession.findFirst({
+		where: { token: tokenHash, expiresAt: { gt: new Date() } },
+		include: { user: true }
+	});
 	if (!session || !session.user) return null;
-	return { id: session.user.id, email: session.user.email, role: session.user.role };
+	return {
+		id: session.user.id,
+		email: session.user.email,
+		role: session.user.role
+	};
 }
 
-export async function requireAdmin(): Promise<{ id: string; email: string; role: string }> {
+export async function requireAdmin(): Promise<{
+	id: string;
+	email: string;
+	role: string;
+}> {
 	const admin = await getCurrentAdmin();
 	if (!admin) redirect('/admin/login');
 	return admin;
@@ -119,7 +138,9 @@ export async function createAdminUser(formData: FormData): Promise<void> {
 	}
 
 	const passwordHash = await bcrypt.hash(password, 12);
-	const created = await prisma.adminUser.create({ data: { email, name, passwordHash, role } });
+	const created = await prisma.adminUser.create({
+		data: { email, name, passwordHash, role }
+	});
 
 	await createAuditLog({
 		actorId: current.id,
@@ -160,7 +181,9 @@ export async function deleteAdminUser(formData: FormData): Promise<void> {
 	if (!user) redirect('/admin?error=not_found');
 
 	if (user.role === 'ADMIN') {
-		const adminCount = await prisma.adminUser.count({ where: { role: 'ADMIN' } });
+		const adminCount = await prisma.adminUser.count({
+			where: { role: 'ADMIN' }
+		});
 		if (adminCount <= 1) {
 			redirect('/admin?error=last_admin');
 		}

@@ -1,0 +1,11 @@
+NEXT_PUBLIC_POSTHOG_KEY=phc_F3tcedpmgxCLL6xlMie2mk4C1plbxtRfJOmhWrBHPQN
+NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME="de26y2rdn"
+CLOUDINARY_UNSIGNED_PRESET="student-resumes"
+NEXT_PUBLIC_CLOUDINARY_API_KEY="535212267266121"
+CLOUDINARY_API_SECRET="I0rJV32CxmPX9ZrQwi9_KbQVtxU"
+CLOUDINARY_URL="cloudinary://535212267266121:I0rJV32CxmPX9ZrQwi9_KbQVtxU@de26y2rdn"
+MONGO_URI="mongodb+srv://Vinayak:Fj2mz2wpWHmv9Q4B@cluster0.upunyuo.mongodb.net/bpit?retryWrites=true&w=majority"
+NEXT_PUBLIC_CLOUDINARY_UPLOAD_FOLDER=student-resumes  # optional if you want all hero images in this folder
+CLOUDINARY_CLOUD_NAME=de26y2rdn
+CLOUDINARY_API_KEY=535212267266121

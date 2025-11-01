@@ -27,11 +27,19 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
+import { ContactType } from '@prisma/client';
+
+type ContactDTO = {
+  type: ContactType;
+  value: string;
+  displayValue: string | null;
+};
+
 const BPITFooter = ({
-  contactInfoData,
+  contacts,
   bottomLeftContent,
 }: {
-  contactInfoData: FooterContactInfoData;
+  contacts: ContactDTO[];
   bottomLeftContent: FooterBottomLeftContent;
 }) => {
 	const [expandedSection, setExpandedSection] = useState<string | null>(null);
@@ -173,13 +181,39 @@ const BPITFooter = ({
 		}
 	];
 
-    const contactInfo = contactInfoData.items.map((item) => ({
-      icon: item.key === 'address' ? MapPin : item.key === 'phone' ? Phone : Mail,
-      title: item.title,
-      text: item.text,
-      href: item.href,
-      type: 'link',
-    }));
+    const phones = contacts.filter(c => c.type === 'PHONE');
+    const email = contacts.find(c => c.type === 'EMAIL') ?? null;
+    const address = contacts.find(c => c.type === 'ADDRESS') ?? null;
+    const sanitizeTel = (input: string): string => input.replace(/[^+\d]/g, '');
+    const phoneText = phones
+      .map(p => p.displayValue ?? p.value)
+      .filter(Boolean)
+      .join(', ');
+    const contactInfo = [
+      {
+        icon: MapPin,
+        title: 'Campus Address',
+        text: address?.displayValue ?? address?.value ?? '',
+        href: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+          address?.displayValue ?? address?.value ?? ''
+        )}`,
+        type: 'link'
+      },
+      {
+        icon: Phone,
+        title: 'Phone Numbers',
+        text: phoneText,
+        href: phones[0] ? `tel:${sanitizeTel(phones[0].value)}` : '',
+        type: 'link'
+      },
+      {
+        icon: Mail,
+        title: 'Email Address',
+        text: email?.value ?? '',
+        href: email ? `mailto:${email.value}` : '',
+        type: 'link'
+      }
+    ];
 
 	const achievements = [
 		{

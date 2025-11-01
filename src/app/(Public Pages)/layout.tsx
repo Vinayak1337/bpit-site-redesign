@@ -4,6 +4,7 @@ import './globals.css';
 import Header from '@/components/header/header';
 import { getHeaderData } from '@/app/(Public Pages)/actions/header';
 import { getFooterData } from '@/app/(Public Pages)/actions/footer';
+import { getContacts } from '@/app/(Public Pages)/actions/contacts';
 import Footer from '@/components/footer/BPITFooter';
 import EnquiryPopup from '@/components/pop-up/enquiry-popup';
 
@@ -103,10 +104,9 @@ export default async function RootLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const [
-		{ contactData, announcementsData },
-		{ contactInfoData, bottomLeftContent }
-	] = await Promise.all([getHeaderData(), getFooterData()]);
+	const [{ announcementsData }, { bottomLeftContent }, contacts] =
+		await Promise.all([getHeaderData('main'), getFooterData(), getContacts()]);
+
 	return (
 		<html lang='en'>
 			<head>
@@ -119,16 +119,10 @@ export default async function RootLayout({
 			</head>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}>
-				<Header
-					contactData={contactData}
-					announcementsData={announcementsData}
-				/>
+				<Header contacts={contacts} announcementsData={announcementsData} />
 				{children}
-				<Footer
-					contactInfoData={contactInfoData}
-					bottomLeftContent={bottomLeftContent}
-				/>
-				<EnquiryPopup />
+				<Footer contacts={contacts} bottomLeftContent={bottomLeftContent} />
+				<EnquiryPopup contacts={contacts} />
 			</body>
 		</html>
 	);

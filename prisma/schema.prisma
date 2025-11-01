@@ -109,3 +109,20 @@ model AuditLogChange {
   @@index([logId])
   @@index([resourceId])
 }
+
+enum ContactType {
+  PHONE
+  EMAIL
+  ADDRESS
+}
+
+model Contact {
+  id           String      @id @default(auto()) @map("_id") @db.ObjectId
+  type         ContactType
+  value        String
+  displayValue String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@index([type])
+}

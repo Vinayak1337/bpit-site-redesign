@@ -1,8 +1,5 @@
 import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
-import Header from '@/components/header/header';
 import BPITFooter from '@/components/footer/BPITFooter';
-
-import Hero2 from '@/components/hero/hero2';
 import NoticesSection from '@/components/carousel/notices-section';
 import EventsSection from '@/components/carousel/events-section';
 import PlacementCompanies from '@/components/placement/placement-companies';
@@ -10,15 +7,14 @@ import TopPlacedStudents from '@/components/placement/top-placed-students';
 import Testimonial from '@/components/carousel/testimonial';
 import Editable from '@/components/ui/Editable';
 
-import {
-	headerContactData,
-	headerAnnouncementsData,
-	footerContactInfoData,
-	footerBottomLeftContent
-} from '@/data/header';
+import { footerBottomLeftContent } from '@/data/header';
+import { getContacts } from '@/app/(Public Pages)/actions/contacts';
+import HeaderAnnouncementsEditor from '@/app/(Private Pages)/admin/home/components/HeaderAnnouncementsEditor';
+import HeroSlidesEditor from '@/app/(Private Pages)/admin/components/HeroSlidesEditor';
+import { getHeaderAnnouncements } from '@/app/(Private Pages)/actions/announcements';
+import { getHeroSlides } from '@/app/(Private Pages)/actions/hero';
 
 import {
-	homeHero2Data,
 	homeNoticesData,
 	homeEventsData,
 	homePlacementData,
@@ -28,59 +24,31 @@ import {
 
 export default async function AdminHomePage() {
 	await requireAdmin();
+	const pageSlug = 'main';
+	const [contacts, initialAnnouncementItems, heroSlides] = await Promise.all([
+		getContacts(),
+		getHeaderAnnouncements(pageSlug),
+		getHeroSlides(pageSlug)
+	]);
+
+	const announcementsData: HeaderAnnouncementsData = {
+		labels: { desktop: 'Important Announcements:', mobile: 'News:' },
+		items: initialAnnouncementItems
+	};
+
 	return (
 		<div className='space-y-0'>
 			<div className='bg-blue-50 border-b border-blue-200 text-blue-900 p-3 text-center text-sm'>
 				Select any section to start editing
 			</div>
-			<Editable
-				label='Header'
-				formContent={
-					<form className='space-y-3'>
-						<div>
-							<label className='block text-sm font-medium text-slate-800'>
-								Announcements label
-							</label>
-							<input
-								className='mt-1 w-full border rounded-md px-3 py-2'
-								placeholder='Important Announcements'
-							/>
-						</div>
-						<button
-							type='button'
-							className='px-4 py-2 rounded-md bg-blue-600 text-white text-sm'>
-							Save
-						</button>
-					</form>
-				}>
-				<Header
-					contactData={headerContactData}
-					announcementsData={headerAnnouncementsData}
-				/>
-			</Editable>
+			<HeaderAnnouncementsEditor
+				initialItems={initialAnnouncementItems}
+				announcementsData={announcementsData}
+				contacts={contacts}
+				pageSlug={pageSlug}
+			/>
 			<main>
-				<Editable
-					label='Hero'
-					formContent={
-						<form className='space-y-3'>
-							<div>
-								<label className='block text-sm font-medium text-slate-800'>
-									Title
-								</label>
-								<input
-									className='mt-1 w-full border rounded-md px-3 py-2'
-									placeholder='Welcome to BPIT'
-								/>
-							</div>
-							<button
-								type='button'
-								className='px-4 py-2 rounded-md bg-blue-600 text-white text-sm'>
-								Save
-							</button>
-						</form>
-					}>
-					<Hero2 data={homeHero2Data} />
-				</Editable>
+				<HeroSlidesEditor initialSlides={heroSlides} pageSlug={pageSlug} />
 				<Editable
 					label='Notices'
 					formContent={
@@ -135,7 +103,7 @@ export default async function AdminHomePage() {
 					</div>
 				}>
 				<BPITFooter
-					contactInfoData={footerContactInfoData}
+					contacts={contacts}
 					bottomLeftContent={footerBottomLeftContent}
 				/>
 			</Editable>
