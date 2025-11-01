@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { motion, } from 'framer-motion';
+import { motion } from 'framer-motion';
 import Image from 'next/image';
 import {
 	Bell,
@@ -13,8 +13,7 @@ import {
 	Award,
 	Users,
 	TrendingUp,
-	Pin,
-	Eye,
+	Pin
 } from 'lucide-react';
 
 const getCategoryConfig = (category: Category) => {
@@ -116,8 +115,7 @@ const formatDate = (dateString: string) => {
 	});
 };
 
-const NoticeCard = ({ item, index }: { item: Notice; index: number }) =>
-{
+const NoticeCard = ({ item, index }: { item: Notice; index: number }) => {
 	const [isHovered, setIsHovered] = useState(false);
 	const categoryConfig = getCategoryConfig(item.category);
 	const priorityConfig = getPriorityConfig(item.priority);
@@ -246,10 +244,6 @@ const NoticeCard = ({ item, index }: { item: Notice; index: number }) =>
 								<Clock className='w-3 h-3' />
 								<span>{item.time}</span>
 							</div>
-							<div className='items-center gap-1 hidden sm:flex'>
-								<Eye className='w-3 h-3' />
-								<span>{item.views}</span>
-							</div>
 						</div>
 
 						<motion.button
@@ -267,11 +261,4 @@ const NoticeCard = ({ item, index }: { item: Notice; index: number }) =>
 					initial={{ opacity: 0 }}
 					animate={{ opacity: isHovered ? 0.02 : 0 }}
 					transition={{ duration: 0.3 }}
-					className={`absolute inset-0 bg-gradient-to-br ${categoryConfig.gradient}`}
-				/>
-			</div>
-		</motion.div>
-	);
-};
-
-export default NoticeCard;
+					className={`

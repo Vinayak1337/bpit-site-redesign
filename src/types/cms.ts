@@ -166,7 +166,6 @@ export type NoticesBlock = {
 		priority?: 'low' | 'medium' | 'high';
 		tags?: string[];
 		description?: string;
-		views?: number;
 		pinned?: boolean;
 		urgent?: boolean;
 	}[];
@@ -424,7 +423,6 @@ export const noticesItemZ = z.object({
 	priority: z.enum(['low', 'medium', 'high']).optional(),
 	tags: z.array(z.string()).optional(),
 	description: z.string().optional(),
-	views: z.number().optional(),
 	pinned: z.boolean().optional(),
 	urgent: z.boolean().optional()
 });

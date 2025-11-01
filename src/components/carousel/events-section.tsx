@@ -1,19 +1,28 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, useAnimate } from 'framer-motion';
 import { ArrowRight, Calendar } from 'lucide-react';
 import EventCard from './event-card';
 import MobileEventsCarousel from './mobile-events-carousel';
 
 export default function EventsSection({ data }: EventsSectionProps) {
+	const uniqueEvents = useMemo(() => {
+		const seen = new Set<string>();
+		return data.events.filter(event => {
+			const key = `${event.id ?? ''}-${event.title}`;
+			if (seen.has(key)) return false;
+			seen.add(key);
+			return true;
+		});
+	}, [data.events]);
 	const [scope, animate] = useAnimate();
 	const [isHovered, setIsHovered] = useState(false);
 	const containerRef = useRef<HTMLDivElement>(null);
 	const animationRef = useRef<ReturnType<typeof animate> | null>(null);
 	const currentPositionRef = useRef(0);
 
-	const { events } = data;
+	const events = uniqueEvents;
 
 	const getCardWidth = () => {
 		if (typeof window !== 'undefined') {
@@ -35,7 +44,7 @@ export default function EventsSection({ data }: EventsSectionProps) {
 	};
 	const [cardGap, setCardGap] = useState(getCardGap());
 	const cardWithGap = cardWidth + cardGap;
-	const totalCardsWidth = events.length * cardWithGap * 2;
+	const totalCardsWidth = events.length * cardWithGap;
 	const speed = 160; // pixels per second
 
 	useEffect(() => {
@@ -207,7 +216,7 @@ export default function EventsSection({ data }: EventsSectionProps) {
 							<div className='absolute right-0 top-0 bottom-0 w-0 sm:w-16 lg:w-20 bg-gradient-to-l from-indigo-50 via-blue-50/80 to-transparent z-10 pointer-events-none' />
 
 							<div ref={scope} className='flex gap-3 sm:gap-4 lg:gap-6 w-max'>
-								{[...events, ...events].map((event, index) => (
+								{events.map((event, index) => (
 									<div
 										key={`${event.id}-${index}`}
 										className='w-[280px] sm:w-[300px] lg:w-[360px] flex-shrink-0'

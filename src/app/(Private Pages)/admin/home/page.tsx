@@ -1,7 +1,5 @@
 import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
 import BPITFooter from '@/components/footer/BPITFooter';
-import NoticesSection from '@/components/carousel/notices-section';
-import EventsSection from '@/components/carousel/events-section';
 import PlacementCompanies from '@/components/placement/placement-companies';
 import TopPlacedStudents from '@/components/placement/top-placed-students';
 import Testimonial from '@/components/carousel/testimonial';
@@ -11,12 +9,14 @@ import { footerBottomLeftContent } from '@/data/header';
 import { getContacts } from '@/app/(Public Pages)/actions/contacts';
 import HeaderAnnouncementsEditor from '@/app/(Private Pages)/admin/home/components/HeaderAnnouncementsEditor';
 import HeroSlidesEditor from '@/app/(Private Pages)/admin/components/HeroSlidesEditor';
+import NoticesSectionEditor from '@/app/(Private Pages)/admin/components/NoticesSectionEditor';
+import EventsSectionEditor from '@/app/(Private Pages)/admin/components/EventsSectionEditor';
 import { getHeaderAnnouncements } from '@/app/(Private Pages)/actions/announcements';
 import { getHeroSlides } from '@/app/(Private Pages)/actions/hero';
+import { getNoticesSection } from '@/app/(Private Pages)/actions/notices';
+import { getEventsSection } from '@/app/(Private Pages)/actions/events';
 
 import {
-	homeNoticesData,
-	homeEventsData,
 	homePlacementData,
 	homeTopPlacedStudentsData,
 	homeTestimonialsData
@@ -25,10 +25,18 @@ import {
 export default async function AdminHomePage() {
 	await requireAdmin();
 	const pageSlug = 'main';
-	const [contacts, initialAnnouncementItems, heroSlides] = await Promise.all([
+	const [
+		contacts,
+		initialAnnouncementItems,
+		heroSlides,
+		noticesSection,
+		eventsSection
+	] = await Promise.all([
 		getContacts(),
 		getHeaderAnnouncements(pageSlug),
-		getHeroSlides(pageSlug)
+		getHeroSlides(pageSlug),
+		getNoticesSection(pageSlug),
+		getEventsSection(pageSlug)
 	]);
 
 	const announcementsData: HeaderAnnouncementsData = {
@@ -49,24 +57,11 @@ export default async function AdminHomePage() {
 			/>
 			<main>
 				<HeroSlidesEditor initialSlides={heroSlides} pageSlug={pageSlug} />
-				<Editable
-					label='Notices'
-					formContent={
-						<div className='text-sm text-slate-700'>
-							Manage notices from Academia → Notices & Circulars section editor.
-						</div>
-					}>
-					<NoticesSection data={homeNoticesData} />
-				</Editable>
-				<Editable
-					label='Events'
-					formContent={
-						<div className='text-sm text-slate-700'>
-							Manage events data in placements/events data source.
-						</div>
-					}>
-					<EventsSection data={homeEventsData} />
-				</Editable>
+				<NoticesSectionEditor
+					initialData={noticesSection}
+					pageSlug={pageSlug}
+				/>
+				<EventsSectionEditor initialData={eventsSection} pageSlug={pageSlug} />
 				<Editable
 					label='Placement Companies'
 					formContent={

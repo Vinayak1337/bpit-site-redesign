@@ -19,6 +19,8 @@ import {
 	getHeroSlides,
 	type HeroSlide
 } from '@/app/(Private Pages)/actions/hero';
+import { getNoticesSection } from '@/app/(Private Pages)/actions/notices';
+import { getEventsSection } from '@/app/(Private Pages)/actions/events';
 
 type HeroCarouselData = ComponentProps<typeof Hero2>['data'];
 type HeroCarouselSlide = HeroCarouselData['slides'][number];
@@ -52,21 +54,40 @@ const mapHeroSlidesToHeroData = (slides: HeroSlide[]): HeroCarouselData => ({
 	}))
 });
 
+const hasNoticesContent = (data: NoticesSectionData): boolean => {
+	return data.notices.length > 0 || data.announcements.length > 0;
+};
+
+const hasEventsContent = (data: EventsSectionData): boolean => data.events.length > 0;
+
 export default async function Home() {
 	const pageSlug = 'main';
-	const heroSlides = await getHeroSlides(pageSlug);
+	const [heroSlides, noticesSection, eventsSection] = await Promise.all([
+		getHeroSlides(pageSlug),
+		getNoticesSection(pageSlug),
+		getEventsSection(pageSlug)
+	]);
+
 	const heroData: HeroCarouselData =
 		heroSlides.length > 0
 			? mapHeroSlidesToHeroData(heroSlides)
 			: homeHero2Data;
 
+	const noticesData = hasNoticesContent(noticesSection)
+		? noticesSection
+		: homeNoticesData;
+
+	const eventsData = hasEventsContent(eventsSection)
+		? eventsSection
+		: homeEventsData;
+
 	return (
 		<>
 			<Hero2 data={heroData} />
 
-			<NoticesSection data={homeNoticesData} />
+			<NoticesSection data={noticesData} />
 
-			<EventsSection data={homeEventsData} />
+			<EventsSection data={eventsData} />
 
 			<PlacementCompanies data={homePlacementData} />
 

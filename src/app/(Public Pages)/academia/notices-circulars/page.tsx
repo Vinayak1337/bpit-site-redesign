@@ -7,7 +7,6 @@ import {
 	Bell, 
 	Calendar, 
 	Clock, 
-	Eye, 
 	Pin, 
 	Search, 
 	ExternalLink,
@@ -25,7 +24,7 @@ export default function NoticesCircularsPage() {
 	const [searchTerm, setSearchTerm] = useState('');
 	const [selectedCategory, setSelectedCategory] = useState<string>('all');
 	const [selectedPriority, setSelectedPriority] = useState<string>('all');
-	const [sortBy, setSortBy] = useState<'date' | 'priority' | 'views'>('date');
+	const [sortBy, setSortBy] = useState<'date' | 'priority'>('date');
 	const notices: Notice[] = [
 		{
 			id: 1,
@@ -37,7 +36,6 @@ export default function NoticesCircularsPage() {
 			priority: 'high',
 			tags: ['Exam', 'Schedule', 'Important'],
 			description: 'The mid-semester examination schedule has been released. Students are advised to check their individual exam timetables and prepare accordingly.',
-			views: 1250,
 			pinned: true,
 			urgent: true,
 			image: '/placeholder.svg?height=120&width=120'
@@ -52,7 +50,6 @@ export default function NoticesCircularsPage() {
 			priority: 'medium',
 			tags: ['Scholarship', 'Financial Aid', 'Application'],
 			description: 'Applications are now open for Merit-cum-Means Scholarships for the academic year 2024-25. Eligible students can apply online.',
-			views: 890,
 			pinned: true,
 			urgent: false,
 			image: '/placeholder.svg?height=120&width=120'
@@ -67,7 +64,6 @@ export default function NoticesCircularsPage() {
 			priority: 'high',
 			tags: ['Admission', 'Counseling', 'B.Tech'],
 			description: 'Additional counseling round will be conducted for remaining vacant seats in various B.Tech programs. Interested candidates should apply immediately.',
-			views: 2100,
 			pinned: false,
 			urgent: true,
 			image: '/placeholder.svg?height=120&width=120'
@@ -82,7 +78,6 @@ export default function NoticesCircularsPage() {
 			priority: 'medium',
 			tags: ['Sports', 'Tournament', 'Registration'],
 			description: 'Registration is now open for the annual inter-college sports tournament. Students can participate in various indoor and outdoor sports.',
-			views: 650,
 			pinned: false,
 			urgent: false,
 			image: '/placeholder.svg?height=120&width=120'
@@ -97,7 +92,6 @@ export default function NoticesCircularsPage() {
 			priority: 'low',
 			tags: ['Library', 'Digital Resources', 'E-books'],
 			description: 'The library has added new digital resources including international journals, e-books, and research databases for student access.',
-			views: 420,
 			pinned: false,
 			urgent: false,
 			image: '/placeholder.svg?height=120&width=120'
@@ -112,7 +106,6 @@ export default function NoticesCircularsPage() {
 			priority: 'high',
 			tags: ['Practical', 'Examination', 'Guidelines'],
 			description: 'Detailed guidelines for conducting online practical examinations. Students must follow all protocols for successful completion.',
-			views: 1580,
 			pinned: true,
 			urgent: false,
 			image: '/placeholder.svg?height=120&width=120'
@@ -130,7 +123,6 @@ export default function NoticesCircularsPage() {
 			priority: 'medium',
 			tags: ['Maintenance', 'Infrastructure', 'Schedule'],
 			description: 'Scheduled maintenance activities for campus infrastructure. Some facilities may be temporarily unavailable during maintenance hours.',
-			views: 320,
 			pinned: false,
 			urgent: false,
 			image: '/placeholder.svg?height=120&width=120'
@@ -145,7 +137,6 @@ export default function NoticesCircularsPage() {
 			priority: 'medium',
 			tags: ['Research', 'Symposium', 'Papers'],
 			description: 'Call for research papers for the annual academic symposium. Students and faculty are invited to submit their research work.',
-			views: 560,
 			pinned: false,
 			urgent: false,
 			image: '/placeholder.svg?height=120&width=120'
@@ -160,7 +151,6 @@ export default function NoticesCircularsPage() {
 			priority: 'high',
 			tags: ['Innovation', 'Contest', 'Technology'],
 			description: 'Participate in the annual innovation contest and present your groundbreaking ideas. Multiple categories and attractive prizes await.',
-			views: 890,
 			pinned: true,
 			urgent: false,
 			image: '/placeholder.svg?height=120&width=120'
@@ -175,7 +165,6 @@ export default function NoticesCircularsPage() {
 			priority: 'medium',
 			tags: ['Sports Day', 'Celebration', 'Events'],
 			description: 'Annual sports day with various athletic competitions, cultural programs, and prize distributions for outstanding performers.',
-			views: 750,
 			pinned: false,
 			urgent: false,
 			image: '/placeholder.svg?height=120&width=120'
@@ -229,8 +218,6 @@ export default function NoticesCircularsPage() {
 				case 'priority':
 					const priorityOrder = { high: 3, medium: 2, low: 1 };
 					return priorityOrder[b.priority] - priorityOrder[a.priority];
-				case 'views':
-					return b.views - a.views;
 				default:
 					return 0;
 			}
@@ -368,12 +355,11 @@ export default function NoticesCircularsPage() {
 							<div className="relative">
 								<select
 									value={sortBy}
-									onChange={(e) => setSortBy(e.target.value as 'date' | 'priority' | 'views')}
+									onChange={(e) => setSortBy(e.target.value as 'date' | 'priority')}
 									className="appearance-none bg-white border border-gray-300 rounded-xl px-4 py-3 pr-10 focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
 								>
 									<option value="date">Sort by Date</option>
 									<option value="priority">Sort by Priority</option>
-									<option value="views">Sort by Views</option>
 								</select>
 								<ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 pointer-events-none" />
 							</div>
@@ -441,7 +427,7 @@ export default function NoticesCircularsPage() {
 			>
 				{filteredNotices.length > 0 ? (
 					<motion.div 
-						className="grid grid-cols-1 lg:grid-cols-2 gap-8"
+						className="grid grid-cols-1 md:grid-cols-2 gap-8"
 						initial="hidden"
 						animate="visible"
 						variants={{
@@ -583,10 +569,6 @@ export default function NoticesCircularsPage() {
 													<div className="flex items-center gap-1">
 														<Clock className="w-3 h-3" />
 														<span>{notice.time}</span>
-													</div>
-													<div className="flex items-center gap-1">
-														<Eye className="w-3 h-3" />
-														<span>{notice.views}</span>
 													</div>
 												</div>
 

@@ -19,7 +19,6 @@ interface Notice {
 	priority: Priority;
 	tags: string[];
 	description: string;
-	views: number;
 	pinned: boolean;
 	urgent: boolean;
 }
@@ -35,7 +34,6 @@ interface Announcement {
 	priority: Priority;
 	tags: string[];
 	description: string;
-	views: number;
 	pinned: boolean;
 	urgent: boolean;
 }

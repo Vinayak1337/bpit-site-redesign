@@ -137,7 +137,6 @@ export const homeNoticesData: NoticesSectionData = {
 			tags: ['Exam', 'Schedule', 'Important'],
 			description:
 				'The mid-semester examination schedule has been released. Students are advised to check their individual exam timetables and prepare accordingly.',
-			views: 1250,
 			pinned: true,
 			urgent: true
 		},
@@ -153,7 +152,6 @@ export const homeNoticesData: NoticesSectionData = {
 			tags: ['Scholarship', 'Finance', 'Government'],
 			description:
 				'Students can now apply for education loans through the PM Vidya Laxmi scheme. Eligible students can receive financial assistance for their studies.',
-			views: 890,
 			pinned: false,
 			urgent: false
 		},
@@ -169,7 +167,6 @@ export const homeNoticesData: NoticesSectionData = {
 			tags: ['Registration', 'Deadline', 'Extension'],
 			description:
 				'The deadline for semester registration has been extended by one week. Students who have not yet registered are advised to complete the process immediately.',
-			views: 2100,
 			pinned: true,
 			urgent: true
 		}
@@ -187,7 +184,6 @@ export const homeNoticesData: NoticesSectionData = {
 			tags: ['Innovation', 'Council', 'Meeting'],
 			description:
 				'Monthly meeting of the Institute Innovation Council to discuss ongoing projects and future initiatives.',
-			views: 450,
 			pinned: true,
 			urgent: false
 		},
@@ -203,7 +199,6 @@ export const homeNoticesData: NoticesSectionData = {
 			tags: ['Sports', 'Tournament', 'Basketball'],
 			description:
 				'Registration is now open for the inter-college basketball tournament. Teams must register before the deadline.',
-			views: 620,
 			pinned: false,
 			urgent: false
 		},
@@ -219,7 +214,6 @@ export const homeNoticesData: NoticesSectionData = {
 			tags: ['Registration', 'Deadline', 'Extension'],
 			description:
 				'The deadline for semester registration has been extended by one week. Students who have not yet registered are advised to complete the process immediately.',
-			views: 2100,
 			pinned: true,
 			urgent: true
 		}
