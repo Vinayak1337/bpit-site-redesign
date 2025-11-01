@@ -51,6 +51,7 @@ type NoticeFormValue = {
 	description: string;
 	pinned: 'true' | 'false';
 	urgent: 'true' | 'false';
+	link: string;
 };
 
 type FormValues = {
@@ -76,7 +77,8 @@ const createEmptyNotice = (): NoticeFormValue => ({
 	tags: '',
 	description: '',
 	pinned: 'false',
-	urgent: 'false'
+	urgent: 'false',
+	link: '/'
 });
 
 const toNotice = (value: NoticeFormValue): Notice | null => {
@@ -106,7 +108,8 @@ const toNotice = (value: NoticeFormValue): Notice | null => {
 		tags,
 		description,
 		pinned: value.pinned === 'true',
-		urgent: value.urgent === 'true'
+		urgent: value.urgent === 'true',
+		link: value.link.trim().length > 0 ? value.link.trim() : '/'
 	};
 };
 
@@ -144,7 +147,8 @@ const toFormValue = (notice: Notice): NoticeFormValue => ({
 	tags: toTagsString(notice.tags),
 	description: notice.description,
 	pinned: notice.pinned ? 'true' : 'false',
-	urgent: notice.urgent ? 'true' : 'false'
+	urgent: notice.urgent ? 'true' : 'false',
+	link: notice.link
 });
 
 const ensureMinimumItems = (values: FormValues): FormValues => ({
@@ -383,6 +387,21 @@ export default function NoticesSectionForm({
 							</FormItem>
 						)}
 					/>
+
+				<FormField
+					control={form.control}
+					name={`${arrayName}.${index}.link` as const}
+					rules={{ required: 'Link is required' }}
+					render={({ field: linkField }) => (
+						<FormItem>
+							<FormLabel>Link</FormLabel>
+							<FormControl>
+								<Input placeholder='/' {...linkField} />
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
 				</div>
 
 				<FormField

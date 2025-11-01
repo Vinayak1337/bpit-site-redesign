@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import Link from 'next/link';
 import {
 	Bell,
 	Calendar,
@@ -98,6 +99,8 @@ const getPriorityConfig = (priority: Priority) => {
 	return configs[priority];
 };
 
+const MotionLink = motion(Link);
+
 const formatDate = (dateString: string) => {
 	const date = new Date(dateString);
 	const now = new Date();
@@ -119,6 +122,7 @@ const NoticeCard = ({ item, index }: { item: Notice; index: number }) => {
 	const [isHovered, setIsHovered] = useState(false);
 	const categoryConfig = getCategoryConfig(item.category);
 	const priorityConfig = getPriorityConfig(item.priority);
+	const isExternalLink = item.link.startsWith('http');
 
 	return (
 		<motion.div
@@ -246,13 +250,16 @@ const NoticeCard = ({ item, index }: { item: Notice; index: number }) => {
 							</div>
 						</div>
 
-						<motion.button
+						<MotionLink
+							href={item.link}
+							target={isExternalLink ? '_blank' : undefined}
+							rel={isExternalLink ? 'noopener noreferrer' : undefined}
 							whileHover={{ scale: 1.05 }}
 							whileTap={{ scale: 0.95 }}
 							className='flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors duration-200'>
 							View
 							<ArrowRight className='w-3 h-3' />
-						</motion.button>
+						</MotionLink>
 					</div>
 				</div>
 
@@ -261,4 +268,11 @@ const NoticeCard = ({ item, index }: { item: Notice; index: number }) => {
 					initial={{ opacity: 0 }}
 					animate={{ opacity: isHovered ? 0.02 : 0 }}
 					transition={{ duration: 0.3 }}
-					className={`
+					className={`absolute inset-0 bg-gradient-to-br ${categoryConfig.gradient}`}
+				/>
+			</div>
+		</motion.div>
+	);
+};
+
+export default NoticeCard;

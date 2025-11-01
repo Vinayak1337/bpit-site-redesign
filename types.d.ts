@@ -21,6 +21,7 @@ interface Notice {
 	description: string;
 	pinned: boolean;
 	urgent: boolean;
+	link: string;
 }
 
 interface Announcement {
@@ -36,6 +37,7 @@ interface Announcement {
 	description: string;
 	pinned: boolean;
 	urgent: boolean;
+	link: string;
 }
 
 interface NoticesSectionData {

@@ -168,6 +168,7 @@ export type NoticesBlock = {
 		description?: string;
 		pinned?: boolean;
 		urgent?: boolean;
+		link?: string;
 	}[];
 	announcements?: NoticesBlock['notices'];
 };

@@ -138,7 +138,8 @@ export const homeNoticesData: NoticesSectionData = {
 			description:
 				'The mid-semester examination schedule has been released. Students are advised to check their individual exam timetables and prepare accordingly.',
 			pinned: true,
-			urgent: true
+			urgent: true,
+			link: '/'
 		},
 		{
 			id: 2,
@@ -153,7 +154,8 @@ export const homeNoticesData: NoticesSectionData = {
 			description:
 				'Students can now apply for education loans through the PM Vidya Laxmi scheme. Eligible students can receive financial assistance for their studies.',
 			pinned: false,
-			urgent: false
+			urgent: false,
+			link: '/'
 		},
 		{
 			id: 3,
@@ -168,7 +170,8 @@ export const homeNoticesData: NoticesSectionData = {
 			description:
 				'The deadline for semester registration has been extended by one week. Students who have not yet registered are advised to complete the process immediately.',
 			pinned: true,
-			urgent: true
+			urgent: true,
+			link: '/'
 		}
 	],
 	announcements: [
@@ -185,7 +188,8 @@ export const homeNoticesData: NoticesSectionData = {
 			description:
 				'Monthly meeting of the Institute Innovation Council to discuss ongoing projects and future initiatives.',
 			pinned: true,
-			urgent: false
+			urgent: false,
+			link: '/'
 		},
 		{
 			id: 2,
@@ -200,7 +204,8 @@ export const homeNoticesData: NoticesSectionData = {
 			description:
 				'Registration is now open for the inter-college basketball tournament. Teams must register before the deadline.',
 			pinned: false,
-			urgent: false
+			urgent: false,
+			link: '/'
 		},
 		{
 			id: 3,
@@ -215,7 +220,8 @@ export const homeNoticesData: NoticesSectionData = {
 			description:
 				'The deadline for semester registration has been extended by one week. Students who have not yet registered are advised to complete the process immediately.',
 			pinned: true,
-			urgent: true
+			urgent: true,
+			link: '/'
 		}
 	]
 };

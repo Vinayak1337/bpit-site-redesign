@@ -31,7 +31,18 @@ const noticeItemSchema = z.object({
 	tags: z.array(z.string()).default([]),
 	description: z.string().default(''),
 	pinned: z.boolean().default(false),
-	urgent: z.boolean().default(false)
+	urgent: z.boolean().default(false),
+	link: z
+		.string()
+		.min(1)
+		.default('/')
+		.refine(
+			value =>
+				value.startsWith('/') ||
+				value.startsWith('https://') ||
+				value.startsWith('http://'),
+			'Link must start with "/" or "http(s)://"'
+		)
 });
 
 const noticesSectionSchema = z.object({
@@ -57,7 +68,8 @@ const defaultNoticesSection: NoticesSectionInput = {
 			description:
 				'The mid-semester examination schedule has been released. Students are advised to check their individual exam timetables and prepare accordingly.',
 			pinned: true,
-			urgent: true
+			urgent: true,
+			link: '/'
 		}
 	],
 	announcements: [
@@ -74,7 +86,8 @@ const defaultNoticesSection: NoticesSectionInput = {
 			description:
 				'Monthly meeting of the Institute Innovation Council to discuss ongoing projects and future initiatives.',
 			pinned: true,
-			urgent: false
+			urgent: false,
+			link: '/'
 		}
 	]
 };
@@ -91,7 +104,8 @@ const toNotice = (item: NoticeItemInput): Notice => ({
 	tags: item.tags ?? [],
 	description: item.description ?? '',
 	pinned: item.pinned ?? false,
-	urgent: item.urgent ?? false
+	urgent: item.urgent ?? false,
+	link: item.link ?? '/'
 });
 
 const fromNotice = (notice: Notice): NoticeItemInput => ({
@@ -114,7 +128,8 @@ const fromNotice = (notice: Notice): NoticeItemInput => ({
 	tags: notice.tags,
 	description: notice.description,
 	pinned: notice.pinned,
-	urgent: notice.urgent
+	urgent: notice.urgent,
+	link: notice.link
 });
 
 const normalizeSection = (

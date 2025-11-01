@@ -38,7 +38,8 @@ export default function NoticesCircularsPage() {
 			description: 'The mid-semester examination schedule has been released. Students are advised to check their individual exam timetables and prepare accordingly.',
 			pinned: true,
 			urgent: true,
-			image: '/placeholder.svg?height=120&width=120'
+			image: '/placeholder.svg?height=120&width=120',
+			link: '/'
 		},
 		{
 			id: 2,
@@ -52,7 +53,8 @@ export default function NoticesCircularsPage() {
 			description: 'Applications are now open for Merit-cum-Means Scholarships for the academic year 2024-25. Eligible students can apply online.',
 			pinned: true,
 			urgent: false,
-			image: '/placeholder.svg?height=120&width=120'
+			image: '/placeholder.svg?height=120&width=120',
+			link: '/'
 		},
 		{
 			id: 3,
@@ -66,7 +68,8 @@ export default function NoticesCircularsPage() {
 			description: 'Additional counseling round will be conducted for remaining vacant seats in various B.Tech programs. Interested candidates should apply immediately.',
 			pinned: false,
 			urgent: true,
-			image: '/placeholder.svg?height=120&width=120'
+			image: '/placeholder.svg?height=120&width=120',
+			link: '/'
 		},
 		{
 			id: 4,
@@ -80,7 +83,8 @@ export default function NoticesCircularsPage() {
 			description: 'Registration is now open for the annual inter-college sports tournament. Students can participate in various indoor and outdoor sports.',
 			pinned: false,
 			urgent: false,
-			image: '/placeholder.svg?height=120&width=120'
+			image: '/placeholder.svg?height=120&width=120',
+			link: '/'
 		},
 		{
 			id: 5,
@@ -94,7 +98,8 @@ export default function NoticesCircularsPage() {
 			description: 'The library has added new digital resources including international journals, e-books, and research databases for student access.',
 			pinned: false,
 			urgent: false,
-			image: '/placeholder.svg?height=120&width=120'
+			image: '/placeholder.svg?height=120&width=120',
+			link: '/'
 		},
 		{
 			id: 6,
@@ -108,7 +113,8 @@ export default function NoticesCircularsPage() {
 			description: 'Detailed guidelines for conducting online practical examinations. Students must follow all protocols for successful completion.',
 			pinned: true,
 			urgent: false,
-			image: '/placeholder.svg?height=120&width=120'
+			image: '/placeholder.svg?height=120&width=120',
+			link: '/'
 		}
 	];
 
@@ -125,7 +131,8 @@ export default function NoticesCircularsPage() {
 			description: 'Scheduled maintenance activities for campus infrastructure. Some facilities may be temporarily unavailable during maintenance hours.',
 			pinned: false,
 			urgent: false,
-			image: '/placeholder.svg?height=120&width=120'
+			image: '/placeholder.svg?height=120&width=120',
+			link: '/'
 		},
 		{
 			id: 8,
@@ -139,7 +146,8 @@ export default function NoticesCircularsPage() {
 			description: 'Call for research papers for the annual academic symposium. Students and faculty are invited to submit their research work.',
 			pinned: false,
 			urgent: false,
-			image: '/placeholder.svg?height=120&width=120'
+			image: '/placeholder.svg?height=120&width=120',
+			link: '/'
 		},
 		{
 			id: 9,
@@ -153,7 +161,8 @@ export default function NoticesCircularsPage() {
 			description: 'Participate in the annual innovation contest and present your groundbreaking ideas. Multiple categories and attractive prizes await.',
 			pinned: true,
 			urgent: false,
-			image: '/placeholder.svg?height=120&width=120'
+			image: '/placeholder.svg?height=120&width=120',
+			link: '/'
 		},
 		{
 			id: 10,
@@ -167,7 +176,8 @@ export default function NoticesCircularsPage() {
 			description: 'Annual sports day with various athletic competitions, cultural programs, and prize distributions for outstanding performers.',
 			pinned: false,
 			urgent: false,
-			image: '/placeholder.svg?height=120&width=120'
+			image: '/placeholder.svg?height=120&width=120',
+			link: '/'
 		}
 	];
 
