@@ -19,9 +19,7 @@ const normalizeData = (
 	statistics: data.statistics ?? []
 });
 
-const toFormValues = (
-	data: PlacementCompaniesData
-) => ({
+const toFormValues = (data: PlacementCompaniesData) => ({
 	title: data.title,
 	subtitle: data.subtitle,
 	companies: (data.companies ?? []).map(company => ({
@@ -36,20 +34,28 @@ const toFormValues = (
 	}))
 });
 
-const dataEqual = (a: PlacementCompaniesData, b: PlacementCompaniesData): boolean =>
-	JSON.stringify(a) === JSON.stringify(b);
+const dataEqual = (
+	a: PlacementCompaniesData,
+	b: PlacementCompaniesData
+): boolean => JSON.stringify(a) === JSON.stringify(b);
 
 export default function PlacementCompaniesEditor({
 	initialData,
 	pageSlug
 }: PlacementCompaniesEditorProps) {
 	const normalized = useMemo(() => normalizeData(initialData), [initialData]);
-	const initialFormValues = useMemo(() => toFormValues(normalized), [normalized]);
-	const [previewData, setPreviewData] = useState<PlacementCompaniesData>(normalized);
+	const initialFormValues = useMemo(
+		() => toFormValues(normalized),
+		[normalized]
+	);
+	const [previewData, setPreviewData] =
+		useState<PlacementCompaniesData>(normalized);
 
 	const handlePreviewChange = useCallback((data: PlacementCompaniesData) => {
 		const normalizedData = normalizeData(data);
-		setPreviewData(prev => (dataEqual(prev, normalizedData) ? prev : normalizedData));
+		setPreviewData(prev =>
+			dataEqual(prev, normalizedData) ? prev : normalizedData
+		);
 	}, []);
 
 	return (
@@ -66,4 +72,3 @@ export default function PlacementCompaniesEditor({
 		</Editable>
 	);
 }
-
