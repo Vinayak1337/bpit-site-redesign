@@ -114,6 +114,26 @@ interface TopPlacedStudentsData {
 	statistics: PlacementStatistic[];
 }
 
+interface TestimonialItem {
+	id: number;
+	name: string;
+	batch: string;
+	company: string;
+	position: string;
+	image: string;
+	video: string;
+	testimonial: string;
+	rating: number;
+	achievement: string;
+	tags: string[];
+}
+
+interface TestimonialsData {
+	title: string;
+	subtitle: string;
+	testimonials: TestimonialItem[];
+}
+
 // Header contact bar data shape
 interface HeaderContactUsData {
 	phone: { tel: string; display: string };

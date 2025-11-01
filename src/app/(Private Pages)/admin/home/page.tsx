@@ -1,6 +1,6 @@
 import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
 import BPITFooter from '@/components/footer/BPITFooter';
-import Testimonial from '@/components/carousel/testimonial';
+import TestimonialsEditor from '@/app/(Private Pages)/admin/components/TestimonialsEditor';
 import Editable from '@/components/ui/Editable';
 
 import { footerBottomLeftContent } from '@/data/header';
@@ -19,8 +19,7 @@ import {
 	getPlacementCompanies,
 	getTopPlacedStudents
 } from '@/app/(Private Pages)/actions/placement';
-
-import { homeTestimonialsData } from '@/data/home';
+import { getTestimonials } from '@/app/(Private Pages)/actions/testimonials';
 
 export default async function AdminHomePage() {
 	await requireAdmin();
@@ -32,7 +31,8 @@ export default async function AdminHomePage() {
 		noticesSection,
 		eventsSection,
 		placementCompanies,
-		topPlacedStudents
+		topPlacedStudents,
+		testimonials
 	] = await Promise.all([
 		getContacts(),
 		getHeaderAnnouncements(pageSlug),
@@ -40,7 +40,8 @@ export default async function AdminHomePage() {
 		getNoticesSection(pageSlug),
 		getEventsSection(pageSlug),
 		getPlacementCompanies(pageSlug),
-		getTopPlacedStudents(pageSlug)
+		getTopPlacedStudents(pageSlug),
+		getTestimonials(pageSlug)
 	]);
 
 	const announcementsData: HeaderAnnouncementsData = {
@@ -74,15 +75,7 @@ export default async function AdminHomePage() {
 					initialData={topPlacedStudents}
 					pageSlug={pageSlug}
 				/>
-				<Editable
-					label='Testimonials'
-					formContent={
-						<div className='text-sm text-slate-700'>
-							Edit testimonials content and media.
-						</div>
-					}>
-					<Testimonial data={homeTestimonialsData} />
-				</Editable>
+				<TestimonialsEditor initialData={testimonials} pageSlug={pageSlug} />
 			</main>
 			<Editable
 				label='Footer'

@@ -5,15 +5,23 @@ import WhyHero from './components/WhyHero';
 import StatsStrip from './components/StatsStrip';
 import PlacementCompanies from '@/components/placement/placement-companies';
 import Testimonial from '@/components/carousel/testimonial';
-import { whyBpitHeroData, whyBpitStats, whyBpitFinalCta } from '@/data/why-bpit';
-import { homeTestimonialsData } from '@/data/home';
+import {
+	whyBpitHeroData,
+	whyBpitStats,
+	whyBpitFinalCta
+} from '@/data/why-bpit';
 import { getPlacementCompanies } from '@/app/(Private Pages)/actions/placement';
+import { getTestimonials } from '@/app/(Private Pages)/actions/testimonials';
 
 const pageSlug = 'main';
 
 const WhyBPITPage = async () => {
-    const placementData = await getPlacementCompanies(pageSlug);
-    return (
+	const [placementData, testimonials] = await Promise.all([
+		getPlacementCompanies(pageSlug),
+		getTestimonials(pageSlug)
+	]);
+
+	return (
 		<div className='min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-50'>
 			{/* Frosted Blue Hero aligned to homepage language */}
 			<WhyHero data={whyBpitHeroData} />
@@ -33,8 +41,8 @@ const WhyBPITPage = async () => {
 				<WhyBPITHighlights />
 			</section>
 
-            {/* Recruiters Marquee in white canvas */}
-            <PlacementCompanies data={placementData} />
+			{/* Recruiters Marquee in white canvas */}
+			<PlacementCompanies data={placementData} />
 
 			{/* Accreditations with consistent frosted accents */}
 			<section className='relative py-2'>
@@ -42,8 +50,10 @@ const WhyBPITPage = async () => {
 				<Accreditations />
 			</section>
 
-            {/* Testimonials to mirror home tone */}
-            <Testimonial data={homeTestimonialsData} />
+			{/* Testimonials to mirror home tone */}
+			{testimonials.testimonials.length > 0 && (
+				<Testimonial data={testimonials} />
+			)}
 
 			{/* CTA with blue gradient and glass buttons */}
 			<FinalCTA data={whyBpitFinalCta} />

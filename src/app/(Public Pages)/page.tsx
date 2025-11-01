@@ -7,11 +7,7 @@ import EventsSection from '@/components/carousel/events-section';
 import NoticesSection from '@/components/carousel/notices-section';
 import TopPlacedStudents from '@/components/placement/top-placed-students';
 
-import {
-	homeHero2Data,
-	homeNoticesData,
-	homeTestimonialsData
-} from '@/data/home';
+import { homeHero2Data } from '@/data/home';
 import {
 	getHeroSlides,
 	type HeroSlide
@@ -22,13 +18,12 @@ import {
 	getPlacementCompanies,
 	getTopPlacedStudents
 } from '@/app/(Private Pages)/actions/placement';
+import { getTestimonials } from '@/app/(Private Pages)/actions/testimonials';
 
 type HeroCarouselData = ComponentProps<typeof Hero2>['data'];
 type HeroCarouselSlide = HeroCarouselData['slides'][number];
 
-const normalizeCta = (
-	cta?: HeroSlide['cta']
-): HeroCarouselSlide['cta'] => {
+const normalizeCta = (cta?: HeroSlide['cta']): HeroCarouselSlide['cta'] => {
 	if (!cta) return undefined;
 	const label = cta.label?.trim();
 	if (!label || label.length === 0) return undefined;
@@ -55,10 +50,6 @@ const mapHeroSlidesToHeroData = (slides: HeroSlide[]): HeroCarouselData => ({
 	}))
 });
 
-const hasNoticesContent = (data: NoticesSectionData): boolean => {
-	return data.notices.length > 0 || data.announcements.length > 0;
-};
-
 export default async function Home() {
 	const pageSlug = 'main';
 	const [
@@ -66,29 +57,25 @@ export default async function Home() {
 		noticesSection,
 		eventsSection,
 		placementCompanies,
-		topPlacedStudents
+		topPlacedStudents,
+		testimonials
 	] = await Promise.all([
 		getHeroSlides(pageSlug),
 		getNoticesSection(pageSlug),
 		getEventsSection(pageSlug),
 		getPlacementCompanies(pageSlug),
-		getTopPlacedStudents(pageSlug)
+		getTopPlacedStudents(pageSlug),
+		getTestimonials(pageSlug)
 	]);
 
 	const heroData: HeroCarouselData =
-		heroSlides.length > 0
-			? mapHeroSlidesToHeroData(heroSlides)
-			: homeHero2Data;
-
-	const noticesData = hasNoticesContent(noticesSection)
-		? noticesSection
-		: homeNoticesData;
+		heroSlides.length > 0 ? mapHeroSlidesToHeroData(heroSlides) : homeHero2Data;
 
 	return (
 		<>
 			<Hero2 data={heroData} />
 
-			<NoticesSection data={noticesData} />
+			<NoticesSection data={noticesSection} />
 
 			<EventsSection data={eventsSection} />
 
@@ -96,7 +83,9 @@ export default async function Home() {
 
 			<TopPlacedStudents data={topPlacedStudents} />
 
-			<Testimonial data={homeTestimonialsData} />
+			{testimonials.testimonials.length > 0 && (
+				<Testimonial data={testimonials} />
+			)}
 		</>
 	);
 }
