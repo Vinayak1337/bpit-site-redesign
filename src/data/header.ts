@@ -43,6 +43,6 @@ export const footerContactInfoData: FooterContactInfoData = {
 
 export const footerBottomLeftContent: FooterBottomLeftContent = {
 	copyright:
-		'© 2024 Bhagwan Parshuram Institute of Technology. All rights reserved.',
+		'Bhagwan Parshuram Institute of Technology. All rights reserved.',
 	accreditation: 'Affiliated to GGSIPU | NBA Accredited | NAAC Certified'
 };
