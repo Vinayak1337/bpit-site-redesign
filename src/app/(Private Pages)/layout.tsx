@@ -55,11 +55,6 @@ export default function AdminLayout({
 									Pages
 								</Link>
 								<Link
-									href='/admin/media'
-									className='px-3 py-2 rounded-md hover:bg-slate-100'>
-									Media
-								</Link>
-								<Link
 									href='/admin/logs'
 									className='px-3 py-2 rounded-md hover:bg-slate-100'>
 									Logs

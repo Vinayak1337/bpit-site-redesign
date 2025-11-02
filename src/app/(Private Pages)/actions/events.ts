@@ -6,6 +6,7 @@ import prisma from '@/lib/prisma';
 import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
 import { createAuditLog } from '@/lib/audit';
 import type { Prisma } from '@prisma/client';
+import { revalidateTag, unstable_cache } from 'next/cache';
 
 const eventSchema = z.object({
 	id: z.union([z.string(), z.number()]).optional(),
@@ -42,6 +43,8 @@ const eventSchema = z.object({
 const eventsSectionSchema = z.object({
 	events: z.array(eventSchema).default([])
 });
+
+const EVENTS_CACHE_TAG = 'events-section';
 
 type EventItemInput = z.infer<typeof eventSchema>;
 type EventsSectionInput = z.infer<typeof eventsSectionSchema>;
@@ -96,7 +99,7 @@ const normalizeEvents = (
 	events: section?.events.map(toEvent) ?? []
 });
 
-export async function getEventsSection(
+async function getEventsSectionUncached(
 	pageSlug: string
 ): Promise<EventsSectionData> {
 	const page = await prisma.page.findUnique({ where: { slug: pageSlug } });
@@ -118,6 +121,12 @@ export async function getEventsSection(
 
 	return normalizeEvents(parsed.data);
 }
+
+export const getEventsSection = unstable_cache(
+	getEventsSectionUncached,
+	['getEventsSection'],
+	{ tags: [EVENTS_CACHE_TAG] }
+);
 
 export async function updateEventsSection(
 	pageSlug: string,
@@ -168,6 +177,8 @@ export async function updateEventsSection(
 			}
 		]
 	});
+
+	revalidateTag(EVENTS_CACHE_TAG);
 
 	return { ok: true };
 }

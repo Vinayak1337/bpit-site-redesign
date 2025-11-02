@@ -6,6 +6,7 @@ import prisma from '@/lib/prisma';
 import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
 import { createAuditLog } from '@/lib/audit';
 import { Prisma } from '@prisma/client';
+import { revalidateTag, unstable_cache } from 'next/cache';
 
 const EMPTY_PLACEMENT_COMPANIES: PlacementCompaniesData = {
 	title: '',
@@ -20,6 +21,9 @@ const EMPTY_TOP_PLACED_STUDENTS: TopPlacedStudentsData = {
 	students: [],
 	statistics: []
 };
+
+const PLACEMENT_COMPANIES_CACHE_TAG = 'placement-companies';
+const TOP_PLACED_STUDENTS_CACHE_TAG = 'top-placed-students';
 
 const placementCompanySchema = z.object({
 	name: z.string().min(1),
@@ -214,7 +218,7 @@ const getOrCreateComponent = async (
 	return component;
 };
 
-export async function getPlacementCompanies(
+async function getPlacementCompaniesUncached(
 	pageSlug: string
 ): Promise<PlacementCompaniesData> {
 	const page = await prisma.page.findUnique({ where: { slug: pageSlug } });
@@ -236,6 +240,12 @@ export async function getPlacementCompanies(
 
 	return normalizePlacementCompanies(parsed.data);
 }
+
+export const getPlacementCompanies = unstable_cache(
+	getPlacementCompaniesUncached,
+	['getPlacementCompanies'],
+	{ tags: [PLACEMENT_COMPANIES_CACHE_TAG] }
+);
 
 export async function updatePlacementCompanies(
 	pageSlug: string,
@@ -286,10 +296,12 @@ export async function updatePlacementCompanies(
 		]
 	});
 
+	revalidateTag(PLACEMENT_COMPANIES_CACHE_TAG);
+
 	return { ok: true };
 }
 
-export async function getTopPlacedStudents(
+async function getTopPlacedStudentsUncached(
 	pageSlug: string
 ): Promise<TopPlacedStudentsData> {
 	const page = await prisma.page.findUnique({ where: { slug: pageSlug } });
@@ -311,6 +323,12 @@ export async function getTopPlacedStudents(
 
 	return normalizeTopPlacedStudents(parsed.data);
 }
+
+export const getTopPlacedStudents = unstable_cache(
+	getTopPlacedStudentsUncached,
+	['getTopPlacedStudents'],
+	{ tags: [TOP_PLACED_STUDENTS_CACHE_TAG] }
+);
 
 export async function updateTopPlacedStudents(
 	pageSlug: string,
@@ -360,6 +378,8 @@ export async function updateTopPlacedStudents(
 			}
 		]
 	});
+
+	revalidateTag(TOP_PLACED_STUDENTS_CACHE_TAG);
 
 	return { ok: true };
 }

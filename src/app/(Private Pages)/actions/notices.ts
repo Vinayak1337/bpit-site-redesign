@@ -6,6 +6,7 @@ import prisma from '@/lib/prisma';
 import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
 import { createAuditLog } from '@/lib/audit';
 import type { Prisma } from '@prisma/client';
+import { revalidateTag, unstable_cache } from 'next/cache';
 
 const categoryValues = [
 	'Academic',
@@ -49,6 +50,8 @@ const noticesSectionSchema = z.object({
 	notices: z.array(noticeItemSchema).default([]),
 	announcements: z.array(noticeItemSchema).default([])
 });
+
+const NOTICES_CACHE_TAG = 'notices-section';
 
 type NoticeItemInput = z.infer<typeof noticeItemSchema>;
 type NoticesSectionInput = z.infer<typeof noticesSectionSchema>;
@@ -139,7 +142,7 @@ const normalizeSection = (
 	announcements: section.announcements.map(toNotice)
 });
 
-export async function getNoticesSection(
+async function getNoticesSectionUncached(
 	pageSlug: string
 ): Promise<NoticesSectionData> {
 	const page = await prisma.page.findUnique({ where: { slug: pageSlug } });
@@ -161,6 +164,12 @@ export async function getNoticesSection(
 
 	return normalizeSection(parsed.data);
 }
+
+export const getNoticesSection = unstable_cache(
+	getNoticesSectionUncached,
+	['getNoticesSection'],
+	{ tags: [NOTICES_CACHE_TAG] }
+);
 
 export async function updateNoticesSection(
 	pageSlug: string,
@@ -216,6 +225,8 @@ export async function updateNoticesSection(
 			}
 		]
 	});
+
+	revalidateTag(NOTICES_CACHE_TAG);
 
 	return { ok: true };
 }

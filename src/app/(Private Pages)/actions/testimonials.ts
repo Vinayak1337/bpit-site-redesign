@@ -6,6 +6,7 @@ import prisma from '@/lib/prisma';
 import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
 import { createAuditLog } from '@/lib/audit';
 import { Prisma } from '@prisma/client';
+import { revalidateTag, unstable_cache } from 'next/cache';
 
 const EMPTY_TESTIMONIALS: TestimonialsData = {
 	title: '',
@@ -32,6 +33,8 @@ const testimonialsSchema = z.object({
 	subtitle: z.string().default(''),
 	testimonials: z.array(testimonialItemSchema).default([])
 });
+
+const TESTIMONIALS_CACHE_TAG = 'testimonials';
 
 type TestimonialsInput = z.infer<typeof testimonialsSchema>;
 
@@ -153,7 +156,7 @@ const getOrCreateComponent = async (
 	return component;
 };
 
-export async function getTestimonials(
+async function getTestimonialsUncached(
 	pageSlug: string
 ): Promise<TestimonialsData> {
 	const page = await prisma.page.findUnique({ where: { slug: pageSlug } });
@@ -175,6 +178,12 @@ export async function getTestimonials(
 
 	return normalizeTestimonials(parsed.data);
 }
+
+export const getTestimonials = unstable_cache(
+	getTestimonialsUncached,
+	['getTestimonials'],
+	{ tags: [TESTIMONIALS_CACHE_TAG] }
+);
 
 export async function updateTestimonials(
 	pageSlug: string,
@@ -224,6 +233,8 @@ export async function updateTestimonials(
 			}
 		]
 	});
+
+	revalidateTag(TESTIMONIALS_CACHE_TAG);
 
 	return { ok: true };
 }

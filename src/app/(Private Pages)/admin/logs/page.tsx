@@ -39,31 +39,32 @@ export default async function AdminLogsPage() {
 											<span className='text-slate-500'>-</span>
 										) : (
 											<div className='space-y-2'>
-												{log.changes.map(change => (
-													<div
-														key={change.id}
-														className='rounded border border-slate-200 p-2'>
-														<div className='text-xs text-slate-600 mb-1'>
-															Resource ID:{' '}
-															<span className='font-mono'>
-																{change.resourceId}
-															</span>{' '}
-															{change.field ? `· Field: ${change.field}` : ''}
-														</div>
-														<div className='grid grid-cols-1 md:grid-cols-2 gap-2 text-xs'>
-															<pre className='bg-slate-50 p-2 rounded overflow-x-auto'>
-																<code>
-																	{JSON.stringify(change.previousData, null, 2)}
-																</code>
-															</pre>
-															<pre className='bg-slate-50 p-2 rounded overflow-x-auto'>
-																<code>
-																	{JSON.stringify(change.newData, null, 2)}
-																</code>
-															</pre>
-														</div>
-													</div>
-												))}
+								{log.changes.map(change => (
+									<div
+										key={change.id}
+										className='rounded border border-slate-200 p-2'>
+										<div className='text-xs text-slate-600 mb-1'>
+											Resource ID:{' '}
+											<span className='font-mono'>
+												{change.resourceId}
+											</span>{' '}
+											{change.field ? `· Field: ${change.field}` : ''}
+										</div>
+										<details className='text-xs text-slate-600'>
+											<summary className='cursor-pointer select-none rounded bg-slate-100 px-2 py-1 text-slate-700 hover:bg-slate-200'>
+												Show change details
+											</summary>
+											<div className='mt-2 grid grid-cols-1 gap-2 md:grid-cols-2'>
+												<pre className='bg-slate-50 p-2 rounded overflow-x-auto'>
+													<code>{JSON.stringify(change.previousData, null, 2)}</code>
+												</pre>
+												<pre className='bg-slate-50 p-2 rounded overflow-x-auto'>
+													<code>{JSON.stringify(change.newData, null, 2)}</code>
+												</pre>
+											</div>
+										</details>
+									</div>
+								))}
 											</div>
 										)}
 									</td>

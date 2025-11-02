@@ -6,6 +6,7 @@ import prisma from '@/lib/prisma';
 import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
 import { createAuditLog } from '@/lib/audit';
 import type { Prisma } from '@prisma/client';
+import { revalidateTag, unstable_cache } from 'next/cache';
 
 const heroCtaSchema = z.object({
 	label: z.string().optional(),
@@ -27,60 +28,7 @@ const heroSlideSchema = z.object({
 const heroComponentSchema = z.object({
 	slides: z.array(heroSlideSchema)
 });
-const defaultHeroSlides: HeroSlide[] = [
-	{
-		title: 'Welcome to BPIT',
-		subtitle: "Shaping Tomorrow's Innovators",
-		description:
-			'A Unit of Bhartiya Brahmin Charitable Trust (Regd.).\n(Approved by AICTE, Ministry of Education (MoE))\nAffiliated to Guru Gobind Singh Indraprastha University, Delhi',
-		image: 'https://images.unsplash.com/photo-1562774053-701939374585?w=1200&q=80',
-		icon: 'Award',
-		stats: 'NBA Accredited Institution',
-		cta: { label: 'Apply Now', isEnquiry: true },
-		secondary_cta: { label: 'Explore Programs', href: '/admissions' }
-	},
-	{
-		title: 'Engineering Excellence',
-		subtitle: 'NBA Accredited Programs',
-		description:
-			"Discover our world-class engineering programs in Computer Science, Information Technology, Electronics, and Electrical Engineering designed to shape tomorrow's innovators.",
-		image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=1200&q=80',
-		icon: 'BookOpen',
-		stats: '1000+ Students',
-		cta: { label: 'View Programs', href: '/departments' }
-	},
-	{
-		title: 'Campus Life',
-		subtitle: 'Beyond Academics',
-		description:
-			'Experience vibrant campus life with hostels, sports complexes, and dozens of clubs and societies that nurture holistic development.',
-		image: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1200&q=80',
-		icon: 'Users',
-		stats: '50+ Clubs',
-		cta: { label: 'Student Life', href: '/student-life' }
-	},
-	{
-		title: 'Placement Success',
-		subtitle: 'Industry Ready',
-		description:
-			'Join our alumni network working at top companies like Amazon, Microsoft, and Google with dedicated placement support.',
-		image: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=1200&q=80',
-		icon: 'Trophy',
-		stats: '100% Placement Assistance',
-		cta: { label: 'View Placements', href: '/placements/overview' }
-	},
-	{
-		title: 'Modern Infrastructure',
-		subtitle: 'Learning Environment',
-		description:
-			'Study in smart classrooms, well-equipped labs, digital libraries, and modern campus facilities designed for excellence.',
-		image: 'https://images.unsplash.com/photo-1562774053-701939374585?w=1200&q=80',
-		icon: 'Building',
-		stats: 'State-of-the-art Facilities',
-		cta: { label: 'About BPIT', href: '/about' }
-	}
-];
-
+const HERO_CACHE_TAG = 'hero-slides';
 
 const legacyHeroSchema = z.object({
 	mainTitle: z.string().optional(),
@@ -104,7 +52,7 @@ const legacyHeroSchema = z.object({
 
 export type HeroSlide = z.infer<typeof heroSlideSchema>;
 
-export async function getHeroSlides(pageSlug: string): Promise<HeroSlide[]> {
+async function getHeroSlidesUncached(pageSlug: string): Promise<HeroSlide[]> {
 	const page = await prisma.page.findUnique({ where: { slug: pageSlug } });
 	if (!page) return [];
 	const comp = await prisma.component.findFirst({
@@ -137,21 +85,29 @@ export async function getHeroSlides(pageSlug: string): Promise<HeroSlide[]> {
 		if (legacy.data.buttons && legacy.data.buttons.length > 0) {
 			const [primary, secondary] = legacy.data.buttons;
 			if (primary) {
-				slide.cta = primary.action === 'openEnquiry'
-					? { label: primary.text, isEnquiry: true }
-					: { label: primary.text, href: primary.action ?? undefined };
+				slide.cta =
+					primary.action === 'openEnquiry'
+						? { label: primary.text, isEnquiry: true }
+						: { label: primary.text, href: primary.action ?? undefined };
 			}
 			if (secondary) {
-				slide.secondary_cta = secondary.action === 'openEnquiry'
-					? { label: secondary.text, isEnquiry: true }
-					: { label: secondary.text, href: secondary.action ?? undefined };
+				slide.secondary_cta =
+					secondary.action === 'openEnquiry'
+						? { label: secondary.text, isEnquiry: true }
+						: { label: secondary.text, href: secondary.action ?? undefined };
 			}
 		}
 		return [slide];
 	}
 
-	return defaultHeroSlides;
+	return [];
 }
+
+export const getHeroSlides = unstable_cache(
+	getHeroSlidesUncached,
+	['getHeroSlides'],
+	{ tags: [HERO_CACHE_TAG] }
+);
 
 export async function updateHeroSlides(
 	pageSlug: string,
@@ -193,7 +149,7 @@ export async function updateHeroSlides(
 		]
 	});
 
+	revalidateTag(HERO_CACHE_TAG);
+
 	return { ok: true };
 }
-
-
