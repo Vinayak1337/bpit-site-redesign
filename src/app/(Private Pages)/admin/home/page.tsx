@@ -1,7 +1,6 @@
 import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
-import BPITFooter from '@/components/footer/BPITFooter';
 import TestimonialsEditor from '@/app/(Private Pages)/admin/components/TestimonialsEditor';
-import Editable from '@/components/ui/Editable';
+import FooterContactsEditor from '@/app/(Private Pages)/admin/components/FooterContactsEditor';
 
 import { footerBottomLeftContent } from '@/data/header';
 import { getContacts } from '@/app/(Public Pages)/actions/contacts';
@@ -77,18 +76,10 @@ export default async function AdminHomePage() {
 				/>
 				<TestimonialsEditor initialData={testimonials} pageSlug={pageSlug} />
 			</main>
-			<Editable
-				label='Footer'
-				formContent={
-					<div className='text-sm text-slate-700'>
-						Edit contact info, social links and bottom content.
-					</div>
-				}>
-				<BPITFooter
-					contacts={contacts}
-					bottomLeftContent={footerBottomLeftContent}
-				/>
-			</Editable>
+			<FooterContactsEditor
+				initialContacts={contacts}
+				bottomLeftContent={footerBottomLeftContent}
+			/>
 		</div>
 	);
 }
