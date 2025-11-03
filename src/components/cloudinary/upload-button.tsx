@@ -91,7 +91,7 @@ export default function CloudinaryUploadButton({
 	const displayText = missingConfig
 		? 'Configure Cloudinary'
 		: isUploading
-		? 'Uploading…'
+        ? 'Uploading...'
 		: buttonText;
 	const disabled = missingConfig || isUploading;
 	const accept =
@@ -157,3 +157,4 @@ const extractErrorMessage = (payload: unknown): string | undefined => {
 	}
 	return undefined;
 };
+

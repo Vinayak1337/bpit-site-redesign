@@ -418,7 +418,7 @@ export default function HeroSlidesForm({
 							disabled={isPending}
 							className='bg-gradient-to-r from-sky-500 via-blue-500 to-indigo-500 text-white shadow-lg hover:from-sky-400 hover:via-blue-400 hover:to-indigo-400'>
 							{isPending ? (
-								<span className='flex items-center gap-2'>Saving‚Ä¶</span>
+								<span className='flex items-center gap-2'>Saving...</span>
 							) : (
 								<span className='flex items-center gap-2'>
 									<Save className='h-4 w-4' /> Save changes
@@ -428,8 +428,8 @@ export default function HeroSlidesForm({
 					</div>
 					<p className='text-xs text-slate-500'>
 						Images should be publicly accessible URLs. CTA links support
-						absolute URLs or internal paths (starting with /). Choose ‚ÄúOpen
-						enquiry modal‚Äù to trigger the enquiry popup.
+						absolute URLs or internal paths (starting with /). Choose ‚úOpen
+						enquiry modal‚ù to trigger the enquiry popup.
 					</p>
 				</div>
 			</form>
@@ -536,3 +536,5 @@ function formSlideToHeroSlide(slide: HeroSlideFormValue): HeroSlide {
 
 	return payload;
 }
+
+

@@ -83,33 +83,65 @@ const NavPagesGrid: React.FC = () => {
 					</CardHeader>
 					<CardContent className='space-y-4'>
 						<div className='grid grid-cols-1 gap-2'>
-							{group.items.map(item => (
-								<div
-									key={item.href}
-									className='flex items-center justify-between p-2 rounded-md border transition-colors border-slate-200 hover:bg-slate-50'>
-									<div className='flex items-center gap-2'>
-										<span className='inline-flex items-center justify-center'>
-											{item.icon}
-										</span>
-										<span className='font-medium'>{item.title}</span>
+							{group.items.map(item => {
+								const rawHref = item.href;
+								const isExternal = /^https?:\/\//.test(rawHref);
+								const normalized = isExternal
+									? rawHref
+									: rawHref.startsWith('/')
+									? rawHref
+									: `/${rawHref}`;
+								const publicHref = isExternal
+									? normalized
+									: normalized === '/home'
+									? '/'
+									: normalized;
+								const adminHref = isExternal
+									? null
+									: `/admin${normalized === '/' ? '' : normalized}`;
+
+								return (
+									<div
+										key={item.href}
+										className='flex items-center justify-between p-2 rounded-md border transition-colors border-slate-200 hover:bg-slate-50'>
+										<div className='flex items-center gap-2'>
+											<span className='inline-flex items-center justify-center'>
+												{item.icon}
+											</span>
+											<span className='font-medium'>{item.title}</span>
+										</div>
+										<div className='flex items-center gap-2'>
+											{isExternal ? (
+												<a
+													href={publicHref}
+													target='_blank'
+													rel='noreferrer'
+													aria-label={`Open ${item.title}`}>
+													<Button variant='outline' size='sm'>
+														Open
+													</Button>
+												</a>
+											) : (
+												<Link
+													href={publicHref}
+													target='_blank'
+													aria-label={`Open ${item.title}`}>
+													<Button variant='outline' size='sm'>
+														Open
+													</Button>
+												</Link>
+											)}
+											{adminHref ? (
+												<Link
+													href={adminHref}
+													aria-label={`Edit ${item.title}`}>
+													<Button size='sm'>Edit</Button>
+												</Link>
+											) : null}
+										</div>
 									</div>
-									<div className='flex items-center gap-2'>
-										<Link
-											href={item.href.replace('home', '')}
-											target='_blank'
-											aria-label={`Open ${item.title}`}>
-											<Button variant='outline' size='sm'>
-												Open
-											</Button>
-										</Link>
-										<Link
-											href={`/admin/${item.href}`}
-											aria-label={`Edit ${item.title}`}>
-											<Button size='sm'>Edit</Button>
-										</Link>
-									</div>
-								</div>
-							))}
+								);
+							})}
 						</div>
 					</CardContent>
 				</Card>

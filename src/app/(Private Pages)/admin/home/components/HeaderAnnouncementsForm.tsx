@@ -115,7 +115,7 @@ export default function HeaderAnnouncementsForm({
 											<FormLabel className='text-slate-700'>Headline</FormLabel>
 											<FormControl>
 												<Input
-													placeholder='Admission window closes this week — apply now'
+													placeholder='Admission window closes this week - apply now'
 													className='border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:ring-blue-500/40'
 													{...field}
 												/>
@@ -172,7 +172,7 @@ export default function HeaderAnnouncementsForm({
 							disabled={isPending}
 							className='bg-gradient-to-r from-sky-500 via-blue-500 to-indigo-500 text-white shadow-lg hover:from-sky-400 hover:via-blue-400 hover:to-indigo-400'>
 							{isPending ? (
-								<span className='flex items-center gap-2'>Saving…</span>
+								<span className='flex items-center gap-2'>Saving...</span>
 							) : (
 								<span className='flex items-center gap-2'>
 									<Save className='h-4 w-4' /> Save changes
@@ -189,3 +189,11 @@ export default function HeaderAnnouncementsForm({
 		</Form>
 	);
 }
+
+
+
+
+
+
+
+

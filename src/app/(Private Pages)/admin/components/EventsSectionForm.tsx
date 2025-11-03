@@ -215,8 +215,8 @@ export default function EventsSectionForm({
 							</span>
 						)}
 						<Button type='submit' disabled={isPending}>
-							{isPending ? 'Saving…' : 'Save changes'}
-						</Button>
+                        {isPending ? 'Saving...' : 'Save changes'}
+                        </Button>
 					</div>
 				</div>
 
@@ -573,3 +573,5 @@ export const toFormValuesFromEventsSection = (
 ): FormValues => ({
 	events: section.events.map(toFormValue)
 });
+
+

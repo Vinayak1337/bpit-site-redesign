@@ -2,63 +2,76 @@ export const aboutHeroData = {
 	title: 'About BPIT',
 	subtitle:
 		'Discover our journey of excellence, vision, and commitment to engineering education',
-	gradient: 'from-blue-600 to-blue-700'
+	gradient: 'from-blue-600 to-blue-700',
+	backgroundImage: null as string | null
 };
 
-export const aboutPageData = {
+export const aboutOverviewData = {
 	header: {
 		title: 'Bhagwan Parshuram Institute of Technology',
 		subtitle: 'Excellence in Engineering Education',
 		established: '2007',
 		location: 'Rohini, New Delhi',
 		accreditation: 'NBA & NAAC',
-		affiliation: 'GGSIPU'
+		affiliation: 'GGSIPU',
+		image: null as string | null
 	},
 	stats: [
 		{
 			icon: 'GraduationCap',
 			value: '1000+',
 			label: 'Students Enrolled',
-			color: 'green'
+			color: 'green' as 'green' | 'purple' | 'blue'
 		},
 		{
 			icon: 'BookOpen',
 			value: '5',
 			label: 'Engineering Departments',
-			color: 'purple'
+			color: 'purple' as 'green' | 'purple' | 'blue'
 		}
+	]
+};
+
+export const aboutLegacyData = {
+	title: 'Our Legacy',
+	paragraphs: [
+		'Bhagwan Parshuram Institute of Technology (BPIT) stands as a beacon of excellence in engineering education in Delhi. Established in 2007, BPIT has been committed to providing world-class technical education and fostering innovation among aspiring engineers.',
+		'Located in the heart of Rohini, New Delhi, our institution is affiliated with Guru Gobind Singh Indraprastha University (GGSIPU) and is accredited by the National Board of Accreditation (NBA) and National Assessment and Accreditation Council (NAAC), ensuring the highest standards of education quality.',
+		'Our campus is equipped with state-of-the-art laboratories, modern classrooms, and cutting-edge research facilities. We offer undergraduate programs in Computer Science, Information Technology, Electronics & Communication, Electrical Engineering, and Management Studies.'
 	],
-	legacy: {
-		title: 'Our Legacy',
-		paragraphs: [
-			'Bhagwan Parshuram Institute of Technology (BPIT) stands as a beacon of excellence in engineering education in Delhi. Established in 2007, BPIT has been committed to providing world-class technical education and fostering innovation among aspiring engineers.',
-			'Located in the heart of Rohini, New Delhi, our institution is affiliated with Guru Gobind Singh Indraprastha University (GGSIPU) and is accredited by the National Board of Accreditation (NBA) and National Assessment and Accreditation Council (NAAC), ensuring the highest standards of education quality.',
-			'Our campus is equipped with state-of-the-art laboratories, modern classrooms, and cutting-edge research facilities. We offer undergraduate programs in Computer Science, Information Technology, Electronics & Communication, Electrical Engineering, and Management Studies.'
-		]
-	},
 	features: [
 		{
 			icon: 'Trophy',
 			title: 'Academic Excellence',
 			description:
 				'Consistently high placement rates and academic achievements by our students.',
-			color: 'blue'
+			color: 'blue' as 'green' | 'purple' | 'blue'
 		},
 		{
 			icon: 'Lightbulb',
 			title: 'Innovation Hub',
 			description:
 				'Fostering creativity and innovation through research projects and startups.',
-			color: 'green'
+			color: 'green' as 'green' | 'purple' | 'blue'
 		},
 		{
 			icon: 'Users',
 			title: 'Industry Connect',
 			description:
 				'Strong industry partnerships providing internships and placement opportunities.',
-			color: 'purple'
+			color: 'purple' as 'green' | 'purple' | 'blue'
 		}
 	]
+};
+
+export const aboutPageData = {
+	header: aboutOverviewData.header,
+	stats: aboutOverviewData.stats,
+	legacy: {
+		title: aboutLegacyData.title,
+		paragraphs: aboutLegacyData.paragraphs
+	},
+	features: aboutLegacyData.features
 };
 
 // Chairman's Message Page data

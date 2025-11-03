@@ -3,8 +3,8 @@ import type { Metadata } from 'next';
 import AboutHero from '@/app/(Public Pages)/about/components/AboutHero';
 import DynamicSidebar from '@/components/ui/DynamicSidebar';
 import AboutContentWrapper from '@/app/(Public Pages)/about/components/AboutContentWrapper';
-
-import { aboutHeroData } from '@/data/about';
+import { getAboutHero } from '@/app/(Private Pages)/actions/about';
+import { ABOUT_PAGE_SLUG } from '@/lib/page-slugs';
 import { aboutSidebarData } from '@/data/sidebar';
 
 export const metadata: Metadata = {
@@ -25,15 +25,16 @@ export const metadata: Metadata = {
 	]
 };
 
-const AboutLayout = ({
+const AboutLayout = async ({
 	children
 }: Readonly<{
 	children: React.ReactNode;
 }>) => {
+	const heroData = await getAboutHero(ABOUT_PAGE_SLUG);
 	return (
 		<main className='min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50'>
 			{/* Hero Section */}
-			<AboutHero data={aboutHeroData} />
+			<AboutHero data={heroData} />
 
 			{/* Main Content with Sidebar */}
 			<div className='container mx-auto px-4 py-12'>

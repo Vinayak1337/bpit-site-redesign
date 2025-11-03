@@ -3,20 +3,30 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-interface AboutHeroData {
-	title: string;
-	subtitle: string;
-	gradient: string;
-}
-
 interface AboutHeroProps {
-	data: AboutHeroData;
+	data: {
+		title: string;
+		subtitle: string;
+		gradient: string;
+		backgroundImage?: string | null;
+	};
 }
 
 const AboutHero = ({ data }: AboutHeroProps) => {
+	const backgroundStyles =
+		data.backgroundImage && data.backgroundImage.length > 0
+			? {
+					backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.65), rgba(15, 23, 42, 0.55)), url(${data.backgroundImage})`,
+					backgroundSize: 'cover',
+					backgroundPosition: 'center'
+			  }
+			: undefined;
+
 	return (
-		<section className={`bg-gradient-to-r ${data.gradient} text-white py-16`}>
-			<div className='container mx-auto px-4'>
+		<section
+			className={`relative bg-gradient-to-r ${data.gradient} text-white py-16`}
+			style={backgroundStyles}>
+			<div className='container mx-auto px-4 relative z-10'>
 				<motion.div
 					initial={{ opacity: 0, y: 30 }}
 					animate={{ opacity: 1, y: 0 }}
@@ -68,6 +78,9 @@ const AboutHero = ({ data }: AboutHeroProps) => {
 					</div>
 				</motion.div>
 			</div>
+			{backgroundStyles ? (
+				<div className='absolute inset-0 bg-slate-900/40 pointer-events-none' />
+			) : null}
 		</section>
 	);
 };

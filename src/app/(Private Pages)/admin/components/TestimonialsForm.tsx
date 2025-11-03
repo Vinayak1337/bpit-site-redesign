@@ -166,8 +166,8 @@ export default function TestimonialsForm({
 							</span>
 						)}
 						<Button type='submit' disabled={isPending}>
-							{isPending ? 'Saving…' : 'Save changes'}
-						</Button>
+                        {isPending ? 'Saving...' : 'Save changes'}
+                        </Button>
 					</div>
 				</div>
 
@@ -427,5 +427,7 @@ export default function TestimonialsForm({
 		</Form>
 	);
 }
+
+
 
 

@@ -490,8 +490,8 @@ export default function NoticesSectionForm({
 							</span>
 						)}
 						<Button type='submit' disabled={isPending}>
-							{isPending ? 'Saving…' : 'Save changes'}
-						</Button>
+                {isPending ? 'Saving...' : 'Save changes'}
+                </Button>
 					</div>
 				</div>
 
@@ -557,3 +557,5 @@ export const toFormValuesFromSection = (
 	notices: section.notices.map(toFormValue),
 	announcements: section.announcements.map(toFormValue)
 });
+
+

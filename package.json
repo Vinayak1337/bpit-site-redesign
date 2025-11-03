@@ -11,7 +11,8 @@
     "postbuild": "next-sitemap",
     "prisma:push": "prisma db push",
     "seed:contacts": "node scripts/seed-contacts.cjs",
-    "seed:home": "node scripts/seed-homepage.cjs"
+    "seed:home": "node scripts/seed-homepage.cjs",
+    "seed:about": "node scripts/seed-about.cjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",

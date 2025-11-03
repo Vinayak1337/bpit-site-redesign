@@ -154,8 +154,8 @@ export default function PlacementCompaniesForm({
 							</span>
 						)}
 						<Button type='submit' disabled={isPending}>
-							{isPending ? 'Saving…' : 'Save changes'}
-						</Button>
+                        {isPending ? 'Saving...' : 'Save changes'}
+                        </Button>
 					</div>
 				</div>
 
@@ -369,3 +369,5 @@ export default function PlacementCompaniesForm({
 		</Form>
 	);
 }
+
+
