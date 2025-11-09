@@ -1,50 +1,10 @@
-'use client';
-
 import React from 'react';
-import { motion } from 'framer-motion';
-import { missionPageData } from '@/data/vision-mission';
-import PageHero from '../components/PageHero';
-import QuoteSection from '../components/QuoteSection';
-import FeatureCard from '../components/FeatureCard';
-import StatsSection from '../components/StatsSection';
+import { getMission } from '@/app/(Private Pages)/actions/vision-mission';
+import { VISION_MISSION_SLUG } from '@/lib/page-slugs';
+import MissionSection from '../components/MissionSection';
 
-const MissionPage = () => {
-	const { hero, missionStatement, objectives, impact } = missionPageData;
+export default async function MissionPage() {
+	const missionData = await getMission(VISION_MISSION_SLUG);
 
-	return (
-		<div className='space-y-6 sm:space-y-8'>
-			{/* Hero Section */}
-			<PageHero {...hero} />
-
-			{/* Mission Statement */}
-			<QuoteSection {...missionStatement} />
-
-			{/* Mission Objectives */}
-			<motion.div
-				initial={{ opacity: 0, y: 20 }}
-				animate={{ opacity: 1, y: 0 }}
-				transition={{ duration: 0.6, delay: 0.3 }}
-				className='space-y-4 sm:space-y-6'>
-				<h3 className='text-xl sm:text-2xl font-bold text-gray-900 text-center mb-6 sm:mb-8'>
-					Mission Objectives
-				</h3>
-
-				<div className='space-y-3 sm:space-y-4'>
-					{objectives.map((objective, index) => (
-						<FeatureCard
-							key={index}
-							{...objective}
-							index={index}
-							variant='objective'
-						/>
-					))}
-				</div>
-			</motion.div>
-
-			{/* Mission Impact */}
-			<StatsSection {...impact} />
-		</div>
-	);
-};
-
-export default MissionPage;
+	return <MissionSection data={missionData} />;
+}

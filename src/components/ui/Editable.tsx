@@ -45,11 +45,11 @@ export default function Editable({
 				}
 			/>
 			<Sheet open={open} onOpenChange={setOpen}>
-				<SheetContent side='right' className='w-full sm:max-w-md'>
+				<SheetContent side='right' className='w-full sm:max-w-md overflow-y-auto'>
 					<SheetHeader>
 						<SheetTitle>Edit: {label}</SheetTitle>
 					</SheetHeader>
-					<div className='p-4 space-y-4'>{formContent}</div>
+					<div className='p-4 space-y-4 max-h-full overflow-y-auto'>{formContent}</div>
 				</SheetContent>
 			</Sheet>
 		</div>

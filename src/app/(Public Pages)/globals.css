@@ -26,6 +26,19 @@
 	display: none;  /* Safari and Chrome */
 }
 
+/* Dynamic classes for CMS - ensures Tailwind includes these in build */
+/*
+bg-gradient-to-r from-blue-50 to-blue-100 from-green-50 to-green-100 from-purple-50 to-purple-100 
+from-orange-50 to-orange-100 from-red-50 to-red-100 from-indigo-50 to-indigo-100 
+from-gray-50 to-gray-100 from-teal-50 to-teal-100 from-pink-50 to-pink-100
+bg-blue-600 bg-green-600 bg-purple-600 bg-orange-600 bg-red-600 bg-indigo-600 
+bg-gray-600 bg-teal-600 bg-pink-600 bg-blue-50 bg-green-50 bg-purple-50
+text-blue-600 text-green-600 text-purple-600 text-orange-600 text-red-600 
+text-indigo-600 text-gray-600 text-teal-600 text-pink-600
+text-blue-700 text-green-700 text-purple-700 text-orange-700 text-red-700
+text-blue-800 text-green-800 text-purple-800 text-orange-800 text-red-800
+*/
+
 @keyframes carousel {
 	0% {
 		transform: translateX(0);

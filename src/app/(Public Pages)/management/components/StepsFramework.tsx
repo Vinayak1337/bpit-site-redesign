@@ -55,7 +55,7 @@ const StepsFramework: React.FC<StepsFrameworkProps> = ({ data }) => {
 			</h3>
 			<div className='grid md:grid-cols-4 gap-4'>
 				{data.steps.map(step => {
-					const IconComponent = iconMap[step.icon as keyof typeof iconMap];
+					const IconComponent = iconMap[step.icon as keyof typeof iconMap] || Target; // Fallback to Target icon
 					return (
 						<div key={step.id} className='text-center'>
 							<div

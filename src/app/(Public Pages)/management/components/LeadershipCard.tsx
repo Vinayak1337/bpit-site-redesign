@@ -14,7 +14,9 @@ import {
 	Target,
 	GraduationCap,
 	Calendar,
-	Mail
+	Mail,
+	Settings,
+	User
 } from 'lucide-react';
 
 interface LeadershipCardData {
@@ -48,11 +50,13 @@ const iconMap = {
 	Target,
 	GraduationCap,
 	Calendar,
-	Mail
+	Mail,
+	Settings,
+	User
 };
 
 const LeadershipCard: React.FC<LeadershipCardProps> = ({ data }) => {
-	const MainIconComponent = iconMap[data.icon as keyof typeof iconMap];
+	const MainIconComponent = iconMap[data.icon as keyof typeof iconMap] || User;
 
 	return (
 		<motion.div
@@ -77,7 +81,7 @@ const LeadershipCard: React.FC<LeadershipCardProps> = ({ data }) => {
 			<div className='space-y-2 text-xs sm:text-sm text-gray-600'>
 				{data.details.map((detail, index) => {
 					const DetailIconComponent =
-						iconMap[detail.icon as keyof typeof iconMap];
+						iconMap[detail.icon as keyof typeof iconMap] || User;
 					return (
 						<div key={index} className='flex items-center gap-2'>
 							<DetailIconComponent className='w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0' />
