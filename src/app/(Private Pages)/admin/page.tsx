@@ -155,7 +155,7 @@ export default async function AdminDashboardPage() {
 				<div className='mt-6 text-blue-800'>
 					<p className='mb-4'>Welcome! Use the quick links below to manage your website content:</p>
 					
-					<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+					<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'>
 						<Link
 							href='/admin/about'
 							className='block p-4 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition-colors'>
@@ -175,6 +175,13 @@ export default async function AdminDashboardPage() {
 							className='block p-4 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg transition-colors'>
 							<h3 className='font-semibold text-purple-900 mb-2'>Homepage</h3>
 							<p className='text-sm text-purple-700'>Edit hero section, announcements, and events</p>
+						</Link>
+						
+						<Link
+							href='/admin/placements/overview'
+							className='block p-4 bg-orange-50 hover:bg-orange-100 border border-orange-200 rounded-lg transition-colors'>
+							<h3 className='font-semibold text-orange-900 mb-2'>Placement Overview</h3>
+							<p className='text-sm text-orange-700'>Edit placement statistics, features, mission, and contact information</p>
 						</Link>
 					</div>
 				</div>
