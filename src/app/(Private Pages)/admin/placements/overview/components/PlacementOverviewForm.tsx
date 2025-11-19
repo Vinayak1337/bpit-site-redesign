@@ -520,11 +520,11 @@ export default function PlacementOverviewForm({
 		const updatedData = createUpdatedData(currentData, form.getValues());
 		onChange?.(updatedData);
 		const subscription = form.watch(values => {
-			const formValues: Partial<FormValues> = {
+			const formValues = {
 				...values,
-				stats: values.stats?.filter(Boolean) as StatFormValue[],
-				contacts: values.contacts?.filter(Boolean) as ContactFormValue[]
-			};
+				stats: values.stats?.filter(Boolean),
+				contacts: values.contacts?.filter(Boolean)
+			} as unknown as Partial<FormValues>;
 			const newData = createUpdatedData(currentData, formValues);
 			onChange?.(newData);
 		});

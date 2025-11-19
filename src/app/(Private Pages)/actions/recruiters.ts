@@ -72,7 +72,7 @@ export async function getRecruitersData(): Promise<RecruitersData | null> {
 		}
 
 		const component = page.components[0];
-		return component.data as RecruitersData;
+		return component.data as unknown as RecruitersData;
 	} catch (error) {
 		console.error('Error fetching recruiters data:', error);
 		throw new Error('Failed to fetch recruiters data');
@@ -106,14 +106,14 @@ export async function updateRecruitersData(
 			const component = page.components[0];
 			await prisma.component.update({
 				where: { id: component.id },
-				data: { data: data }
+				data: { data: data as any }
 			});
 		} else {
 			await prisma.component.create({
 				data: {
 					pageId: page.id,
 					key: 'recruiters-data',
-					data: data,
+					data: data as any,
 					order: 0
 				}
 			});
@@ -123,7 +123,7 @@ export async function updateRecruitersData(
 		await createAuditLog({
 			actorId,
 			action: 'UPDATE',
-			resourceType: 'recruiters',
+			resourceType: 'COMPONENT',
 			summary: `Updated recruiters data with ${data.recruiters.length} companies`
 		});
 

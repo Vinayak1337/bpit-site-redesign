@@ -2,7 +2,7 @@ import 'server-only';
 import { prisma } from '@/lib/prisma';
 import type { Prisma } from '@prisma/client';
 
-export type AuditResourceType = 'PAGE' | 'COMPONENT' | 'USER' | 'MEDIA' | 'OTHER';
+export type AuditResourceType = 'PAGE' | 'COMPONENT' | 'USER' | 'MEDIA' | 'OTHER' | 'CONTACT';
 
 export type AuditActionType = 'CREATE' | 'UPDATE' | 'DELETE' | 'PUBLISH' | 'UNPUBLISH';
 

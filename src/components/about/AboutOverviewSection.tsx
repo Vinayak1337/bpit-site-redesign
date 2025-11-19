@@ -40,7 +40,7 @@ function AboutOverviewSectionComponent({ data }: Props) {
 				<div className='relative w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0 overflow-hidden bg-blue-600 aspect-square'>
 					{hasHeaderImage ? (
 						<Image
-							src={data.header.image}
+							src={data.header.image as string}
 							alt={data.header.title}
 							fill
 							className='object-cover'

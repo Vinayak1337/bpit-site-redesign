@@ -155,11 +155,11 @@ export default function RecruitersForm({
 	useEffect(() => {
 		const subscription = form.watch(formValues => {
 			const updatedData: RecruitersData = {
-				hero: formValues.hero || initialData.hero,
-				stats: formValues.stats || initialData.stats,
+				hero: (formValues.hero as any) || initialData.hero,
+				stats: (formValues.stats as any) || initialData.stats,
 				categories: (formValues.categories || []).map(c => c?.name || ''),
-				recruiters: formValues.recruiters || initialData.recruiters,
-				cta: formValues.cta || initialData.cta
+				recruiters: (formValues.recruiters as any) || initialData.recruiters,
+				cta: (formValues.cta as any) || initialData.cta
 			};
 			setCurrentData(updatedData);
 			onChange?.(updatedData);

@@ -11,7 +11,7 @@ interface RecruitersSectionProps {
 }
 
 export default function RecruitersSection({ data }: RecruitersSectionProps) {
-	const HeroIcon = Icons[data.hero.icon as keyof typeof Icons] as React.ElementType || Icons.Building2;
+	const HeroIcon = (Icons[data.hero.icon as keyof typeof Icons] || Icons.Building2) as any;
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
@@ -51,7 +51,7 @@ export default function RecruitersSection({ data }: RecruitersSectionProps) {
 				<div className="container mx-auto px-4">
 					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 						{data.stats.map((stat, index) => {
-							const StatIcon = Icons[stat.icon as keyof typeof Icons] as React.ElementType || Icons.TrendingUp;
+							const StatIcon = (Icons[stat.icon as keyof typeof Icons] || Icons.TrendingUp) as any;
 							return (
 								<motion.div
 									key={index}
@@ -190,7 +190,7 @@ export default function RecruitersSection({ data }: RecruitersSectionProps) {
 						</p>
 						<div className="flex flex-col sm:flex-row gap-4 justify-center">
 							{data.cta.buttons.map((btn, index) => {
-								const BtnIcon = Icons[btn.icon as keyof typeof Icons] as React.ElementType || Icons.Building2;
+								const BtnIcon = (Icons[btn.icon as keyof typeof Icons] || Icons.Building2) as any;
 								return (
 									<button
 										key={index}

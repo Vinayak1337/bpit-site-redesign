@@ -37,12 +37,7 @@ const aboutOverviewHeaderSchema = z.object({
 	location: z.string().min(1),
 	accreditation: z.string().min(1),
 	affiliation: z.string().min(1),
-	image: z
-		.string()
-		.url()
-		.or(z.literal(''))
-		.nullable()
-		.optional()
+	image: z.string().url().or(z.literal('')).nullable().optional()
 });
 
 const aboutOverviewSchema = z.object({
@@ -86,15 +81,28 @@ const principalMessageSchema = z.object({
 	cards: z.object({
 		academicLeadership: z.object({
 			title: z.string().min(1).default('Academic Leadership'),
-			description: z.string().min(1).default('Guiding curriculum development and maintaining academic standards.')
+			description: z
+				.string()
+				.min(1)
+				.default(
+					'Guiding curriculum development and maintaining academic standards.'
+				)
 		}),
 		strategicVision: z.object({
 			title: z.string().min(1).default('Strategic Vision'),
-			description: z.string().min(1).default('Developing long-term strategies for institutional growth and excellence.')
+			description: z
+				.string()
+				.min(1)
+				.default(
+					'Developing long-term strategies for institutional growth and excellence.'
+				)
 		}),
 		studentMentorship: z.object({
 			title: z.string().min(1).default('Student Mentorship'),
-			description: z.string().min(1).default('Fostering student development and career guidance.')
+			description: z
+				.string()
+				.min(1)
+				.default('Fostering student development and career guidance.')
 		})
 	})
 });
@@ -128,9 +136,7 @@ const CHAIRMAN_MESSAGE_CACHE_TAG = 'chairman-message';
 const PRINCIPAL_MESSAGE_CACHE_TAG = 'principal-message';
 const FOUNDER_TRIBUTE_CACHE_TAG = 'founder-tribute';
 
-function normalizeHero(
-	input: AboutHeroData | null | undefined
-): AboutHeroData {
+function normalizeHero(input: AboutHeroData | null | undefined): AboutHeroData {
 	const base: AboutHeroData = {
 		title: aboutHeroDefaults.title,
 		subtitle: aboutHeroDefaults.subtitle,
@@ -235,9 +241,7 @@ function normalizeChairmanMessage(
 			title: "Chairman's Message",
 			subtitle: 'A Vision for Excellence in Engineering Education'
 		},
-		paragraphs: [
-			'Welcome to Bhagwan Parshuram Institute of Technology...'
-		],
+		paragraphs: ['Welcome to Bhagwan Parshuram Institute of Technology...'],
 		quote: '"Dear Students, Faculty, and Stakeholders,"',
 		more: []
 	};
@@ -263,16 +267,22 @@ function normalizePrincipalMessage(
 		],
 		quote: '"Dear Students and Academic Community,"',
 		more: [],
-		achievements: [
-			'Academic Leadership',
-			'Curriculum Development',
-			'Research Innovation'
-		],
-		vision: [
-			'Excellence in Education',
-			'Industry Integration',
-			'Student Success'
-		]
+		cards: {
+			academicLeadership: {
+				title: 'Academic Leadership',
+				description:
+					'Guiding curriculum development and maintaining academic standards.'
+			},
+			strategicVision: {
+				title: 'Strategic Vision',
+				description:
+					'Developing long-term strategies for institutional growth and excellence.'
+			},
+			studentMentorship: {
+				title: 'Student Mentorship',
+				description: 'Fostering student development and career guidance.'
+			}
+		}
 	};
 
 	const parsed = principalMessageSchema.safeParse(input);
@@ -294,18 +304,13 @@ function normalizeFounderTribute(
 		paragraphs: [
 			'Our institution draws its name and inspiration from Bhagwan Parshuram...'
 		],
-		quote: '"Education is the most powerful weapon which you can use to change the world."',
+		quote:
+			'"Education is the most powerful weapon which you can use to change the world."',
 		more: [
 			'The values of discipline, dedication, and excellence continue to guide us...'
 		],
-		coreValues: [
-			'Righteousness and Integrity',
-			'Excellence in Education'
-		],
-		commitments: [
-			'Holistic Development',
-			'Ethical Leadership'
-		]
+		coreValues: ['Righteousness and Integrity', 'Excellence in Education'],
+		commitments: ['Holistic Development', 'Ethical Leadership']
 	};
 
 	const parsed = founderTributeSchema.safeParse(input);
@@ -335,10 +340,7 @@ async function fetchComponentData<T>(
 }
 
 async function getAboutHeroUncached(pageSlug: string): Promise<AboutHeroData> {
-	const data = await fetchComponentData<AboutHeroData>(
-		pageSlug,
-		'ABOUT_HERO'
-	);
+	const data = await fetchComponentData<AboutHeroData>(pageSlug, 'ABOUT_HERO');
 	return normalizeHero(data);
 }
 

@@ -25,7 +25,7 @@ const RecruitersClient = ({ data }: RecruitersClientProps) => {
 		return matchesCategory && matchesSearch;
 	});
 
-	const HeroIcon = Icons[data.hero.icon as keyof typeof Icons] as React.ElementType || Icons.Building2;
+	const HeroIcon = (Icons[data.hero.icon as keyof typeof Icons] || Icons.Building2) as any;
 	const SearchIcon = Icons.Search;
 
 	return (
@@ -64,7 +64,7 @@ const RecruitersClient = ({ data }: RecruitersClientProps) => {
 				<div className="container mx-auto px-4">
 					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 						{data.stats.map((stat, index) => {
-							const StatIcon = Icons[stat.icon as keyof typeof Icons] as React.ElementType || Icons.TrendingUp;
+							const StatIcon = (Icons[stat.icon as keyof typeof Icons] || Icons.TrendingUp) as any;
 							return (
 								<motion.div
 									key={index}
@@ -285,7 +285,7 @@ const RecruitersClient = ({ data }: RecruitersClientProps) => {
 						<p className="text-xl text-blue-200 mb-8 leading-relaxed">{data.cta.subtitle}</p>
 						<div className="flex flex-col sm:flex-row gap-4 justify-center">
 							{data.cta.buttons.map((btn, index) => {
-								const BtnIcon = Icons[btn.icon as keyof typeof Icons] as React.ElementType || Icons.Building2;
+								const BtnIcon = (Icons[btn.icon as keyof typeof Icons] || Icons.Building2) as any;
 								return (
 									<button
 										key={index}
