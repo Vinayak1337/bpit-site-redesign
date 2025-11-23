@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Editable from '@/components/ui/Editable';
 import TrainingPlacementSection from './TrainingPlacementSection';
 import TrainingPlacementForm from './TrainingPlacementForm';
@@ -10,14 +10,16 @@ import {
 } from '@/app/(Private Pages)/actions/training-placement';
 
 export default function TrainingPlacementEditor() {
-	const [data, setData] = useState<TrainingPlacementData | null>(null);
+	const [initialData, setInitialData] = useState<TrainingPlacementData | null>(null);
+	const [previewData, setPreviewData] = useState<TrainingPlacementData | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {
 		async function fetchData() {
 			try {
 				const result = await getTrainingPlacement();
-				setData(result);
+				setInitialData(result);
+				setPreviewData(result);
 			} catch (error) {
 				console.error('Error fetching training placement data:', error);
 			} finally {
@@ -27,6 +29,17 @@ export default function TrainingPlacementEditor() {
 		fetchData();
 	}, []);
 
+	const formContent = useMemo(() => {
+		if (!initialData) return null;
+		return (
+			<TrainingPlacementForm
+				initialData={initialData}
+				pageSlug="training-placement"
+				onChange={setPreviewData}
+			/>
+		);
+	}, [initialData]);
+
 	if (isLoading) {
 		return (
 			<div className='flex min-h-[400px] items-center justify-center'>
@@ -35,7 +48,7 @@ export default function TrainingPlacementEditor() {
 		);
 	}
 
-	if (!data) {
+	if (!initialData || !previewData) {
 		return (
 			<div className='rounded-lg border border-slate-200 bg-white p-8 text-center'>
 				<p className='text-slate-600'>
@@ -48,16 +61,9 @@ export default function TrainingPlacementEditor() {
 	return (
 		<Editable
 			label="Training & Placement"
-			formContent={
-				<TrainingPlacementForm
-					initialData={data}
-					pageSlug="training-placement"
-					onChange={setData}
-				/>
-			}
+			formContent={formContent}
 		>
-			<TrainingPlacementSection data={data} />
+			<TrainingPlacementSection data={previewData} />
 		</Editable>
 	);
 }
-

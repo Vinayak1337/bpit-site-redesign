@@ -19,16 +19,21 @@ export default function AboutOverviewEditor({
 	const [previewData, setPreviewData] =
 		useState<AboutOverviewData>(initial);
 
+	const formContent = useMemo(
+		() => (
+			<AboutOverviewForm
+				initialData={initial}
+				pageSlug={pageSlug}
+				onChange={setPreviewData}
+			/>
+		),
+		[initial, pageSlug]
+	);
+
 	return (
 		<Editable
 			label='About Overview'
-			formContent={
-				<AboutOverviewForm
-					initialData={initial}
-					pageSlug={pageSlug}
-					onChange={setPreviewData}
-				/>
-			}>
+			formContent={formContent}>
 			<AboutOverviewSection data={previewData} />
 		</Editable>
 	);

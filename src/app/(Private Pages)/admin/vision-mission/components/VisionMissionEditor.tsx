@@ -15,16 +15,21 @@ export default function VisionMissionEditor({ initialData, pageSlug }: Props) {
 	const initial = useMemo(() => initialData, [initialData]);
 	const [previewData, setPreviewData] = useState<VisionMissionData>(initial);
 
+	const formContent = useMemo(
+		() => (
+			<VisionMissionForm
+				initialData={initial}
+				pageSlug={pageSlug}
+				onChange={setPreviewData}
+			/>
+		),
+		[initial, pageSlug]
+	);
+
 	return (
 		<Editable
 			label='Vision & Mission'
-			formContent={
-				<VisionMissionForm
-					initialData={initial}
-					pageSlug={pageSlug}
-					onChange={setPreviewData}
-				/>
-			}>
+			formContent={formContent}>
 			<VisionMissionSection data={previewData} />
 		</Editable>
 	);

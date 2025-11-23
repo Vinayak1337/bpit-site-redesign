@@ -15,16 +15,21 @@ export default function GovernanceStructureEditor({ initialData, pageSlug }: Gov
 	const initial = useMemo(() => initialData, [initialData]);
 	const [currentData, setCurrentData] = useState<GovernanceStructureData>(initial);
 
+	const formContent = useMemo(
+		() => (
+			<GovernanceStructureForm
+				initialData={initial}
+				pageSlug={pageSlug}
+				onChange={setCurrentData}
+			/>
+		),
+		[initial, pageSlug]
+	);
+
 	return (
 		<Editable
 			label="Governance Structure"
-			formContent={
-				<GovernanceStructureForm
-					initialData={initial}
-					pageSlug={pageSlug}
-					onChange={setCurrentData}
-				/>
-			}
+			formContent={formContent}
 		>
 			<GovernanceStructureSection data={currentData} />
 		</Editable>

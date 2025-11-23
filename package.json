@@ -10,11 +10,10 @@
     "prebuild": "npx prisma generate",
     "postbuild": "next-sitemap",
     "prisma:push": "prisma db push",
-    "seed:contacts": "node scripts/seed-contacts.cjs",
-    "seed:home": "node scripts/seed-homepage.cjs",
-    "seed:about": "node scripts/seed-about.cjs"
+    "seed": "node scripts/seed.cjs"
   },
   "dependencies": {
+    "@hello-pangea/dnd": "^18.0.1",
     "@hookform/resolvers": "^5.1.1",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-dialog": "^1.1.14",
@@ -25,6 +24,7 @@
     "@radix-ui/react-select": "^2.2.5",
     "@radix-ui/react-separator": "^1.1.7",
     "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-tabs": "^1.1.13",
     "@react-three/drei": "^10.3.0",
     "@react-three/fiber": "^9.1.2",
     "axios": "^1.10.0",
@@ -51,6 +51,7 @@
     "react-hook-form": "^7.59.0",
     "react-intersection-observer": "^9.16.0",
     "react-spinners": "^0.17.0",
+    "react-toastify": "^11.0.5",
     "tailwind-merge": "^3.3.1",
     "three": "^0.177.0",
     "zod": "^3.25.67"

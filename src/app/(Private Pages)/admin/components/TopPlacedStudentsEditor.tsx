@@ -57,18 +57,22 @@ export default function TopPlacedStudentsEditor({
 		setPreviewData(prev => (dataEqual(prev, normalizedData) ? prev : normalizedData));
 	}, []);
 
+	const formContent = useMemo(
+		() => (
+			<TopPlacedStudentsForm
+				initialValues={initialFormValues}
+				pageSlug={pageSlug}
+				onChange={handlePreviewChange}
+			/>
+		),
+		[initialFormValues, pageSlug, handlePreviewChange]
+	);
+
 	return (
 		<Editable
 			label='Top Placed Students'
-			formContent={
-				<TopPlacedStudentsForm
-					initialValues={initialFormValues}
-					pageSlug={pageSlug}
-					onChange={handlePreviewChange}
-				/>
-			}>
+			formContent={formContent}>
 			<TopPlacedStudents data={previewData} />
 		</Editable>
 	);
 }
-

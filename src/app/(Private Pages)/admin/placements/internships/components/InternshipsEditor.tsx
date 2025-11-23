@@ -1,23 +1,36 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { getInternshipsData, type InternshipsData } from '@/app/(Private Pages)/actions/internships';
 import Editable from '@/components/ui/Editable';
 import InternshipsSection from './InternshipsSection';
 import InternshipsForm from './InternshipsForm';
 
 export default function InternshipsEditor() {
-	const [data, setData] = useState<InternshipsData | null>(null);
+	const [initialData, setInitialData] = useState<InternshipsData | null>(null);
+	const [previewData, setPreviewData] = useState<InternshipsData | null>(null);
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
 		async function fetchData() {
 			const internshipsData = await getInternshipsData();
-			setData(internshipsData);
+			setInitialData(internshipsData);
+			setPreviewData(internshipsData);
 			setLoading(false);
 		}
 		fetchData();
 	}, []);
+
+	const formContent = useMemo(() => {
+		if (!initialData) return null;
+		return (
+			<InternshipsForm
+				initialData={initialData}
+				pageSlug='internships'
+				onChange={setPreviewData}
+			/>
+		);
+	}, [initialData]);
 
 	if (loading) {
 		return (
@@ -27,7 +40,7 @@ export default function InternshipsEditor() {
 		);
 	}
 
-	if (!data) {
+	if (!initialData || !previewData) {
 		return (
 			<div className='flex items-center justify-center min-h-[400px]'>
 				<div className='text-center'>
@@ -45,14 +58,8 @@ export default function InternshipsEditor() {
 	return (
 		<Editable
 			label='Internships'
-			formContent={
-				<InternshipsForm
-					initialData={data}
-					pageSlug='internships'
-					onChange={setData}
-				/>
-			}>
-			<InternshipsSection data={data} />
+			formContent={formContent}>
+			<InternshipsSection data={previewData} />
 		</Editable>
 	);
 }

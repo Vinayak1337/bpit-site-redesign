@@ -15,16 +15,21 @@ export default function PlacementOverviewEditor({ initialData, pageSlug }: Place
 	const initial = useMemo(() => initialData, [initialData]);
 	const [currentData, setCurrentData] = useState<PlacementOverviewData>(initial);
 
+	const formContent = useMemo(
+		() => (
+			<PlacementOverviewForm
+				initialData={initial}
+				pageSlug={pageSlug}
+				onChange={setCurrentData}
+			/>
+		),
+		[initial, pageSlug]
+	);
+
 	return (
 		<Editable
 			label="Placement Overview"
-			formContent={
-				<PlacementOverviewForm
-					initialData={initial}
-					pageSlug={pageSlug}
-					onChange={setCurrentData}
-				/>
-			}
+			formContent={formContent}
 		>
 			<PlacementOverviewSection data={currentData} />
 		</Editable>

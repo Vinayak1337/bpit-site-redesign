@@ -1,7 +1,9 @@
 import { Suspense } from 'react';
+import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
 import InternshipsEditor from './components/InternshipsEditor';
 
-export default function InternshipsManagementPage() {
+export default async function InternshipsManagementPage() {
+	await requireAdmin();
 	return (
 		<div className='container mx-auto py-8'>
 			<div className='mb-8'>

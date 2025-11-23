@@ -20,6 +20,8 @@ import {
 	SelectTrigger,
 	SelectValue
 } from '@/components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Loader2, Save, Plus, Trash2 } from 'lucide-react';
 import type { VisionMissionData } from '@/app/(Private Pages)/actions/vision-mission';
 import { updateVisionMission } from '@/app/(Private Pages)/actions/vision-mission';
 import { SUPPORTED_ICON_NAMES } from '@/components/about/icons';
@@ -209,18 +211,12 @@ export default function VisionMissionForm({
 
 	return (
 		<Form {...form}>
-			<form
-				className='space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm max-h-[70vh] overflow-y-auto overflow-x-hidden'
-				onSubmit={form.handleSubmit(handleSubmit)}>
+			<form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-8 max-w-5xl mx-auto pb-24'>
 				
-				<div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
+				<div className='flex items-center justify-between'>
 					<div>
-						<h3 className='text-lg font-semibold text-slate-900'>
-							Vision & Mission
-						</h3>
-						<p className='text-sm text-slate-500'>
-							Edit vision statement, pillars, and future aspirations.
-						</p>
+						<h3 className='text-lg font-semibold text-gray-900'>Vision & Mission</h3>
+						<p className='text-sm text-gray-500'>Edit vision statement, pillars, and future aspirations.</p>
 					</div>
 					<div className='flex items-center gap-2'>
 						{message && (
@@ -229,395 +225,417 @@ export default function VisionMissionForm({
 							</span>
 						)}
 						<Button type='submit' disabled={isPending}>
-							{isPending ? 'Saving...' : 'Save changes'}
+							{isPending ? (
+								<>
+									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+									Saving...
+								</>
+							) : (
+								<>
+									<Save className="mr-2 h-4 w-4" />
+									Save Changes
+								</>
+							)}
 						</Button>
 					</div>
 				</div>
 
 				{/* Hero Section */}
-				<div className='space-y-4'>
-					<h4 className='text-sm font-semibold text-slate-700'>Hero Section</h4>
-					<div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-						<FormField
-							control={form.control}
-							name='heroTitle'
-							rules={{ required: 'Title is required' }}
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Title</FormLabel>
-									<FormControl>
-										<Input placeholder='Our Vision' {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name='heroSubtitle'
-							rules={{ required: 'Subtitle is required' }}
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Subtitle</FormLabel>
-									<FormControl>
-										<Input placeholder='Inspiring Excellence, Shaping Tomorrow' {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name='heroIcon'
-							render={({ field }) => (
-								<FormItem className='sm:col-span-2'>
-									<FormLabel>Icon</FormLabel>
-									<FormControl>
-										<Select
-											onValueChange={field.onChange}
-											value={field.value}>
-											<SelectTrigger>
-												<SelectValue placeholder='Select icon' />
-											</SelectTrigger>
-											<SelectContent>
-												{iconOptions.map(option => (
-													<SelectItem key={option} value={option}>
-														{option}
-													</SelectItem>
-												))}
-											</SelectContent>
-										</Select>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-					</div>
-				</div>
+				<Card>
+					<CardHeader>
+						<CardTitle>Hero Section</CardTitle>
+					</CardHeader>
+					<CardContent className='space-y-4'>
+						<div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+							<FormField
+								control={form.control}
+								name='heroTitle'
+								rules={{ required: 'Title is required' }}
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Title</FormLabel>
+										<FormControl>
+											<Input placeholder='Our Vision' {...field} />
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name='heroSubtitle'
+								rules={{ required: 'Subtitle is required' }}
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Subtitle</FormLabel>
+										<FormControl>
+											<Input placeholder='Inspiring Excellence, Shaping Tomorrow' {...field} />
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name='heroIcon'
+								render={({ field }) => (
+									<FormItem className='sm:col-span-2'>
+										<FormLabel>Icon</FormLabel>
+										<FormControl>
+											<Select
+												onValueChange={field.onChange}
+												value={field.value}>
+												<SelectTrigger>
+													<SelectValue placeholder='Select icon' />
+												</SelectTrigger>
+												<SelectContent>
+													{iconOptions.map(option => (
+														<SelectItem key={option} value={option}>
+															{option}
+														</SelectItem>
+													))}
+												</SelectContent>
+											</Select>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						</div>
+					</CardContent>
+				</Card>
 
 				{/* Vision Statement */}
-				<div className='space-y-4'>
-					<h4 className='text-sm font-semibold text-slate-700'>Vision Statement</h4>
-					<div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-						<FormField
-							control={form.control}
-							name='visionTitle'
-							rules={{ required: 'Title is required' }}
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Title</FormLabel>
-									<FormControl>
-										<Input placeholder='Vision Statement' {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name='visionIcon'
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Icon</FormLabel>
-									<FormControl>
-										<Select
-											onValueChange={field.onChange}
-											value={field.value}>
-											<SelectTrigger>
-												<SelectValue placeholder='Select icon' />
-											</SelectTrigger>
-											<SelectContent>
-												{iconOptions.map(option => (
-													<SelectItem key={option} value={option}>
-														{option}
-													</SelectItem>
-												))}
-											</SelectContent>
-										</Select>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name='visionQuote'
-							rules={{ required: 'Vision quote is required' }}
-							render={({ field }) => (
-								<FormItem className='sm:col-span-2'>
-									<FormLabel>Vision Quote</FormLabel>
-									<FormControl>
-										<Textarea 
-											{...field} 
-											placeholder='To be a premier institute of technical education...'
-											rows={4}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-					</div>
-				</div>
+				<Card>
+					<CardHeader>
+						<CardTitle>Vision Statement</CardTitle>
+					</CardHeader>
+					<CardContent className='space-y-4'>
+						<div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+							<FormField
+								control={form.control}
+								name='visionTitle'
+								rules={{ required: 'Title is required' }}
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Title</FormLabel>
+										<FormControl>
+											<Input placeholder='Vision Statement' {...field} />
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name='visionIcon'
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Icon</FormLabel>
+										<FormControl>
+											<Select
+												onValueChange={field.onChange}
+												value={field.value}>
+												<SelectTrigger>
+													<SelectValue placeholder='Select icon' />
+												</SelectTrigger>
+												<SelectContent>
+													{iconOptions.map(option => (
+														<SelectItem key={option} value={option}>
+															{option}
+														</SelectItem>
+													))}
+												</SelectContent>
+											</Select>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name='visionQuote'
+								rules={{ required: 'Vision quote is required' }}
+								render={({ field }) => (
+									<FormItem className='sm:col-span-2'>
+										<FormLabel>Vision Quote</FormLabel>
+										<FormControl>
+											<Textarea 
+												{...field} 
+												placeholder='To be a premier institute of technical education...'
+												rows={4}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						</div>
+					</CardContent>
+				</Card>
 
 				{/* Vision Pillars */}
 				<div className='space-y-4'>
 					<div className='flex items-center justify-between'>
-						<h4 className='text-sm font-semibold text-slate-700'>
-							Vision Pillars
-						</h4>
+						<h3 className='text-xl font-semibold'>Vision Pillars</h3>
 						<Button
 							type='button'
 							variant='outline'
 							size='sm'
 							onClick={() => pillarsArray.append(createEmptyPillar())}>
-							Add pillar
+							<Plus className="w-4 h-4 mr-2" />
+							Add Pillar
 						</Button>
 					</div>
-					<div className='space-y-4'>
+					<div className='grid md:grid-cols-2 gap-4'>
 						{pillarsArray.fields.map((field, index) => (
-							<div
-								key={field.id}
-								className='rounded-lg border border-slate-200 p-4 space-y-4 bg-slate-50/50'>
-								<div className='flex items-center justify-between'>
-									<span className='text-sm font-medium text-slate-700'>
-										Pillar {index + 1}
-									</span>
+							<Card key={field.id} className='relative'>
+								<div className='absolute top-2 right-2'>
 									<Button
 										type='button'
 										variant='ghost'
-										size='sm'
+										size='icon'
+										className="h-8 w-8 text-red-500 hover:bg-red-50"
 										onClick={() =>
 											pillarsArray.remove(index < 0 ? 0 : index)
 										}>
-										Remove
+										<Trash2 className='w-4 h-4' />
 									</Button>
 								</div>
-								<div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-									<FormField
-										control={form.control}
-										name={`pillars.${index}.title`}
-										rules={{ required: 'Title is required' }}
-										render={({ field: titleField }) => (
-											<FormItem>
-												<FormLabel>Title</FormLabel>
-												<FormControl>
-													<Input placeholder='Academic Excellence' {...titleField} />
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-									<FormField
-										control={form.control}
-										name={`pillars.${index}.icon`}
-										render={({ field: iconField }) => (
-											<FormItem>
-												<FormLabel>Icon</FormLabel>
-												<FormControl>
-													<Select
-														onValueChange={iconField.onChange}
-														value={iconField.value}>
-														<SelectTrigger>
-															<SelectValue placeholder='Select icon' />
-														</SelectTrigger>
-														<SelectContent>
-															{iconOptions.map(option => (
-																<SelectItem key={option} value={option}>
-																	{option}
-																</SelectItem>
-															))}
-														</SelectContent>
-													</Select>
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-									<FormField
-										control={form.control}
-										name={`pillars.${index}.description`}
-										rules={{ required: 'Description is required' }}
-										render={({ field: descField }) => (
-											<FormItem className='sm:col-span-2'>
-												<FormLabel>Description</FormLabel>
-												<FormControl>
-													<Textarea 
-														{...descField} 
-														placeholder='Delivering world-class technical education...'
-														rows={3}
-													/>
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-									<FormField
-										control={form.control}
-										name={`pillars.${index}.color`}
-										render={({ field: colorField }) => (
-											<FormItem>
-												<FormLabel>Color</FormLabel>
-												<FormControl>
-													<Select
-														onValueChange={colorField.onChange}
-														value={colorField.value}>
-														<SelectTrigger>
-															<SelectValue placeholder='Select color' />
-														</SelectTrigger>
-														<SelectContent>
-															{COLOR_OPTIONS.map(color => (
-																<SelectItem key={color} value={color}>
-																	{color.charAt(0).toUpperCase() +
-																		color.slice(1)}
-																</SelectItem>
-															))}
-														</SelectContent>
-													</Select>
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-								</div>
-							</div>
+								<CardContent className='pt-6 space-y-4'>
+									<div className='grid grid-cols-1 gap-4'>
+										<FormField
+											control={form.control}
+											name={`pillars.${index}.title`}
+											rules={{ required: 'Title is required' }}
+											render={({ field: titleField }) => (
+												<FormItem>
+													<FormLabel>Title</FormLabel>
+													<FormControl>
+														<Input placeholder='Academic Excellence' {...titleField} />
+													</FormControl>
+													<FormMessage />
+												</FormItem>
+											)}
+										/>
+										<div className='grid grid-cols-2 gap-4'>
+											<FormField
+												control={form.control}
+												name={`pillars.${index}.icon`}
+												render={({ field: iconField }) => (
+													<FormItem>
+														<FormLabel>Icon</FormLabel>
+														<FormControl>
+															<Select
+																onValueChange={iconField.onChange}
+																value={iconField.value}>
+																<SelectTrigger>
+																	<SelectValue placeholder='Select icon' />
+																</SelectTrigger>
+																<SelectContent>
+																	{iconOptions.map(option => (
+																		<SelectItem key={option} value={option}>
+																			{option}
+																		</SelectItem>
+																	))}
+																</SelectContent>
+															</Select>
+														</FormControl>
+														<FormMessage />
+													</FormItem>
+												)}
+											/>
+											<FormField
+												control={form.control}
+												name={`pillars.${index}.color`}
+												render={({ field: colorField }) => (
+													<FormItem>
+														<FormLabel>Color</FormLabel>
+														<FormControl>
+															<Select
+																onValueChange={colorField.onChange}
+																value={colorField.value}>
+																<SelectTrigger>
+																	<SelectValue placeholder='Select color' />
+																</SelectTrigger>
+																<SelectContent>
+																	{COLOR_OPTIONS.map(color => (
+																		<SelectItem key={color} value={color}>
+																			{color.charAt(0).toUpperCase() +
+																				color.slice(1)}
+																		</SelectItem>
+																	))}
+																</SelectContent>
+															</Select>
+														</FormControl>
+														<FormMessage />
+													</FormItem>
+												)}
+											/>
+										</div>
+										<FormField
+											control={form.control}
+											name={`pillars.${index}.description`}
+											rules={{ required: 'Description is required' }}
+											render={({ field: descField }) => (
+												<FormItem>
+													<FormLabel>Description</FormLabel>
+													<FormControl>
+														<Textarea 
+															{...descField} 
+															placeholder='Delivering world-class technical education...'
+															rows={3}
+														/>
+													</FormControl>
+													<FormMessage />
+												</FormItem>
+											)}
+										/>
+									</div>
+								</CardContent>
+							</Card>
 						))}
-						{pillarsArray.fields.length === 0 ? (
-							<div className='rounded-lg border border-dashed border-slate-300 p-4 text-sm text-slate-500'>
-								Add at least one pillar to display in this section.
-							</div>
-						) : null}
 					</div>
 				</div>
 
 				{/* Future Aspirations */}
 				<div className='space-y-4'>
 					<div className='flex items-center justify-between'>
-						<h4 className='text-sm font-semibold text-slate-700'>
-							Future Aspirations
-						</h4>
+						<h3 className='text-xl font-semibold'>Future Aspirations</h3>
 						<Button
 							type='button'
 							variant='outline'
 							size='sm'
 							onClick={() => aspirationsArray.append(createEmptyAspiration())}>
-							Add aspiration
+							<Plus className="w-4 h-4 mr-2" />
+							Add Aspiration
 						</Button>
 					</div>
-					<div className='space-y-4'>
+					<div className='grid md:grid-cols-2 gap-4'>
 						{aspirationsArray.fields.map((field, index) => (
-							<div
-								key={field.id}
-								className='rounded-lg border border-slate-200 p-4 space-y-4 bg-slate-50/50'>
-								<div className='flex items-center justify-between'>
-									<span className='text-sm font-medium text-slate-700'>
-										Aspiration {index + 1}
-									</span>
+							<Card key={field.id} className='relative'>
+								<div className='absolute top-2 right-2'>
 									<Button
 										type='button'
 										variant='ghost'
-										size='sm'
+										size='icon'
+										className="h-8 w-8 text-red-500 hover:bg-red-50"
 										onClick={() =>
 											aspirationsArray.remove(index < 0 ? 0 : index)
 										}>
-										Remove
+										<Trash2 className='w-4 h-4' />
 									</Button>
 								</div>
-								<div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-									<FormField
-										control={form.control}
-										name={`aspirations.${index}.title`}
-										rules={{ required: 'Title is required' }}
-										render={({ field: titleField }) => (
-											<FormItem>
-												<FormLabel>Title</FormLabel>
-												<FormControl>
-													<Input placeholder='2030 Goals' {...titleField} />
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-									<FormField
-										control={form.control}
-										name={`aspirations.${index}.icon`}
-										render={({ field: iconField }) => (
-											<FormItem>
-												<FormLabel>Icon</FormLabel>
-												<FormControl>
-													<Select
-														onValueChange={iconField.onChange}
-														value={iconField.value}>
-														<SelectTrigger>
-															<SelectValue placeholder='Select icon' />
-														</SelectTrigger>
-														<SelectContent>
-															{iconOptions.map(option => (
-																<SelectItem key={option} value={option}>
-																	{option}
-																</SelectItem>
-															))}
-														</SelectContent>
-													</Select>
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-									<FormField
-										control={form.control}
-										name={`aspirations.${index}.description`}
-										rules={{ required: 'Description is required' }}
-										render={({ field: descField }) => (
-											<FormItem className='sm:col-span-2'>
-												<FormLabel>Description</FormLabel>
-												<FormControl>
-													<Textarea 
-														{...descField} 
-														placeholder='Achieve top 50 ranking among engineering institutes in India'
-														rows={3}
-													/>
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-									<FormField
-										control={form.control}
-										name={`aspirations.${index}.color`}
-										render={({ field: colorField }) => (
-											<FormItem>
-												<FormLabel>Color</FormLabel>
-												<FormControl>
-													<Select
-														onValueChange={colorField.onChange}
-														value={colorField.value}>
-														<SelectTrigger>
-															<SelectValue placeholder='Select color' />
-														</SelectTrigger>
-														<SelectContent>
-															{COLOR_OPTIONS.map(color => (
-																<SelectItem key={color} value={color}>
-																	{color.charAt(0).toUpperCase() +
-																		color.slice(1)}
-																</SelectItem>
-															))}
-														</SelectContent>
-													</Select>
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-								</div>
-							</div>
+								<CardContent className='pt-6 space-y-4'>
+									<div className='grid grid-cols-1 gap-4'>
+										<FormField
+											control={form.control}
+											name={`aspirations.${index}.title`}
+											rules={{ required: 'Title is required' }}
+											render={({ field: titleField }) => (
+												<FormItem>
+													<FormLabel>Title</FormLabel>
+													<FormControl>
+														<Input placeholder='2030 Goals' {...titleField} />
+													</FormControl>
+													<FormMessage />
+												</FormItem>
+											)}
+										/>
+										<div className='grid grid-cols-2 gap-4'>
+											<FormField
+												control={form.control}
+												name={`aspirations.${index}.icon`}
+												render={({ field: iconField }) => (
+													<FormItem>
+														<FormLabel>Icon</FormLabel>
+														<FormControl>
+															<Select
+																onValueChange={iconField.onChange}
+																value={iconField.value}>
+																<SelectTrigger>
+																	<SelectValue placeholder='Select icon' />
+																</SelectTrigger>
+																<SelectContent>
+																	{iconOptions.map(option => (
+																		<SelectItem key={option} value={option}>
+																			{option}
+																		</SelectItem>
+																	))}
+																</SelectContent>
+															</Select>
+														</FormControl>
+														<FormMessage />
+													</FormItem>
+												)}
+											/>
+											<FormField
+												control={form.control}
+												name={`aspirations.${index}.color`}
+												render={({ field: colorField }) => (
+													<FormItem>
+														<FormLabel>Color</FormLabel>
+														<FormControl>
+															<Select
+																onValueChange={colorField.onChange}
+																value={colorField.value}>
+																<SelectTrigger>
+																	<SelectValue placeholder='Select color' />
+																</SelectTrigger>
+																<SelectContent>
+																	{COLOR_OPTIONS.map(color => (
+																		<SelectItem key={color} value={color}>
+																			{color.charAt(0).toUpperCase() +
+																				color.slice(1)}
+																		</SelectItem>
+																	))}
+																</SelectContent>
+															</Select>
+														</FormControl>
+														<FormMessage />
+													</FormItem>
+												)}
+											/>
+										</div>
+										<FormField
+											control={form.control}
+											name={`aspirations.${index}.description`}
+											rules={{ required: 'Description is required' }}
+											render={({ field: descField }) => (
+												<FormItem>
+													<FormLabel>Description</FormLabel>
+													<FormControl>
+														<Textarea 
+															{...descField} 
+															placeholder='Achieve top 50 ranking...'
+															rows={3}
+														/>
+													</FormControl>
+													<FormMessage />
+												</FormItem>
+											)}
+										/>
+									</div>
+								</CardContent>
+							</Card>
 						))}
-						{aspirationsArray.fields.length === 0 ? (
-							<div className='rounded-lg border border-dashed border-slate-300 p-4 text-sm text-slate-500'>
-								Add at least one aspiration to display in this section.
-							</div>
-						) : null}
 					</div>
+				</div>
+
+				<div className="sticky bottom-4 bg-white p-4 border rounded-xl shadow-lg flex justify-end z-50">
+					<Button type='submit' disabled={isPending} className='w-full md:w-auto min-w-[150px]'>
+						{isPending ? (
+							<>
+								<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+								Saving...
+							</>
+						) : (
+							<>
+								<Save className="mr-2 h-4 w-4" />
+								Save Changes
+							</>
+						)}
+					</Button>
 				</div>
 			</form>
 		</Form>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Editable from '@/components/ui/Editable';
 import PlacementStatisticsSection from './PlacementStatisticsSection';
 import PlacementStatisticsForm from './PlacementStatisticsForm';
@@ -10,14 +10,16 @@ import {
 } from '@/app/(Private Pages)/actions/placement-statistics';
 
 export default function PlacementStatisticsEditor() {
-	const [data, setData] = useState<PlacementStatisticsData | null>(null);
+	const [initialData, setInitialData] = useState<PlacementStatisticsData | null>(null);
+	const [previewData, setPreviewData] = useState<PlacementStatisticsData | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {
 		async function fetchData() {
 			try {
 				const result = await getPlacementStatistics();
-				setData(result);
+				setInitialData(result);
+				setPreviewData(result);
 			} catch (error) {
 				console.error('Error fetching placement statistics:', error);
 			} finally {
@@ -27,6 +29,17 @@ export default function PlacementStatisticsEditor() {
 		fetchData();
 	}, []);
 
+	const formContent = useMemo(() => {
+		if (!initialData) return null;
+		return (
+			<PlacementStatisticsForm
+				initialData={initialData}
+				pageSlug='placement-statistics'
+				onChange={setPreviewData}
+			/>
+		);
+	}, [initialData]);
+
 	if (isLoading) {
 		return (
 			<div className='flex min-h-[400px] items-center justify-center'>
@@ -35,7 +48,7 @@ export default function PlacementStatisticsEditor() {
 		);
 	}
 
-	if (!data) {
+	if (!initialData || !previewData) {
 		return (
 			<div className='rounded-lg border border-slate-200 bg-white p-8 text-center'>
 				<p className='text-slate-600'>
@@ -48,14 +61,8 @@ export default function PlacementStatisticsEditor() {
 	return (
 		<Editable
 			label='Placement Statistics'
-			formContent={
-				<PlacementStatisticsForm
-					initialData={data}
-					pageSlug='placement-statistics'
-					onChange={setData}
-				/>
-			}>
-			<PlacementStatisticsSection data={data} />
+			formContent={formContent}>
+			<PlacementStatisticsSection data={previewData} />
 		</Editable>
 	);
 }

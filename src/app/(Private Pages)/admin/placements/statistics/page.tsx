@@ -1,7 +1,9 @@
 import { Suspense } from 'react';
+import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
 import PlacementStatisticsEditor from './components/PlacementStatisticsEditor';
 
-export default function AdminPlacementStatisticsPage() {
+export default async function AdminPlacementStatisticsPage() {
+	await requireAdmin();
 	return (
 		<div className='container mx-auto py-8'>
 			<div className='mb-8'>

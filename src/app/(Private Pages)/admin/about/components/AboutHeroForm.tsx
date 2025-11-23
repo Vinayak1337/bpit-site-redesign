@@ -18,6 +18,8 @@ import {
 	updateAboutHero,
 	type AboutHeroData
 } from '@/app/(Private Pages)/actions/about';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Loader2, Save } from 'lucide-react';
 
 type FormValues = {
 	title: string;
@@ -83,101 +85,113 @@ export default function AboutHeroForm({
 
 	return (
 		<Form {...form}>
-			<form
-				className='space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm max-h-[70vh] overflow-y-auto overflow-x-hidden'
-				onSubmit={form.handleSubmit(handleSubmit)}>
-				<div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
-					<div>
-						<h3 className='text-lg font-semibold text-slate-900'>Hero</h3>
-						<p className='text-sm text-slate-500'>
-							Update the headline, description, and optional background image.
-						</p>
-					</div>
-					<div className='flex items-center gap-2'>
-						{message && (
-							<span className='rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700'>
-								{message}
-							</span>
+			<form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-6'>
+				<div className='flex items-center justify-between'>
+					<h3 className='text-lg font-semibold text-gray-900'>About Hero Section</h3>
+					<Button type='submit' disabled={isPending}>
+						{isPending ? (
+							<>
+								<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+								Saving...
+							</>
+						) : (
+							<>
+								<Save className="mr-2 h-4 w-4" />
+								Save Changes
+							</>
 						)}
-						<Button type='submit' disabled={isPending}>
-							{isPending ? 'Saving...' : 'Save changes'}
-						</Button>
-					</div>
+					</Button>
 				</div>
 
-				<div className='space-y-4'>
-					<FormField
-						control={form.control}
-						name='title'
-						rules={{ required: 'Title is required' }}
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Title</FormLabel>
-								<FormControl>
-									<Input placeholder='About BPIT' {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
+				<Card>
+					<CardHeader>
+						<CardTitle>Hero Content</CardTitle>
+						<CardDescription>
+							Update the main headline, description, and background image for the About page.
+						</CardDescription>
+					</CardHeader>
+					<CardContent className='space-y-4'>
+						<FormField
+							control={form.control}
+							name='title'
+							rules={{ required: 'Title is required' }}
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Title</FormLabel>
+									<FormControl>
+										<Input placeholder='About BPIT' {...field} />
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 
-					<FormField
-						control={form.control}
-						name='subtitle'
-						rules={{ required: 'Subtitle is required' }}
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Subtitle</FormLabel>
-								<FormControl>
-									<Textarea
-										rows={3}
-										placeholder='Discover our journey of excellence...'
-										{...field}
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
+						<FormField
+							control={form.control}
+							name='subtitle'
+							rules={{ required: 'Subtitle is required' }}
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Subtitle</FormLabel>
+									<FormControl>
+										<Textarea
+											rows={3}
+											placeholder='Discover our journey of excellence...'
+											{...field}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 
-					<FormField
-						control={form.control}
-						name='backgroundImage'
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Background image URL (optional)</FormLabel>
-								<FormControl>
-									<Input placeholder='https://...' {...field} />
-								</FormControl>
-								<div className='flex gap-2 pt-2'>
-									<CloudinaryUploadButton
-										buttonText='Upload background'
-										onUpload={url =>
-											form.setValue('backgroundImage', url, {
-												shouldDirty: true,
-												shouldTouch: true
-											})
-										}
-										onError={message => setMessage(message)}
-									/>
-									<Button
-										type='button'
-										variant='ghost'
-										size='sm'
-										onClick={() =>
-											form.setValue('backgroundImage', '', {
-												shouldDirty: true,
-												shouldTouch: true
-											})
-										}>
-										Clear
-									</Button>
-								</div>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-				</div>
+						<FormField
+							control={form.control}
+							name='backgroundImage'
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Background Image</FormLabel>
+									<FormControl>
+										<Input placeholder='https://...' {...field} />
+									</FormControl>
+									<div className='flex gap-2 pt-2'>
+										<CloudinaryUploadButton
+											buttonText='Upload Image'
+											onUpload={url =>
+												form.setValue('backgroundImage', url, {
+													shouldDirty: true,
+													shouldTouch: true
+												})
+											}
+											onError={message => setMessage(message)}
+										/>
+										<Button
+											type='button'
+											variant='outline'
+											onClick={() =>
+												form.setValue('backgroundImage', '', {
+													shouldDirty: true,
+													shouldTouch: true
+												})
+											}>
+											Clear
+										</Button>
+									</div>
+									{field.value && (
+										<div className="mt-4 rounded-lg overflow-hidden border h-40 w-full relative">
+											<img 
+												src={field.value} 
+												alt="Background preview" 
+												className="w-full h-full object-cover"
+											/>
+										</div>
+									)}
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</CardContent>
+				</Card>
 			</form>
 		</Form>
 	);

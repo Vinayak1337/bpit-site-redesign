@@ -1,7 +1,9 @@
 import { Suspense } from 'react';
+import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
 import TrainingPlacementEditor from './components/TrainingPlacementEditor';
 
-export default function TrainingPlacementAdminPage() {
+export default async function TrainingPlacementAdminPage() {
+	await requireAdmin();
 	return (
 		<div className='min-h-screen bg-slate-50'>
 			<div className='mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8'>

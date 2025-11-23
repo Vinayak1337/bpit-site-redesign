@@ -1,8 +1,10 @@
 import React from 'react';
 import PlacementOverviewEditor from '@/app/(Private Pages)/admin/placements/overview/components/PlacementOverviewEditor';
 import { getPlacementOverview } from '@/app/(Private Pages)/actions/placement-overview';
+import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
 
 export default async function PlacementOverviewAdminPage() {
+	await requireAdmin();
 	const data = await getPlacementOverview();
 
 	return (

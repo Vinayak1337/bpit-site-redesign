@@ -19,16 +19,21 @@ export default function AboutLegacyEditor({
 	const [previewData, setPreviewData] =
 		useState<AboutLegacyData>(initial);
 
+	const formContent = useMemo(
+		() => (
+			<AboutLegacyForm
+				initialData={initial}
+				pageSlug={pageSlug}
+				onChange={setPreviewData}
+			/>
+		),
+		[initial, pageSlug]
+	);
+
 	return (
 		<Editable
 			label='About Legacy'
-			formContent={
-				<AboutLegacyForm
-					initialData={initial}
-					pageSlug={pageSlug}
-					onChange={setPreviewData}
-				/>
-			}>
+			formContent={formContent}>
 			<AboutLegacySection data={previewData} />
 		</Editable>
 	);

@@ -15,16 +15,21 @@ export default function ManagementEditor({ initialData, pageSlug }: Props) {
 	const initial = useMemo(() => initialData, [initialData]);
 	const [previewData, setPreviewData] = useState<ManagementData>(initial);
 
+	const formContent = useMemo(
+		() => (
+			<ManagementForm
+				initialData={initial}
+				pageSlug={pageSlug}
+				onChange={setPreviewData}
+			/>
+		),
+		[initial, pageSlug]
+	);
+
 	return (
 		<Editable
 			label='Management Team'
-			formContent={
-				<ManagementForm
-					initialData={initial}
-					pageSlug={pageSlug}
-					onChange={setPreviewData}
-				/>
-			}>
+			formContent={formContent}>
 			<ManagementSection data={previewData} />
 		</Editable>
 	);

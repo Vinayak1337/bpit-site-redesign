@@ -1,6 +1,8 @@
 import { prisma } from '@/lib/prisma';
+import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
 
 export default async function AdminLogsPage() {
+	await requireAdmin();
 	const logs = await prisma.auditLog.findMany({
 		orderBy: { createdAt: 'desc' },
 		include: { actor: true, changes: true },

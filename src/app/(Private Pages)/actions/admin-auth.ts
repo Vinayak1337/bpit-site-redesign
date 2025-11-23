@@ -55,7 +55,7 @@ export async function loginAdmin(formData: FormData): Promise<void> {
 	const cookieStore = await cookies();
 	cookieStore.set(SESSION_COOKIE, rawToken, {
 		httpOnly: true,
-		secure: true,
+		secure: process.env.NODE_ENV === 'production',
 		sameSite: 'lax',
 		path: '/',
 		expires: expiresAt
