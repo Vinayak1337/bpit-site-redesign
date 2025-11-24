@@ -1,7 +1,7 @@
 'use server';
 
 import { prisma } from '@/lib/prisma';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, unstable_cache } from 'next/cache';
 
 const MANAGEMENT_SLUG = 'management';
 
@@ -31,32 +31,35 @@ export interface ManagementData {
 }
 
 export async function getManagement(slug = MANAGEMENT_SLUG): Promise<ManagementData> {
-	try {
-		const page = await prisma.page.findUnique({
-			where: { slug },
-			include: {
-				components: {
-					where: {
-						key: 'MANAGEMENT_DATA'
-					},
-					orderBy: { order: 'asc' },
-					take: 1
+	return unstable_cache(
+		async () => {
+			try {
+				const page = await prisma.page.findUnique({
+					where: { slug },
+					include: {
+						components: {
+							where: {
+								key: 'MANAGEMENT_DATA'
+							},
+							orderBy: { order: 'asc' },
+							take: 1
+						}
+					}
+				});
+
+				if (!page || !page.components[0]) {
+					return getDefaultManagementData();
 				}
+
+				return page.components[0].data as unknown as ManagementData;
+			} catch (error) {
+				console.error('Error fetching management data:', error);
+				return getDefaultManagementData();
 			}
-		});
-
-		if (!page || !page.components[0]) {
-			console.log('No management data found in DB, returning default data');
-			// Return default data if no page found
-			return getDefaultManagementData();
-		}
-
-		console.log('Retrieved management data from DB:', JSON.stringify(page.components[0].data, null, 2));
-		return page.components[0].data as unknown as ManagementData;
-	} catch (error) {
-		console.error('Error fetching management data:', error);
-		return getDefaultManagementData();
-	}
+		},
+		[`management-${slug}`],
+		{ tags: [`management-${slug}`], revalidate: 3600 }
+	)();
 }
 
 export async function updateManagement(data: ManagementData, slug = MANAGEMENT_SLUG) {
@@ -230,31 +233,35 @@ export interface LeadershipTeamData {
 const LEADERSHIP_TEAM_SLUG = 'leadership-team';
 
 export async function getLeadershipTeam(slug = LEADERSHIP_TEAM_SLUG): Promise<LeadershipTeamData> {
-	try {
-		const page = await prisma.page.findUnique({
-			where: { slug },
-			include: {
-				components: {
-					where: {
-						key: 'LEADERSHIP_TEAM_DATA'
-					},
-					orderBy: { order: 'asc' },
-					take: 1
+	return unstable_cache(
+		async () => {
+			try {
+				const page = await prisma.page.findUnique({
+					where: { slug },
+					include: {
+						components: {
+							where: {
+								key: 'LEADERSHIP_TEAM_DATA'
+							},
+							orderBy: { order: 'asc' },
+							take: 1
+						}
+					}
+				});
+
+				if (!page || !page.components[0]) {
+					return getDefaultLeadershipTeamData();
 				}
+
+				return page.components[0].data as unknown as LeadershipTeamData;
+			} catch (error) {
+				console.error('Error fetching leadership team data:', error);
+				return getDefaultLeadershipTeamData();
 			}
-		});
-
-		if (!page || !page.components[0]) {
-			console.log('No leadership team data found in DB, returning default data');
-			return getDefaultLeadershipTeamData();
-		}
-
-		console.log('Retrieved leadership team data from DB:', JSON.stringify(page.components[0].data, null, 2));
-		return page.components[0].data as unknown as LeadershipTeamData;
-	} catch (error) {
-		console.error('Error fetching leadership team data:', error);
-		return getDefaultLeadershipTeamData();
-	}
+		},
+		[`leadership-team-${slug}`],
+		{ tags: [`leadership-team-${slug}`], revalidate: 3600 }
+	)();
 }
 
 export async function updateLeadershipTeam(data: LeadershipTeamData, slug = LEADERSHIP_TEAM_SLUG) {
@@ -452,31 +459,35 @@ export interface GovernanceStructureData {
 }
 
 export async function getGovernanceStructure(slug = 'governance-structure'): Promise<GovernanceStructureData> {
-	try {
-		const page = await prisma.page.findUnique({
-			where: { slug },
-			include: {
-				components: {
-					where: {
-						key: 'GOVERNANCE_STRUCTURE_DATA'
-					},
-					orderBy: { order: 'asc' },
-					take: 1
+	return unstable_cache(
+		async () => {
+			try {
+				const page = await prisma.page.findUnique({
+					where: { slug },
+					include: {
+						components: {
+							where: {
+								key: 'GOVERNANCE_STRUCTURE_DATA'
+							},
+							orderBy: { order: 'asc' },
+							take: 1
+						}
+					}
+				});
+
+				if (!page || !page.components[0]) {
+					return getDefaultGovernanceStructureData();
 				}
+
+				return page.components[0].data as unknown as GovernanceStructureData;
+			} catch (error) {
+				console.error('Error fetching governance structure data:', error);
+				return getDefaultGovernanceStructureData();
 			}
-		});
-
-		if (!page || !page.components[0]) {
-			console.log('No governance structure data found in DB, returning default data');
-			return getDefaultGovernanceStructureData();
-		}
-
-		console.log('Retrieved governance structure data from DB:', JSON.stringify(page.components[0].data, null, 2));
-		return page.components[0].data as unknown as GovernanceStructureData;
-	} catch (error) {
-		console.error('Error fetching governance structure data:', error);
-		return getDefaultGovernanceStructureData();
-	}
+		},
+		[`governance-structure-${slug}`],
+		{ tags: [`governance-structure-${slug}`], revalidate: 3600 }
+	)();
 }
 
 export async function updateGovernanceStructure(data: GovernanceStructureData, slug = 'governance-structure') {
@@ -595,31 +606,35 @@ export interface PoliciesProceduresData {
 }
 
 export async function getPoliciesProcedures(slug = 'policies-procedures'): Promise<PoliciesProceduresData> {
-	try {
-		const page = await prisma.page.findUnique({
-			where: { slug },
-			include: {
-				components: {
-					where: {
-						key: 'POLICIES_PROCEDURES_DATA'
-					},
-					orderBy: { order: 'asc' },
-					take: 1
+	return unstable_cache(
+		async () => {
+			try {
+				const page = await prisma.page.findUnique({
+					where: { slug },
+					include: {
+						components: {
+							where: {
+								key: 'POLICIES_PROCEDURES_DATA'
+							},
+							orderBy: { order: 'asc' },
+							take: 1
+						}
+					}
+				});
+
+				if (!page || !page.components[0]) {
+					return getDefaultPoliciesProceduresData();
 				}
+
+				return page.components[0].data as unknown as PoliciesProceduresData;
+			} catch (error) {
+				console.error('Error fetching policies procedures data:', error);
+				return getDefaultPoliciesProceduresData();
 			}
-		});
-
-		if (!page || !page.components[0]) {
-			console.log('No policies procedures data found in DB, returning default data');
-			return getDefaultPoliciesProceduresData();
-		}
-
-		console.log('Retrieved policies procedures data from DB:', JSON.stringify(page.components[0].data, null, 2));
-		return page.components[0].data as unknown as PoliciesProceduresData;
-	} catch (error) {
-		console.error('Error fetching policies procedures data:', error);
-		return getDefaultPoliciesProceduresData();
-	}
+		},
+		[`policies-procedures-${slug}`],
+		{ tags: [`policies-procedures-${slug}`], revalidate: 3600 }
+	)();
 }
 
 export async function updatePoliciesProcedures(data: PoliciesProceduresData, slug = 'policies-procedures') {

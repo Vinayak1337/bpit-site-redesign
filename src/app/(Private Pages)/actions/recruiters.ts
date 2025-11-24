@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, unstable_cache } from 'next/cache';
 import prisma from '@/lib/prisma';
 import { createAuditLog } from '@/lib/audit';
 
@@ -56,27 +56,33 @@ export interface RecruitersData {
  * Get recruiters data from the database
  */
 export async function getRecruitersData(): Promise<RecruitersData | null> {
-	try {
-		const page = await prisma.page.findUnique({
-			where: { slug: 'recruiters' },
-			include: {
-				components: {
-					where: { key: 'recruiters-data' },
-					orderBy: { order: 'asc' }
+	return unstable_cache(
+		async () => {
+			try {
+				const page = await prisma.page.findUnique({
+					where: { slug: 'recruiters' },
+					include: {
+						components: {
+							where: { key: 'recruiters-data' },
+							orderBy: { order: 'asc' }
+						}
+					}
+				});
+
+				if (!page || !page.components || page.components.length === 0) {
+					return null;
 				}
+
+				const component = page.components[0];
+				return component.data as unknown as RecruitersData;
+			} catch (error) {
+				console.error('Error fetching recruiters data:', error);
+				throw new Error('Failed to fetch recruiters data');
 			}
-		});
-
-		if (!page || !page.components || page.components.length === 0) {
-			return null;
-		}
-
-		const component = page.components[0];
-		return component.data as unknown as RecruitersData;
-	} catch (error) {
-		console.error('Error fetching recruiters data:', error);
-		throw new Error('Failed to fetch recruiters data');
-	}
+		},
+		['recruiters-data'],
+		{ tags: ['recruiters-data'], revalidate: 3600 }
+	)();
 }
 
 /**

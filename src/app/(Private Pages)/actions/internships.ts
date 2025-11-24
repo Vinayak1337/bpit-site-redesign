@@ -1,7 +1,7 @@
 'use server';
 
 import { prisma } from '@/lib/prisma';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, unstable_cache } from 'next/cache';
 import { createAuditLog } from '@/lib/audit';
 
 // TypeScript interfaces
@@ -72,27 +72,33 @@ export interface InternshipsData {
  * Get internships data from database
  */
 export async function getInternshipsData(): Promise<InternshipsData | null> {
-	try {
-		const page = await prisma.page.findUnique({
-			where: { slug: 'internships' },
-			include: {
-				components: {
-					where: { key: 'internships-data' },
-					orderBy: { order: 'asc' }
+	return unstable_cache(
+		async () => {
+			try {
+				const page = await prisma.page.findUnique({
+					where: { slug: 'internships' },
+					include: {
+						components: {
+							where: { key: 'internships-data' },
+							orderBy: { order: 'asc' }
+						}
+					}
+				});
+
+				if (!page || !page.components[0]) {
+					console.error('Internships data not found');
+					return null;
 				}
+
+				return page.components[0].data as unknown as InternshipsData;
+			} catch (error) {
+				console.error('Error fetching internships data:', error);
+				return null;
 			}
-		});
-
-		if (!page || !page.components[0]) {
-			console.error('Internships data not found');
-			return null;
-		}
-
-		return page.components[0].data as unknown as InternshipsData;
-	} catch (error) {
-		console.error('Error fetching internships data:', error);
-		return null;
-	}
+		},
+		['internships-data'],
+		{ tags: ['internships-data'], revalidate: 3600 }
+	)();
 }
 
 /**

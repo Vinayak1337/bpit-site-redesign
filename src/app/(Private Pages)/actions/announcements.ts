@@ -6,6 +6,7 @@ import prisma from '@/lib/prisma';
 import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
 import { createAuditLog } from '@/lib/audit';
 import type { Prisma } from '@prisma/client';
+import { unstable_cache } from 'next/cache';
 
 const headerAnnouncementItemSchema = z.object({
 	title: z.string().min(1),
@@ -21,15 +22,21 @@ type HeaderAnnouncementItem = z.infer<typeof headerAnnouncementItemSchema>;
 export async function getHeaderAnnouncements(
 	pageSlug: string
 ): Promise<HeaderAnnouncementItem[]> {
-	const page = await prisma.page.findUnique({ where: { slug: pageSlug } });
-	if (!page) return [];
-	const comp = await prisma.component.findFirst({
-		where: { pageId: page.id, key: 'HEADER_ANNOUNCEMENTS' }
-	});
-	if (!comp) return [];
-	const parsed = headerAnnouncementsSchema.safeParse(comp.data);
-	if (!parsed.success) return [];
-	return parsed.data.items;
+	return unstable_cache(
+		async () => {
+			const page = await prisma.page.findUnique({ where: { slug: pageSlug } });
+			if (!page) return [];
+			const comp = await prisma.component.findFirst({
+				where: { pageId: page.id, key: 'HEADER_ANNOUNCEMENTS' }
+			});
+			if (!comp) return [];
+			const parsed = headerAnnouncementsSchema.safeParse(comp.data);
+			if (!parsed.success) return [];
+			return parsed.data.items;
+		},
+		[`header-announcements-${pageSlug}`],
+		{ tags: [`header-announcements-${pageSlug}`], revalidate: 3600 }
+	)();
 }
 
 export async function updateHeaderAnnouncements(
