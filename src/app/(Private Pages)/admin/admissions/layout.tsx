@@ -28,3 +28,4 @@ const AdminAdmissionsLayout = ({
 export default AdminAdmissionsLayout;
 
 
+

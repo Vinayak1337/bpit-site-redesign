@@ -30,3 +30,4 @@ const AdmissionsContentWrapper = ({ children }: AdmissionsContentWrapperProps) =
 export default AdmissionsContentWrapper;
 
 
+

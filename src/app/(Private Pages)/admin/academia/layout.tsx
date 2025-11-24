@@ -28,3 +28,4 @@ const AdminAcademiaLayout = ({
 export default AdminAcademiaLayout;
 
 
+
