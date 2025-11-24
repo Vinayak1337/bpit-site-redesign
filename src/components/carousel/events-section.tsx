@@ -3,8 +3,27 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, useAnimate } from 'framer-motion';
 import { ArrowRight, Calendar } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import EventCard from './event-card';
 import MobileEventsCarousel from './mobile-events-carousel';
+
+interface Event {
+	id?: string;
+	title: string;
+	date: string;
+	time: string;
+	location: string;
+	image: string;
+	category: string;
+	description: string;
+	registrationLink?: string;
+}
+
+interface EventsSectionProps {
+	data: {
+		events: Event[];
+	};
+}
 
 export default function EventsSection({ data }: EventsSectionProps) {
 	const uniqueEvents = useMemo(() => {
@@ -196,16 +215,15 @@ export default function EventsSection({ data }: EventsSectionProps) {
 								</div>
 							</div>
 
-							<motion.button
-								className='group flex items-center space-x-2 px-4 lg:px-6 py-2 lg:py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl lg:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 text-sm lg:text-base'
-								whileHover={{ scale: 1.05, x: 5 }}
-								whileTap={{ scale: 0.95 }}>
+							<Button
+								className='group flex items-center space-x-2 px-4 lg:px-6 py-2 lg:py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl lg:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 text-sm lg:text-base hover:scale-105'
+								trackingEvent="events_view_all_clicked">
 								<span className='font-semibold'>
 									<span className='hidden sm:inline'>View All Events</span>
 									<span className='sm:hidden'>View All</span>
 								</span>
 								<ArrowRight className='w-4 h-4 lg:w-5 lg:h-5 group-hover:translate-x-1 transition-transform' />
-							</motion.button>
+							</Button>
 						</div>
 
 						<div

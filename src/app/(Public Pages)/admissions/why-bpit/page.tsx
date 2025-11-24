@@ -12,6 +12,7 @@ import {
 } from '@/data/why-bpit';
 import { getPlacementCompanies } from '@/app/(Private Pages)/actions/placement';
 import { getTestimonials } from '@/app/(Private Pages)/actions/testimonials';
+import { toTestimonialComponentData } from '@/lib/carousel-adapters';
 
 const pageSlug = 'main';
 
@@ -52,7 +53,7 @@ const WhyBPITPage = async () => {
 
 			{/* Testimonials to mirror home tone */}
 			{testimonials.testimonials.length > 0 && (
-				<Testimonial data={testimonials} />
+				<Testimonial data={toTestimonialComponentData(testimonials)} />
 			)}
 
 			{/* CTA with blue gradient and glass buttons */}

@@ -12,6 +12,24 @@ import {
 import { Button } from '@/components/ui/button';
 import NoticeCard from './notice-card';
 
+interface Notice {
+	id?: string;
+	title: string;
+	date: string;
+	category: string;
+	href?: string;
+	fileUrl?: string;
+	priority?: boolean;
+	content?: string;
+}
+
+interface NoticesSectionProps {
+	data: {
+		notices: Notice[];
+		announcements: Notice[];
+	};
+}
+
 const ScrollingSection = ({
 	title,
 	items,
@@ -193,12 +211,16 @@ const ScrollingSection = ({
 					<Button
 						variant='outline'
 						size='sm'
-						className='rounded-xl text-xs lg:text-sm'>
+						className='rounded-xl text-xs lg:text-sm'
+						trackingEvent="notices_filter_clicked"
+						trackingData={{ section: title }}>
 						<Filter className='w-3 h-3 lg:w-4 lg:h-4 mr-1 lg:mr-2' />
 						<span className='hidden sm:inline'>Filter</span>
 					</Button>
 					<Button
-						className={`bg-gradient-to-r from-blue-600 to-blue-800 hover:opacity-90 rounded-xl border-0 text-xs lg:text-sm`}>
+						className={`bg-gradient-to-r from-blue-600 to-blue-800 hover:opacity-90 rounded-xl border-0 text-xs lg:text-sm`}
+						trackingEvent="notices_view_all_clicked"
+						trackingData={{ section: title }}>
 						<span className='hidden sm:inline'>View All</span>
 						<span className='sm:hidden'>All</span>
 						<ExternalLink className='w-3 h-3 lg:w-4 lg:h-4 ml-1 lg:ml-2' />

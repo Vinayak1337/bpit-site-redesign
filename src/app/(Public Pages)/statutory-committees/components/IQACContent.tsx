@@ -12,6 +12,7 @@ import {
 	Eye,
 	Settings
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import type { IqacData } from '@/app/(Private Pages)/actions/statutory-committees';
 
 const iconMap = {
@@ -231,10 +232,12 @@ const IQACContent = ({ data }: Props) => {
 								<p className='text-sm text-gray-600 mb-3'>
 									{report.description}
 								</p>
-								<button
-									className={`${report.buttonColor} text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors`}>
-									{report.buttonText}
-								</button>
+							<Button
+								className={`${report.buttonColor} text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors`}
+								trackingEvent="iqac_report_download"
+								trackingData={{ title: report.title }}>
+								{report.buttonText}
+							</Button>
 							</div>
 						))}
 					</div>

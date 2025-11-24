@@ -15,6 +15,7 @@ import {
     Award
 } from 'lucide-react';
 import AdmissionsSidebar from '../components/AdmissionSidebar';
+import { Button } from '@/components/ui/button';
 
 interface Program {
     id: string;
@@ -703,11 +704,14 @@ const AdmissionsProcessPage = () => {
                                         ))}
                                     </div>
                                 </div>
-                                <button 
-                                    onClick={() => handleViewDetails(program.id)}
-                                    className="w-full sm:w-auto sm:ml-6 px-4 py-2 sm:px-6 sm:py-2 bg-white border-2 border-blue-500 text-blue-600 rounded-lg font-semibold hover:bg-blue-500 hover:text-white transition-all duration-300 whitespace-nowrap text-sm sm:text-base">
-                                    View Details
-                                </button>
+                                <Button 
+                                                    variant="outline"
+                                                    onClick={() => handleViewDetails(program.id)}
+                                                    className="w-full sm:w-auto sm:ml-6 px-4 py-2 sm:px-6 sm:py-2 bg-white border-2 border-blue-500 text-blue-600 rounded-lg font-semibold hover:bg-blue-500 hover:text-white transition-all duration-300 whitespace-nowrap text-sm sm:text-base"
+                                                    trackingEvent="admissions_view_program_details"
+                                                    trackingData={{ programId: program.id, programTitle: program.title }}>
+                                                    View Details
+                                                </Button>
                             </div>
                         </div>
                     </motion.div>

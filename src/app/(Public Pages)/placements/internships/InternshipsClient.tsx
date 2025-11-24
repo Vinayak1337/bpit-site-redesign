@@ -8,6 +8,7 @@ import {
   Search
 } from 'lucide-react';
 import * as Icons from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import type { InternshipsData } from '@/app/(Private Pages)/actions/internships';
 
 interface InternshipsClientProps {
@@ -163,17 +164,19 @@ export default function InternshipsClient({ data }: InternshipsClientProps) {
                 {/* Category Filter */}
                 <div className="flex flex-wrap justify-center gap-3">
                   {data.filters.map((filter) => (
-                    <button
+                    <Button
                       key={filter}
                       onClick={() => setSelectedFilter(filter)}
-                      className={`px-8 py-3 rounded-full text-sm font-medium transition-all duration-300 ${
+                      className={`px-8 py-3 rounded-full text-sm font-medium transition-all duration-300 h-auto ${
                         selectedFilter === filter
                           ? 'bg-blue-600 text-white shadow-md hover:bg-blue-700'
                           : 'bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-600 border border-gray-200'
                       }`}
+                      trackingEvent="internships_filter_clicked"
+                      trackingData={{ filter }}
                     >
                       {filter}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
@@ -364,17 +367,19 @@ export default function InternshipsClient({ data }: InternshipsClientProps) {
               {data.contact.buttons.map((btn, index) => {
                 const BtnIcon = (Icons as any)[btn.icon] || Icons.BookOpen;
                 return (
-                  <button
+                  <Button
                     key={index}
                     className={`${
                       btn.variant === 'primary'
                         ? 'bg-white text-blue-900 hover:bg-blue-50'
                         : 'bg-transparent border-2 border-white text-white hover:bg-white hover:text-blue-900'
-                    } px-8 py-4 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center`}
+                    } px-8 py-4 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center h-auto`}
+                    trackingEvent="internships_cta_clicked"
+                    trackingData={{ buttonText: btn.text, variant: btn.variant }}
                   >
                     <BtnIcon className="mr-2 w-5 h-5" />
                     {btn.text}
-                  </button>
+                  </Button>
                 );
               })}
             </div>

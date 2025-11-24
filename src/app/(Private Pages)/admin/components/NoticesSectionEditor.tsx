@@ -5,6 +5,7 @@ import NoticesSection from '@/components/carousel/notices-section';
 import NoticesSectionForm, {
 	toFormValuesFromSection
 } from '@/app/(Private Pages)/admin/components/NoticesSectionForm';
+import { toNoticesSectionComponentData } from '@/lib/carousel-adapters';
 
 type NoticesSectionEditorProps = {
 	initialData: NoticesSectionData;
@@ -57,7 +58,7 @@ export default function NoticesSectionEditor({
 					onChange={handlePreviewChange}
 				/>
 			}>
-			<NoticesSection data={previewData} />
+			<NoticesSection data={toNoticesSectionComponentData(previewData)} />
 		</Editable>
 	);
 }

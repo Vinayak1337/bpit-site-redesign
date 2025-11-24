@@ -19,6 +19,11 @@ import {
 	getTopPlacedStudents
 } from '@/app/(Private Pages)/actions/placement';
 import { getTestimonials } from '@/app/(Private Pages)/actions/testimonials';
+import {
+	toNoticesSectionComponentData,
+	toEventsSectionComponentData,
+	toTestimonialComponentData
+} from '@/lib/carousel-adapters';
 
 type HeroCarouselData = ComponentProps<typeof Hero2>['data'];
 type HeroCarouselSlide = HeroCarouselData['slides'][number];
@@ -75,16 +80,16 @@ export default async function Home() {
 		<>
 			<Hero2 data={heroData} />
 
-			<NoticesSection data={noticesSection} />
+			<NoticesSection data={toNoticesSectionComponentData(noticesSection)} />
 
-			<EventsSection data={eventsSection} />
+			<EventsSection data={toEventsSectionComponentData(eventsSection)} />
 
 			<PlacementCompanies data={placementCompanies} />
 
 			<TopPlacedStudents data={topPlacedStudents} />
 
 			{testimonials.testimonials.length > 0 && (
-				<Testimonial data={testimonials} />
+				<Testimonial data={toTestimonialComponentData(testimonials)} />
 			)}
 		</>
 	);

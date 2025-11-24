@@ -7,6 +7,7 @@ import { getFooterData } from '@/app/(Public Pages)/actions/footer';
 import { getContacts } from '@/app/(Public Pages)/actions/contacts';
 import Footer from '@/components/footer/BPITFooter';
 import EnquiryPopup from '@/components/pop-up/enquiry-popup';
+import { PostHogProvider, PageTracker } from '@/components/providers';
 
 const geistSans = Geist({
 	variable: '--font-geist-sans',
@@ -119,10 +120,13 @@ export default async function RootLayout({
 			</head>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}>
-				<Header contacts={contacts} announcementsData={announcementsData} />
-				{children}
-				<Footer contacts={contacts} bottomLeftContent={bottomLeftContent} />
-				<EnquiryPopup contacts={contacts} />
+				<PostHogProvider>
+					<PageTracker />
+					<Header contacts={contacts} announcementsData={announcementsData} />
+					{children}
+					<Footer contacts={contacts} bottomLeftContent={bottomLeftContent} />
+					<EnquiryPopup contacts={contacts} />
+				</PostHogProvider>
 			</body>
 		</html>
 	);

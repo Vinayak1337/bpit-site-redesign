@@ -15,6 +15,7 @@ import {
     Users,
     BookOpen
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface Department {
     id: string;
@@ -236,10 +237,14 @@ export default function DepartmentsPage() {
                                 {/* Action Button */}
                                 <div className="flex justify-center">
                                     {department.available ? (
-                                        <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 transition-colors duration-200">
+                                        <Button 
+                                            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 transition-colors duration-200 h-auto"
+                                            trackingEvent="department_explore_clicked"
+                                            trackingData={{ department: department.id, name: department.name }}
+                                        >
                                             Explore Department
                                             <ChevronRight className="w-5 h-5" />
-                                        </button>
+                                        </Button>
                                     ) : (
                                         <div className="bg-gray-100 text-gray-500 px-6 py-3 rounded-lg font-medium flex items-center gap-2 cursor-not-allowed">
                                             Page Under Development

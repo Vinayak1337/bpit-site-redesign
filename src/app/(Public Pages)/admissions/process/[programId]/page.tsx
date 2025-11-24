@@ -19,6 +19,7 @@ import {
     Cpu,
     Brain
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const ProgramDetailsPage = () => {
     const params = useParams<{ programId?: string }>();
@@ -863,12 +864,13 @@ const ProgramDetailsPage = () => {
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
                 <div className="text-center">
                     <h1 className="text-2xl font-bold text-gray-900 mb-4">Program Not Found</h1>
-                    <button 
+                    <Button 
                         onClick={() => router.back()}
                         className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+                        trackingEvent="program_not_found_go_back"
                     >
                         Go Back
-                    </button>
+                    </Button>
                 </div>
             </div>
         );
@@ -1087,14 +1089,16 @@ const ProgramDetailsPage = () => {
                                         </p>
                                         
                                         {/* Connect Button */}
-                                        <button 
+                                        <Button 
                                             onClick={() => {
                                                 // Connect functionality can be added here
                                             }}
                                             className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-600 transition-colors duration-200 text-sm"
+                                            trackingEvent="faculty_connect_clicked"
+                                            trackingData={{ faculty: faculty.name, program: currentProgram.id }}
                                         >
                                             Connect
-                                        </button>
+                                        </Button>
                                     </div>
                                 </motion.div>
                             ))}
@@ -1113,12 +1117,15 @@ const ProgramDetailsPage = () => {
             <div className="bg-white shadow-sm border-b">
                 <div className="container mx-auto px-4 py-6">
                     <div className="flex items-center gap-4 mb-4">
-                        <button
+                        <Button
+                            variant="ghost"
                             onClick={() => router.back()}
                             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                            trackingEvent="program_details_back"
+                            trackingData={{ program: programId }}
                         >
                             <ArrowLeft className="w-5 h-5 text-gray-600" />
-                        </button>
+                        </Button>
                         <div className="flex items-center gap-3">
                             <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600">
                                 {currentProgram.icon}
@@ -1144,40 +1151,48 @@ const ProgramDetailsPage = () => {
 
                             <div className="p-4">
                                 {sidebarSections.map((section) => (
-                                    <button
+                                    <Button
                                         key={section.id}
+                                        variant="ghost"
                                         onClick={() => setActiveSection(section.id)}
-                                        className={`w-full text-left p-3 rounded-lg mb-2 transition-all duration-200 flex items-center gap-3 ${
+                                        className={`w-full text-left p-3 rounded-lg mb-2 transition-all duration-200 flex items-center gap-3 justify-start h-auto ${
                                             activeSection === section.id
-                                                ? 'bg-blue-500 text-white'
+                                                ? 'bg-blue-500 text-white hover:bg-blue-600'
                                                 : 'hover:bg-gray-50 text-gray-700'
                                         }`}
+                                        trackingEvent="program_section_clicked"
+                                        trackingData={{ section: section.id, program: programId }}
                                     >
                                         <span className={activeSection === section.id ? 'text-white' : 'text-blue-600'}>
                                             {section.icon}
                                         </span>
                                         {section.label}
-                                    </button>
+                                    </Button>
                                 ))}
                             </div>
                         </div>
 
                         {/* Action Buttons */}
                         <div className="mt-6 bg-white rounded-xl p-6 border border-gray-200 space-y-3">
-                            <button 
+                            <Button 
                                 onClick={handleApplyNow}
-                                className="w-full bg-blue-500 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-600 transition-colors flex items-center justify-center gap-2"
+                                className="w-full bg-blue-500 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-600 transition-colors flex items-center justify-center gap-2 h-auto"
+                                trackingEvent="program_apply_now"
+                                trackingData={{ program: programId }}
                             >
                                 <UserPlus className="w-4 h-4" />
                                 Apply Now
-                            </button>
-                            <button 
+                            </Button>
+                            <Button 
+                                variant="outline"
                                 onClick={handleDownloadBrochure}
-                                className="w-full bg-white border-2 border-blue-500 text-blue-500 py-3 px-4 rounded-lg font-semibold hover:bg-blue-500 hover:text-white transition-colors flex items-center justify-center gap-2"
+                                className="w-full bg-white border-2 border-blue-500 text-blue-500 py-3 px-4 rounded-lg font-semibold hover:bg-blue-500 hover:text-white transition-colors flex items-center justify-center gap-2 h-auto"
+                                trackingEvent="program_download_brochure"
+                                trackingData={{ program: programId }}
                             >
                                 <FileText className="w-4 h-4" />
                                 Download Brochure
-                            </button>
+                            </Button>
                         </div>
                     </div>
 

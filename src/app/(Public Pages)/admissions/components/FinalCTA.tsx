@@ -1,6 +1,8 @@
 'use client';
 import { motion } from 'framer-motion';
 import { GraduationCap, Target, MapPin, Phone } from 'lucide-react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 type CTAButton = { label: string; href: string; icon?: 'target' | 'map' | 'phone' };
 type FinalCTAData = { title: string; subtitle: string; ctas: ReadonlyArray<CTAButton> };
@@ -36,20 +38,24 @@ const FinalCTA = ({ data }: { data: FinalCTAData }) => {
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             {data.ctas.map((cta, idx) => (
-              <motion.a
+              <Button
                 key={`${cta.label}-${idx}`}
-                href={cta.href}
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
+                asChild
+                variant={idx === 0 ? 'default' : 'outline'}
+                size="lg"
                 className={
                   idx === 0
-                    ? 'bg-white text-blue-900 px-6 py-3 rounded-xl font-semibold shadow-sm flex items-center gap-2 justify-center'
-                    : 'bg-white/10 backdrop-blur-sm hover:bg-white/15 text-white border border-white/20 px-6 py-3 rounded-xl font-semibold flex items-center gap-2 justify-center'
+                    ? 'bg-white text-blue-900 hover:bg-blue-50 px-6 py-3 rounded-xl font-semibold shadow-sm'
+                    : 'bg-white/10 backdrop-blur-sm hover:bg-white/15 text-white border border-white/20 px-6 py-3 rounded-xl font-semibold'
                 }
+                trackingEvent="admissions_cta_clicked"
+                trackingData={{ label: cta.label, href: cta.href, position: idx }}
               >
-                {iconFor(cta.icon)}
-                {cta.label}
-              </motion.a>
+                <Link href={cta.href} className="flex items-center gap-2">
+                  {iconFor(cta.icon)}
+                  {cta.label}
+                </Link>
+              </Button>
             ))}
           </div>
         </motion.div>
