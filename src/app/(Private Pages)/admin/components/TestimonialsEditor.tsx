@@ -3,7 +3,10 @@
 import { useCallback, useMemo, useState } from 'react';
 import Editable from '@/components/ui/Editable';
 import Testimonial from '@/components/carousel/testimonial';
-import TestimonialsForm, { type TestimonialsFormValues } from '@/app/(Private Pages)/admin/components/TestimonialsForm';
+import TestimonialsForm, {
+	type TestimonialsFormValues
+} from '@/app/(Private Pages)/admin/components/TestimonialsForm';
+import { toTestimonialComponentData } from '@/lib/carousel-adapters';
 
 const normalizeTestimonialsData = (
 	data: TestimonialsData
@@ -99,7 +102,7 @@ export default function TestimonialsEditor({
 					onChange={handlePreviewChange}
 				/>
 			}>
-			<Testimonial data={previewData} />
+			<Testimonial data={toTestimonialComponentData(previewData)} />
 		</Editable>
 	);
 }

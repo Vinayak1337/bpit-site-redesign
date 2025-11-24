@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { IndianRupee, GraduationCap, Calculator, FileText, CreditCard, Info, ChevronDown, ChevronUp, Download } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import jsPDF from 'jspdf';
 
 interface FeeComponent {
@@ -526,13 +527,13 @@ export default function FeesPage() {
                     <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">Select Program</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {programFees.map((program) => (
-                            <motion.button
+                            <motion.div
                                 key={program.id}
                                 onClick={() => {
                                     setSelectedProgram(program.id);
                                     setExpandedYear(null);
                                 }}
-                                className={`${program.color} text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ${
+                                className={`${program.color} text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer ${
                                     selectedProgram === program.id ? 'ring-4 ring-white scale-105' : 'hover:scale-105'
                                 }`}
                                 whileHover={{ scale: 1.05 }}
@@ -546,18 +547,20 @@ export default function FeesPage() {
                                 <p className="text-xl font-bold mt-4">{formatCurrency(program.totalProgramFee)}</p>
                                 <p className="text-xs opacity-75 mb-4">Total Program Fee</p>
                                 <div className="flex gap-2">
-                                    <div
+                                    <Button
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             downloadFeeStructure(program);
                                         }}
-                                        className="bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded text-xs flex items-center gap-1 transition-colors duration-200 cursor-pointer"
+                                        className="bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded text-xs flex items-center gap-1 transition-colors duration-200 h-auto"
+                                        trackingEvent="fees_download_program"
+                                        trackingData={{ program: program.id }}
                                     >
                                         <Download className="w-3 h-3" />
                                         Download
-                                    </div>
+                                    </Button>
                                 </div>
-                            </motion.button>
+                            </motion.div>
                         ))}
                     </div>
                 </motion.div>
@@ -580,13 +583,15 @@ export default function FeesPage() {
                                 <div className="text-right">
                                     <p className="text-3xl font-bold">{formatCurrency(currentProgram.totalProgramFee)}</p>
                                     <p className="text-lg opacity-75">Total Program Fee</p>
-                                    <button
+                                    <Button
                                         onClick={() => downloadFeeStructure(currentProgram)}
-                                        className="mt-4 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors duration-200"
+                                        className="mt-4 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors duration-200 h-auto"
+                                        trackingEvent="fees_download_complete"
+                                        trackingData={{ program: currentProgram.id }}
                                     >
                                         <Download className="w-4 h-4" />
                                         Download Complete Structure
-                                    </button>
+                                    </Button>
                                 </div>
                             </div>
                         </div>
@@ -602,9 +607,12 @@ export default function FeesPage() {
                                         transition={{ duration: 0.5, delay: index * 0.1 }}
                                         className="border border-gray-200 rounded-xl overflow-hidden"
                                     >
-                                        <button
+                                        <Button
+                                            variant="ghost"
                                             onClick={() => toggleYearExpansion(yearData.year)}
-                                            className="w-full bg-gray-50 p-6 text-left hover:bg-gray-100 transition-colors duration-200"
+                                            className="w-full bg-gray-50 p-6 text-left hover:bg-gray-100 transition-colors duration-200 h-auto justify-start"
+                                            trackingEvent="fees_year_expand"
+                                            trackingData={{ year: yearData.year, program: currentProgram.id }}
                                         >
                                             <div className="flex items-center justify-between">
                                                 <div>
@@ -622,16 +630,18 @@ export default function FeesPage() {
                                                         </p>
                                                         <p className="text-sm text-gray-600">Annual Fee</p>
                                                     </div>
-                                                    <div
+                                                    <Button
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             downloadFeeStructure(currentProgram, yearData.year);
                                                         }}
-                                                        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg flex items-center gap-2 text-sm transition-colors duration-200 cursor-pointer"
+                                                        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg flex items-center gap-2 text-sm transition-colors duration-200 h-auto"
+                                                        trackingEvent="fees_download_year"
+                                                        trackingData={{ year: yearData.year, program: currentProgram.id }}
                                                     >
                                                         <Download className="w-4 h-4" />
                                                         Download
-                                                    </div>
+                                                    </Button>
                                                     {expandedYear === yearData.year ? (
                                                         <ChevronUp className="w-6 h-6 text-gray-500" />
                                                     ) : (
@@ -639,7 +649,7 @@ export default function FeesPage() {
                                                     )}
                                                 </div>
                                             </div>
-                                        </button>
+                                        </Button>
 
                                         <AnimatePresence>
                                             {expandedYear === yearData.year && (

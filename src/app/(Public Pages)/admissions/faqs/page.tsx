@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronUp, HelpCircle, Phone, Mail, MapPin, Users, Award, GraduationCap } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface FAQ {
     id: number;
@@ -200,22 +201,26 @@ export default function FAQPage() {
                 >
                     <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Browse by Category</h2>
                     <div className="flex flex-wrap justify-center gap-4">
-                        <button
+                        <Button
                             onClick={() => setSelectedCategory(null)}
-                            className={`${selectedCategory === null ? 'bg-gray-800 ring-2 ring-white shadow-lg scale-105' : 'bg-gray-600'} text-white px-4 py-2 rounded-full flex items-center gap-2 text-sm font-medium hover:bg-gray-700 hover:scale-105 transition-all duration-200`}
+                            className={`${selectedCategory === null ? 'bg-gray-800 ring-2 ring-white shadow-lg scale-105' : 'bg-gray-600'} text-white px-4 py-2 rounded-full flex items-center gap-2 text-sm font-medium hover:bg-gray-700 hover:scale-105 transition-all duration-200 h-auto`}
+                            trackingEvent="faq_category_filter"
+                            trackingData={{ category: 'all' }}
                         >
                             <HelpCircle className="w-5 h-5" />
                             All Questions
-                        </button>
+                        </Button>
                         {categories.map((category) => (
-                            <button
+                            <Button
                                 key={category}
                                 onClick={() => handleCategoryClick(category || 'General')}
-                                className={`${getCategoryColor(category || 'General')} text-white px-4 py-2 rounded-full flex items-center gap-2 text-sm font-medium hover:opacity-90 transition-all duration-200 ${selectedCategory === category ? 'ring-2 ring-white shadow-lg scale-105' : 'hover:scale-105'}`}
+                                className={`${getCategoryColor(category || 'General')} text-white px-4 py-2 rounded-full flex items-center gap-2 text-sm font-medium hover:opacity-90 transition-all duration-200 h-auto ${selectedCategory === category ? 'ring-2 ring-white shadow-lg scale-105' : 'hover:scale-105'}`}
+                                trackingEvent="faq_category_filter"
+                                trackingData={{ category }}
                             >
                                 {getCategoryIcon(category || 'General')}
                                 {category}
-                            </button>
+                            </Button>
                         ))}
                     </div>
                 </motion.div>
@@ -254,9 +259,12 @@ export default function FAQPage() {
                                     transition={{ duration: 0.5, delay: index * 0.05 }}
                                     className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden"
                                 >
-                                    <button
+                                    <Button
+                                        variant="ghost"
                                         onClick={() => toggleFAQ(faq.id)}
-                                        className="w-full px-6 py-4 text-left hover:bg-gray-50 transition-colors duration-200 flex items-center justify-between"
+                                        className="w-full px-6 py-4 text-left hover:bg-gray-50 transition-colors duration-200 flex items-center justify-between h-auto"
+                                        trackingEvent="faq_question_toggle"
+                                        trackingData={{ questionId: faq.id, question: faq.question }}
                                     >
                                         <div className="flex items-center gap-4">
                                             <div className={`${getCategoryColor(faq.category || 'General')} w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm font-bold`}>
@@ -278,7 +286,7 @@ export default function FAQPage() {
                                                 <ChevronDown className="w-5 h-5 text-gray-500" />
                                             )}
                                         </div>
-                                    </button>
+                                    </Button>
                                     
                                     <AnimatePresence>
                                         {openFAQ === faq.id && (
@@ -350,9 +358,12 @@ export default function FAQPage() {
                     <p className="text-lg mb-6">
                         Start your admission enquiry process today
                     </p>
-                    <button className="bg-white text-green-600 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors duration-200">
+                    <Button 
+                        className="bg-white text-green-600 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors duration-200 h-auto"
+                        trackingEvent="faq_admission_enquiry"
+                    >
                         Admission Enquiry Here
-                    </button>
+                    </Button>
                 </motion.div>
             </div>
         </div>

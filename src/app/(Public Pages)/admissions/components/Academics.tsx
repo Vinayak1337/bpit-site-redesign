@@ -2,6 +2,7 @@
 import { motion } from 'framer-motion';
 import React, { useState } from 'react';
 import { BookOpen, Users, Lightbulb } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const Academics = () => {
     const [activeTab, setActiveTab] = useState('academics');
@@ -30,18 +31,20 @@ const Academics = () => {
                             { id: 'faculty', label: 'Faculty Support', icon: <Users className="w-5 h-5" /> },
                             { id: 'research', label: 'R&D & Industry', icon: <Lightbulb className="w-5 h-5" /> }
                         ].map((tab) => (
-                            <button
+                            <Button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold transition-all duration-300 text-sm md:text-base ${activeTab === tab.id
+                                className={`flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold transition-all duration-300 text-sm md:text-base h-auto ${activeTab === tab.id
                                         ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg'
                                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                     }`}
+                                trackingEvent="admissions_academics_tab"
+                                trackingData={{ tab: tab.id }}
                             >
                                 {tab.icon}
                                 <span className="hidden sm:inline">{tab.label}</span>
                                 <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
-                            </button>
+                            </Button>
                         ))}
                     </div>
 

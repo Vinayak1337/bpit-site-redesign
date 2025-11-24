@@ -1,6 +1,8 @@
 'use client';
 import { motion } from 'framer-motion';
 import { GraduationCap, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 const stats = [
   { value: 'NBA', label: 'Accredited Programs' },
@@ -36,17 +38,28 @@ const HeroSection = () => {
           </p>
 
           <div className="mt-8 md:mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <a
-              href="#highlights"
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-white text-blue-900 font-semibold px-5 py-3 shadow-sm hover:shadow transition">
-              Explore Highlights
-              <ArrowRight className="w-4 h-4" />
-            </a>
-            <a
-              href="/admissions/process"
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-white/10 border border-white/20 text-white px-5 py-3 hover:bg-white/15 transition">
-              Admissions Process
-            </a>
+            <Button
+              asChild
+              size="lg"
+              className="rounded-xl bg-white text-blue-900 font-semibold px-5 py-3 shadow-sm hover:shadow hover:bg-blue-50 transition"
+              trackingEvent="admissions_hero_explore_highlights"
+            >
+              <Link href="#highlights" className="inline-flex items-center gap-2">
+                Explore Highlights
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              size="lg"
+              className="rounded-xl bg-white/10 border border-white/20 text-white px-5 py-3 hover:bg-white/15 transition"
+              trackingEvent="admissions_hero_process_click"
+            >
+              <Link href="/admissions/process">
+                Admissions Process
+              </Link>
+            </Button>
           </div>
 
           <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto">

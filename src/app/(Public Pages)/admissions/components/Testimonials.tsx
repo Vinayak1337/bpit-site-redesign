@@ -2,6 +2,7 @@
 import { motion } from 'framer-motion';
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { testimonials } from '@/data/admissions';
 
 const Testimonials = () => {
@@ -35,12 +36,14 @@ const Testimonials = () => {
                 <div className="relative max-w-4xl mx-auto">
                     <div className="bg-white rounded-2xl p-4 md:p-8 shadow-lg">
                         <div className="flex items-center justify-between mb-6">
-                            <button
+                            <Button
+                                variant="ghost"
                                 onClick={prevTestimonial}
                                 className="w-12 h-12 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-all duration-300"
+                                trackingEvent="admissions_testimonial_prev"
                             >
                                 <ChevronLeft className="w-6 h-6 text-gray-600" />
-                            </button>
+                            </Button>
                             <div className="text-center flex-1">
                                 <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
                                     <span className="text-white font-bold text-xl">
@@ -50,12 +53,14 @@ const Testimonials = () => {
                                 <h3 className="text-xl font-bold text-gray-900">{testimonials[currentTestimonial].name}</h3>
                                 <p className="text-gray-600">{testimonials[currentTestimonial].department}</p>
                             </div>
-                            <button
+                            <Button
+                                variant="ghost"
                                 onClick={nextTestimonial}
                                 className="w-12 h-12 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-all duration-300"
+                                trackingEvent="admissions_testimonial_next"
                             >
                                 <ChevronRight className="w-6 h-6 text-gray-600" />
-                            </button>
+                            </Button>
                         </div>
 
                         <motion.div

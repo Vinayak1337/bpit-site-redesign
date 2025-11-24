@@ -2,6 +2,8 @@
 
 import { motion } from "framer-motion";
 import { GraduationCap, ArrowRight } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 type WhyHeroData = {
   badgeText: string;
@@ -39,19 +41,30 @@ const WhyHero = ({ data }: { data: WhyHeroData }) => {
             {data.description}
           </p>
           <div className="mt-8 md:mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <a
-              href={data.primaryCta.href}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-white text-blue-900 font-semibold px-5 py-3 shadow-sm hover:shadow transition"
+            <Button
+              asChild
+              size="lg"
+              className="rounded-xl bg-white text-blue-900 font-semibold px-5 py-3 shadow-sm hover:shadow hover:bg-blue-50 transition"
+              trackingEvent="why_bpit_hero_primary_cta"
+              trackingData={{ label: data.primaryCta.label, href: data.primaryCta.href }}
             >
-              {data.primaryCta.label}
-              <ArrowRight className="w-4 h-4" />
-            </a>
-            <a
-              href={data.secondaryCta.href}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-white/10 border border-white/20 text-white px-5 py-3 hover:bg-white/15 transition"
+              <Link href={data.primaryCta.href} className="inline-flex items-center gap-2">
+                {data.primaryCta.label}
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              size="lg"
+              className="rounded-xl bg-white/10 border border-white/20 text-white px-5 py-3 hover:bg-white/15 transition"
+              trackingEvent="why_bpit_hero_secondary_cta"
+              trackingData={{ label: data.secondaryCta.label, href: data.secondaryCta.href }}
             >
-              {data.secondaryCta.label}
-            </a>
+              <Link href={data.secondaryCta.href}>
+                {data.secondaryCta.label}
+              </Link>
+            </Button>
           </div>
         </motion.div>
       </div>

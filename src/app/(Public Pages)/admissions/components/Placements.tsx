@@ -2,6 +2,7 @@
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { TrendingUp, DollarSign, Trophy } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { recruitersWithLogos } from '@/data/admissions';
 
 const recruitersRow1 = recruitersWithLogos.slice(0, 6);
@@ -274,9 +275,12 @@ const Placements = () => {
                     </div>
 
                     <div className="text-center mt-8">
-                        <button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                        <Button 
+                            className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl h-auto"
+                            trackingEvent="admissions_explore_placements"
+                        >
                             Explore Placement Reports
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </div>

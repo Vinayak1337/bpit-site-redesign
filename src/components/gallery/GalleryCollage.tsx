@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight, ZoomIn, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { GalleryItem } from '@/lib/schemas/gallery';
+import { Button } from '@/components/ui/button';
 
 interface GalleryCollageProps {
 	items: GalleryItem[];
@@ -85,17 +86,20 @@ export default function GalleryCollage({
 			<div className='sticky top-20 z-30 flex justify-center pb-4'>
 				<div className='bg-white/80 backdrop-blur-md p-1.5 rounded-full shadow-lg border border-gray-200/50 flex flex-wrap justify-center gap-1'>
 					{categories.map(category => (
-						<button
+						<Button
 							key={category}
+							variant={selectedCategory === category ? 'default' : 'ghost'}
 							onClick={() => setSelectedCategory(category)}
 							className={cn(
-								'px-4 py-2 rounded-full text-sm font-medium transition-all duration-300',
+								'px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 h-auto',
 								selectedCategory === category
-									? 'bg-blue-600 text-white shadow-md'
+									? 'bg-blue-600 text-white shadow-md hover:bg-blue-700'
 									: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-							)}>
+							)}
+							trackingEvent="gallery_filter_category"
+							trackingData={{ category }}>
 							{category}
-						</button>
+						</Button>
 					))}
 				</div>
 			</div>
@@ -180,32 +184,41 @@ export default function GalleryCollage({
 						className='fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-xl p-4'
 						onClick={closeLightbox}>
 						{/* Close Button */}
-						<button
+						<Button
+							variant="ghost"
+							size="icon"
 							onClick={closeLightbox}
 							aria-label='Close lightbox'
-							className='absolute top-6 right-6 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors z-50 group'>
+							className='absolute top-6 right-6 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors z-50 group h-auto w-auto'
+							trackingEvent="gallery_lightbox_close">
 							<X className='w-6 h-6 group-hover:rotate-90 transition-transform duration-300' />
-						</button>
+						</Button>
 
 						{/* Navigation Buttons */}
-						<button
+						<Button
+							variant="ghost"
+							size="icon"
 							onClick={e => {
 								e.stopPropagation();
 								navigateLightbox('prev');
 							}}
 							aria-label='Previous image'
-							className='absolute left-6 top-1/2 -translate-y-1/2 p-4 bg-white/10 hover:bg-white/20 rounded-full text-white transition-all z-50 hover:scale-110 hidden sm:flex'>
+							className='absolute left-6 top-1/2 -translate-y-1/2 p-4 bg-white/10 hover:bg-white/20 rounded-full text-white transition-all z-50 hover:scale-110 hidden sm:flex h-auto w-auto'
+							trackingEvent="gallery_lightbox_prev">
 							<ChevronLeft className='w-8 h-8' />
-						</button>
-						<button
+						</Button>
+						<Button
+							variant="ghost"
+							size="icon"
 							onClick={e => {
 								e.stopPropagation();
 								navigateLightbox('next');
 							}}
 							aria-label='Next image'
-							className='absolute right-6 top-1/2 -translate-y-1/2 p-4 bg-white/10 hover:bg-white/20 rounded-full text-white transition-all z-50 hover:scale-110 hidden sm:flex'>
+							className='absolute right-6 top-1/2 -translate-y-1/2 p-4 bg-white/10 hover:bg-white/20 rounded-full text-white transition-all z-50 hover:scale-110 hidden sm:flex h-auto w-auto'
+							trackingEvent="gallery_lightbox_next">
 							<ChevronRight className='w-8 h-8' />
-						</button>
+						</Button>
 
 						{/* Image Container */}
 						<motion.div

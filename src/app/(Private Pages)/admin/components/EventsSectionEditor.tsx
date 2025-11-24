@@ -5,6 +5,7 @@ import EventsSection from '@/components/carousel/events-section';
 import EventsSectionForm, {
 	toFormValuesFromEventsSection
 } from '@/app/(Private Pages)/admin/components/EventsSectionForm';
+import { toEventsSectionComponentData } from '@/lib/carousel-adapters';
 
 type EventsSectionEditorProps = {
 	initialData: EventsSectionData;
@@ -53,7 +54,7 @@ export default function EventsSectionEditor({
 		<Editable
 			label='Events'
 			formContent={formContent}>
-			<EventsSection data={previewData} />
+			<EventsSection data={toEventsSectionComponentData(previewData)} />
 		</Editable>
 	);
 }
