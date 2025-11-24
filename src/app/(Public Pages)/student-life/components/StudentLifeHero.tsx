@@ -72,3 +72,4 @@ const StudentLifeHero = ({ data }: StudentLifeHeroProps) => {
 export default StudentLifeHero;
 
 
+

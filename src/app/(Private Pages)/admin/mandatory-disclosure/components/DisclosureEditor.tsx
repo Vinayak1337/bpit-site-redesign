@@ -10,20 +10,11 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue
-} from '@/components/ui/select';
 
 import {
-    DisclosureData,
-    disclosureDataSchema,
     updateMandatoryDisclosure
 } from '@/app/(Private Pages)/actions/mandatory-disclosure';
+import { DisclosureData, disclosureDataSchema } from '@/lib/schemas/mandatory-disclosure';
 
 interface DisclosureEditorProps {
     initialData: DisclosureData;
@@ -190,4 +181,3 @@ export default function DisclosureEditor({ initialData }: DisclosureEditorProps)
         </form>
     );
 }
-

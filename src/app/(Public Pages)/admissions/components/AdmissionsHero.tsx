@@ -72,3 +72,4 @@ const AdmissionsHero = ({ data }: AdmissionsHeroProps) => {
 export default AdmissionsHero;
 
 
+

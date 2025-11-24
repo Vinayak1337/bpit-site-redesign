@@ -246,3 +246,4 @@ const IQACContent = ({ data }: Props) => {
 
 export default IQACContent;
 
+
