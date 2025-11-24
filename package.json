@@ -45,6 +45,7 @@
     "next-cloudinary": "^6.17.0",
     "next-sitemap": "^4.2.3",
     "nodemailer": "^6.9.14",
+    "posthog-js": "^1.298.0",
     "qss": "^3.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

@@ -58,6 +58,24 @@ const getYouTubeEmbedUrl = (url: string): string | null => {
 	return `https://www.youtube.com/embed/${id}?${params.toString()}`;
 };
 
+interface TestimonialsData {
+    title: string;
+    subtitle: string;
+    testimonials: Array<{
+        id?: string;
+        name: string;
+        position: string;
+        batch: string;
+        achievement: string;
+        testimonial: string;
+        image: string;
+        video?: string;
+        company: string;
+        rating?: number;
+        tags: string[];
+    }>;
+}
+
 interface TestimonialProps {
 	data: TestimonialsData;
 }
@@ -430,7 +448,12 @@ export default function Testimonial({ data }: TestimonialProps) {
 														? 'opacity-60 cursor-not-allowed pointer-events-none'
 														: ''
 												}`}
-												onClick={() => handleToggleVideo(currentIndex)}>
+												onClick={() => handleToggleVideo(currentIndex)}
+												trackingEvent="testimonial_watch_story_clicked"
+												trackingData={{
+													student: currentTestimonial?.name,
+													videoUrl: videoUrl
+												}}>
 												<Volume2 className='w-3 h-3 sm:w-4 sm:h-4 mr-2' />
 												<span className='hidden sm:inline'>
 													Watch Full Story
@@ -446,18 +469,22 @@ export default function Testimonial({ data }: TestimonialProps) {
 					</AnimatePresence>
 
 					{/* Navigation Arrows - Hidden on mobile and tablet */}
-					<button
+					<Button
+						variant="ghost"
+						size="icon"
 						onClick={prevTestimonial}
 						aria-label='Previous testimonial'
-						className='hidden lg:block absolute left-4 top-1/2 transform -translate-y-1/2 z-10 p-4 bg-white/90 backdrop-blur-sm rounded-full border border-white/30 text-blue-600 hover:bg-white hover:scale-110 transition-all duration-300 shadow-xl group'>
+						className='hidden lg:flex absolute left-4 top-1/2 transform -translate-y-1/2 z-10 w-14 h-14 p-0 bg-white/90 backdrop-blur-sm rounded-full border border-white/30 text-blue-600 hover:bg-white hover:scale-110 transition-all duration-300 shadow-xl group'>
 						<ChevronLeft className='w-6 h-6 group-hover:-translate-x-1 transition-transform' />
-					</button>
-					<button
+					</Button>
+					<Button
+						variant="ghost"
+						size="icon"
 						onClick={nextTestimonial}
 						aria-label='Next testimonial'
-						className='hidden lg:block absolute right-4 top-1/2 transform -translate-y-1/2 z-10 p-4 bg-white/90 backdrop-blur-sm rounded-full border border-white/30 text-blue-600 hover:bg-white hover:scale-110 transition-all duration-300 shadow-xl group'>
+						className='hidden lg:flex absolute right-4 top-1/2 transform -translate-y-1/2 z-10 w-14 h-14 p-0 bg-white/90 backdrop-blur-sm rounded-full border border-white/30 text-blue-600 hover:bg-white hover:scale-110 transition-all duration-300 shadow-xl group'>
 						<ChevronRight className='w-6 h-6 group-hover:translate-x-1 transition-transform' />
-					</button>
+					</Button>
 				</div>
 
 				{/* Thumbnail Navigation */}

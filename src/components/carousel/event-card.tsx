@@ -19,6 +19,26 @@ import {
 	Palette
 } from 'lucide-react';
 
+interface EventItem {
+    id?: string;
+    title: string;
+    date: string;
+    ctaLabel?: string;
+    ctaLink: string;
+    featured?: boolean;
+    organizer?: string;
+    image: string;
+    status: string;
+    category: string;
+    subtitle?: string;
+    description?: string;
+    time?: string;
+    location?: string;
+    attendees?: string;
+    highlights: string[];
+    registrationOpen?: boolean;
+}
+
 const categoryIcons = {
 	Technology: <Zap className='w-5 h-5' />,
 	Cultural: <Palette className='w-5 h-5' />,
@@ -179,7 +199,13 @@ const EventCard = ({ event, index }: { event: EventItem; index: number }) => {
 						<motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
 							<Button
 								asChild
-								className='w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:shadow-xl text-white border-0 rounded-xl lg:rounded-2xl py-2 lg:py-3 text-xs lg:text-sm font-bold transition-all duration-300'>
+								className='w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:shadow-xl text-white border-0 rounded-xl lg:rounded-2xl py-2 lg:py-3 text-xs lg:text-sm font-bold transition-all duration-300'
+								trackingEvent="event_register_clicked"
+								trackingData={{
+									title: event.title,
+									id: event.id,
+									link: event.ctaLink
+								}}>
 								<Link
 									href={event.ctaLink}
 									target={isExternalLink ? '_blank' : undefined}

@@ -17,8 +17,33 @@ import {
 	Pin
 } from 'lucide-react';
 
-const getCategoryConfig = (category: Category) => {
-	const configs = {
+interface Category {
+    name: string;
+}
+
+interface Priority {
+    level: 'high' | 'medium' | 'low';
+}
+
+interface Notice {
+    id?: string;
+    title: string;
+    date: string;
+    time: string;
+    category: string;
+    link: string;
+    fileUrl?: string;
+    image: string;
+    subtitle?: string;
+    description?: string;
+    tags: string[];
+    priority: 'high' | 'medium' | 'low';
+    pinned?: boolean;
+    urgent?: boolean;
+}
+
+const getCategoryConfig = (category: string) => {
+	const configs: Record<string, any> = {
 		Academic: {
 			gradient: 'from-blue-500 to-indigo-600',
 			icon: <GraduationCap className='w-4 h-4' />,
@@ -69,11 +94,11 @@ const getCategoryConfig = (category: Category) => {
 			text: 'text-gray-700'
 		}
 	};
-	return configs[category];
+	return configs[category] || configs['General'];
 };
 
-const getPriorityConfig = (priority: Priority) => {
-	const configs = {
+const getPriorityConfig = (priority: string) => {
+	const configs: Record<string, any> = {
 		high: {
 			gradient: 'from-red-500 to-rose-600',
 			bg: 'bg-red-50',
@@ -96,7 +121,7 @@ const getPriorityConfig = (priority: Priority) => {
 			label: 'Low Priority'
 		}
 	};
-	return configs[priority];
+	return configs[priority] || configs['low'];
 };
 
 const MotionLink = motion(Link);
@@ -256,7 +281,14 @@ const NoticeCard = ({ item, index }: { item: Notice; index: number }) => {
 							rel={isExternalLink ? 'noopener noreferrer' : undefined}
 							whileHover={{ scale: 1.05 }}
 							whileTap={{ scale: 0.95 }}
-							className='flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors duration-200'>
+							className='flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors duration-200'
+                            data-ph-event="notice_card_clicked"
+                            data-ph-data={JSON.stringify({
+                                title: item.title,
+                                category: item.category,
+                                id: item.id,
+                                link: item.link
+                            })}>
 							View
 							<ArrowRight className='w-3 h-3' />
 						</MotionLink>

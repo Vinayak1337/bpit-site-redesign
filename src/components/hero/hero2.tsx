@@ -202,6 +202,12 @@ const Hero2 = ({ data }: Hero2Props) => {
 											className='bg-white text-blue-900 hover:bg-blue-50 px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 group text-sm sm:text-base'
 											onMouseEnter={handleMouseEnter}
 											onMouseLeave={handleMouseLeave}
+											trackingEvent="hero_primary_cta_click"
+											trackingData={{
+												label: slides[currentSlide].cta.label,
+												href: slides[currentSlide].cta.href,
+												slide_index: currentSlide
+											}}
 											onClick={() => {
 												if (slides[currentSlide].cta?.isEnquiry) {
 													const event = new CustomEvent('openEnquiry');
@@ -221,6 +227,12 @@ const Hero2 = ({ data }: Hero2Props) => {
 											className='border-2 border-white/80 text-white bg-white/10 backdrop-blur-sm hover:bg-white hover:text-blue-900 hover:border-white px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold transition-all duration-300 text-sm sm:text-base shadow-lg'
 											onMouseEnter={handleMouseEnter}
 											onMouseLeave={handleMouseLeave}
+											trackingEvent="hero_secondary_cta_click"
+											trackingData={{
+												label: slides[currentSlide].secondary_cta.label,
+												href: slides[currentSlide].secondary_cta.href,
+												slide_index: currentSlide
+											}}
 											onClick={() => {
 												if (slides[currentSlide].secondary_cta?.isEnquiry) {
 													const event = new CustomEvent('openEnquiry');
@@ -240,22 +252,26 @@ const Hero2 = ({ data }: Hero2Props) => {
 			</div>
 
 			{/* Navigation Arrows */}
-			<button
+			<Button
+				variant="ghost"
+				size="icon"
 				onClick={prevSlide}
 				onMouseEnter={handleMouseEnter}
 				onMouseLeave={handleMouseLeave}
 				aria-label='Previous slide'
-				className='absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 z-20 p-2 sm:p-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 text-white hover:bg-white/20 transition-all duration-300 group'>
+				className='absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 z-20 p-2 sm:p-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 text-white hover:bg-white/20 transition-all duration-300 group h-auto w-auto'>
 				<ChevronLeft className='w-5 h-5 sm:w-6 sm:h-6 group-hover:-translate-x-1 transition-transform' />
-			</button>
-			<button
+			</Button>
+			<Button
+				variant="ghost"
+				size="icon"
 				onClick={nextSlide}
 				onMouseEnter={handleMouseEnter}
 				onMouseLeave={handleMouseLeave}
 				aria-label='Next slide'
-				className='absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 z-20 p-2 sm:p-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 text-white hover:bg-white/20 transition-all duration-300 group'>
+				className='absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 z-20 p-2 sm:p-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 text-white hover:bg-white/20 transition-all duration-300 group h-auto w-auto'>
 				<ChevronRight className='w-5 h-5 sm:w-6 sm:h-6 group-hover:translate-x-1 transition-transform' />
-			</button>
+			</Button>
 
 			{/* Slide Indicators */}
 			<div className='absolute bottom-6 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-20 flex space-x-2 sm:space-x-3'>

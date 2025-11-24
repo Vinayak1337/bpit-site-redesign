@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Download, FileText, GraduationCap, Calendar, ExternalLink, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface BrochureInfo {
     id: string;
@@ -23,8 +24,6 @@ interface ScrapedBrochures {
     ugText?: string;
     pgText?: string;
 }
-
-
 
 export default function BrochurePage() {
     const [brochures, setBrochures] = useState<BrochureInfo[]>([]);
@@ -111,21 +110,6 @@ export default function BrochurePage() {
         setLastChecked(new Date().toLocaleString());
         setIsLoading(false);
     }, [autoDetected]);
-
-    // Remove unused function
-    // const checkBrochureAvailability = async (url: string): Promise<boolean> => {
-    //     try {
-    //         // Use a proxy or CORS-enabled approach to check URL availability
-    //         await fetch(url, { 
-    //             method: 'HEAD',
-    //             mode: 'no-cors'
-    //         });
-    //         return true;
-    //     } catch {
-    //         console.warn(`Brochure URL may not be available: ${url}`);
-    //         return false;
-    //     }
-    // };
 
     const refreshBrochureUrls = async () => {
         setIsRefreshing(true);
@@ -221,16 +205,17 @@ export default function BrochurePage() {
                                     ✓ Auto-detected
                                 </div>
                             )}
-                            <button
+                            <Button
                                 onClick={refreshBrochureUrls}
                                 disabled={isRefreshing || isLoading}
                                 className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 sm:px-4 py-2 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95 text-sm sm:text-base w-full sm:w-auto justify-center"
+                                trackingEvent="brochure_refresh_clicked"
                             >
                                 <RefreshCw className={`w-4 h-4 transition-transform duration-700 ${isRefreshing ? 'animate-spin' : ''}`} />
                                 <span className="whitespace-nowrap">
                                     {isRefreshing ? 'Scanning IPU...' : 'Refresh from IPU'}
                                 </span>
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </motion.div>
@@ -291,20 +276,24 @@ export default function BrochurePage() {
                                 </div>
                                 
                                 <div className="flex flex-col sm:flex-row gap-3">
-                                    <button
+                                    <Button
                                         onClick={() => downloadBrochure(brochure)}
                                         className="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors duration-200 text-sm sm:text-base"
+                                        trackingEvent="brochure_download_clicked"
+                                        trackingData={{ brochure: brochure.title, url: brochure.url }}
                                     >
                                         <Download className="w-4 h-4 sm:w-5 sm:h-5" />
                                         Download PDF
-                                    </button>
-                                    <button
+                                    </Button>
+                                    <Button
                                         onClick={() => openBrochure(brochure)}
                                         className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors duration-200 text-sm sm:text-base"
+                                        trackingEvent="brochure_view_clicked"
+                                        trackingData={{ brochure: brochure.title, url: brochure.url }}
                                     >
                                         <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />
                                         View Online
-                                    </button>
+                                    </Button>
                                 </div>
                             </div>
                         </motion.div>
