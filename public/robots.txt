@@ -8,8 +8,8 @@ User-agent: *
 Allow: /
 
 # Host
-Host: https://redesign.bpitindia.com
+Host: https://redesogn.bpitindia.com
 
 # Sitemaps
-Sitemap: https://redesign.bpitindia.com/sitemap.xml
-Sitemap: https://redesign.bpitindia.com/sitemap-0.xml
+Sitemap: https://redesogn.bpitindia.com/sitemap.xml
+Sitemap: https://redesogn.bpitindia.com/sitemap-0.xml

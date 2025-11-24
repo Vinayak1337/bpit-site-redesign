@@ -133,7 +133,11 @@ export default function AboutOverviewForm({
 	useEffect(() => {
 		onChange?.(normalizeOverview(form.getValues()));
 		const subscription = form.watch(values => {
-			onChange?.(normalizeOverview(values));
+			const formValues: Partial<FormValues> = {
+				...values,
+				stats: values.stats?.filter(Boolean) as StatFormValue[]
+			};
+			onChange?.(normalizeOverview(formValues));
 		});
 		return () => subscription.unsubscribe();
 	}, [form, onChange]);

@@ -38,16 +38,21 @@ export default function EventsSectionEditor({
 		);
 	}, []);
 
+	const formContent = useMemo(
+		() => (
+			<EventsSectionForm
+				initialValues={initialFormValues}
+				pageSlug={pageSlug}
+				onChange={handlePreviewChange}
+			/>
+		),
+		[initialFormValues, pageSlug, handlePreviewChange]
+	);
+
 	return (
 		<Editable
 			label='Events'
-			formContent={
-				<EventsSectionForm
-					initialValues={initialFormValues}
-					pageSlug={pageSlug}
-					onChange={handlePreviewChange}
-				/>
-			}>
+			formContent={formContent}>
 			<EventsSection data={previewData} />
 		</Editable>
 	);

@@ -1,22 +1,10 @@
-'use client';
+import { getLeadershipTeam } from '@/app/(Private Pages)/actions/management';
+import LeadershipTeamSection from './components/LeadershipTeamSection';
 
-import React from 'react';
-import PageHero from '@/app/(Public Pages)/management/components/PageHero';
-import LeadershipCard from '@/app/(Public Pages)/management/components/LeadershipCard';
-import { leadershipTeamData } from '@/data/management';
+const LEADERSHIP_TEAM_SLUG = 'leadership-team';
 
-const LeadershipTeamPage = () => {
-	return (
-		<div className='space-y-8'>
-			<PageHero data={leadershipTeamData.hero} />
+export default async function LeadershipTeamPage() {
+	const leadershipTeamData = await getLeadershipTeam(LEADERSHIP_TEAM_SLUG);
 
-			<div className='grid md:grid-cols-2 gap-8'>
-				{leadershipTeamData.leaders.map(leader => (
-					<LeadershipCard key={leader.id} data={leader} />
-				))}
-			</div>
-		</div>
-	);
+	return <LeadershipTeamSection data={leadershipTeamData} />;
 };
-
-export default LeadershipTeamPage;

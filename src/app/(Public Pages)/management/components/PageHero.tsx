@@ -45,7 +45,7 @@ const iconMap = {
 };
 
 const PageHero: React.FC<PageHeroProps> = ({ data }) => {
-	const IconComponent = iconMap[data.icon as keyof typeof iconMap];
+	const IconComponent = iconMap[data.icon as keyof typeof iconMap] || Target; // Fallback to Target icon
 
 	return (
 		<div

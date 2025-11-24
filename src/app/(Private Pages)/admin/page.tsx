@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import Link from 'next/link';
 import {
 	requireAdmin,
 	logoutAdmin,
@@ -152,7 +153,37 @@ export default async function AdminDashboardPage() {
 				</div>
 
 				<div className='mt-6 text-blue-800'>
-					<p>Welcome! Your admin CMS will render pages here.</p>
+					<p className='mb-4'>Welcome! Use the quick links below to manage your website content:</p>
+					
+					<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'>
+						<Link
+							href='/admin/about'
+							className='block p-4 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition-colors'>
+							<h3 className='font-semibold text-blue-900 mb-2'>About Pages</h3>
+							<p className='text-sm text-blue-700'>Edit About, Chairman Message, Principal Message, and Founder Tribute</p>
+						</Link>
+						
+						<Link
+							href='/admin/vision-mission'
+							className='block p-4 bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg transition-colors'>
+							<h3 className='font-semibold text-green-900 mb-2'>Vision & Mission</h3>
+							<p className='text-sm text-green-700'>Edit vision statement, pillars, and future aspirations</p>
+						</Link>
+						
+						<Link
+							href='/admin/home'
+							className='block p-4 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg transition-colors'>
+							<h3 className='font-semibold text-purple-900 mb-2'>Homepage</h3>
+							<p className='text-sm text-purple-700'>Edit hero section, announcements, and events</p>
+						</Link>
+						
+						<Link
+							href='/admin/placements/overview'
+							className='block p-4 bg-orange-50 hover:bg-orange-100 border border-orange-200 rounded-lg transition-colors'>
+							<h3 className='font-semibold text-orange-900 mb-2'>Placement Overview</h3>
+							<p className='text-sm text-orange-700'>Edit placement statistics, features, mission, and contact information</p>
+						</Link>
+					</div>
 				</div>
 			</div>
 		</div>

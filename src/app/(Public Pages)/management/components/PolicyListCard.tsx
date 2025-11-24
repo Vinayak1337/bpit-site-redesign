@@ -44,7 +44,7 @@ const iconMap = {
 };
 
 const PolicyListCard: React.FC<PolicyListCardProps> = ({ data }) => {
-	const IconComponent = iconMap[data.icon as keyof typeof iconMap];
+	const IconComponent = iconMap[data.icon as keyof typeof iconMap] || Target; // Fallback to Target icon
 
 	return (
 		<div className='bg-white rounded-lg sm:rounded-xl p-4 sm:p-6 shadow-lg border border-gray-200'>

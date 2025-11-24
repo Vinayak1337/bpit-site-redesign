@@ -58,16 +58,21 @@ export default function PlacementCompaniesEditor({
 		);
 	}, []);
 
+	const formContent = useMemo(
+		() => (
+			<PlacementCompaniesForm
+				initialValues={initialFormValues}
+				pageSlug={pageSlug}
+				onChange={handlePreviewChange}
+			/>
+		),
+		[initialFormValues, pageSlug, handlePreviewChange]
+	);
+
 	return (
 		<Editable
 			label='Placement Companies'
-			formContent={
-				<PlacementCompaniesForm
-					initialValues={initialFormValues}
-					pageSlug={pageSlug}
-					onChange={handlePreviewChange}
-				/>
-			}>
+			formContent={formContent}>
 			<PlacementCompanies data={previewData} />
 		</Editable>
 	);

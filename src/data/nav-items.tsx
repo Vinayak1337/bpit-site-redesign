@@ -58,8 +58,8 @@ export const aboutBPITItems = [
 		icon: <Shield className='w-4 h-4 text-blue-600' />
 	},
 	{
-		title: 'Mandatory Disclosures',
-		href: '/accreditation',
+		title: 'Mandatory Disclosure',
+		href: '/mandatory-disclosure',
 		description: 'AICTE/NBA accreditation and mandatory disclosures',
 		icon: <Award className='w-4 h-4 text-blue-600' />
 	},

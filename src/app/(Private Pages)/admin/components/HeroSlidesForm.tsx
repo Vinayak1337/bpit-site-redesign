@@ -428,8 +428,8 @@ export default function HeroSlidesForm({
 					</div>
 					<p className='text-xs text-slate-500'>
 						Images should be publicly accessible URLs. CTA links support
-						absolute URLs or internal paths (starting with /). Choose ‚úOpen
-						enquiry modal‚ù to trigger the enquiry popup.
+						absolute URLs or internal paths (starting with /). Choose 'Open
+						enquiry modal' to trigger the enquiry popup.
 					</p>
 				</div>
 			</form>
@@ -536,5 +536,3 @@ function formSlideToHeroSlide(slide: HeroSlideFormValue): HeroSlide {
 
 	return payload;
 }
-
-

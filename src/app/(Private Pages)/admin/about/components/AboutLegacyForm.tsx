@@ -129,7 +129,12 @@ export default function AboutLegacyForm({
 	useEffect(() => {
 		onChange?.(normalizeLegacy(form.getValues()));
 		const subscription = form.watch(values => {
-			onChange?.(normalizeLegacy(values));
+			const formValues: Partial<FormValues> = {
+				...values,
+				paragraphs: values.paragraphs?.filter(Boolean) as ParagraphFormValue[],
+				features: values.features?.filter(Boolean) as FeatureFormValue[]
+			};
+			onChange?.(normalizeLegacy(formValues));
 		});
 		return () => subscription.unsubscribe();
 	}, [form, onChange]);
