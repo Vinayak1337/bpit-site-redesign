@@ -2,6 +2,8 @@ import React from 'react';
 import { getInternshipsData } from '@/app/(Private Pages)/actions/internships';
 import InternshipsClient from './InternshipsClient';
 
+export const revalidate = 3600; // Revalidate every hour
+
 export default async function InternshipsPage() {
   const data = await getInternshipsData();
 

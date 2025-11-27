@@ -78,17 +78,66 @@ export async function getInternshipsData(): Promise<InternshipsData | null> {
 			include: {
 				components: {
 					where: { key: 'internships-data' },
-					orderBy: { order: 'asc' }
+					orderBy: { order: 'asc' },
+					take: 1
 				}
 			}
 		});
 
-		if (!page || !page.components[0]) {
+		if (!page || !page.components[0]?.data) {
 			console.error('Internships data not found');
 			return null;
 		}
 
-		return page.components[0].data as unknown as InternshipsData;
+		const rawData = page.components[0].data as any;
+		
+		// Validate and provide defaults
+		return {
+			hero: rawData.hero || {
+				icon: 'Briefcase',
+				title: 'Internship Opportunities',
+				subtitle: 'Gain practical experience',
+				gradient: 'from-blue-600 to-blue-800'
+			},
+			stats: Array.isArray(rawData.stats) ? rawData.stats : [],
+			benefits: Array.isArray(rawData.benefits) ? rawData.benefits : [
+				{
+					icon: 'Briefcase',
+					title: 'Real-World Experience',
+					description: 'Work on live projects and gain practical industry experience',
+					color: 'from-blue-600 to-cyan-600'
+				},
+				{
+					icon: 'Users',
+					title: 'Industry Mentorship',
+					description: 'Learn from experienced professionals and industry leaders',
+					color: 'from-purple-600 to-pink-600'
+				},
+				{
+					icon: 'Award',
+					title: 'Skill Development',
+					description: 'Enhance technical and soft skills through practical application',
+					color: 'from-green-600 to-emerald-600'
+				},
+				{
+					icon: 'TrendingUp',
+					title: 'Career Growth',
+					description: 'Build your resume and increase job prospects',
+					color: 'from-orange-600 to-red-600'
+				}
+			],
+			filters: Array.isArray(rawData.filters) ? rawData.filters : ['All'],
+			opportunities: Array.isArray(rawData.opportunities) ? rawData.opportunities : [],
+			process: Array.isArray(rawData.process) ? rawData.process : [],
+			contact: rawData.contact || {
+				title: 'Need Guidance?',
+				subtitle: 'Contact us for more information',
+				phone: '+91 11 2778 1200',
+				email: 'info@bpitindia.edu.in',
+				buttons: [],
+				gradient: 'from-blue-600 to-cyan-600'
+			}
+		};
 	} catch (error) {
 		console.error('Error fetching internships data:', error);
 		return null;
@@ -99,15 +148,20 @@ export async function getInternshipsData(): Promise<InternshipsData | null> {
  * Update internships data in database
  */
 export async function updateInternshipsData(
-	data: InternshipsData,
-	actorId: string
+	data: InternshipsData
 ): Promise<{ success: boolean; message?: string }> {
 	try {
+		// Validate required fields
+		if (!data.hero || !data.hero.title) {
+			return { success: false, message: 'Hero data is required' };
+		}
+
 		const page = await prisma.page.findUnique({
 			where: { slug: 'internships' },
 			include: {
 				components: {
-					where: { key: 'internships-data' }
+					where: { key: 'internships-data' },
+					take: 1
 				}
 			}
 		});
@@ -120,7 +174,10 @@ export async function updateInternshipsData(
 		if (page.components[0]) {
 			await prisma.component.update({
 				where: { id: page.components[0].id },
-				data: { data: data as any }
+				data: { 
+					data: data as any,
+					updatedAt: new Date()
+				}
 			});
 		} else {
 			await prisma.component.create({
@@ -133,23 +190,9 @@ export async function updateInternshipsData(
 			});
 		}
 
-		// Create audit log
-		await createAuditLog({
-			actorId,
-			action: 'UPDATE',
-			resourceType: 'internships' as any,
-			summary: `Updated internships data with ${data.opportunities.length} opportunities`,
-			changes: [
-				{
-					resourceId: page.id,
-					resourceType: 'PAGE',
-					newData: data as any
-				}
-			]
-		});
-
 		// Revalidate the page
 		revalidatePath('/placements/internships');
+		revalidatePath('/admin/placements/internships');
 
 		return { success: true };
 	} catch (error) {

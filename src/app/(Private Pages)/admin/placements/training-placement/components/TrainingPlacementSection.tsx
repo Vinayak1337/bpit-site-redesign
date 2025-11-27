@@ -107,19 +107,28 @@ export default function TrainingPlacementSection({
 							<div className='bg-gradient-to-br from-blue-50 to-blue-100 rounded-3xl p-8 md:p-12 shadow-xl'>
 								<div className='grid grid-cols-1 lg:grid-cols-3 gap-8 items-center'>
 									<div className='lg:col-span-1'>
-										<motion.div
-											initial={{ scale: 0.8, opacity: 0 }}
-											whileInView={{ scale: 1, opacity: 1 }}
-											transition={{ duration: 0.6 }}
-											className='relative'>
-											<div
-												className={`w-48 h-48 mx-auto bg-gradient-to-br ${data.directorMessage.gradientColor || 'from-blue-500 to-blue-700'} rounded-full flex items-center justify-center text-white text-6xl font-bold shadow-2xl`}>
-												{data.directorMessage.initials || 'AK'}
-											</div>
-											<div className='absolute -top-4 -right-4 w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center'>
-												<Quote className='w-6 h-6 text-yellow-800' />
-											</div>
-										</motion.div>
+									<motion.div
+										initial={{ scale: 0.8, opacity: 0 }}
+										whileInView={{ scale: 1, opacity: 1 }}
+										transition={{ duration: 0.6 }}
+										className='relative'>
+										{data.directorMessage.image ? (
+											<img
+												src={data.directorMessage.image}
+												alt={data.directorMessage.name}
+												className='w-48 h-48 mx-auto rounded-full object-cover shadow-2xl border-4 border-white'
+											/>
+										) : (
+											<img
+												src='/avatar-default.svg'
+												alt={data.directorMessage.name}
+												className='w-48 h-48 mx-auto rounded-full object-cover shadow-2xl border-4 border-white bg-blue-500'
+											/>
+										)}
+										<div className='absolute -top-4 -right-4 w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center'>
+											<Quote className='w-6 h-6 text-yellow-800' />
+										</div>
+									</motion.div>
 									</div>
 
 									<div className='lg:col-span-2 space-y-6'>
@@ -179,12 +188,19 @@ export default function TrainingPlacementSection({
 									className='bg-white rounded-2xl p-8 shadow-lg h-full'>
 									<div className='flex items-start space-x-8 h-full'>
 										<div className='flex-shrink-0'>
-											<div className='w-20 h-20 bg-gradient-to-r from-blue-500 to-blue-700 rounded-full flex items-center justify-center text-white text-xl font-bold'>
-												{member.name
-													.split(' ')
-													.map(n => n[0])
-													.join('')}
-											</div>
+											{member.image ? (
+												<img
+													src={member.image}
+													alt={member.name}
+													className='w-20 h-20 rounded-full object-cover border-4 border-blue-100 shadow-lg'
+												/>
+											) : (
+												<img
+													src='/avatar-default.svg'
+													alt={member.name}
+													className='w-20 h-20 rounded-full object-cover border-4 border-blue-100 shadow-lg bg-blue-500'
+												/>
+											)}
 										</div>
 										<div className='flex-1 min-w-0'>
 											<h3 className='text-2xl font-bold text-gray-900 mb-2 break-words'>

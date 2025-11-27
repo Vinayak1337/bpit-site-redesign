@@ -6,6 +6,7 @@ import { Plus, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import UploadButton from '@/components/cloudinary/upload-button';
 import {
 	Form,
 	FormControl,
@@ -585,20 +586,34 @@ export default function RecruitersForm({
 											)}
 										/>
 
-										<FormField
-											control={form.control}
-											name={`recruiters.${index}.logo`}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel className='text-xs'>Logo Path</FormLabel>
-													<FormControl>
-														<Input {...field} placeholder='/recruiters/logo.png' />
-													</FormControl>
-												</FormItem>
-											)}
-										/>
-
-										<FormField
+							<FormField
+								control={form.control}
+								name={`recruiters.${index}.logo`}
+								render={({ field }) => (
+									<FormItem className='col-span-2'>
+										<FormLabel className='text-xs'>Company Logo</FormLabel>
+										<FormControl>
+											<div className='space-y-2'>
+												<Input {...field} placeholder='Logo URL or /recruiters/logo.png' />
+												<UploadButton
+													onUpload={(url) => field.onChange(url)}
+													buttonText='Upload Company Logo'
+													className='w-full'
+												/>
+												{field.value && (
+													<div className='mt-2'>
+														<img
+															src={field.value}
+															alt='Logo preview'
+															className='h-12 object-contain'
+														/>
+													</div>
+												)}
+											</div>
+										</FormControl>
+									</FormItem>
+								)}
+							/>										<FormField
 											control={form.control}
 											name={`recruiters.${index}.category`}
 											render={({ field }) => (

@@ -32,6 +32,7 @@ import {
 } from '@/components/ui/select';
 import { SUPPORTED_ICON_NAMES } from '@/components/about/icons';
 import { Plus, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import UploadButton from '@/components/cloudinary/upload-button';
 
 interface PlacementStatisticsFormProps {
 	initialData: PlacementStatisticsData;
@@ -95,6 +96,7 @@ interface StudentFormValue {
 	package: number;
 	batch: string;
 	role: string;
+	image?: string;
 }
 
 interface FormValues {
@@ -1439,6 +1441,37 @@ export default function PlacementStatisticsForm({
 													<FormLabel className='text-xs'>Role</FormLabel>
 													<FormControl>
 														<Input {...field} placeholder='Software Engineer' />
+													</FormControl>
+												</FormItem>
+											)}
+										/>
+
+										<FormField
+											control={form.control}
+											name={`studentPlacements.${index}.image`}
+											render={({ field }) => (
+												<FormItem className='col-span-2'>
+													<FormLabel className='text-xs'>Student Image</FormLabel>
+													<FormControl>
+														<div className='space-y-2'>
+															<Input {...field} placeholder='Image URL (optional)' />
+															<UploadButton
+																onUpload={(url) => field.onChange(url)}
+																buttonText='Upload Student Image'
+																className='w-full'
+															/>
+															{field.value ? (
+																<div className='mt-2'>
+																	<img
+																		src={field.value}
+																		alt='Student preview'
+																		className='w-20 h-20 rounded-full object-cover border-2 border-blue-200'
+																	/>
+																</div>
+															) : (
+																<p className='text-sm text-gray-500'>Initials avatar will be shown if no image uploaded</p>
+															)}
+														</div>
 													</FormControl>
 												</FormItem>
 											)}
