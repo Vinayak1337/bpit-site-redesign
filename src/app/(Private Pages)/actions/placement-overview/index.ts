@@ -173,7 +173,11 @@ export async function getPlacementOverview(): Promise<PlacementOverviewData> {
 	}
 }
 
-export async function updatePlacementOverview(pageSlug: string, data: PlacementOverviewData): Promise<void> {
+import { createAuditLog } from '@/lib/audit';
+
+// ... existing interfaces ...
+
+export async function updatePlacementOverview(pageSlug: string, data: PlacementOverviewData, userId?: string): Promise<void> {
 	try {
 		// Find or create the page
 		const page = await prisma.page.upsert({
@@ -206,6 +210,21 @@ export async function updatePlacementOverview(pageSlug: string, data: PlacementO
 				order: 0
 			}
 		});
+
+		if (userId) {
+			await createAuditLog({
+				actorId: userId,
+				action: 'UPDATE',
+				resourceType: 'PAGE',
+				summary: 'Updated placement overview page data',
+				changes: [{
+					resourceId: page.id,
+					resourceType: 'PAGE',
+					field: 'PLACEMENT_OVERVIEW',
+					newData: data as any
+				}]
+			});
+		}
 
 		revalidatePath('/placements/overview');
 	} catch (error) {

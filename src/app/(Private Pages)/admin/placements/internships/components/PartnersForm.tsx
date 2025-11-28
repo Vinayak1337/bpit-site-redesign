@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import UploadButton from '@/components/cloudinary/upload-button';
+import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
 import { updateInternshipsData, getInternshipsData } from '@/app/(Private Pages)/actions/internships';
 import type { InternshipsData, InternshipOpportunity } from '@/app/(Private Pages)/actions/internships';
 import { Plus, Trash2, X, Building2 } from 'lucide-react';
@@ -50,12 +51,13 @@ export default function PartnersForm({ initialData, pageSlug, onChange }: Partne
 	const onSubmit = async (values: any) => {
 		try {
 			setSaveStatus('saving');
+			const admin = await requireAdmin();
 
 			const result = await updateInternshipsData({
 				...initialData,
 				opportunities: values.opportunities,
 				filters: filters
-			});
+			}, admin.id);
 
 			if (result.success) {
 				const freshData = await getInternshipsData();

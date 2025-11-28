@@ -13,6 +13,7 @@ import {
 	SelectTrigger,
 	SelectValue
 } from '@/components/ui/select';
+import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
 import { updateInternshipsData, getInternshipsData } from '@/app/(Private Pages)/actions/internships';
 import type { InternshipsData, InternshipBenefit } from '@/app/(Private Pages)/actions/internships';
 import { Plus, Trash2, Sparkles } from 'lucide-react';
@@ -63,11 +64,12 @@ export default function BenefitsForm({ initialData, pageSlug, onChange }: Benefi
 	const onSubmit = async (values: any) => {
 		try {
 			setSaveStatus('saving');
+			const admin = await requireAdmin();
 
 			const result = await updateInternshipsData({
 				...initialData,
 				benefits: values.benefits
-			});
+			}, admin.id);
 
 			if (result.success) {
 				const freshData = await getInternshipsData();

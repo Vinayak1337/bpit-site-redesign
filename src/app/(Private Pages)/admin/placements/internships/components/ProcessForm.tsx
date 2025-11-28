@@ -13,6 +13,7 @@ import {
 	SelectTrigger,
 	SelectValue
 } from '@/components/ui/select';
+import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
 import { updateInternshipsData, getInternshipsData } from '@/app/(Private Pages)/actions/internships';
 import type { InternshipsData, ProcessStep } from '@/app/(Private Pages)/actions/internships';
 import { Plus, Trash2, CheckCircle } from 'lucide-react';
@@ -55,11 +56,12 @@ export default function ProcessForm({ initialData, pageSlug, onChange }: Process
 	const onSubmit = async (values: any) => {
 		try {
 			setSaveStatus('saving');
+			const admin = await requireAdmin();
 
 			const result = await updateInternshipsData({
 				...initialData,
 				process: values.process
-			});
+			}, admin.id);
 
 			if (result.success) {
 				const freshData = await getInternshipsData();

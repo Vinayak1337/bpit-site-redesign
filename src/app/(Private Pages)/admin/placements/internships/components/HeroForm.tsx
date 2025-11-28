@@ -13,6 +13,7 @@ import {
 	SelectTrigger,
 	SelectValue
 } from '@/components/ui/select';
+import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
 import { updateInternshipsData, getInternshipsData } from '@/app/(Private Pages)/actions/internships';
 import type { InternshipsData } from '@/app/(Private Pages)/actions/internships';
 import { Sparkles } from 'lucide-react';
@@ -64,6 +65,7 @@ export default function HeroForm({ initialData, pageSlug, onChange }: HeroFormPr
 	const onSubmit = async (values: any) => {
 		try {
 			setSaveStatus('saving');
+			const admin = await requireAdmin();
 
 			const result = await updateInternshipsData({
 				...initialData,
@@ -73,7 +75,7 @@ export default function HeroForm({ initialData, pageSlug, onChange }: HeroFormPr
 					subtitle: values.subtitle,
 					gradient: values.gradient
 				}
-			});
+			}, admin.id);
 
 			if (result.success) {
 				// Fetch fresh data
