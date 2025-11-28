@@ -469,7 +469,7 @@ export default function ServicesTeamForm({ initialData, pageSlug, onChange }: Pr
 														<Input placeholder="Image URL" {...imageField} />
 													</FormControl>
 													<UploadButton
-														onUploadSuccess={(url) => {
+														onUpload={(url: string) => {
 															form.setValue(`teamMembers.${index}.image`, url);
 														}}
 													/>

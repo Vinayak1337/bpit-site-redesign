@@ -41,6 +41,7 @@ export interface PlacementTeamMemberData {
 	initials: string;
 	gradientColor: string;
 	textColor: string;
+	image?: string;
 }
 
 export interface PlacementTrainingAreaData {

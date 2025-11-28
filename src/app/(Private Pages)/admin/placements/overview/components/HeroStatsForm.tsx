@@ -113,9 +113,17 @@ export default function HeroStatsForm({ initialData, pageSlug, onChange }: Props
 	useEffect(() => {
 		const subscription = form.watch((values) => {
 			if (onChange) {
+				const hero = values.hero;
 				const updatedData: PlacementOverviewData = {
 					...initialData,
-					hero: values.hero || initialData.hero,
+					hero: hero ? {
+						icon: hero.icon || initialData.hero.icon,
+						title: hero.title || initialData.hero.title,
+						subtitle: hero.subtitle || initialData.hero.subtitle,
+						gradient: hero.gradient || initialData.hero.gradient,
+						iconColor: hero.iconColor || initialData.hero.iconColor,
+						textColor: hero.textColor || initialData.hero.textColor
+					} : initialData.hero,
 					stats: (values.stats || [])
 						.map(stat => ({
 							icon: stat?.icon?.trim().length ? stat.icon.trim() : FALLBACK_ICON,
