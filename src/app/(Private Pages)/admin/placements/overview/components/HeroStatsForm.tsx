@@ -20,7 +20,7 @@ import {
 	SelectTrigger,
 	SelectValue
 } from '@/components/ui/select';
-import type { PlacementOverviewData } from '@/app/(Private Pages)/actions/placement-overview';
+import type { PlacementOverviewData, PlacementOverviewHeroData } from '@/app/(Private Pages)/actions/placement-overview';
 import { updatePlacementOverview } from '@/app/(Private Pages)/actions/placement-overview';
 import { SUPPORTED_ICON_NAMES } from '@/components/about/icons';
 import { Plus, Trash2 } from 'lucide-react';
@@ -76,6 +76,15 @@ const GRADIENT_OPTIONS: string[] = [
 
 const FALLBACK_ICON = 'GraduationCap';
 
+const DEFAULT_HERO: PlacementOverviewHeroData = {
+	icon: FALLBACK_ICON,
+	title: '',
+	subtitle: '',
+	gradient: 'bg-gradient-to-br from-blue-600 to-purple-600',
+	iconColor: 'bg-blue-500',
+	textColor: 'text-white'
+};
+
 const createEmptyStat = (): StatFormValue => ({
 	id: crypto.randomUUID(),
 	icon: FALLBACK_ICON,
@@ -91,15 +100,8 @@ export default function HeroStatsForm({ initialData, pageSlug, onChange }: Props
 
 	const form = useForm<FormValues>({
 		defaultValues: {
-			hero: initialData.hero || {
-				icon: FALLBACK_ICON,
-				title: '',
-				subtitle: '',
-				gradient: GRADIENT_OPTIONS[0],
-				iconColor: 'bg-blue-500',
-				textColor: 'text-white'
-			},
-			stats: initialData.stats.length > 0 ? initialData.stats : [createEmptyStat()]
+			hero: initialData.hero ?? DEFAULT_HERO,
+			stats: initialData.stats?.length > 0 ? initialData.stats : [createEmptyStat()]
 		}
 	});
 
@@ -114,16 +116,17 @@ export default function HeroStatsForm({ initialData, pageSlug, onChange }: Props
 		const subscription = form.watch((values) => {
 			if (onChange) {
 				const hero = values.hero;
+				const fallbackHero = initialData.hero ?? DEFAULT_HERO;
 				const updatedData: PlacementOverviewData = {
 					...initialData,
 					hero: hero ? {
-						icon: hero.icon || initialData.hero.icon,
-						title: hero.title || initialData.hero.title,
-						subtitle: hero.subtitle || initialData.hero.subtitle,
-						gradient: hero.gradient || initialData.hero.gradient,
-						iconColor: hero.iconColor || initialData.hero.iconColor,
-						textColor: hero.textColor || initialData.hero.textColor
-					} : initialData.hero,
+						icon: hero.icon || fallbackHero.icon,
+						title: hero.title || fallbackHero.title,
+						subtitle: hero.subtitle || fallbackHero.subtitle,
+						gradient: hero.gradient || fallbackHero.gradient,
+						iconColor: hero.iconColor || fallbackHero.iconColor,
+						textColor: hero.textColor || fallbackHero.textColor
+					} : fallbackHero,
 					stats: (values.stats || [])
 						.map(stat => ({
 							icon: stat?.icon?.trim().length ? stat.icon.trim() : FALLBACK_ICON,
