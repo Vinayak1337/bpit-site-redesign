@@ -432,21 +432,19 @@ export default function PlacementStatisticsSection({
 
 													<div className='flex items-center justify-between'>
 														<div className='flex items-center space-x-6'>
-															<div
-																className={`w-20 h-20 bg-gradient-to-r ${
-																	isTopThree && currentPage === 1
-																		? globalIndex === 0
-																			? 'from-yellow-500 to-yellow-600'
-																			: globalIndex === 1
-																				? 'from-gray-500 to-gray-600'
-																				: 'from-orange-500 to-orange-600'
-																		: 'from-blue-500 to-blue-700'
-																} rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg`}>
-																{student.name
-																	.split(' ')
-																	.map(n => n[0])
-																	.join('')}
-															</div>
+															{student.image ? (
+																<img
+																	src={student.image}
+																	alt={student.name}
+																	className='w-20 h-20 rounded-2xl object-cover shadow-lg border-2 border-blue-100'
+																/>
+															) : (
+																<img
+																	src='/avatar-default.svg'
+																	alt={student.name}
+																	className='w-20 h-20 rounded-2xl object-cover shadow-lg border-2 border-blue-100 bg-blue-500'
+																/>
+															)}
 															<div>
 																<h4 className='text-xl font-bold text-gray-900 mb-2'>
 																	{student.name}

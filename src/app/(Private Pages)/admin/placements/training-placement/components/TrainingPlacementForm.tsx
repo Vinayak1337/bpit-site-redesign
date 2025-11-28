@@ -22,6 +22,7 @@ import {
 	SelectTrigger,
 	SelectValue
 } from '@/components/ui/select';
+import UploadButton from '@/components/cloudinary/upload-button';
 
 interface TrainingPlacementFormProps {
 	initialData: TrainingPlacementData;
@@ -46,6 +47,7 @@ interface DirectorMessageFormValue {
 	gradientColor: string;
 	message1: string;
 	message2: string;
+	image?: string;
 }
 
 interface TeamMemberFormValue {
@@ -54,6 +56,7 @@ interface TeamMemberFormValue {
 	position: string;
 	qualifications: string;
 	specialization: string;
+	image?: string;
 }
 
 interface DepartmentFormValue {
@@ -163,7 +166,8 @@ const createEmptyTeamMember = (): TeamMemberFormValue => ({
 	name: '',
 	position: '',
 	qualifications: '',
-	specialization: ''
+	specialization: '',
+	image: ''
 });
 
 const createEmptyDepartment = (): DepartmentFormValue => ({
@@ -339,7 +343,8 @@ export default function TrainingPlacementForm({
 					'from-blue-500 to-blue-700',
 				message1:
 					initialData.directorMessage?.message1 ?? 'Message from director',
-				message2: initialData.directorMessage?.message2 ?? 'Additional message'
+				message2: initialData.directorMessage?.message2 ?? 'Additional message',
+				image: initialData.directorMessage?.image ?? ''
 			},
 			teamTitle: initialData.teamTitle ?? 'Our Dedicated Team',
 			teamDescription:
@@ -672,6 +677,37 @@ export default function TrainingPlacementForm({
 						/>
 						<FormField
 							control={form.control}
+							name='directorMessage.image'
+							render={({ field }) => (
+								<FormItem className='sm:col-span-2'>
+									<FormLabel>Director Profile Image</FormLabel>
+									<FormControl>
+										<div className='space-y-2'>
+											<Input {...field} placeholder='Image URL (optional)' />
+											<UploadButton
+												onUpload={(url) => field.onChange(url)}
+												buttonText='Upload Director Image'
+												className='sm:w-auto'
+											/>
+											{field.value ? (
+												<div className='mt-2'>
+													<img
+														src={field.value}
+														alt='Director preview'
+														className='w-20 h-20 rounded-full object-cover border-2 border-blue-200'
+													/>
+												</div>
+											) : (
+												<p className='text-sm text-gray-500'>Default avatar will be shown if no image uploaded</p>
+											)}
+										</div>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
 							name='directorMessage.message1'
 							rules={{ required: 'Message 1 is required' }}
 							render={({ field }) => (
@@ -823,6 +859,44 @@ export default function TrainingPlacementForm({
 													<FormLabel>Specialization</FormLabel>
 													<FormControl>
 														<Input placeholder='Specialization' {...specField} />
+													</FormControl>
+													<FormMessage />
+												</FormItem>
+											)}
+										/>
+										<FormField
+											control={form.control}
+											name={`teamMembers.${index}.image`}
+											render={({ field: imageField }) => (
+												<FormItem className='sm:col-span-2'>
+													<FormLabel>Profile Image</FormLabel>
+													<FormControl>
+														<div className='space-y-2'>
+															<Input placeholder='Image URL (optional)' {...imageField} />
+															<UploadButton
+																onUpload={(url) => {
+																	imageField.onChange(url);
+																	form.setValue(`teamMembers.${index}.image`, url, {
+																		shouldDirty: true
+																	});
+																}}
+																buttonText='Upload Profile Image'
+																className='sm:w-auto'
+															/>
+															{imageField.value ? (
+																<div className='mt-2'>
+																	<img
+																		src={imageField.value}
+																		alt='Profile preview'
+																		className='w-20 h-20 rounded-full object-cover border-2 border-gray-200'
+																	/>
+																</div>
+															) : (
+																<div className='mt-2 text-xs text-gray-500'>
+																	No image uploaded. Initials will be shown as avatar.
+																</div>
+															)}
+														</div>
 													</FormControl>
 													<FormMessage />
 												</FormItem>

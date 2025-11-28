@@ -1,30 +1,29 @@
-import { Suspense } from 'react';
 import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
-import TrainingPlacementEditor from './components/TrainingPlacementEditor';
+import { getTrainingPlacement } from '@/app/(Private Pages)/actions/training-placement';
+import HeroEditor from './components/HeroEditor';
+import DirectorMessageEditor from './components/DirectorMessageEditor';
+import TeamEditor from './components/TeamEditor';
+import CoordinatorsEditor from './components/CoordinatorsEditor';
+import ProgramsEditor from './components/ProgramsEditor';
+import ObjectivesEditor from './components/ObjectivesEditor';
+import MetricsEditor from './components/MetricsEditor';
 
 export default async function TrainingPlacementAdminPage() {
 	await requireAdmin();
-	return (
-		<div className='min-h-screen bg-slate-50'>
-			<div className='mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8'>
-				<div className='mb-8'>
-					<h1 className='text-3xl font-bold text-slate-900'>
-						Training & Placement Management
-					</h1>
-					<p className='mt-2 text-sm text-slate-600'>
-						Manage training and placement content, team members, departments, and programs.
-					</p>
-				</div>
+	const data = await getTrainingPlacement();
 
-				<Suspense
-					fallback={
-						<div className='flex min-h-[400px] items-center justify-center'>
-							<div className='text-slate-600'>Loading...</div>
-						</div>
-					}>
-					<TrainingPlacementEditor />
-				</Suspense>
+	return (
+		<div className='space-y-0'>
+			<div className='bg-blue-50 border-b border-blue-200 text-blue-900 p-3 text-center text-sm'>
+				Select any section to start editing
 			</div>
+			<HeroEditor initialData={data} pageSlug="training-placement" />
+			<DirectorMessageEditor initialData={data} pageSlug="training-placement" />
+			<TeamEditor initialData={data} pageSlug="training-placement" />
+			<CoordinatorsEditor initialData={data} pageSlug="training-placement" />
+			<ProgramsEditor initialData={data} pageSlug="training-placement" />
+			<ObjectivesEditor initialData={data} pageSlug="training-placement" />
+			<MetricsEditor initialData={data} pageSlug="training-placement" />
 		</div>
 	);
 }

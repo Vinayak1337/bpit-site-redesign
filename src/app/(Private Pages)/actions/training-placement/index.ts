@@ -9,6 +9,7 @@ export interface TeamMember {
 	position: string;
 	qualifications: string;
 	specialization: string;
+	image?: string;
 }
 
 export interface Department {
@@ -61,6 +62,7 @@ export interface TrainingPlacementData {
 		gradientColor: string;
 		message1: string;
 		message2: string;
+		image?: string;
 	};
 	teamTitle?: string;
 	teamDescription?: string;

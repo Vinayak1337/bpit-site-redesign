@@ -48,6 +48,7 @@ export interface StudentPlacement {
 	package: number;
 	batch: string;
 	role: string;
+	image?: string;
 }
 
 export interface PlacementStatisticsData {
