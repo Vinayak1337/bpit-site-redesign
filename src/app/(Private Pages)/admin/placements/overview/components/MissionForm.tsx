@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useTransition } from 'react';
-import { useFieldArray, useForm } from 'react-hook-form';
+import { useFieldArray, useForm, type FieldArrayPath } from 'react-hook-form';
 import {
 	Form,
 	FormControl,
@@ -53,12 +53,12 @@ export default function MissionForm({ initialData, pageSlug, onChange }: Props) 
 
 	const featuresArray = useFieldArray({
 		control: form.control,
-		name: 'missionContent.features'
+		name: 'missionContent.features' as FieldArrayPath<FormValues>
 	});
 
 	const objectivesArray = useFieldArray({
 		control: form.control,
-		name: 'missionContent.objectives'
+		name: 'missionContent.objectives' as FieldArrayPath<FormValues>
 	});
 
 	useEffect(() => {
@@ -71,8 +71,8 @@ export default function MissionForm({ initialData, pageSlug, onChange }: Props) 
 					missionContent: {
 						paragraph1: values.missionContent?.paragraph1 || '',
 						paragraph2: values.missionContent?.paragraph2 || '',
-						features: (values.missionContent?.features || []).filter(f => f.trim().length > 0),
-						objectives: (values.missionContent?.objectives || []).filter(o => o.trim().length > 0)
+						features: (values.missionContent?.features || []).filter((f): f is string => typeof f === 'string' && f.trim().length > 0),
+						objectives: (values.missionContent?.objectives || []).filter((o): o is string => typeof o === 'string' && o.trim().length > 0)
 					}
 				};
 				onChange(updatedData);

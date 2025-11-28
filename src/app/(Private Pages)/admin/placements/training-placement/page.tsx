@@ -10,7 +10,7 @@ import MetricsEditor from './components/MetricsEditor';
 
 export default async function TrainingPlacementAdminPage() {
 	await requireAdmin();
-	const data = await getTrainingPlacement();
+	const data = await getTrainingPlacement() ?? {};
 
 	return (
 		<div className='space-y-0'>

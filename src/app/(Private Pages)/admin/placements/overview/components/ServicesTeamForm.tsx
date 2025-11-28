@@ -41,7 +41,6 @@ type TeamMemberFormValue = {
 	name: string;
 	position: string;
 	email: string;
-	image?: string;
 	initials: string;
 	gradientColor: string;
 	textColor: string;
@@ -79,7 +78,6 @@ const createEmptyTeamMember = (): TeamMemberFormValue => ({
 	name: '',
 	position: '',
 	email: '',
-	image: '',
 	initials: '',
 	gradientColor: 'blue',
 	textColor: 'white'
@@ -138,7 +136,6 @@ export default function ServicesTeamForm({ initialData, pageSlug, onChange }: Pr
 							name: (member?.name ?? '').trim(),
 							position: (member?.position ?? '').trim(),
 							email: (member?.email ?? '').trim(),
-							image: member?.image || '',
 							initials: (member?.initials ?? '').trim(),
 							gradientColor: member?.gradientColor ?? 'blue',
 							textColor: member?.textColor ?? 'white'
@@ -178,7 +175,6 @@ export default function ServicesTeamForm({ initialData, pageSlug, onChange }: Pr
 							name: (member.name ?? '').trim(),
 							position: (member.position ?? '').trim(),
 							email: (member.email ?? '').trim(),
-							image: member.image || '',
 							initials: (member.initials ?? '').trim(),
 							gradientColor: member.gradientColor ?? 'blue',
 							textColor: member.textColor ?? 'white'
@@ -454,26 +450,6 @@ export default function ServicesTeamForm({ initialData, pageSlug, onChange }: Pr
 												<FormControl>
 													<Input placeholder="email@example.com" {...emailField} />
 												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-									<FormField
-										control={form.control}
-										name={`teamMembers.${index}.image`}
-										render={({ field: imageField }) => (
-											<FormItem>
-												<FormLabel>Image URL</FormLabel>
-												<div className="flex items-center gap-2">
-													<FormControl>
-														<Input placeholder="Image URL" {...imageField} />
-													</FormControl>
-													<UploadButton
-														onUploadSuccess={(url) => {
-															form.setValue(`teamMembers.${index}.image`, url);
-														}}
-													/>
-												</div>
 												<FormMessage />
 											</FormItem>
 										)}

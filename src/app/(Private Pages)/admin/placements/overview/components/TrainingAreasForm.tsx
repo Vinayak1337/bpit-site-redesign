@@ -87,7 +87,7 @@ export default function TrainingAreasForm({ initialData, pageSlug, onChange }: P
 						.map(area => ({
 							id: area?.id || crypto.randomUUID(),
 							title: (area?.title ?? '').trim(),
-							skills: (area?.skills ?? []).filter(skill => skill.trim().length > 0),
+							skills: (area?.skills ?? []).filter((skill): skill is string => typeof skill === 'string' && skill.trim().length > 0),
 							icon: area?.icon?.trim().length ? area.icon.trim() : FALLBACK_ICON,
 							iconColor: area?.iconColor ?? 'blue',
 							textColor: area?.textColor ?? 'black'
