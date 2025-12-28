@@ -23,8 +23,8 @@ type FormValues = {
 	missionContent: {
 		paragraph1: string;
 		paragraph2: string;
-		features: string[];
-		objectives: string[];
+		features: { value: string }[];
+		objectives: { value: string }[];
 	};
 };
 
@@ -42,11 +42,11 @@ export default function MissionForm({ initialData, pageSlug, onChange }: Props) 
 		defaultValues: {
 			missionTitle: initialData.missionTitle || '',
 			missionDescription: initialData.missionDescription || '',
-			missionContent: initialData.missionContent || {
-				paragraph1: '',
-				paragraph2: '',
-				features: [''],
-				objectives: ['']
+			missionContent: {
+				paragraph1: initialData.missionContent?.paragraph1 || '',
+				paragraph2: initialData.missionContent?.paragraph2 || '',
+				features: (initialData.missionContent?.features || ['']).map(f => ({ value: f })),
+				objectives: (initialData.missionContent?.objectives || ['']).map(o => ({ value: o }))
 			}
 		}
 	});
@@ -71,8 +71,12 @@ export default function MissionForm({ initialData, pageSlug, onChange }: Props) 
 					missionContent: {
 						paragraph1: values.missionContent?.paragraph1 || '',
 						paragraph2: values.missionContent?.paragraph2 || '',
-						features: (values.missionContent?.features || []).filter(f => f.trim().length > 0),
-						objectives: (values.missionContent?.objectives || []).filter(o => o.trim().length > 0)
+						features: (values.missionContent?.features || [])
+							.map(f => f?.value || '')
+							.filter(f => f.trim().length > 0),
+						objectives: (values.missionContent?.objectives || [])
+							.map(o => o?.value || '')
+							.filter(o => o.trim().length > 0)
 					}
 				};
 				onChange(updatedData);
@@ -92,8 +96,8 @@ export default function MissionForm({ initialData, pageSlug, onChange }: Props) 
 					missionContent: {
 						paragraph1: values.missionContent.paragraph1,
 						paragraph2: values.missionContent.paragraph2,
-						features: values.missionContent.features.filter(f => f.trim().length > 0),
-						objectives: values.missionContent.objectives.filter(o => o.trim().length > 0)
+						features: values.missionContent.features.map(f => f.value).filter(f => f.trim().length > 0),
+						objectives: values.missionContent.objectives.map(o => o.value).filter(o => o.trim().length > 0)
 					}
 				};
 
@@ -191,7 +195,7 @@ export default function MissionForm({ initialData, pageSlug, onChange }: Props) 
 							type="button"
 							variant="outline"
 							size="sm"
-							onClick={() => featuresArray.append('')}
+							onClick={() => featuresArray.append({ value: '' })}
 						>
 							<Plus className="w-4 h-4 mr-2" />
 							Add Feature
@@ -202,7 +206,7 @@ export default function MissionForm({ initialData, pageSlug, onChange }: Props) 
 							<div key={field.id} className="flex items-center gap-2">
 								<FormField
 									control={form.control}
-									name={`missionContent.features.${index}`}
+									name={`missionContent.features.${index}.value`}
 									render={({ field: featureField }) => (
 										<FormItem className="flex-1">
 											<FormControl>
@@ -233,7 +237,7 @@ export default function MissionForm({ initialData, pageSlug, onChange }: Props) 
 							type="button"
 							variant="outline"
 							size="sm"
-							onClick={() => objectivesArray.append('')}
+							onClick={() => objectivesArray.append({ value: '' })}
 						>
 							<Plus className="w-4 h-4 mr-2" />
 							Add Objective
@@ -244,7 +248,7 @@ export default function MissionForm({ initialData, pageSlug, onChange }: Props) 
 							<div key={field.id} className="flex items-center gap-2">
 								<FormField
 									control={form.control}
-									name={`missionContent.objectives.${index}`}
+									name={`missionContent.objectives.${index}.value`}
 									render={({ field: objectiveField }) => (
 										<FormItem className="flex-1">
 											<FormControl>

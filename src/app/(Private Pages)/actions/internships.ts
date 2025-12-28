@@ -148,7 +148,8 @@ export async function getInternshipsData(): Promise<InternshipsData | null> {
  * Update internships data in database
  */
 export async function updateInternshipsData(
-	data: InternshipsData
+	data: InternshipsData,
+	userId: string
 ): Promise<{ success: boolean; message?: string }> {
 	try {
 		// Validate required fields
@@ -189,6 +190,20 @@ export async function updateInternshipsData(
 				}
 			});
 		}
+
+		// Create audit log
+		await createAuditLog({
+			actorId: userId,
+			action: 'UPDATE',
+			resourceType: 'PAGE',
+			summary: 'Updated internships page data',
+			changes: [{
+				resourceId: page.id,
+				resourceType: 'PAGE',
+				field: 'internships-data',
+				newData: data as any
+			}]
+		});
 
 		// Revalidate the page
 		revalidatePath('/placements/internships');

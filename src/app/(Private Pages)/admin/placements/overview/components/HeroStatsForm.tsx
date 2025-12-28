@@ -115,7 +115,14 @@ export default function HeroStatsForm({ initialData, pageSlug, onChange }: Props
 			if (onChange) {
 				const updatedData: PlacementOverviewData = {
 					...initialData,
-					hero: values.hero || initialData.hero,
+					hero: {
+						icon: values.hero?.icon || initialData.hero.icon,
+						title: values.hero?.title || initialData.hero.title,
+						subtitle: values.hero?.subtitle || initialData.hero.subtitle,
+						gradient: values.hero?.gradient || initialData.hero.gradient,
+						iconColor: values.hero?.iconColor || initialData.hero.iconColor,
+						textColor: values.hero?.textColor || initialData.hero.textColor
+					},
 					stats: (values.stats || [])
 						.map(stat => ({
 							icon: stat?.icon?.trim().length ? stat.icon.trim() : FALLBACK_ICON,

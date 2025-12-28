@@ -12,6 +12,21 @@ export default async function TrainingPlacementAdminPage() {
 	await requireAdmin();
 	const data = await getTrainingPlacement();
 
+	if (!data) {
+		return (
+			<div className='flex items-center justify-center min-h-[400px]'>
+				<div className='text-center'>
+					<h2 className='text-xl font-semibold text-slate-900 mb-2'>
+						No Data Found
+					</h2>
+					<p className='text-slate-600'>
+						Please run the seed script to populate training placement data.
+					</p>
+				</div>
+			</div>
+		);
+	}
+
 	return (
 		<div className='space-y-0'>
 			<div className='bg-blue-50 border-b border-blue-200 text-blue-900 p-3 text-center text-sm'>

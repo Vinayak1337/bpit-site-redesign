@@ -12,6 +12,7 @@ import {
 	SelectTrigger,
 	SelectValue
 } from '@/components/ui/select';
+import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
 import { updateInternshipsData, getInternshipsData } from '@/app/(Private Pages)/actions/internships';
 import type { InternshipsData, InternshipStat } from '@/app/(Private Pages)/actions/internships';
 import { Plus, Trash2, BarChart3 } from 'lucide-react';
@@ -60,11 +61,12 @@ export default function StatsForm({ initialData, pageSlug, onChange }: StatsForm
 	const onSubmit = async (values: any) => {
 		try {
 			setSaveStatus('saving');
+			const admin = await requireAdmin();
 
 			const result = await updateInternshipsData({
 				...initialData,
 				stats: values.stats
-			});
+			}, admin.id);
 
 			if (result.success) {
 				const freshData = await getInternshipsData();
