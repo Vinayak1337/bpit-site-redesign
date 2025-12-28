@@ -3,10 +3,24 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import MobileEventCard from './mobile-event-card';
 
+// Local interface matching what EventsSection passes
+interface Event {
+	id?: string;
+	title: string;
+	date: string;
+	time: string;
+	location: string;
+	image: string;
+	category: string;
+	description: string;
+	registrationLink?: string;
+}
+
 interface MobileEventsCarouselProps {
-	events: EventItem[];
+	events: Event[];
 }
 
 const FloatingBubble = ({
@@ -202,18 +216,22 @@ const MobileEventsCarousel = ({ events }: MobileEventsCarouselProps) => {
 					onMouseEnter={() => setIsHovered(true)}
 					onMouseLeave={() => setIsHovered(false)}>
 					{/* Navigation Arrows - Hidden on mobile and tablet */}
-					<button
+					<Button
+						variant="ghost"
 						onClick={goToPrev}
 						aria-label='Previous event'
-						className='absolute left-4 top-1/2 -translate-y-1/2 z-20 p-3 bg-white/90 backdrop-blur-sm rounded-full border border-white/30 text-blue-600 hover:bg-white hover:scale-110 transition-all duration-300 shadow-xl hidden lg:block'>
+						className='absolute left-4 top-1/2 -translate-y-1/2 z-20 p-3 bg-white/90 backdrop-blur-sm rounded-full border border-white/30 text-blue-600 hover:bg-white hover:scale-110 transition-all duration-300 shadow-xl hidden lg:block'
+						trackingEvent="events_carousel_prev">
 						<ChevronLeft className='w-5 h-5' />
-					</button>
-					<button
+					</Button>
+					<Button
+						variant="ghost"
 						onClick={goToNext}
 						aria-label='Next event'
-						className='absolute right-4 top-1/2 -translate-y-1/2 z-20 p-3 bg-white/90 backdrop-blur-sm rounded-full border border-white/30 text-blue-600 hover:bg-white hover:scale-110 transition-all duration-300 shadow-xl hidden lg:block'>
+						className='absolute right-4 top-1/2 -translate-y-1/2 z-20 p-3 bg-white/90 backdrop-blur-sm rounded-full border border-white/30 text-blue-600 hover:bg-white hover:scale-110 transition-all duration-300 shadow-xl hidden lg:block'
+						trackingEvent="events_carousel_next">
 						<ChevronRight className='w-5 h-5' />
-					</button>
+					</Button>
 
 					{/* Card Slider */}
 					<div className='relative h-full overflow-hidden'>

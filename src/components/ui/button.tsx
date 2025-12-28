@@ -40,10 +40,14 @@ function Button({
   variant,
   size,
   asChild = false,
+  trackingEvent,
+  trackingData,
   ...props
 }: React.ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean
+    trackingEvent?: string
+    trackingData?: Record<string, any>
   }) {
   const Comp = asChild ? Slot : "button"
 
@@ -51,6 +55,8 @@ function Button({
     <Comp
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
+      data-ph-event={trackingEvent}
+      data-ph-data={trackingData ? JSON.stringify(trackingData) : undefined}
       {...props}
     />
   )

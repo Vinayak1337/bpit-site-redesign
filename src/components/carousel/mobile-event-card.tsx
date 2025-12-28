@@ -3,10 +3,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 import {
 	Calendar,
 	MapPin,
-	Users,
 	Clock,
 	Star,
 	Zap,
@@ -34,13 +35,29 @@ const formatDate = (dateString: string) => {
 	};
 };
 
+// Local interface matching what MobileEventsCarousel passes
+interface Event {
+	id?: string;
+	title: string;
+	date: string;
+	time: string;
+	location: string;
+	image: string;
+	category: string;
+	description: string;
+	registrationLink?: string;
+}
+
 interface MobileEventCardProps {
-	event: EventItem;
+	event: Event;
 	isActive: boolean;
 }
 
 const MobileEventCard = ({ event, isActive }: MobileEventCardProps) => {
 	const dateObj = formatDate(event.date);
+	const ctaLabel = 'Register Now';
+	const ctaLink = event.registrationLink ?? '/';
+	const isExternalLink = ctaLink.startsWith('http');
 
 	return (
 		<motion.div
@@ -56,16 +73,6 @@ const MobileEventCard = ({ event, isActive }: MobileEventCardProps) => {
 			<div className='relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-50 via-white to-blue-100 border border-blue-200/50 shadow-xl backdrop-blur-lg'>
 				{/* Gradient Overlay */}
 				<div className='absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5' />
-
-				{/* Featured Badge */}
-				{event.featured && (
-					<div className='absolute top-4 left-4 z-20'>
-						<div className='flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold rounded-full shadow-lg'>
-							<Star className='w-3 h-3 fill-current' />
-							<span>Featured</span>
-						</div>
-					</div>
-				)}
 
 				{/* Category Badge */}
 				<div className='absolute top-4 right-4 z-20'>
@@ -101,12 +108,12 @@ const MobileEventCard = ({ event, isActive }: MobileEventCardProps) => {
 						</div>
 					</div>
 
-					{/* Rating Badge */}
+					{/* Status Badge */}
 					<div className='absolute bottom-4 right-4'>
 						<div className='flex items-center gap-1 px-3 py-1.5 bg-white/95 backdrop-blur-sm rounded-full shadow-lg border border-white/30'>
-							<Star className='w-3 h-3 text-yellow-500 fill-current' />
-							<span className='text-xs font-bold text-gray-800'>
-								{event.rating}
+							<Star className='w-3 h-3 text-blue-500' />
+							<span className='text-xs font-semibold text-gray-800'>
+								Upcoming
 							</span>
 						</div>
 					</div>
@@ -114,14 +121,11 @@ const MobileEventCard = ({ event, isActive }: MobileEventCardProps) => {
 
 				{/* Content Section */}
 				<div className='p-6 space-y-4'>
-					{/* Title and Subtitle */}
+					{/* Title */}
 					<div>
-						<h3 className='text-lg font-bold text-gray-900 mb-1 line-clamp-2 leading-tight'>
+						<h3 className='text-lg font-bold text-gray-900 mb-2 line-clamp-2 leading-tight'>
 							{event.title}
 						</h3>
-						<p className='text-sm font-medium text-blue-600 mb-2'>
-							{event.subtitle}
-						</p>
 						<p className='text-sm text-gray-600 leading-relaxed line-clamp-2'>
 							{event.description}
 						</p>
@@ -137,49 +141,25 @@ const MobileEventCard = ({ event, isActive }: MobileEventCardProps) => {
 							<MapPin className='w-4 h-4 text-blue-500' />
 							<span className='line-clamp-1'>{event.location}</span>
 						</div>
-						<div className='flex items-center gap-2 text-sm text-gray-600'>
-							<Users className='w-4 h-4 text-blue-500' />
-							<span>{event.attendees} attendees</span>
-						</div>
-					</div>
-
-					{/* Highlights */}
-					<div className='flex flex-wrap gap-1.5'>
-						{event.highlights.slice(0, 3).map((highlight, index) => (
-							<span
-								key={index}
-								className='px-2.5 py-1 text-xs font-medium rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-sm'>
-								{highlight}
-							</span>
-						))}
-						{event.highlights.length > 3 && (
-							<span className='px-2.5 py-1 text-xs font-medium rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-sm'>
-								+{event.highlights.length - 3}
-							</span>
-						)}
 					</div>
 
 					{/* Registration Button */}
-					<motion.button
-						whileTap={{ scale: 0.95 }}
-						className={`w-full py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 shadow-lg ${
-							event.registrationOpen
-								? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white hover:shadow-xl'
-								: 'bg-gray-100 text-gray-500 cursor-not-allowed'
-						}`}
-						disabled={!event.registrationOpen}>
-						{event.registrationOpen ? (
-							<div className='flex items-center justify-center gap-2'>
+					<motion.div whileTap={{ scale: 0.95 }}>
+						<Button
+							asChild
+							className='w-full py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 shadow-lg bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white border-0'
+							trackingEvent="mobile_event_register_clicked"
+							trackingData={{ eventTitle: event.title, eventId: event.id }}>
+							<Link
+								href={ctaLink}
+								target={isExternalLink ? '_blank' : undefined}
+								rel={isExternalLink ? 'noopener noreferrer' : undefined}
+								className='flex items-center justify-center gap-2'>
 								<Calendar className='w-4 h-4' />
-								<span>Register Now</span>
-							</div>
-						) : (
-							<div className='flex items-center justify-center gap-2'>
-								<Clock className='w-4 h-4' />
-								<span>Registration Closed</span>
-							</div>
-						)}
-					</motion.button>
+								<span>{ctaLabel}</span>
+							</Link>
+						</Button>
+					</motion.div>
 				</div>
 
 				{/* Decorative Elements */}

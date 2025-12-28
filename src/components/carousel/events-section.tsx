@@ -1,19 +1,47 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, useAnimate } from 'framer-motion';
 import { ArrowRight, Calendar } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import EventCard from './event-card';
 import MobileEventsCarousel from './mobile-events-carousel';
 
+interface Event {
+	id?: string;
+	title: string;
+	date: string;
+	time: string;
+	location: string;
+	image: string;
+	category: string;
+	description: string;
+	registrationLink?: string;
+}
+
+interface EventsSectionProps {
+	data: {
+		events: Event[];
+	};
+}
+
 export default function EventsSection({ data }: EventsSectionProps) {
+	const uniqueEvents = useMemo(() => {
+		const seen = new Set<string>();
+		return data.events.filter(event => {
+			const key = `${event.id ?? ''}-${event.title}`;
+			if (seen.has(key)) return false;
+			seen.add(key);
+			return true;
+		});
+	}, [data.events]);
 	const [scope, animate] = useAnimate();
 	const [isHovered, setIsHovered] = useState(false);
 	const containerRef = useRef<HTMLDivElement>(null);
 	const animationRef = useRef<ReturnType<typeof animate> | null>(null);
 	const currentPositionRef = useRef(0);
 
-	const { events } = data;
+	const events = uniqueEvents;
 
 	const getCardWidth = () => {
 		if (typeof window !== 'undefined') {
@@ -35,7 +63,7 @@ export default function EventsSection({ data }: EventsSectionProps) {
 	};
 	const [cardGap, setCardGap] = useState(getCardGap());
 	const cardWithGap = cardWidth + cardGap;
-	const totalCardsWidth = events.length * cardWithGap * 2;
+	const totalCardsWidth = events.length * cardWithGap;
 	const speed = 160; // pixels per second
 
 	useEffect(() => {
@@ -187,16 +215,15 @@ export default function EventsSection({ data }: EventsSectionProps) {
 								</div>
 							</div>
 
-							<motion.button
-								className='group flex items-center space-x-2 px-4 lg:px-6 py-2 lg:py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl lg:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 text-sm lg:text-base'
-								whileHover={{ scale: 1.05, x: 5 }}
-								whileTap={{ scale: 0.95 }}>
+							<Button
+								className='group flex items-center space-x-2 px-4 lg:px-6 py-2 lg:py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl lg:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 text-sm lg:text-base hover:scale-105'
+								trackingEvent="events_view_all_clicked">
 								<span className='font-semibold'>
 									<span className='hidden sm:inline'>View All Events</span>
 									<span className='sm:hidden'>View All</span>
 								</span>
 								<ArrowRight className='w-4 h-4 lg:w-5 lg:h-5 group-hover:translate-x-1 transition-transform' />
-							</motion.button>
+							</Button>
 						</div>
 
 						<div
@@ -207,7 +234,7 @@ export default function EventsSection({ data }: EventsSectionProps) {
 							<div className='absolute right-0 top-0 bottom-0 w-0 sm:w-16 lg:w-20 bg-gradient-to-l from-indigo-50 via-blue-50/80 to-transparent z-10 pointer-events-none' />
 
 							<div ref={scope} className='flex gap-3 sm:gap-4 lg:gap-6 w-max'>
-								{[...events, ...events].map((event, index) => (
+								{events.map((event, index) => (
 									<div
 										key={`${event.id}-${index}`}
 										className='w-[280px] sm:w-[300px] lg:w-[360px] flex-shrink-0'

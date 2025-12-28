@@ -16,28 +16,68 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-interface TestimonialItem {
-	id: number;
-	name: string;
-	batch: string;
-	company: string;
-	position: string;
-	image: string;
-	video: string;
-	testimonial: string;
-	rating: number;
-	achievement: string;
-	tags: string[];
-}
+const YOUTUBE_HOSTS = [
+	'youtube.com',
+	'www.youtube.com',
+	'youtu.be',
+	'www.youtu.be',
+	'm.youtube.com'
+];
 
-interface TestimonialData {
-	title: string;
-	subtitle: string;
-	testimonials: TestimonialItem[];
+const getYouTubeId = (url: string): string | null => {
+	try {
+		const parsed = new URL(url);
+		if (!YOUTUBE_HOSTS.some(host => parsed.hostname.endsWith(host))) {
+			return null;
+		}
+		if (parsed.hostname.includes('youtu.be')) {
+			return parsed.pathname.replace('/', '').trim() || null;
+		}
+		if (parsed.pathname.startsWith('/embed/')) {
+			return parsed.pathname.replace('/embed/', '').split('/')[0] || null;
+		}
+		if (parsed.pathname === '/watch' || parsed.searchParams.has('v')) {
+			return parsed.searchParams.get('v');
+		}
+		if (parsed.pathname.startsWith('/shorts/')) {
+			return parsed.pathname.replace('/shorts/', '').split('/')[0] || null;
+		}
+		return null;
+	} catch (error) {
+		console.error(error);
+		return null;
+	}
+};
+
+const getYouTubeEmbedUrl = (url: string): string | null => {
+	const id = getYouTubeId(url);
+	if (!id) {
+		return null;
+	}
+	const params = new URLSearchParams({ autoplay: '1', mute: '1', rel: '0' });
+	return `https://www.youtube.com/embed/${id}?${params.toString()}`;
+};
+
+interface TestimonialsData {
+    title: string;
+    subtitle: string;
+    testimonials: Array<{
+        id?: string;
+        name: string;
+        position: string;
+        batch: string;
+        achievement: string;
+        testimonial: string;
+        image: string;
+        video?: string;
+        company: string;
+        rating?: number;
+        tags: string[];
+    }>;
 }
 
 interface TestimonialProps {
-	data: TestimonialData;
+	data: TestimonialsData;
 }
 
 export default function Testimonial({ data }: TestimonialProps) {
@@ -51,18 +91,27 @@ export default function Testimonial({ data }: TestimonialProps) {
 	const timerRef = useRef<NodeJS.Timeout | null>(null);
 
 	const { title, subtitle, testimonials } = data;
+	const testimonialsList = testimonials ?? [];
+
+	const currentTestimonial =
+		testimonialsList[currentIndex] ?? testimonialsList[0];
+	const videoUrl = currentTestimonial?.video?.trim() ?? '';
+	const youtubeEmbedUrl = videoUrl ? getYouTubeEmbedUrl(videoUrl) : null;
+	const isYouTubeVideo = Boolean(youtubeEmbedUrl);
+	const shouldShowVideo =
+		playingIndex === currentIndex && isPlaying && videoUrl.length > 0;
 
 	const resetTimer = useCallback(() => {
 		if (timerRef.current) {
 			clearInterval(timerRef.current);
 		}
 		timerRef.current = setInterval(() => {
-			if (!isPlaying && !isHovered) {
+			if (!isPlaying && !isHovered && testimonialsList.length > 0) {
 				setDirection(1);
-				setCurrentIndex(prev => (prev + 1) % testimonials.length);
+				setCurrentIndex(prev => (prev + 1) % testimonialsList.length);
 			}
 		}, 5000);
-	}, [isPlaying, isHovered, testimonials.length]);
+	}, [isPlaying, isHovered, testimonialsList.length]);
 
 	useEffect(() => {
 		resetTimer();
@@ -71,18 +120,24 @@ export default function Testimonial({ data }: TestimonialProps) {
 				clearInterval(timerRef.current);
 			}
 		};
-	}, [isPlaying, isHovered, testimonials.length, resetTimer]);
+	}, [isPlaying, isHovered, testimonialsList.length, resetTimer]);
+
+	useEffect(() => {
+		if (currentIndex >= testimonialsList.length) {
+			setCurrentIndex(0);
+		}
+	}, [currentIndex, testimonialsList.length]);
 
 	const nextTestimonial = () => {
 		setDirection(1);
-		setCurrentIndex(prev => (prev + 1) % testimonials.length);
+		setCurrentIndex(prev => (prev + 1) % testimonialsList.length);
 		resetTimer(); // Reset timer when manually navigating
 	};
 
 	const prevTestimonial = () => {
 		setDirection(-1);
 		setCurrentIndex(
-			prev => (prev - 1 + testimonials.length) % testimonials.length
+			prev => (prev - 1 + testimonialsList.length) % testimonialsList.length
 		);
 		resetTimer(); // Reset timer when manually navigating
 	};
@@ -93,7 +148,12 @@ export default function Testimonial({ data }: TestimonialProps) {
 		resetTimer(); // Reset timer when manually navigating
 	};
 
-	const toggleVideo = (index: number) => {
+	const handleToggleVideo = (index: number) => {
+		const url = testimonialsList[index]?.video?.trim() ?? '';
+		const hasVideo = url.length > 0;
+		if (!hasVideo) {
+			return;
+		}
 		if (playingIndex === index) {
 			setIsPlaying(false);
 			setPlayingIndex(null);
@@ -102,6 +162,11 @@ export default function Testimonial({ data }: TestimonialProps) {
 			setPlayingIndex(index);
 		}
 	};
+
+	useEffect(() => {
+		setIsPlaying(false);
+		setPlayingIndex(null);
+	}, [currentIndex]);
 
 	const slideVariants = {
 		enter: (direction: number) => ({
@@ -246,31 +311,65 @@ export default function Testimonial({ data }: TestimonialProps) {
 								<div className='flex flex-col md:grid md:grid-cols-2 min-h-full'>
 									{/* Left Side - Image/Video */}
 									<div className='relative overflow-hidden h-[250px] sm:h-[300px] md:h-full md:min-h-[600px]'>
-										<Image
-											src={testimonials[currentIndex].image}
-											alt={testimonials[currentIndex].name}
-											fill
-											className='object-cover object-top lg:object-center transition-transform duration-700 group-hover:scale-110'
-										/>
-										<div className='absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent' />
+										{shouldShowVideo ? (
+											isYouTubeVideo && youtubeEmbedUrl ? (
+												<motion.iframe
+													key={`${currentIndex}-youtube`}
+													src={youtubeEmbedUrl}
+													className='h-full w-full object-cover'
+													title={`${
+														currentTestimonial?.name ?? 'Video'
+													} video testimonial`}
+													allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
+													allowFullScreen
+												/>
+											) : (
+												<motion.video
+													key={`${currentIndex}-video`}
+													src={videoUrl}
+													className='h-full w-full object-cover object-top lg:object-center'
+													autoPlay
+													muted
+													playsInline
+													controls
+													onPause={() => {
+														setIsPlaying(false);
+														setPlayingIndex(null);
+													}}
+													onEnded={() => {
+														setIsPlaying(false);
+														setPlayingIndex(null);
+													}}
+												/>
+											)
+										) : (
+											<Image
+												src={currentTestimonial?.image ?? ''}
+												alt={currentTestimonial?.name ?? 'Testimonial'}
+												fill
+												className='object-cover object-top lg:object-center transition-transform duration-700 group-hover:scale-110'
+											/>
+										)}
+										<div className='absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none' />
 
 										{/* Video Play Button */}
-										<motion.button
-											whileHover={{ scale: 1.1 }}
-											whileTap={{ scale: 0.95 }}
-											onClick={() => toggleVideo(currentIndex)}
-											className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-white/90 backdrop-blur-sm text-blue-600 rounded-full flex items-center justify-center shadow-2xl hover:bg-white hover:shadow-blue-500/30 transition-all duration-300'>
-											{playingIndex === currentIndex && isPlaying ? (
-												<Pause className='w-8 h-8' fill='currentColor' />
-											) : (
+										{videoUrl.length && !shouldShowVideo ? (
+											<motion.button
+												type='button'
+												whileHover={{ scale: 1.1 }}
+												whileTap={{ scale: 0.95 }}
+												onClick={() => {
+													handleToggleVideo(currentIndex);
+												}}
+												className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-white/90 backdrop-blur-sm text-blue-600 rounded-full flex items-center justify-center shadow-2xl hover:bg-white hover:shadow-blue-500/30 transition-all duration-300 z-[9999999] cursor-pointer'>
 												<Play className='w-8 h-8 ml-1' fill='currentColor' />
-											)}
-										</motion.button>
+											</motion.button>
+										) : null}
 
 										{/* Company Badge */}
 										<div className='absolute bottom-6 left-6 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30'>
 											<span className='text-sm font-semibold text-gray-800'>
-												{testimonials[currentIndex].company}
+												{currentTestimonial?.company}
 											</span>
 										</div>
 
@@ -289,47 +388,50 @@ export default function Testimonial({ data }: TestimonialProps) {
 											transition={{ delay: 0.3, duration: 0.6 }}>
 											{/* Star Rating */}
 											<div className='flex items-center mb-4 sm:mb-6'>
-												{[...Array(testimonials[currentIndex].rating)].map(
-													(_, i) => (
-														<motion.div
-															key={i}
-															initial={{ scale: 0, rotate: 180 }}
-															animate={{ scale: 1, rotate: 0 }}
-															transition={{
-																delay: 0.5 + i * 0.1,
-																type: 'spring',
-																stiffness: 200
-															}}>
-															<Star className='w-4 h-4 sm:w-6 sm:h-6 text-yellow-400 fill-current mr-1' />
-														</motion.div>
+												{Array.from({
+													length: Math.min(
+														5,
+														Math.max(1, currentTestimonial?.rating ?? 5)
 													)
-												)}
+												}).map((_, i) => (
+													<motion.div
+														key={i}
+														initial={{ scale: 0, rotate: 180 }}
+														animate={{ scale: 1, rotate: 0 }}
+														transition={{
+															delay: 0.5 + i * 0.1,
+															type: 'spring',
+															stiffness: 200
+														}}>
+														<Star className='w-4 h-4 sm:w-6 sm:h-6 text-yellow-400 fill-current mr-1' />
+													</motion.div>
+												))}
 											</div>
 
 											{/* Quote */}
 											<Quote className='w-8 h-8 sm:w-12 sm:h-12 text-blue-200 mb-4 sm:mb-6 opacity-50' />
 
 											<blockquote className='text-base sm:text-lg md:text-xl text-gray-700 leading-relaxed mb-6 md:mb-8 italic'>
-												&ldquo;{testimonials[currentIndex].testimonial}&rdquo;
+												&ldquo;{currentTestimonial?.testimonial}&rdquo;
 											</blockquote>
 
 											{/* Student Info */}
 											<div className='space-y-2 mb-4 md:mb-6'>
 												<h3 className='text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-700 to-blue-900 bg-clip-text text-transparent'>
-													{testimonials[currentIndex].name}
+													{currentTestimonial?.name}
 												</h3>
 												<p className='text-blue-600 font-semibold text-sm sm:text-base'>
-													{testimonials[currentIndex].position}
+													{currentTestimonial?.position}
 												</p>
 												<p className='text-gray-600 text-sm sm:text-base'>
-													{testimonials[currentIndex].batch} •{' '}
-													{testimonials[currentIndex].achievement}
+													{currentTestimonial?.batch} •{' '}
+													{currentTestimonial?.achievement}
 												</p>
 											</div>
 
 											{/* Tags */}
 											<div className='flex flex-wrap gap-1 sm:gap-2 mb-4 md:mb-6'>
-												{testimonials[currentIndex].tags.map((tag, index) => (
+												{(currentTestimonial?.tags ?? []).map((tag, index) => (
 													<span
 														key={index}
 														className='px-2 py-1 sm:px-3 bg-blue-100 text-blue-700 rounded-full text-xs sm:text-sm font-medium'>
@@ -340,8 +442,18 @@ export default function Testimonial({ data }: TestimonialProps) {
 
 											{/* Watch Full Story Button */}
 											<Button
-												className='bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 group text-sm sm:text-base'
-												onClick={() => toggleVideo(currentIndex)}>
+												disabled={!videoUrl.length}
+												className={`bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 group text-sm sm:text-base ${
+													!videoUrl.length
+														? 'opacity-60 cursor-not-allowed pointer-events-none'
+														: ''
+												}`}
+												onClick={() => handleToggleVideo(currentIndex)}
+												trackingEvent="testimonial_watch_story_clicked"
+												trackingData={{
+													student: currentTestimonial?.name,
+													videoUrl: videoUrl
+												}}>
 												<Volume2 className='w-3 h-3 sm:w-4 sm:h-4 mr-2' />
 												<span className='hidden sm:inline'>
 													Watch Full Story
@@ -357,18 +469,22 @@ export default function Testimonial({ data }: TestimonialProps) {
 					</AnimatePresence>
 
 					{/* Navigation Arrows - Hidden on mobile and tablet */}
-					<button
+					<Button
+						variant="ghost"
+						size="icon"
 						onClick={prevTestimonial}
 						aria-label='Previous testimonial'
-						className='hidden lg:block absolute left-4 top-1/2 transform -translate-y-1/2 z-10 p-4 bg-white/90 backdrop-blur-sm rounded-full border border-white/30 text-blue-600 hover:bg-white hover:scale-110 transition-all duration-300 shadow-xl group'>
+						className='hidden lg:flex absolute left-4 top-1/2 transform -translate-y-1/2 z-10 w-14 h-14 p-0 bg-white/90 backdrop-blur-sm rounded-full border border-white/30 text-blue-600 hover:bg-white hover:scale-110 transition-all duration-300 shadow-xl group'>
 						<ChevronLeft className='w-6 h-6 group-hover:-translate-x-1 transition-transform' />
-					</button>
-					<button
+					</Button>
+					<Button
+						variant="ghost"
+						size="icon"
 						onClick={nextTestimonial}
 						aria-label='Next testimonial'
-						className='hidden lg:block absolute right-4 top-1/2 transform -translate-y-1/2 z-10 p-4 bg-white/90 backdrop-blur-sm rounded-full border border-white/30 text-blue-600 hover:bg-white hover:scale-110 transition-all duration-300 shadow-xl group'>
+						className='hidden lg:flex absolute right-4 top-1/2 transform -translate-y-1/2 z-10 w-14 h-14 p-0 bg-white/90 backdrop-blur-sm rounded-full border border-white/30 text-blue-600 hover:bg-white hover:scale-110 transition-all duration-300 shadow-xl group'>
 						<ChevronRight className='w-6 h-6 group-hover:translate-x-1 transition-transform' />
-					</button>
+					</Button>
 				</div>
 
 				{/* Thumbnail Navigation */}
@@ -377,7 +493,7 @@ export default function Testimonial({ data }: TestimonialProps) {
 					animate={isInView ? { opacity: 1, y: 0 } : {}}
 					transition={{ delay: 1, duration: 0.8 }}
 					className='flex justify-center space-x-4 mb-8 overflow-x-auto py-4'>
-					{testimonials.map((testimonial, index) => (
+					{testimonialsList.map((testimonial, index) => (
 						<motion.button
 							key={testimonial.id}
 							onClick={() => goToTestimonial(index)}
@@ -405,7 +521,7 @@ export default function Testimonial({ data }: TestimonialProps) {
 
 				{/* Progress Indicators */}
 				<div className='flex justify-center space-x-3'>
-					{testimonials.map((_, index) => (
+					{testimonialsList.map((_, index) => (
 						<button
 							key={index}
 							onClick={() => goToTestimonial(index)}

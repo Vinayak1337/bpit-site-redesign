@@ -1,0 +1,128 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("MONGO_URI")
+}
+
+enum PageKind {
+  PAGE
+  GLOBAL
+}
+
+enum PageStatus {
+  DRAFT
+  PUBLISHED
+}
+
+model Page {
+  id         String      @id @default(auto()) @map("_id") @db.ObjectId
+  slug       String      @unique
+  title      String
+  kind       PageKind
+  status     PageStatus
+  seo        Json?
+  metadata   Json?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  components Component[]
+}
+
+model Component {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  pageId    String   @db.ObjectId
+  page      Page     @relation(fields: [pageId], references: [id])
+  data      Json
+  order     Int
+  key       String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([pageId, order])
+  @@index([pageId])
+}
+
+enum AdminRole {
+  ADMIN
+  EDITOR
+}
+
+model AdminUser {
+  id           String         @id @default(auto()) @map("_id") @db.ObjectId
+  email        String         @unique
+  name         String?
+  passwordHash String
+  role         AdminRole      @default(ADMIN)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  sessions     AdminSession[]
+  logs         AuditLog[]     @relation("AdminUserToAuditLog")
+}
+
+model AdminSession {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String    @db.ObjectId
+  user      AdminUser @relation(fields: [userId], references: [id])
+  token     String    @unique
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  PUBLISH
+  UNPUBLISH
+}
+
+model AuditLog {
+  id           String           @id @default(auto()) @map("_id") @db.ObjectId
+  actorId      String           @db.ObjectId
+  actor        AdminUser        @relation("AdminUserToAuditLog", fields: [actorId], references: [id])
+  action       AuditAction
+  resourceType String
+  summary      String?
+  count        Int?
+  metadata     Json?
+  createdAt    DateTime         @default(now())
+  changes      AuditLogChange[]
+
+  @@index([actorId, createdAt])
+}
+
+model AuditLogChange {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  logId        String   @db.ObjectId
+  log          AuditLog @relation(fields: [logId], references: [id])
+  resourceId   String
+  resourceType String?
+  field        String?
+  previousData Json?
+  newData      Json?
+
+  @@index([logId])
+  @@index([resourceId])
+}
+
+enum ContactType {
+  PHONE
+  EMAIL
+  ADDRESS
+}
+
+model Contact {
+  id           String      @id @default(auto()) @map("_id") @db.ObjectId
+  type         ContactType
+  value        String
+  displayValue String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@index([type])
+}

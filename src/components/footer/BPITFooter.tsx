@@ -1,599 +1,222 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import Link from 'next/link';
+import { useEffect, useMemo, useState } from 'react';
+import { ContactType } from '@prisma/client';
 import {
-	MapPin,
-	Phone,
-	Mail,
-	Instagram,
-	Linkedin,
-	Twitter,
-	Youtube,
-	Send,
-	GraduationCap,
-	Building2,
-	Award,
-	Users,
-	BookOpen,
-	ChevronRight,
-	ArrowUp,
-	Calendar,
-	Trophy,
-	ChevronDown,
-	Facebook
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+	buildDepartmentLinks,
+	buildQuickLinks,
+	footerAchievements,
+	footerSocialLinks
+} from '@/components/footer/data';
+import FooterScrollToTopButton from '@/components/footer/components/FooterScrollToTopButton';
+import FooterBackgroundEffects from '@/components/footer/components/FooterBackgroundEffects';
+import FooterHeaderSection from '@/components/footer/components/FooterHeaderSection';
+import FooterQuickLinksSection from '@/components/footer/components/FooterQuickLinksSection';
+import FooterDepartmentsSection from '@/components/footer/components/FooterDepartmentsSection';
+import FooterContactSection from '@/components/footer/components/FooterContactSection';
+import FooterEngagementSection from '@/components/footer/components/FooterEngagementSection';
+import FooterBottomBar from '@/components/footer/components/FooterBottomBar';
+import type {
+	FooterParticle,
+	FooterContactItem
+} from '@/components/footer/types';
+import { MapPin, Phone, Mail } from 'lucide-react';
 
-const BPITFooter = () => {
+type ContactDTO = {
+	type: ContactType;
+	value: string;
+	displayValue: string | null;
+};
+
+type BPITFooterProps = {
+	contacts: ContactDTO[];
+	bottomLeftContent: FooterBottomLeftContent;
+};
+
+const PARTICLE_COUNT = 20;
+const MOBILE_BREAKPOINT = 768;
+
+const createParticles = (): FooterParticle[] =>
+	Array.from({ length: PARTICLE_COUNT }, (_, index) => ({
+		id: index,
+		left: Math.random() * 100,
+		top: Math.random() * 100,
+		duration: 3 + Math.random() * 2,
+		delay: Math.random() * 2
+	}));
+
+const sanitizeTelephone = (input: string): string => input.replace(/[^+\d]/g, '');
+
+const BPITFooter = ({ contacts, bottomLeftContent }: BPITFooterProps) => {
 	const [expandedSection, setExpandedSection] = useState<string | null>(null);
-	const [isVisible, setIsVisible] = useState(false);
+	const [isFooterVisible, setIsFooterVisible] = useState(false);
 	const [showScrollTop, setShowScrollTop] = useState(false);
 	const [isMobile, setIsMobile] = useState(false);
 	const [isClient, setIsClient] = useState(false);
-	const [particles, setParticles] = useState<Array<{
-		id: number;
-		left: number;
-		top: number;
-		duration: number;
-		delay: number;
-	}>>([]);
+	const [particles, setParticles] = useState<FooterParticle[]>([]);
 
-	// Generate particles only on client side
 	useEffect(() => {
 		setIsClient(true);
-		const generatedParticles = [...Array(20)].map((_, i) => ({
-			id: i,
-			left: Math.random() * 100,
-			top: Math.random() * 100,
-			duration: 3 + Math.random() * 2,
-			delay: Math.random() * 2
-		}));
-		setParticles(generatedParticles);
+		setParticles(createParticles());
 	}, []);
 
-	// Check screen size only on client side
 	useEffect(() => {
-		if (!isClient) return;
+		if (!isClient) {
+			return;
+		}
 
-		const checkMobile = () => {
-			setIsMobile(window.innerWidth < 768);
+		const updateIsMobile = () => {
+			setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
 		};
 
-		checkMobile();
-		window.addEventListener('resize', checkMobile);
-
-		return () => window.removeEventListener('resize', checkMobile);
+		updateIsMobile();
+		window.addEventListener('resize', updateIsMobile);
+		return () => window.removeEventListener('resize', updateIsMobile);
 	}, [isClient]);
 
-	// Scroll visibility effect
 	useEffect(() => {
-		if (!isClient) return;
+		if (!isClient) {
+			return;
+		}
+
+		const footerElement = document.getElementById('footer');
+		if (!footerElement) {
+			return;
+		}
 
 		const observer = new IntersectionObserver(
 			([entry]) => {
-				setIsVisible(entry.isIntersecting);
+				setIsFooterVisible(entry.isIntersecting);
 			},
 			{ threshold: 0.1 }
 		);
 
-		const footerElement = document.getElementById('footer');
-		if (footerElement) {
-			observer.observe(footerElement);
-		}
-
-		// Scroll to top button visibility
 		const handleScroll = () => {
 			setShowScrollTop(window.scrollY > 500);
 		};
 
+		observer.observe(footerElement);
 		window.addEventListener('scroll', handleScroll);
 
 		return () => {
-			if (footerElement) observer.unobserve(footerElement);
+			observer.disconnect();
 			window.removeEventListener('scroll', handleScroll);
 		};
 	}, [isClient]);
 
-	const quickLinks = [
-		{
-			name: 'About BPIT',
-			href: '/about',
-			icon: <Building2 className='w-4 h-4' />
-		},
-		{
-			name: 'Admissions',
-			href: '/admissions',
-			icon: <GraduationCap className='w-4 h-4' />
-		},
-		{
-			name: 'Academics',
-			href: '/academics',
-			icon: <BookOpen className='w-4 h-4' />
-		},
-		{
-			name: 'Placements',
-			href: '/placements',
-			icon: <Trophy className='w-4 h-4' />
-		},
-		{
-			name: 'Campus Life',
-			href: '/campus',
-			icon: <Users className='w-4 h-4' />
-		},
-		{ name: 'Contact Us', href: '/contact', icon: <Mail className='w-4 h-4' /> }
-	];
+	const quickLinks = useMemo(() => buildQuickLinks(), []);
+	const departmentLinks = useMemo(() => buildDepartmentLinks(), []);
 
-	const departments = [
-		{ name: 'Computer Science Engineering', code: 'CSE', color: 'blue' },
-		{ name: 'Information Technology', code: 'IT', color: 'green' },
-		{ name: 'Electronics & Communication', code: 'ECE', color: 'purple' },
-		{ name: 'Electrical Engineering', code: 'EEE', color: 'orange' },
-		{ name: 'Management Studies', code: 'MG', color: 'rose' }
-	];
+	const contactItems = useMemo<FooterContactItem[]>(() => {
+		const phoneContacts = contacts.filter(contact => contact.type === ContactType.PHONE);
+		const emailContact = contacts.find(contact => contact.type === ContactType.EMAIL);
+		const addressContact = contacts.find(contact => contact.type === ContactType.ADDRESS);
 
-	const socialLinks = [
-		{
-			icon: Instagram,
-			href: 'https://www.instagram.com/bpitindia/',
-			label: 'Instagram',
-			color: 'from-pink-500 to-purple-600'
-		},
-		{
-			icon: Linkedin,
-			href: 'https://www.linkedin.com/in/bhagwan-parshuram-institute-of-technology-bpit-50358a178/',
-			label: 'LinkedIn',
-			color: 'from-blue-600 to-blue-700'
-		},
-		{
-			icon: Twitter,
-			href: 'https://x.com/BpitIndia',
-			label: 'Twitter',
-			color: 'from-sky-400 to-blue-500'
-		},
-		{
-			icon: Youtube,
-			href: 'https://www.youtube.com/@bpitcampus',
-			label: 'YouTube',
-			color: 'from-red-500 to-red-600'
-		},
-		{
-			icon: Facebook,
-			href: '#',
-			label: 'Facebook',
-			color: 'from-blue-500 to-blue-600'
-		}
-	];
+		const phoneDisplay = phoneContacts
+			.map(contact => contact.displayValue ?? contact.value)
+			.filter(value => value.length > 0)
+			.join(', ');
 
-	const contactInfo = [
-		{
-			icon: MapPin,
-			title: 'Campus Address',
-			text: 'Bhagwan Parshuram Institute of Technology, Rohini Sector-17, New Delhi - 110089',
-			href: 'https://www.google.com/maps/place/Bhagwan+Parshuram+Institute+of+Technology/@28.7366529,77.1097591,17z',
-			type: 'link'
-		},
-		{
-			icon: Phone,
-			title: 'Phone Numbers',
-			text: '011-2757 1080, 011-2757 2900',
-			href: 'tel:01127571080',
-			type: 'link'
-		},
-		{
-			icon: Mail,
-			title: 'Email Address',
-			text: 'bpitindia@yahoo.com',
-			href: 'mailto:bpitindia@yahoo.com',
-			type: 'link'
-		}
-	];
+		const items: FooterContactItem[] = [
+			{
+				title: 'Campus Address',
+				text: addressContact?.displayValue ?? addressContact?.value ?? '',
+				href: addressContact
+					? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+							addressContact.displayValue ?? addressContact.value
+						)}`
+					: '',
+				icon: MapPin,
+				external: true
+			},
+			{
+				title: 'Phone Numbers',
+				text: phoneDisplay,
+				href:
+					phoneContacts[0]?.value
+						? `tel:${sanitizeTelephone(phoneContacts[0].value)}`
+						: '',
+				icon: Phone,
+				external: false
+			},
+			{
+				title: 'Email Address',
+				text: emailContact?.displayValue ?? emailContact?.value ?? '',
+				href: emailContact ? `mailto:${emailContact.value}` : '',
+				icon: Mail,
+				external: false
+			}
+		];
 
-	const achievements = [
-		{
-			number: '2007',
-			label: 'Established',
-			icon: <Calendar className='w-6 h-6' />
-		},
-		{ number: '1000+', label: 'Students', icon: <Users className='w-6 h-6' /> },
-		{ number: 'NBA', label: 'Accredited', icon: <Award className='w-6 h-6' /> },
-		{ number: '95%+', label: 'Placement', icon: <Trophy className='w-6 h-6' /> }
-	];
+		return items.filter(item => item.text.length > 0 && item.href.length > 0);
+	}, [contacts]);
 
-	const scrollToTop = () => {
+	const handleToggleSection = (section: string) => {
+		setExpandedSection(previous =>
+			previous === section ? null : section
+		);
+	};
+
+	const handleScrollToTop = () => {
 		if (typeof window !== 'undefined') {
 			window.scrollTo({ top: 0, behavior: 'smooth' });
 		}
 	};
 
-	const toggleMobileSection = (section: string) => {
-		setExpandedSection(expandedSection === section ? null : section);
-	};
-
 	return (
 		<>
-			{/* Scroll to Top Button */}
-			<AnimatePresence>
-				{showScrollTop && (
-					<motion.button
-						initial={{ opacity: 0, scale: 0.8 }}
-						animate={{ opacity: 1, scale: 1 }}
-						exit={{ opacity: 0, scale: 0.8 }}
-						onClick={scrollToTop}
-						className='fixed bottom-4 right-4 sm:bottom-6 sm:right-6 lg:bottom-8 lg:right-8 z-50 w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group'
-						whileHover={{ scale: 1.1 }}
-						whileTap={{ scale: 0.9 }}>
-						<ArrowUp className='w-4 h-4 sm:w-5 sm:h-5 group-hover:-translate-y-1 transition-transform' />
-					</motion.button>
-				)}
-			</AnimatePresence>
-
+			<FooterScrollToTopButton
+				isVisible={showScrollTop}
+				onClick={handleScrollToTop}
+			/>
 			<footer
 				id='footer'
 				className='relative bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 text-white overflow-hidden'>
-				{/* Animated Background Elements */}
-				<div className='absolute inset-0 overflow-hidden'>
-					<div className='absolute top-20 left-10 w-72 h-72 bg-blue-500/10 rounded-full mix-blend-multiply filter blur-xl animate-blob' />
-					<div className='absolute top-40 right-10 w-72 h-72 bg-purple-500/10 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-2000' />
-					<div className='absolute -bottom-8 left-20 w-72 h-72 bg-pink-500/10 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-4000' />
-				</div>
-
-				{/* Floating Particles */}
-				<div className='absolute inset-0 overflow-hidden pointer-events-none'>
-					{isClient &&
-						particles.map((particle) => (
-							<motion.div
-								key={particle.id}
-								className='absolute w-1 h-1 bg-white/20 rounded-full'
-								style={{
-									left: `${particle.left}%`,
-									top: `${particle.top}%`
-								}}
-								animate={{
-									y: [0, -30, 0],
-									opacity: [0.2, 1, 0.2]
-								}}
-								transition={{
-									duration: particle.duration,
-									repeat: Infinity,
-									delay: particle.delay
-								}}
-							/>
-						))}
-				</div>
-
-				{/* Top Border Accent */}
+				<FooterBackgroundEffects
+					particles={particles}
+					enableParticles={isClient}
+				/>
 				<div className='absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 via-red-500 to-blue-400' />
-
-				{/* Main Content */}
 				<div className='relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20'>
-					{/* Header Section */}
-					<motion.div
-						initial={{ opacity: 0, y: 30 }}
-						animate={isVisible ? { opacity: 1, y: 0 } : {}}
-						transition={{ duration: 0.8 }}
-						className='text-center mb-12 sm:mb-16 lg:mb-20'>
-						<div className='flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-6 sm:mb-8'>
-							<div className='w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl flex items-center justify-center'>
-								<Building2 className='w-6 h-6 sm:w-8 sm:h-8 text-white' />
-							</div>
-							<div className='text-center sm:text-left'>
-								<h2 className='text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent leading-tight'>
-									Bhagwan Parshuram Institute of Technology
-								</h2>
-								<p className='text-blue-200 text-sm sm:text-base lg:text-lg mt-1'>
-									Excellence in Engineering Education
-								</p>
-							</div>
-						</div>
-
-						{/* Achievement Stats */}
-						<div className='grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mt-8 sm:mt-12'>
-							{achievements.map((achievement, index) => (
-								<motion.div
-									key={achievement.label}
-									initial={{ opacity: 0, scale: 0.8 }}
-									animate={isVisible ? { opacity: 1, scale: 1 } : {}}
-									transition={{ duration: 0.6, delay: 0.1 * index }}
-									className='bg-white/5 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/10 hover:border-white/20 transition-all duration-300 group'
-									whileHover={{ scale: 1.05 }}>
-									<div className='flex items-center justify-center mb-2 sm:mb-3 text-blue-400 group-hover:text-blue-300 transition-colors'>
-										{achievement.icon}
-									</div>
-									<div className='text-lg sm:text-xl lg:text-2xl font-bold text-white mb-1'>
-										{achievement.number}
-									</div>
-									<div className='text-xs sm:text-sm text-blue-200'>
-										{achievement.label}
-									</div>
-								</motion.div>
-							))}
-						</div>
-					</motion.div>
-
-					{/* Main Footer Grid */}
+					<FooterHeaderSection
+						achievements={footerAchievements}
+						isVisible={isFooterVisible}
+					/>
 					<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 mb-8 sm:mb-12'>
-						{/* Quick Links */}
-						<motion.div
-							initial={{ opacity: 0, x: -30 }}
-							animate={isVisible ? { opacity: 1, x: 0 } : {}}
-							transition={{ duration: 0.8, delay: 0.2 }}
-							className='space-y-6'>
-							<div className='flex items-center gap-3 md:hidden'>
-								<h3 className='text-xl font-bold text-white'>Quick Links</h3>
-								<button
-									onClick={() => toggleMobileSection('links')}
-									className='md:hidden text-white/60'
-									aria-label='Toggle Quick Links section'>
-									<ChevronDown
-										className={`w-5 h-5 transition-transform ${
-											expandedSection === 'links' ? 'rotate-180' : ''
-										}`}
-									/>
-								</button>
-							</div>
-							<h3 className='hidden md:block text-xl font-bold text-white mb-6'>
-								Quick Links
-							</h3>
-
-							<div
-								className={`space-y-3 ${
-									expandedSection === 'links' || !isMobile ? 'block' : 'hidden'
-								} md:block`}>
-								{quickLinks.map((link, index) => (
-									<motion.div
-										key={link.name}
-										initial={{ opacity: 0, x: -20 }}
-										animate={isVisible ? { opacity: 1, x: 0 } : {}}
-										transition={{ duration: 0.4, delay: 0.1 * index }}>
-										<Link
-											href={link.href}
-											className='flex items-center gap-3 p-3 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-all duration-300 group'>
-											<div className='p-2 bg-blue-600/20 rounded-lg group-hover:bg-blue-600/40 transition-colors'>
-												{link.icon}
-											</div>
-											<span className='group-hover:translate-x-1 transition-transform'>
-												{link.name}
-											</span>
-											<ChevronRight className='w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity' />
-										</Link>
-									</motion.div>
-								))}
-							</div>
-						</motion.div>
-
-						{/* Departments */}
-						<motion.div
-							initial={{ opacity: 0, x: -30 }}
-							animate={isVisible ? { opacity: 1, x: 0 } : {}}
-							transition={{ duration: 0.8, delay: 0.3 }}
-							className='space-y-6'>
-							<div className='flex items-center gap-3 md:hidden'>
-								<h3 className='text-xl font-bold text-white'>Departments</h3>
-								<button
-									onClick={() => toggleMobileSection('departments')}
-									className='md:hidden text-white/60'
-									aria-label='Toggle Departments section'>
-									<ChevronDown
-										className={`w-5 h-5 transition-transform ${
-											expandedSection === 'departments' ? 'rotate-180' : ''
-										}`}
-									/>
-								</button>
-							</div>
-							<h3 className='hidden md:block text-xl font-bold text-white mb-6'>
-								Departments
-							</h3>
-
-							<div
-								className={`space-y-3 ${
-									expandedSection === 'departments' || !isMobile
-										? 'block'
-										: 'hidden'
-								} md:block`}>
-								{departments.map((dept, index) => (
-									<motion.div
-										key={dept.name}
-										initial={{ opacity: 0, scale: 0.9 }}
-										animate={isVisible ? { opacity: 1, scale: 1 } : {}}
-										transition={{ duration: 0.4, delay: 0.1 * index }}
-										className='bg-white/5 backdrop-blur-sm rounded-lg p-3 border border-white/10 hover:border-white/20 transition-all duration-300 group cursor-pointer'
-										whileHover={{ scale: 1.02 }}>
-										<div className='flex items-center gap-3'>
-											<div
-												className={`w-10 h-10 bg-${dept.color}-100 rounded-lg flex items-center justify-center flex-shrink-0`}>
-												<span
-													className={`text-${dept.color}-600 font-semibold text-xs`}>
-													{dept.code}
-												</span>
-											</div>
-											<div>
-												<div className='text-white font-medium text-sm'>
-													{dept.name}
-												</div>
-												<div className='text-white/60 text-xs'>Engineering</div>
-											</div>
-										</div>
-									</motion.div>
-								))}
-							</div>
-						</motion.div>
-
-						{/* Contact Information */}
-						<motion.div
-							initial={{ opacity: 0, x: 30 }}
-							animate={isVisible ? { opacity: 1, x: 0 } : {}}
-							transition={{ duration: 0.8, delay: 0.4 }}
-							className='space-y-6'>
-							<div className='flex items-center gap-3 md:hidden'>
-								<h3 className='text-xl font-bold text-white'>Contact Info</h3>
-								<button
-									onClick={() => toggleMobileSection('contact')}
-									className='md:hidden text-white/60'
-									aria-label='Toggle Contact Info section'>
-									<ChevronDown
-										className={`w-5 h-5 transition-transform ${
-											expandedSection === 'contact' ? 'rotate-180' : ''
-										}`}
-									/>
-								</button>
-							</div>
-							<h3 className='hidden md:block text-xl font-bold text-white mb-6'>
-								Contact Info
-							</h3>
-
-							<div
-								className={`space-y-4 ${
-									expandedSection === 'contact' || !isMobile
-										? 'block'
-										: 'hidden'
-								} md:block`}>
-								{contactInfo.map((contact, index) => (
-									<motion.div
-										key={contact.title}
-										initial={{ opacity: 0, y: 20 }}
-										animate={isVisible ? { opacity: 1, y: 0 } : {}}
-										transition={{ duration: 0.4, delay: 0.1 * index }}>
-										<a
-											href={contact.href}
-											target={
-												contact.href.startsWith('http') ? '_blank' : undefined
-											}
-											rel={
-												contact.href.startsWith('http')
-													? 'noopener noreferrer'
-													: undefined
-											}
-											className='block p-4 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 hover:border-white/20 transition-all duration-300 group'>
-											<div className='flex items-start gap-3'>
-												<div className='p-2 bg-blue-600/20 rounded-lg group-hover:bg-blue-600/40 transition-colors flex-shrink-0'>
-													<contact.icon className='w-5 h-5 text-blue-400' />
-												</div>
-												<div>
-													<div className='text-white font-medium text-sm mb-1'>
-														{contact.title}
-													</div>
-													<div className='text-white/80 text-xs leading-relaxed group-hover:text-white transition-colors'>
-														{contact.text}
-													</div>
-												</div>
-											</div>
-										</a>
-									</motion.div>
-								))}
-							</div>
-						</motion.div>
-
-						{/* Newsletter & Social */}
-						<motion.div
-							initial={{ opacity: 0, x: 30 }}
-							animate={isVisible ? { opacity: 1, x: 0 } : {}}
-							transition={{ duration: 0.8, delay: 0.5 }}
-							className='space-y-6'>
-							<div className='flex items-center gap-3 md:hidden'>
-								<h3 className='text-xl font-bold text-white'>Stay Connected</h3>
-								<button
-									onClick={() => toggleMobileSection('social')}
-									className='md:hidden text-white/60'
-									aria-label='Toggle Stay Connected section'>
-									<ChevronDown
-										className={`w-5 h-5 transition-transform ${
-											expandedSection === 'social' ? 'rotate-180' : ''
-										}`}
-									/>
-								</button>
-							</div>
-							<h3 className='hidden md:block text-xl font-bold text-white mb-6'>
-								Stay Connected
-							</h3>
-
-							<div
-								className={`space-y-6 ${
-									expandedSection === 'social' || !isMobile ? 'block' : 'hidden'
-								} md:block`}>
-								{/* Newsletter Signup */}
-								<div className='bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/10'>
-									<h4 className='text-white font-medium mb-3'>Get Updates</h4>
-									<div className='space-y-3'>
-										<Input
-											type='email'
-											placeholder='Enter your email'
-											className='bg-white/10 border-white/20 text-white placeholder:text-white/60 focus:border-blue-400 focus:ring-blue-400/20'
-										/>
-										<Button className='w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white border-0 shadow-lg'>
-											<Send className='w-4 h-4 mr-2' />
-											Subscribe
-										</Button>
-									</div>
-								</div>
-
-								{/* Social Media Links */}
-								<div>
-									<h4 className='text-white font-medium mb-4'>Follow Us</h4>
-									<div className='flex flex-wrap gap-3'>
-										{socialLinks.map((social, index) => (
-											<motion.a
-												key={social.label}
-												href={social.href}
-												target='_blank'
-												rel='noopener noreferrer'
-												className={`w-12 h-12 bg-gradient-to-r ${social.color} rounded-xl flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 group`}
-												whileHover={{ scale: 1.1, rotate: 5 }}
-												whileTap={{ scale: 0.95 }}
-												initial={{ opacity: 0, scale: 0.8 }}
-												animate={isVisible ? { opacity: 1, scale: 1 } : {}}
-												transition={{ duration: 0.4, delay: 0.1 * index }}>
-												<social.icon className='w-5 h-5 text-white group-hover:scale-110 transition-transform' />
-											</motion.a>
-										))}
-									</div>
-								</div>
-							</div>
-						</motion.div>
+						<FooterQuickLinksSection
+							links={quickLinks}
+							isVisible={isFooterVisible}
+							isMobile={isMobile}
+							expandedSection={expandedSection}
+							onToggle={handleToggleSection}
+						/>
+						<FooterDepartmentsSection
+							departments={departmentLinks}
+							isVisible={isFooterVisible}
+							isMobile={isMobile}
+							expandedSection={expandedSection}
+							onToggle={handleToggleSection}
+						/>
+						<FooterContactSection
+							contacts={contactItems}
+							isVisible={isFooterVisible}
+							isMobile={isMobile}
+							expandedSection={expandedSection}
+							onToggle={handleToggleSection}
+						/>
+						<FooterEngagementSection
+							socialLinks={footerSocialLinks}
+							isVisible={isFooterVisible}
+							isMobile={isMobile}
+							expandedSection={expandedSection}
+							onToggle={handleToggleSection}
+						/>
 					</div>
-
-					{/* Bottom Section */}
-					<motion.div
-						initial={{ opacity: 0, y: 30 }}
-						animate={isVisible ? { opacity: 1, y: 0 } : {}}
-						transition={{ duration: 0.8, delay: 0.6 }}
-						className='border-t border-white/10 pt-6 sm:pt-8 mt-8 sm:mt-12'>
-						<div className='flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6'>
-							<div className='text-center sm:text-left'>
-								<p className='text-white/80 text-xs sm:text-sm'>
-									© 2024 Bhagwan Parshuram Institute of Technology. All rights
-									reserved.
-								</p>
-								<p className='text-white/60 text-xs mt-1'>
-									Affiliated to GGSIPU | NBA Accredited | NAAC Certified
-								</p>
-							</div>
-
-							<div className='flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-xs sm:text-sm text-white/60'>
-								<Link
-									href='/privacy'
-									className='hover:text-white transition-colors'>
-									Privacy Policy
-								</Link>
-								<Link
-									href='/terms'
-									className='hover:text-white transition-colors'>
-									Terms of Service
-								</Link>
-								<Link
-									href='/sitemap'
-									className='hover:text-white transition-colors'>
-									Sitemap
-								</Link>
-							</div>
-						</div>
-					</motion.div>
+					<FooterBottomBar
+						bottomLeftContent={bottomLeftContent}
+						isVisible={isFooterVisible}
+					/>
 				</div>
-
-				{/* Bottom Gradient */}
-				{/* <div className='absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 via-red-500 to-blue-400' /> */}
 			</footer>
 		</>
 	);

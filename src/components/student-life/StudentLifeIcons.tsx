@@ -1,0 +1,68 @@
+import {
+	Building2,
+	Users,
+	Calendar,
+	Shield,
+	BookOpen,
+	Monitor,
+	Home,
+	TreePine,
+	Utensils,
+	Coffee,
+	Dumbbell,
+	Heart,
+	Car,
+	Wifi,
+	Code,
+	Zap,
+	Target,
+	Music,
+	Mic,
+	Palette,
+	Camera,
+	Trophy,
+	AlertTriangle,
+	Phone,
+	Mail,
+	MapPin,
+	Clock,
+	AlertCircle,
+    Info
+} from 'lucide-react';
+
+export const IconMap: Record<string, any> = {
+	Building2,
+	Users,
+	Calendar,
+	Shield,
+	BookOpen,
+	Monitor,
+	Home,
+	TreePine,
+	Utensils,
+	Coffee,
+	Dumbbell,
+	Heart,
+	Car,
+	Wifi,
+	Code,
+	Zap,
+	Target,
+	Music,
+	Mic,
+	Palette,
+	Camera,
+	Trophy,
+	AlertTriangle,
+	Phone,
+	Mail,
+	MapPin,
+	Clock,
+	AlertCircle,
+    Info
+};
+
+export const getIconComponent = (name: string) => {
+	return IconMap[name] || Building2;
+};
+

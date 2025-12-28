@@ -19,9 +19,9 @@ interface Notice {
 	priority: Priority;
 	tags: string[];
 	description: string;
-	views: number;
 	pinned: boolean;
 	urgent: boolean;
+	link: string;
 }
 
 interface Announcement {
@@ -35,9 +35,9 @@ interface Announcement {
 	priority: Priority;
 	tags: string[];
 	description: string;
-	views: number;
 	pinned: boolean;
 	urgent: boolean;
+	link: string;
 }
 
 interface NoticesSectionData {
@@ -67,8 +67,8 @@ interface EventItem {
 	registrationOpen: boolean;
 	price: string;
 	highlights: string[];
-	rating: number;
-	totalRatings: number;
+	ctaLabel: string;
+	ctaLink: string;
 }
 
 interface EventsSectionData {
@@ -77,4 +77,97 @@ interface EventsSectionData {
 
 interface EventsSectionProps {
 	data: EventsSectionData;
+}
+
+interface PlacementCompany {
+	name: string;
+	logo: string;
+}
+
+interface PlacementStatistic {
+	value: string;
+	label: string;
+}
+
+interface PlacementCompaniesData {
+	title: string;
+	subtitle: string;
+	companies: PlacementCompany[];
+	statistics: PlacementStatistic[];
+}
+
+interface TopPlacedStudent {
+	id: number;
+	name: string;
+	company: string;
+	package: string;
+	branch: string;
+	year: string;
+	image: string;
+	companyLogo: string;
+}
+
+interface TopPlacedStudentsData {
+	title: string;
+	subtitle: string;
+	students: TopPlacedStudent[];
+	statistics: PlacementStatistic[];
+}
+
+interface TestimonialItem {
+	id: number;
+	name: string;
+	batch: string;
+	company: string;
+	position: string;
+	image: string;
+	video: string;
+	testimonial: string;
+	rating: number;
+	achievement: string;
+	tags: string[];
+}
+
+interface TestimonialsData {
+	title: string;
+	subtitle: string;
+	testimonials: TestimonialItem[];
+}
+
+// Header contact bar data shape
+interface HeaderContactUsData {
+	phone: { tel: string; display: string };
+	email: string;
+	address: string;
+	mapUrl: string;
+}
+
+// Header important announcements bar data shape
+interface HeaderAnnouncementItem {
+	title: string;
+	href: string;
+}
+
+interface HeaderAnnouncementsData {
+	items: HeaderAnnouncementItem[];
+	labels: { desktop: string; mobile: string };
+}
+
+// Footer data shapes
+type FooterContactType = 'address' | 'phone' | 'email';
+
+interface FooterContactInfoItem {
+	key: FooterContactType;
+	title: string;
+	text: string;
+	href: string;
+}
+
+interface FooterContactInfoData {
+	items: FooterContactInfoItem[];
+}
+
+interface FooterBottomLeftContent {
+	copyright: string;
+	accreditation: string;
 }

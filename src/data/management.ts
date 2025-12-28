@@ -70,24 +70,24 @@ export const governanceStructureData = {
 		icon: 'Building2',
 		title: 'Governance Structure',
 		subtitle: 'Organizational Framework for Excellence',
-		gradient: 'from-green-50 to-teal-50',
-		iconColor: 'bg-green-600',
-		textColor: 'text-green-600'
+		gradient: 'from-blue-50 to-blue-100',
+		iconColor: 'bg-blue-600',
+		textColor: 'text-blue-600'
 	},
 	sections: [
 		{
 			id: 'board-of-governors',
 			title: 'Board of Governors',
 			icon: 'Award',
-			iconColor: 'text-green-600',
+			iconColor: 'text-blue-600',
 			description:
 				'The Board of Governors provides strategic oversight and policy direction for the institution. Comprising eminent personalities from academia, industry, and public service, the board ensures BPIT maintains its commitment to excellence.',
 			cards: [
 				{
 					title: 'Key Responsibilities',
-					bgColor: 'bg-green-50',
-					textColor: 'text-green-800',
-					listColor: 'text-green-700',
+					bgColor: 'bg-blue-50',
+					textColor: 'text-blue-800',
+					listColor: 'text-blue-700',
 					items: [
 						'Strategic planning and policy formulation',
 						'Financial oversight and budget approval',
@@ -97,9 +97,9 @@ export const governanceStructureData = {
 				},
 				{
 					title: 'Composition',
-					bgColor: 'bg-green-50',
-					textColor: 'text-green-800',
-					listColor: 'text-green-700',
+					bgColor: 'bg-blue-50',
+					textColor: 'text-blue-800',
+					listColor: 'text-blue-700',
 					items: [
 						'Chairman (Industry Leader)',
 						'Academic Representatives',
@@ -147,15 +147,15 @@ export const governanceStructureData = {
 			id: 'administrative-structure',
 			title: 'Administrative Structure',
 			icon: 'Shield',
-			iconColor: 'text-purple-600',
+			iconColor: 'text-blue-600',
 			description:
 				'Our administrative structure ensures efficient operations, student services, and support for academic activities through well-defined roles and responsibilities.',
 			cards: [
 				{
 					title: 'Academic Affairs',
-					bgColor: 'bg-purple-50',
-					textColor: 'text-purple-800',
-					listColor: 'text-purple-700',
+					bgColor: 'bg-blue-50',
+					textColor: 'text-blue-800',
+					listColor: 'text-blue-700',
 					items: [
 						'Admissions Office',
 						'Examination Cell',
@@ -165,9 +165,9 @@ export const governanceStructureData = {
 				},
 				{
 					title: 'Support Services',
-					bgColor: 'bg-purple-50',
-					textColor: 'text-purple-800',
-					listColor: 'text-purple-700',
+					bgColor: 'bg-blue-50',
+					textColor: 'text-blue-800',
+					listColor: 'text-blue-700',
 					items: [
 						'Library Services',
 						'IT Infrastructure',
@@ -177,9 +177,9 @@ export const governanceStructureData = {
 				},
 				{
 					title: 'Quality Assurance',
-					bgColor: 'bg-purple-50',
-					textColor: 'text-purple-800',
-					listColor: 'text-purple-700',
+					bgColor: 'bg-blue-50',
+					textColor: 'text-blue-800',
+					listColor: 'text-blue-700',
 					items: [
 						'IQAC Cell',
 						'Research & Development',
@@ -198,9 +198,9 @@ export const leadershipTeamData = {
 		icon: 'UserCheck',
 		title: 'Our Leadership Team',
 		subtitle: 'Experienced Leaders Driving Excellence',
-		gradient: 'from-purple-50 to-blue-50',
-		iconColor: 'bg-purple-600',
-		textColor: 'text-purple-600'
+		gradient: 'from-blue-50 to-blue-100',
+		iconColor: 'bg-blue-600',
+		textColor: 'text-blue-600'
 	},
 	leaders: [
 		{
@@ -233,9 +233,9 @@ export const leadershipTeamData = {
 			name: 'Dr. [Vice Principal Name]',
 			position: 'Vice Principal',
 			icon: 'Users',
-			iconColor: 'bg-green-100',
-			iconTextColor: 'text-green-600',
-			textColor: 'text-green-600',
+			iconColor: 'bg-blue-100',
+			iconTextColor: 'text-blue-600',
+			textColor: 'text-blue-600',
 			details: [
 				{
 					icon: 'GraduationCap',
@@ -258,9 +258,9 @@ export const leadershipTeamData = {
 			name: 'Dr. [Dean Name]',
 			position: 'Dean - Academics',
 			icon: 'BookOpen',
-			iconColor: 'bg-orange-100',
-			iconTextColor: 'text-orange-600',
-			textColor: 'text-orange-600',
+			iconColor: 'bg-blue-100',
+			iconTextColor: 'text-blue-600',
+			textColor: 'text-blue-600',
 			details: [
 				{
 					icon: 'GraduationCap',
@@ -283,9 +283,9 @@ export const leadershipTeamData = {
 			name: 'Mr./Ms. [Registrar Name]',
 			position: 'Registrar',
 			icon: 'Briefcase',
-			iconColor: 'bg-purple-100',
-			iconTextColor: 'text-purple-600',
-			textColor: 'text-purple-600',
+			iconColor: 'bg-blue-100',
+			iconTextColor: 'text-blue-600',
+			textColor: 'text-blue-600',
 			details: [
 				{
 					icon: 'GraduationCap',
@@ -312,9 +312,9 @@ export const policiesProceduresData = {
 		icon: 'Shield',
 		title: 'Policies & Procedures',
 		subtitle: 'Framework for Institutional Excellence',
-		gradient: 'from-amber-50 to-orange-50',
-		iconColor: 'bg-amber-600',
-		textColor: 'text-amber-600'
+		gradient: 'from-blue-50 to-blue-100',
+		iconColor: 'bg-blue-600',
+		textColor: 'text-blue-600'
 	},
 	policyCategories: [
 		{
@@ -335,8 +335,8 @@ export const policiesProceduresData = {
 			id: 'faculty-policies',
 			title: 'Faculty Policies',
 			icon: 'Users',
-			iconColor: 'text-green-600',
-			bulletColor: 'bg-green-600',
+			iconColor: 'text-blue-600',
+			bulletColor: 'bg-blue-600',
 			policies: [
 				'Faculty Recruitment Policy',
 				'Performance Evaluation System',
@@ -349,8 +349,8 @@ export const policiesProceduresData = {
 			id: 'quality-assurance',
 			title: 'Quality Assurance',
 			icon: 'Award',
-			iconColor: 'text-purple-600',
-			bulletColor: 'bg-purple-600',
+			iconColor: 'text-blue-600',
+			bulletColor: 'bg-blue-600',
 			policies: [
 				'IQAC Guidelines & Procedures',
 				'NBA Accreditation Compliance',
@@ -363,8 +363,8 @@ export const policiesProceduresData = {
 			id: 'administrative-policies',
 			title: 'Administrative Policies',
 			icon: 'Briefcase',
-			iconColor: 'text-orange-600',
-			bulletColor: 'bg-orange-600',
+			iconColor: 'text-blue-600',
+			bulletColor: 'bg-blue-600',
 			policies: [
 				'Financial Management Policy',
 				'Procurement & Purchase Policy',
@@ -390,24 +390,24 @@ export const policiesProceduresData = {
 				title: 'Approval',
 				description: 'Stakeholder consultation and approval',
 				icon: 'UserCheck',
-				iconColor: 'bg-green-100',
-				iconTextColor: 'text-green-600'
+				iconColor: 'bg-blue-100',
+				iconTextColor: 'text-blue-600'
 			},
 			{
 				id: 'communication',
 				title: 'Communication',
 				description: 'Policy dissemination and training',
 				icon: 'BookOpen',
-				iconColor: 'bg-purple-100',
-				iconTextColor: 'text-purple-600'
+				iconColor: 'bg-blue-100',
+				iconTextColor: 'text-blue-600'
 			},
 			{
 				id: 'monitoring',
 				title: 'Monitoring',
 				description: 'Compliance monitoring and evaluation',
 				icon: 'Target',
-				iconColor: 'bg-orange-100',
-				iconTextColor: 'text-orange-600'
+				iconColor: 'bg-blue-100',
+				iconTextColor: 'text-blue-600'
 			}
 		]
 	}
@@ -418,7 +418,7 @@ export const managementHeroData = {
 	title: 'Management',
 	subtitle:
 		'Experienced leadership driving institutional excellence and innovation in engineering education',
-	gradient: 'from-blue-600 via-purple-600 to-blue-800',
+	gradient: 'from-blue-700 to-blue-900',
 	badges: [
 		'Strategic Leadership',
 		'Academic Excellence',

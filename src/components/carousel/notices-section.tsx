@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence, useAnimate } from 'framer-motion';
 import {
 	Bell,
@@ -11,6 +11,24 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import NoticeCard from './notice-card';
+
+interface Notice {
+	id?: string;
+	title: string;
+	date: string;
+	category: string;
+	href?: string;
+	fileUrl?: string;
+	priority?: boolean;
+	content?: string;
+}
+
+interface NoticesSectionProps {
+	data: {
+		notices: Notice[];
+		announcements: Notice[];
+	};
+}
 
 const ScrollingSection = ({
 	title,
@@ -48,7 +66,7 @@ const ScrollingSection = ({
 	};
 	const [cardGap, setCardGap] = useState(getCardGap());
 	const cardWithGap = cardWidth + cardGap;
-	const totalCardsWidth = items.length * cardWithGap * 2;
+	const totalCardsWidth = items.length * cardWithGap;
 	const speed = 160; // pixels per second
 
 	// Update card width and gap on resize
@@ -193,12 +211,16 @@ const ScrollingSection = ({
 					<Button
 						variant='outline'
 						size='sm'
-						className='rounded-xl text-xs lg:text-sm'>
+						className='rounded-xl text-xs lg:text-sm'
+						trackingEvent="notices_filter_clicked"
+						trackingData={{ section: title }}>
 						<Filter className='w-3 h-3 lg:w-4 lg:h-4 mr-1 lg:mr-2' />
 						<span className='hidden sm:inline'>Filter</span>
 					</Button>
 					<Button
-						className={`bg-gradient-to-r from-blue-600 to-blue-800 hover:opacity-90 rounded-xl border-0 text-xs lg:text-sm`}>
+						className={`bg-gradient-to-r from-blue-600 to-blue-800 hover:opacity-90 rounded-xl border-0 text-xs lg:text-sm`}
+						trackingEvent="notices_view_all_clicked"
+						trackingData={{ section: title }}>
 						<span className='hidden sm:inline'>View All</span>
 						<span className='sm:hidden'>All</span>
 						<ExternalLink className='w-3 h-3 lg:w-4 lg:h-4 ml-1 lg:ml-2' />
@@ -213,7 +235,7 @@ const ScrollingSection = ({
 				<div className='absolute right-0 top-0 bottom-0 w-0 sm:w-16 lg:w-20 bg-gradient-to-l from-blue-50 via-blue-50/80 to-transparent z-10 pointer-events-none' />
 
 				<div ref={scope} className='flex gap-3 sm:gap-4 lg:gap-6 w-max'>
-					{[...items, ...items].map((item, index) => (
+					{items.map((item, index) => (
 						<div
 							key={`${item.id}-${index}`}
 							className='w-[260px] sm:w-[320px] lg:w-[360px] flex-shrink-0'
@@ -230,6 +252,26 @@ const ScrollingSection = ({
 
 export default function NoticesSection({ data }: NoticesSectionProps) {
 	const { notices, announcements } = data;
+
+	const uniqueNotices = useMemo(() => {
+		const seen = new Set<string>();
+		return notices.filter(item => {
+			const key = `${item.id ?? ''}-${item.title}`;
+			if (seen.has(key)) return false;
+			seen.add(key);
+			return true;
+		});
+	}, [notices]);
+
+	const uniqueAnnouncements = useMemo(() => {
+		const seen = new Set<string>();
+		return announcements.filter(item => {
+			const key = `${item.id ?? ''}-${item.title}`;
+			if (seen.has(key)) return false;
+			seen.add(key);
+			return true;
+		});
+	}, [announcements]);
 
 	return (
 		<section className='relative py-20 bg-gradient-to-br from-blue-50 via-white to-blue-50 overflow-hidden'>
@@ -308,12 +350,12 @@ export default function NoticesSection({ data }: NoticesSectionProps) {
 							<div className='flex flex-col gap-6'>
 								<ScrollingSection
 									title='Official Notices'
-									items={notices}
+									items={uniqueNotices}
 									icon={<Bell className='w-6 h-6' />}
 								/>
 								<ScrollingSection
 									title='Announcements'
-									items={announcements}
+									items={uniqueAnnouncements}
 									icon={<Megaphone className='w-6 h-6' />}
 								/>
 							</div>

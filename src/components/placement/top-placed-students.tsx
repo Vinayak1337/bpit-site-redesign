@@ -39,7 +39,7 @@ const TopPlacedStudents = ({ data }: TopPlacedStudentsProps) => {
 	const animationRef = useRef<ReturnType<typeof animate> | null>(null);
 	const currentPositionRef = useRef(0);
 
-	const topStudents = data.students;
+	const studentsToRender = data.students;
 
 	// Card dimensions - responsive based on screen size
 	const getCardWidth = () => {
@@ -62,7 +62,8 @@ const TopPlacedStudents = ({ data }: TopPlacedStudentsProps) => {
 	};
 	const [cardGap, setCardGap] = useState(getCardGap());
 	const cardWithGap = cardWidth + cardGap;
-	const totalCardsWidth = topStudents.length * cardWithGap * 2;
+	const totalCardsWidth = studentsToRender.length * cardWithGap;
+	const hasStudents = studentsToRender.length > 0;
 	const speed = 140; // pixels per second
 
 	// Update card width and gap on resize
@@ -77,7 +78,7 @@ const TopPlacedStudents = ({ data }: TopPlacedStudentsProps) => {
 	}, []);
 
 	useEffect(() => {
-		if (!scope.current || !containerRef.current) return;
+		if (!scope.current || !containerRef.current || !hasStudents) return;
 
 		const containerWidth = containerRef.current.offsetWidth;
 
@@ -128,11 +129,10 @@ const TopPlacedStudents = ({ data }: TopPlacedStudentsProps) => {
 				animationRef.current.stop();
 			}
 		};
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [scope, animate, topStudents.length, totalCardsWidth, cardWidth, cardGap]);
+	}, [scope, animate, studentsToRender.length, totalCardsWidth, cardWidth, cardGap, hasStudents]);
 
 	useEffect(() => {
-		if (!isHovered && scope.current && containerRef.current) {
+		if (!isHovered && scope.current && containerRef.current && hasStudents) {
 			const containerWidth = containerRef.current.offsetWidth;
 
 			const continueAnimation = () => {
@@ -170,7 +170,7 @@ const TopPlacedStudents = ({ data }: TopPlacedStudentsProps) => {
 
 			setTimeout(continueAnimation, 50);
 		}
-	}, [isHovered, scope, animate, totalCardsWidth, cardWidth, cardGap]);
+	}, [isHovered, scope, animate, totalCardsWidth, cardWidth, cardGap, hasStudents]);
 
 	useEffect(() => {
 		if (isHovered) {
@@ -215,7 +215,7 @@ const TopPlacedStudents = ({ data }: TopPlacedStudentsProps) => {
 						<div className='absolute top-0 right-0 w-0 sm:w-16 lg:w-20 h-full bg-gradient-to-l from-gray-50 to-transparent pointer-events-none z-10'></div>
 
 						<div ref={scope} className='flex gap-4 sm:gap-6 lg:gap-8 w-max'>
-							{[...topStudents, ...topStudents].map((student, index) => (
+							{studentsToRender.map((student, index) => (
 								<motion.div
 									key={`${student.name}-${index}`}
 									className='flex-shrink-0 w-60 sm:w-64 lg:w-72 bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group mb-5'

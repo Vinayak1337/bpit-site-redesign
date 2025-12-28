@@ -1,0 +1,15 @@
+# *
+User-agent: *
+Disallow: /api/*
+Disallow: /(Private Pages)
+
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://redesogn.bpitindia.com
+
+# Sitemaps
+Sitemap: https://redesogn.bpitindia.com/sitemap.xml
+Sitemap: https://redesogn.bpitindia.com/sitemap-0.xml

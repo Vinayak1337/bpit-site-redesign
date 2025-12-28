@@ -53,7 +53,9 @@ const PlacementCompanies = ({ data }: PlacementCompaniesProps) => {
 	};
 	const [cardGap, setCardGap] = useState(getCardGap());
 	const cardWithGap = cardWidth + cardGap;
-	const totalCardsWidth = data.companies.length * cardWithGap * 2;
+	const companiesToRender = data.companies;
+	const totalCardsWidth = companiesToRender.length * cardWithGap;
+	const hasCompanies = companiesToRender.length > 0;
 	const speed = 120; // pixels per second
 
 	// Update card width and gap on resize
@@ -68,7 +70,9 @@ const PlacementCompanies = ({ data }: PlacementCompaniesProps) => {
 	}, []);
 
 	useEffect(() => {
-		if (!scope.current || !containerRef.current) return;
+		if (!scope.current || !containerRef.current || !hasCompanies) {
+			return;
+		}
 
 		const containerWidth = containerRef.current.offsetWidth;
 		const startPosition = (containerWidth - cardWidth) / 2;
@@ -132,7 +136,7 @@ const PlacementCompanies = ({ data }: PlacementCompaniesProps) => {
 	}, [scope, animate, data.companies.length, totalCardsWidth, cardWidth, cardGap]);
 
 	useEffect(() => {
-		if (!isHovered && scope.current && containerRef.current) {
+		if (!isHovered && scope.current && containerRef.current && hasCompanies) {
 			const containerWidth = containerRef.current.offsetWidth;
 
 			const continueAnimation = () => {
@@ -174,7 +178,7 @@ const PlacementCompanies = ({ data }: PlacementCompaniesProps) => {
 
 			setTimeout(continueAnimation, 50);
 		}
-	}, [isHovered, scope, animate, totalCardsWidth, cardWidth, cardGap]);
+	}, [isHovered, scope, animate, totalCardsWidth, cardWidth, cardGap, hasCompanies]);
 
 	useEffect(() => {
 		if (isHovered && animationRef.current) {
@@ -228,7 +232,7 @@ const PlacementCompanies = ({ data }: PlacementCompaniesProps) => {
 						<div className='absolute top-0 right-0 w-0 sm:w-16 lg:w-20 h-full bg-gradient-to-l from-gray-50 to-transparent pointer-events-none z-10'></div>
 
 						<div ref={scope} className='flex gap-6 sm:gap-8 lg:gap-12 w-max'>
-							{[...data.companies, ...data.companies].map((company, index) => (
+							{companiesToRender.map((company, index) => (
 								<motion.div
 									key={`${company.name}-${index}`}
 									className='flex-shrink-0 flex items-center justify-center w-[120px] sm:w-[140px] lg:w-[160px] h-16 lg:h-20 bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 group'

@@ -39,7 +39,7 @@ const DynamicSidebar = ({ navItems, theme }: DynamicSidebarProps) => {
 		if (href === basePath) {
 			return pathname === basePath;
 		}
-		return pathname.startsWith(href);
+		return pathname?.startsWith(href) ?? false;
 	};
 
 	const getIcon = (iconName: string) => {

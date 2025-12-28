@@ -21,8 +21,15 @@ import {
 	Phone,
 	Mail
 } from 'lucide-react';
+import { ContactType } from '@prisma/client';
 
-const EnquiryPopup = () => {
+type ContactDTO = {
+	type: ContactType;
+	value: string;
+	displayValue: string | null;
+};
+
+const EnquiryPopup = ({ contacts }: { contacts: ContactDTO[] }) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [formData, setFormData] = useState({
 		name: '',
@@ -69,6 +76,14 @@ const EnquiryPopup = () => {
 	};
 
 	const isFormValid = formData.name && formData.email && formData.message;
+
+	const phones = contacts.filter(c => c.type === 'PHONE');
+	const primaryPhone = phones[0] ?? null;
+	const emailContact = contacts.find(c => c.type === 'EMAIL') ?? null;
+	const sanitizeTel = (input: string): string => input.replace(/[^+\d]/g, '');
+	const phoneTel = primaryPhone ? sanitizeTel(primaryPhone.value) : '';
+	const phoneDisplay = primaryPhone?.displayValue ?? primaryPhone?.value ?? '';
+	const email = emailContact?.value ?? '';
 
 	return (
 		<Dialog open={isOpen} onOpenChange={handleClose}>
@@ -283,7 +298,7 @@ const EnquiryPopup = () => {
 									<div className='mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-100'>
 										<div className='grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4'>
 											<a
-												href='tel:011-2757-1080'
+												href={`tel:${phoneTel}`}
 												className='flex items-center gap-3 p-3 sm:p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors group'>
 												<div className='w-10 h-10 sm:w-8 sm:h-8 bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition-colors flex-shrink-0'>
 													<Phone className='w-5 h-5 sm:w-4 sm:h-4 text-blue-600' />
@@ -291,13 +306,13 @@ const EnquiryPopup = () => {
 												<div className='min-w-0 flex-1'>
 													<p className='text-xs text-gray-500'>Call us</p>
 													<p className='text-sm font-medium text-gray-900 truncate'>
-														011-2757-1080
+														{phoneDisplay}
 													</p>
 												</div>
 											</a>
 
 											<a
-												href='mailto:bpitindia@yahoo.com'
+												href={`mailto:${email}`}
 												className='flex items-center gap-3 p-3 sm:p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors group'>
 												<div className='w-10 h-10 sm:w-8 sm:h-8 bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition-colors flex-shrink-0'>
 													<Mail className='w-5 h-5 sm:w-4 sm:h-4 text-blue-600' />
@@ -305,7 +320,7 @@ const EnquiryPopup = () => {
 												<div className='min-w-0 flex-1'>
 													<p className='text-xs text-gray-500'>Email us</p>
 													<p className='text-sm font-medium text-gray-900 truncate'>
-														bpitindia@yahoo.com
+														{email}
 													</p>
 												</div>
 											</a>
