@@ -57,15 +57,24 @@ const createEmptyTrainingArea = (): TrainingAreaFormValue => ({
 	textColor: 'black'
 });
 
-export default function TrainingAreasForm({ initialData, pageSlug, onChange }: Props) {
+export default function TrainingAreasForm({
+	initialData,
+	pageSlug,
+	onChange
+}: Props) {
 	const [isPending, startTransition] = useTransition();
-	const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+	const [saveStatus, setSaveStatus] = useState<
+		'idle' | 'saving' | 'saved' | 'error'
+	>('idle');
 
 	const form = useForm<FormValues>({
 		defaultValues: {
 			trainingTitle: initialData.trainingTitle || '',
 			trainingDescription: initialData.trainingDescription || '',
-			trainingAreas: initialData.trainingAreas.length > 0 ? initialData.trainingAreas : [createEmptyTrainingArea()]
+			trainingAreas:
+				initialData.trainingAreas.length > 0
+					? initialData.trainingAreas
+					: [createEmptyTrainingArea()]
 		}
 	});
 
@@ -77,7 +86,7 @@ export default function TrainingAreasForm({ initialData, pageSlug, onChange }: P
 	const iconOptions = SUPPORTED_ICON_NAMES;
 
 	useEffect(() => {
-		const subscription = form.watch((values) => {
+		const subscription = form.watch(values => {
 			if (onChange) {
 				const updatedData: PlacementOverviewData = {
 					...initialData,
@@ -87,8 +96,13 @@ export default function TrainingAreasForm({ initialData, pageSlug, onChange }: P
 						.map(area => ({
 							id: area?.id || crypto.randomUUID(),
 							title: (area?.title ?? '').trim(),
-							skills: (area?.skills ?? []).filter((skill): skill is string => !!skill && skill.trim().length > 0),
-							icon: area?.icon?.trim().length ? area.icon.trim() : FALLBACK_ICON,
+							skills: (area?.skills ?? []).filter(
+								(skill): skill is string =>
+									typeof skill === 'string' && skill.trim().length > 0
+							),
+							icon: area?.icon?.trim().length
+								? area.icon.trim()
+								: FALLBACK_ICON,
 							iconColor: area?.iconColor ?? 'blue',
 							textColor: area?.textColor ?? 'black'
 						}))
@@ -112,7 +126,9 @@ export default function TrainingAreasForm({ initialData, pageSlug, onChange }: P
 						.map(area => ({
 							id: area.id,
 							title: (area.title ?? '').trim(),
-							skills: (area.skills ?? []).filter((skill): skill is string => !!skill && skill.trim().length > 0),
+							skills: (area.skills ?? []).filter(
+								skill => skill.trim().length > 0
+							),
 							icon: area.icon?.trim().length ? area.icon.trim() : FALLBACK_ICON,
 							iconColor: area.iconColor ?? 'blue',
 							textColor: area.textColor ?? 'black'
@@ -133,19 +149,21 @@ export default function TrainingAreasForm({ initialData, pageSlug, onChange }: P
 
 	return (
 		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+			<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
 				{/* Training Section Headers */}
-				<div className="space-y-4">
-					<h3 className="text-lg font-semibold text-slate-900">Training Section</h3>
-					
+				<div className='space-y-4'>
+					<h3 className='text-lg font-semibold text-slate-900'>
+						Training Section
+					</h3>
+
 					<FormField
 						control={form.control}
-						name="trainingTitle"
+						name='trainingTitle'
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>Training Title</FormLabel>
 								<FormControl>
-									<Input placeholder="Technical Training Areas" {...field} />
+									<Input placeholder='Technical Training Areas' {...field} />
 								</FormControl>
 								<FormMessage />
 							</FormItem>
@@ -154,15 +172,15 @@ export default function TrainingAreasForm({ initialData, pageSlug, onChange }: P
 
 					<FormField
 						control={form.control}
-						name="trainingDescription"
+						name='trainingDescription'
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>Training Description</FormLabel>
 								<FormControl>
-									<Textarea 
-										placeholder="Brief description of training programs"
+									<Textarea
+										placeholder='Brief description of training programs'
 										rows={3}
-										{...field} 
+										{...field}
 									/>
 								</FormControl>
 								<FormMessage />
@@ -172,39 +190,40 @@ export default function TrainingAreasForm({ initialData, pageSlug, onChange }: P
 				</div>
 
 				{/* Training Areas */}
-				<div className="space-y-4">
-					<div className="flex items-center justify-between">
-						<h3 className="text-lg font-semibold text-slate-900">Training Areas</h3>
+				<div className='space-y-4'>
+					<div className='flex items-center justify-between'>
+						<h3 className='text-lg font-semibold text-slate-900'>
+							Training Areas
+						</h3>
 						<Button
-							type="button"
-							variant="outline"
-							size="sm"
-							onClick={() => trainingAreasArray.append(createEmptyTrainingArea())}
-						>
-							<Plus className="w-4 h-4 mr-2" />
+							type='button'
+							variant='outline'
+							size='sm'
+							onClick={() =>
+								trainingAreasArray.append(createEmptyTrainingArea())
+							}>
+							<Plus className='w-4 h-4 mr-2' />
 							Add Training Area
 						</Button>
 					</div>
-					<div className="space-y-4">
+					<div className='space-y-4'>
 						{trainingAreasArray.fields.map((field, index) => (
 							<div
 								key={field.id}
-								className="rounded-lg border border-slate-200 p-4 space-y-4 bg-slate-50/50"
-							>
-								<div className="flex items-center justify-between">
-									<span className="text-sm font-medium text-slate-700">
+								className='rounded-lg border border-slate-200 p-4 space-y-4 bg-slate-50/50'>
+								<div className='flex items-center justify-between'>
+									<span className='text-sm font-medium text-slate-700'>
 										Training Area {index + 1}
 									</span>
 									<Button
-										type="button"
-										variant="ghost"
-										size="sm"
-										onClick={() => trainingAreasArray.remove(index)}
-									>
-										<Trash2 className="w-4 h-4" />
+										type='button'
+										variant='ghost'
+										size='sm'
+										onClick={() => trainingAreasArray.remove(index)}>
+										<Trash2 className='w-4 h-4' />
 									</Button>
 								</div>
-								<div className="grid grid-cols-1 gap-4">
+								<div className='grid grid-cols-1 gap-4'>
 									<FormField
 										control={form.control}
 										name={`trainingAreas.${index}.title`}
@@ -213,7 +232,10 @@ export default function TrainingAreasForm({ initialData, pageSlug, onChange }: P
 											<FormItem>
 												<FormLabel>Title</FormLabel>
 												<FormControl>
-													<Input placeholder="e.g., Core Technologies" {...titleField} />
+													<Input
+														placeholder='e.g., Core Technologies'
+														{...titleField}
+													/>
 												</FormControl>
 												<FormMessage />
 											</FormItem>
@@ -228,10 +250,9 @@ export default function TrainingAreasForm({ initialData, pageSlug, onChange }: P
 												<FormControl>
 													<Select
 														onValueChange={iconField.onChange}
-														value={iconField.value}
-													>
+														value={iconField.value}>
 														<SelectTrigger>
-															<SelectValue placeholder="Select icon" />
+															<SelectValue placeholder='Select icon' />
 														</SelectTrigger>
 														<SelectContent>
 															{iconOptions.map(option => (
@@ -253,7 +274,10 @@ export default function TrainingAreasForm({ initialData, pageSlug, onChange }: P
 											<FormItem>
 												<FormLabel>Icon Color</FormLabel>
 												<FormControl>
-													<Input placeholder="from-blue-500 to-blue-700" {...colorField} />
+													<Input
+														placeholder='from-blue-500 to-blue-700'
+														{...colorField}
+													/>
 												</FormControl>
 												<FormMessage />
 											</FormItem>
@@ -261,52 +285,65 @@ export default function TrainingAreasForm({ initialData, pageSlug, onChange }: P
 									/>
 
 									{/* Skills */}
-									<div className="space-y-2">
-										<div className="flex items-center justify-between">
+									<div className='space-y-2'>
+										<div className='flex items-center justify-between'>
 											<FormLabel>Skills</FormLabel>
 											<Button
-												type="button"
-												variant="outline"
-												size="sm"
+												type='button'
+												variant='outline'
+												size='sm'
 												onClick={() => {
-													const currentSkills = form.getValues(`trainingAreas.${index}.skills`) || [];
-													form.setValue(`trainingAreas.${index}.skills`, [...currentSkills, '']);
-												}}
-											>
-												<Plus className="w-4 h-4 mr-2" />
+													const currentSkills =
+														form.getValues(`trainingAreas.${index}.skills`) ||
+														[];
+													form.setValue(`trainingAreas.${index}.skills`, [
+														...currentSkills,
+														''
+													]);
+												}}>
+												<Plus className='w-4 h-4 mr-2' />
 												Add Skill
 											</Button>
 										</div>
-										{(form.watch(`trainingAreas.${index}.skills`) || ['']).map((_, skillIndex) => (
-											<div key={skillIndex} className="flex items-center gap-2">
-												<FormField
-													control={form.control}
-													name={`trainingAreas.${index}.skills.${skillIndex}`}
-													render={({ field: skillField }) => (
-														<FormItem className="flex-1">
-															<FormControl>
-																<Input placeholder="Skill name" {...skillField} />
-															</FormControl>
-															<FormMessage />
-														</FormItem>
-													)}
-												/>
-												<Button
-													type="button"
-													variant="ghost"
-													size="sm"
-													onClick={() => {
-														const currentSkills = form.getValues(`trainingAreas.${index}.skills`) || [];
-														form.setValue(
-															`trainingAreas.${index}.skills`,
-															currentSkills.filter((_, i) => i !== skillIndex)
-														);
-													}}
-												>
-													<Trash2 className="w-4 h-4" />
-												</Button>
-											</div>
-										))}
+										{(form.watch(`trainingAreas.${index}.skills`) || ['']).map(
+											(_, skillIndex) => (
+												<div
+													key={skillIndex}
+													className='flex items-center gap-2'>
+													<FormField
+														control={form.control}
+														name={`trainingAreas.${index}.skills.${skillIndex}`}
+														render={({ field: skillField }) => (
+															<FormItem className='flex-1'>
+																<FormControl>
+																	<Input
+																		placeholder='Skill name'
+																		{...skillField}
+																	/>
+																</FormControl>
+																<FormMessage />
+															</FormItem>
+														)}
+													/>
+													<Button
+														type='button'
+														variant='ghost'
+														size='sm'
+														onClick={() => {
+															const currentSkills =
+																form.getValues(
+																	`trainingAreas.${index}.skills`
+																) || [];
+															form.setValue(
+																`trainingAreas.${index}.skills`,
+																currentSkills.filter((_, i) => i !== skillIndex)
+															);
+														}}>
+														<Trash2 className='w-4 h-4' />
+													</Button>
+												</div>
+											)
+										)}
 									</div>
 								</div>
 							</div>
@@ -314,16 +351,18 @@ export default function TrainingAreasForm({ initialData, pageSlug, onChange }: P
 					</div>
 				</div>
 
-				<div className="flex items-center justify-between pt-6 border-t">
+				<div className='flex items-center justify-between pt-6 border-t'>
 					<div>
 						{saveStatus === 'saved' && (
-							<p className="text-sm text-green-600">Changes saved successfully!</p>
+							<p className='text-sm text-green-600'>
+								Changes saved successfully!
+							</p>
 						)}
 						{saveStatus === 'error' && (
-							<p className="text-sm text-red-600">Failed to save changes.</p>
+							<p className='text-sm text-red-600'>Failed to save changes.</p>
 						)}
 					</div>
-					<Button type="submit" disabled={isPending || saveStatus === 'saving'}>
+					<Button type='submit' disabled={isPending || saveStatus === 'saving'}>
 						{saveStatus === 'saving' ? 'Saving...' : 'Save Changes'}
 					</Button>
 				</div>

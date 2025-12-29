@@ -56,7 +56,9 @@ interface FormValues {
 	stats: InternshipStat[];
 	benefits: InternshipBenefit[];
 	filters: CategoryFormValue[];
-	opportunities: (InternshipOpportunity & { domainsArray: DomainFormValue[] })[];
+	opportunities: (InternshipOpportunity & {
+		domainsArray: DomainFormValue[];
+	})[];
 	process: ProcessStep[];
 	contact: {
 		title: string;
@@ -185,22 +187,25 @@ export default function InternshipsForm({
 
 	// Watch for changes and update preview
 	useEffect(() => {
-		const subscription = form.watch((values) => {
+		const subscription = form.watch(values => {
 			const updatedData: InternshipsData = {
 				hero: values.hero as any,
 				stats: values.stats as any,
 				benefits: values.benefits as any,
 				filters: values.filters?.map(f => f?.name || '').filter(Boolean) || [],
-				opportunities: values.opportunities?.map(opp => ({
-					company: opp?.company || '',
-					title: opp?.title || '',
-					type: opp?.type || '',
-					location: opp?.location || '',
-					description: opp?.description || '',
-					logo: opp?.logo || '',
-					category: opp?.category || '',
-					domains: (opp?.domainsArray || []).map(d => d?.name || '').filter(Boolean)
-				})) || [],
+				opportunities:
+					values.opportunities?.map(opp => ({
+						company: opp?.company || '',
+						title: opp?.title || '',
+						type: opp?.type || '',
+						location: opp?.location || '',
+						description: opp?.description || '',
+						logo: opp?.logo || '',
+						category: opp?.category || '',
+						domains: (opp?.domainsArray || [])
+							.map(d => d?.name || '')
+							.filter(Boolean)
+					})) || [],
 				process: values.process as any,
 				contact: values.contact as any
 			};
@@ -228,13 +233,15 @@ export default function InternshipsForm({
 						description: opp?.description || '',
 						logo: opp?.logo || '',
 						category: opp?.category || '',
-						domains: (opp?.domainsArray || []).map(d => d?.name || '').filter(Boolean)
+						domains: (opp?.domainsArray || [])
+							.map(d => d?.name || '')
+							.filter(Boolean)
 					})),
 					process: values.process as any,
 					contact: values.contact as any
 				};
 
-				const result = await updateInternshipsData(dataToSubmit, admin.id);
+				const result = await updateInternshipsData(dataToSubmit);
 
 				if (result.success) {
 					setMessage('Saved');
@@ -251,14 +258,17 @@ export default function InternshipsForm({
 
 	return (
 		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm max-h-[70vh] overflow-y-auto overflow-x-hidden'>
+			<form
+				onSubmit={form.handleSubmit(onSubmit)}
+				className='space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm max-h-[70vh] overflow-y-auto overflow-x-hidden'>
 				<div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
 					<div>
 						<h3 className='text-lg font-semibold text-slate-900'>
 							Internships Management
 						</h3>
 						<p className='text-sm text-slate-500'>
-							Edit internship opportunities, stats, benefits, and contact information
+							Edit internship opportunities, stats, benefits, and contact
+							information
 						</p>
 					</div>
 					<div className='flex items-center gap-2'>
@@ -279,14 +289,16 @@ export default function InternshipsForm({
 						type='button'
 						onClick={() => toggleSection('hero')}
 						className='w-full flex items-center justify-between p-4 hover:bg-slate-50 transition-colors'>
-						<h3 className='text-lg font-semibold text-slate-900'>Hero Section</h3>
+						<h3 className='text-lg font-semibold text-slate-900'>
+							Hero Section
+						</h3>
 						{expandedSections.hero ? (
 							<ChevronUp className='w-5 h-5 text-slate-500' />
 						) : (
 							<ChevronDown className='w-5 h-5 text-slate-500' />
 						)}
 					</button>
-					
+
 					{expandedSections.hero && (
 						<div className='p-4 space-y-4 border-t'>
 							<FormField
@@ -355,7 +367,9 @@ export default function InternshipsForm({
 												{GRADIENT_OPTIONS.map(gradient => (
 													<SelectItem key={gradient} value={gradient}>
 														<div className='flex items-center gap-2'>
-															<div className={`w-16 h-4 rounded bg-gradient-to-r ${gradient}`} />
+															<div
+																className={`w-16 h-4 rounded bg-gradient-to-r ${gradient}`}
+															/>
 															<span className='text-xs'>{gradient}</span>
 														</div>
 													</SelectItem>
@@ -376,7 +390,10 @@ export default function InternshipsForm({
 						onClick={() => toggleSection('stats')}
 						className='w-full flex items-center justify-between p-4 hover:bg-slate-50 transition-colors'>
 						<h3 className='text-lg font-semibold text-slate-900'>
-							Stats Section <span className='text-sm text-slate-500'>({statsFields.fields.length} stats)</span>
+							Stats Section{' '}
+							<span className='text-sm text-slate-500'>
+								({statsFields.fields.length} stats)
+							</span>
 						</h3>
 						{expandedSections.stats ? (
 							<ChevronUp className='w-5 h-5 text-slate-500' />
@@ -384,30 +401,39 @@ export default function InternshipsForm({
 							<ChevronDown className='w-5 h-5 text-slate-500' />
 						)}
 					</button>
-					
+
 					{expandedSections.stats && (
 						<div className='p-4 space-y-4 border-t'>
 							<Button
 								type='button'
 								variant='outline'
 								size='sm'
-								onClick={() => statsFields.append({ icon: 'TrendingUp', value: '0', label: 'New Stat', color: 'from-blue-500 to-blue-700' })}
-								className='w-full'
-							>
+								onClick={() =>
+									statsFields.append({
+										icon: 'TrendingUp',
+										value: '0',
+										label: 'New Stat',
+										color: 'from-blue-500 to-blue-700'
+									})
+								}
+								className='w-full'>
 								<Plus className='w-4 h-4 mr-2' />
 								Add Stat
 							</Button>
 
 							{statsFields.fields.map((field, index) => (
-								<div key={field.id} className='p-4 border rounded-lg space-y-4 bg-slate-50'>
+								<div
+									key={field.id}
+									className='p-4 border rounded-lg space-y-4 bg-slate-50'>
 									<div className='flex items-center justify-between'>
-										<span className='font-semibold text-sm'>Stat {index + 1}</span>
+										<span className='font-semibold text-sm'>
+											Stat {index + 1}
+										</span>
 										<Button
 											type='button'
 											variant='ghost'
 											size='sm'
-											onClick={() => statsFields.remove(index)}
-										>
+											onClick={() => statsFields.remove(index)}>
 											<Trash2 className='w-4 h-4 text-red-500' />
 										</Button>
 									</div>
@@ -418,7 +444,9 @@ export default function InternshipsForm({
 										render={({ field }) => (
 											<FormItem>
 												<FormLabel>Icon</FormLabel>
-												<Select onValueChange={field.onChange} value={field.value}>
+												<Select
+													onValueChange={field.onChange}
+													value={field.value}>
 													<FormControl>
 														<SelectTrigger>
 															<SelectValue />
@@ -468,7 +496,9 @@ export default function InternshipsForm({
 										render={({ field }) => (
 											<FormItem>
 												<FormLabel>Color</FormLabel>
-												<Select onValueChange={field.onChange} value={field.value}>
+												<Select
+													onValueChange={field.onChange}
+													value={field.value}>
 													<FormControl>
 														<SelectTrigger>
 															<SelectValue />
@@ -478,7 +508,9 @@ export default function InternshipsForm({
 														{COLOR_OPTIONS.map(color => (
 															<SelectItem key={color} value={color}>
 																<div className='flex items-center gap-2'>
-																	<div className={`w-16 h-4 rounded bg-gradient-to-r ${color}`} />
+																	<div
+																		className={`w-16 h-4 rounded bg-gradient-to-r ${color}`}
+																	/>
 																	<span className='text-xs'>{color}</span>
 																</div>
 															</SelectItem>
@@ -501,7 +533,10 @@ export default function InternshipsForm({
 						onClick={() => toggleSection('benefits')}
 						className='w-full flex items-center justify-between p-4 hover:bg-slate-50 transition-colors'>
 						<h3 className='text-lg font-semibold text-slate-900'>
-							Benefits Section <span className='text-sm text-slate-500'>({benefitsFields.fields.length} benefits)</span>
+							Benefits Section{' '}
+							<span className='text-sm text-slate-500'>
+								({benefitsFields.fields.length} benefits)
+							</span>
 						</h3>
 						{expandedSections.benefits ? (
 							<ChevronUp className='w-5 h-5 text-slate-500' />
@@ -509,30 +544,39 @@ export default function InternshipsForm({
 							<ChevronDown className='w-5 h-5 text-slate-500' />
 						)}
 					</button>
-					
+
 					{expandedSections.benefits && (
 						<div className='p-4 space-y-4 border-t'>
 							<Button
 								type='button'
 								variant='outline'
 								size='sm'
-								onClick={() => benefitsFields.append({ icon: 'Award', title: 'New Benefit', description: 'Description', color: 'blue' })}
-								className='w-full'
-							>
+								onClick={() =>
+									benefitsFields.append({
+										icon: 'Award',
+										title: 'New Benefit',
+										description: 'Description',
+										color: 'blue'
+									})
+								}
+								className='w-full'>
 								<Plus className='w-4 h-4 mr-2' />
 								Add Benefit
 							</Button>
 
 							{benefitsFields.fields.map((field, index) => (
-								<div key={field.id} className='p-4 border rounded-lg space-y-4 bg-slate-50'>
+								<div
+									key={field.id}
+									className='p-4 border rounded-lg space-y-4 bg-slate-50'>
 									<div className='flex items-center justify-between'>
-										<span className='font-semibold text-sm'>Benefit {index + 1}</span>
+										<span className='font-semibold text-sm'>
+											Benefit {index + 1}
+										</span>
 										<Button
 											type='button'
 											variant='ghost'
 											size='sm'
-											onClick={() => benefitsFields.remove(index)}
-										>
+											onClick={() => benefitsFields.remove(index)}>
 											<Trash2 className='w-4 h-4 text-red-500' />
 										</Button>
 									</div>
@@ -543,7 +587,9 @@ export default function InternshipsForm({
 										render={({ field }) => (
 											<FormItem>
 												<FormLabel>Icon</FormLabel>
-												<Select onValueChange={field.onChange} value={field.value}>
+												<Select
+													onValueChange={field.onChange}
+													value={field.value}>
 													<FormControl>
 														<SelectTrigger>
 															<SelectValue />
@@ -593,7 +639,9 @@ export default function InternshipsForm({
 										render={({ field }) => (
 											<FormItem>
 												<FormLabel>Color</FormLabel>
-												<Select onValueChange={field.onChange} value={field.value}>
+												<Select
+													onValueChange={field.onChange}
+													value={field.value}>
 													<FormControl>
 														<SelectTrigger>
 															<SelectValue />
@@ -623,7 +671,10 @@ export default function InternshipsForm({
 						onClick={() => toggleSection('filters')}
 						className='w-full flex items-center justify-between p-4 hover:bg-slate-50 transition-colors'>
 						<h3 className='text-lg font-semibold text-slate-900'>
-							Filters <span className='text-sm text-slate-500'>({filtersFields.fields.length} filters)</span>
+							Filters{' '}
+							<span className='text-sm text-slate-500'>
+								({filtersFields.fields.length} filters)
+							</span>
 						</h3>
 						{expandedSections.filters ? (
 							<ChevronUp className='w-5 h-5 text-slate-500' />
@@ -631,7 +682,7 @@ export default function InternshipsForm({
 							<ChevronDown className='w-5 h-5 text-slate-500' />
 						)}
 					</button>
-					
+
 					{expandedSections.filters && (
 						<div className='p-4 space-y-4 border-t'>
 							<Button
@@ -639,8 +690,7 @@ export default function InternshipsForm({
 								variant='outline'
 								size='sm'
 								onClick={() => filtersFields.append({ name: 'New Filter' })}
-								className='w-full'
-							>
+								className='w-full'>
 								<Plus className='w-4 h-4 mr-2' />
 								Add Filter
 							</Button>
@@ -663,8 +713,7 @@ export default function InternshipsForm({
 											type='button'
 											variant='ghost'
 											size='sm'
-											onClick={() => filtersFields.remove(index)}
-										>
+											onClick={() => filtersFields.remove(index)}>
 											<Trash2 className='w-4 h-4 text-red-500' />
 										</Button>
 									</div>
@@ -681,7 +730,10 @@ export default function InternshipsForm({
 						onClick={() => toggleSection('opportunities')}
 						className='w-full flex items-center justify-between p-4 hover:bg-slate-50 transition-colors'>
 						<h3 className='text-lg font-semibold text-slate-900'>
-							Internship Opportunities <span className='text-sm text-slate-500'>({opportunitiesFields.fields.length} opportunities)</span>
+							Internship Opportunities{' '}
+							<span className='text-sm text-slate-500'>
+								({opportunitiesFields.fields.length} opportunities)
+							</span>
 						</h3>
 						{expandedSections.opportunities ? (
 							<ChevronUp className='w-5 h-5 text-slate-500' />
@@ -689,40 +741,44 @@ export default function InternshipsForm({
 							<ChevronDown className='w-5 h-5 text-slate-500' />
 						)}
 					</button>
-					
+
 					{expandedSections.opportunities && (
 						<div className='p-4 space-y-4 border-t'>
 							<Button
 								type='button'
 								variant='outline'
 								size='sm'
-								onClick={() => opportunitiesFields.append({
-									company: 'New Company',
-									title: 'Internship Title',
-									type: 'Summer Internship',
-									location: 'Location',
-									description: 'Description',
-									logo: '/internships/logo.png',
-									category: 'Technology',
-									domains: [],
-									domainsArray: []
-								})}
-								className='w-full'
-							>
+								onClick={() =>
+									opportunitiesFields.append({
+										company: 'New Company',
+										title: 'Internship Title',
+										type: 'Summer Internship',
+										location: 'Location',
+										description: 'Description',
+										logo: '/internships/logo.png',
+										category: 'Technology',
+										domains: [],
+										domainsArray: []
+									})
+								}
+								className='w-full'>
 								<Plus className='w-4 h-4 mr-2' />
 								Add Opportunity
 							</Button>
 
 							{opportunitiesFields.fields.map((field, index) => (
-								<div key={field.id} className='p-4 border rounded-lg space-y-4 bg-slate-50'>
+								<div
+									key={field.id}
+									className='p-4 border rounded-lg space-y-4 bg-slate-50'>
 									<div className='flex items-center justify-between'>
-										<span className='font-semibold text-sm'>Opportunity {index + 1}</span>
+										<span className='font-semibold text-sm'>
+											Opportunity {index + 1}
+										</span>
 										<Button
 											type='button'
 											variant='ghost'
 											size='sm'
-											onClick={() => opportunitiesFields.remove(index)}
-										>
+											onClick={() => opportunitiesFields.remove(index)}>
 											<Trash2 className='w-4 h-4 text-red-500' />
 										</Button>
 									</div>
@@ -760,7 +816,9 @@ export default function InternshipsForm({
 											render={({ field }) => (
 												<FormItem>
 													<FormLabel>Type</FormLabel>
-													<Select onValueChange={field.onChange} value={field.value}>
+													<Select
+														onValueChange={field.onChange}
+														value={field.value}>
 														<FormControl>
 															<SelectTrigger>
 																<SelectValue />
@@ -784,7 +842,9 @@ export default function InternshipsForm({
 											render={({ field }) => (
 												<FormItem>
 													<FormLabel>Category</FormLabel>
-													<Select onValueChange={field.onChange} value={field.value}>
+													<Select
+														onValueChange={field.onChange}
+														value={field.value}>
 														<FormControl>
 															<SelectTrigger>
 																<SelectValue />
@@ -851,17 +911,26 @@ export default function InternshipsForm({
 												variant='outline'
 												size='sm'
 												onClick={() => {
-													const currentDomains = form.getValues(`opportunities.${index}.domainsArray`) || [];
-													form.setValue(`opportunities.${index}.domainsArray`, [...currentDomains, { name: 'New Domain' }]);
-												}}
-											>
+													const currentDomains =
+														form.getValues(
+															`opportunities.${index}.domainsArray`
+														) || [];
+													form.setValue(`opportunities.${index}.domainsArray`, [
+														...currentDomains,
+														{ name: 'New Domain' }
+													]);
+												}}>
 												<Plus className='w-3 h-3 mr-1' />
 												Add Domain
 											</Button>
 										</div>
 										<div className='grid grid-cols-2 gap-2'>
-											{(form.watch(`opportunities.${index}.domainsArray`) || []).map((domain, domainIndex) => (
-												<div key={domainIndex} className='flex items-center gap-2'>
+											{(
+												form.watch(`opportunities.${index}.domainsArray`) || []
+											).map((domain, domainIndex) => (
+												<div
+													key={domainIndex}
+													className='flex items-center gap-2'>
 													<FormField
 														control={form.control}
 														name={`opportunities.${index}.domainsArray.${domainIndex}.name`}
@@ -878,13 +947,16 @@ export default function InternshipsForm({
 														variant='ghost'
 														size='sm'
 														onClick={() => {
-															const currentDomains = form.getValues(`opportunities.${index}.domainsArray`);
+															const currentDomains = form.getValues(
+																`opportunities.${index}.domainsArray`
+															);
 															form.setValue(
 																`opportunities.${index}.domainsArray`,
-																currentDomains.filter((_, idx) => idx !== domainIndex)
+																currentDomains.filter(
+																	(_, idx) => idx !== domainIndex
+																)
 															);
-														}}
-													>
+														}}>
 														<Trash2 className='w-3 h-3 text-red-500' />
 													</Button>
 												</div>
@@ -904,7 +976,10 @@ export default function InternshipsForm({
 						onClick={() => toggleSection('process')}
 						className='w-full flex items-center justify-between p-4 hover:bg-slate-50 transition-colors'>
 						<h3 className='text-lg font-semibold text-slate-900'>
-							Process Steps <span className='text-sm text-slate-500'>({processFields.fields.length} steps)</span>
+							Process Steps{' '}
+							<span className='text-sm text-slate-500'>
+								({processFields.fields.length} steps)
+							</span>
 						</h3>
 						{expandedSections.process ? (
 							<ChevronUp className='w-5 h-5 text-slate-500' />
@@ -912,30 +987,38 @@ export default function InternshipsForm({
 							<ChevronDown className='w-5 h-5 text-slate-500' />
 						)}
 					</button>
-					
+
 					{expandedSections.process && (
 						<div className='p-4 space-y-4 border-t'>
 							<Button
 								type='button'
 								variant='outline'
 								size='sm'
-								onClick={() => processFields.append({ title: 'New Step', description: 'Description', icon: 'Users' })}
-								className='w-full'
-							>
+								onClick={() =>
+									processFields.append({
+										title: 'New Step',
+										description: 'Description',
+										icon: 'Users'
+									})
+								}
+								className='w-full'>
 								<Plus className='w-4 h-4 mr-2' />
 								Add Step
 							</Button>
 
 							{processFields.fields.map((field, index) => (
-								<div key={field.id} className='p-4 border rounded-lg space-y-4 bg-slate-50'>
+								<div
+									key={field.id}
+									className='p-4 border rounded-lg space-y-4 bg-slate-50'>
 									<div className='flex items-center justify-between'>
-										<span className='font-semibold text-sm'>Step {index + 1}</span>
+										<span className='font-semibold text-sm'>
+											Step {index + 1}
+										</span>
 										<Button
 											type='button'
 											variant='ghost'
 											size='sm'
-											onClick={() => processFields.remove(index)}
-										>
+											onClick={() => processFields.remove(index)}>
 											<Trash2 className='w-4 h-4 text-red-500' />
 										</Button>
 									</div>
@@ -946,7 +1029,9 @@ export default function InternshipsForm({
 										render={({ field }) => (
 											<FormItem>
 												<FormLabel>Icon</FormLabel>
-												<Select onValueChange={field.onChange} value={field.value}>
+												<Select
+													onValueChange={field.onChange}
+													value={field.value}>
 													<FormControl>
 														<SelectTrigger>
 															<SelectValue />
@@ -1001,14 +1086,16 @@ export default function InternshipsForm({
 						type='button'
 						onClick={() => toggleSection('contact')}
 						className='w-full flex items-center justify-between p-4 hover:bg-slate-50 transition-colors'>
-						<h3 className='text-lg font-semibold text-slate-900'>Contact Section</h3>
+						<h3 className='text-lg font-semibold text-slate-900'>
+							Contact Section
+						</h3>
 						{expandedSections.contact ? (
 							<ChevronUp className='w-5 h-5 text-slate-500' />
 						) : (
 							<ChevronDown className='w-5 h-5 text-slate-500' />
 						)}
 					</button>
-					
+
 					{expandedSections.contact && (
 						<div className='p-4 space-y-4 border-t'>
 							<FormField
@@ -1081,7 +1168,9 @@ export default function InternshipsForm({
 												{GRADIENT_OPTIONS.map(gradient => (
 													<SelectItem key={gradient} value={gradient}>
 														<div className='flex items-center gap-2'>
-															<div className={`w-16 h-4 rounded bg-gradient-to-r ${gradient}`} />
+															<div
+																className={`w-16 h-4 rounded bg-gradient-to-r ${gradient}`}
+															/>
 															<span className='text-xs'>{gradient}</span>
 														</div>
 													</SelectItem>
@@ -1100,23 +1189,31 @@ export default function InternshipsForm({
 										type='button'
 										variant='outline'
 										size='sm'
-										onClick={() => contactButtonsFields.append({ text: 'New Button', icon: 'BookOpen', variant: 'primary' })}
-									>
+										onClick={() =>
+											contactButtonsFields.append({
+												text: 'New Button',
+												icon: 'BookOpen',
+												variant: 'primary'
+											})
+										}>
 										<Plus className='w-3 h-3 mr-1' />
 										Add Button
 									</Button>
 								</div>
 
 								{contactButtonsFields.fields.map((field, index) => (
-									<div key={field.id} className='p-3 border rounded-lg space-y-3 bg-white mb-3'>
+									<div
+										key={field.id}
+										className='p-3 border rounded-lg space-y-3 bg-white mb-3'>
 										<div className='flex items-center justify-between'>
-											<span className='text-sm font-semibold'>Button {index + 1}</span>
+											<span className='text-sm font-semibold'>
+												Button {index + 1}
+											</span>
 											<Button
 												type='button'
 												variant='ghost'
 												size='sm'
-												onClick={() => contactButtonsFields.remove(index)}
-											>
+												onClick={() => contactButtonsFields.remove(index)}>
 												<Trash2 className='w-3 h-3 text-red-500' />
 											</Button>
 										</div>
@@ -1140,7 +1237,9 @@ export default function InternshipsForm({
 											render={({ field }) => (
 												<FormItem>
 													<FormLabel>Icon</FormLabel>
-													<Select onValueChange={field.onChange} value={field.value}>
+													<Select
+														onValueChange={field.onChange}
+														value={field.value}>
 														<FormControl>
 															<SelectTrigger>
 																<SelectValue />
@@ -1164,7 +1263,9 @@ export default function InternshipsForm({
 											render={({ field }) => (
 												<FormItem>
 													<FormLabel>Variant</FormLabel>
-													<Select onValueChange={field.onChange} value={field.value}>
+													<Select
+														onValueChange={field.onChange}
+														value={field.value}>
 														<FormControl>
 															<SelectTrigger>
 																<SelectValue />
@@ -1172,7 +1273,9 @@ export default function InternshipsForm({
 														</FormControl>
 														<SelectContent>
 															<SelectItem value='primary'>Primary</SelectItem>
-															<SelectItem value='secondary'>Secondary</SelectItem>
+															<SelectItem value='secondary'>
+																Secondary
+															</SelectItem>
 														</SelectContent>
 													</Select>
 												</FormItem>

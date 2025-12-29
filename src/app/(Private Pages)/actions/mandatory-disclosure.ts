@@ -2,7 +2,10 @@
 
 import { revalidatePath, unstable_cache } from 'next/cache';
 import { prisma } from '@/lib/prisma';
-import { disclosureDataSchema, DisclosureData } from '@/lib/schemas/mandatory-disclosure';
+import {
+	disclosureDataSchema,
+	DisclosureData
+} from '@/lib/schemas/mandatory-disclosure';
 
 // --- Actions ---
 
@@ -25,7 +28,25 @@ export async function getMandatoryDisclosure(
 
 				if (!component) return getDefaultDisclosureData();
 
-				return component.data as unknown as DisclosureData;
+				// Parse data to apply defaults (specifically for hero which might be missing in old data)
+				const parsed = disclosureDataSchema.safeParse(component.data);
+
+				if (parsed.success) {
+					return parsed.data;
+				}
+
+				// If validation fails (e.g. old data structure), try to salvage items or return default with items
+				console.warn(
+					'Mandatory disclosure data schema mismatch, falling back to partial data or defaults'
+				);
+				const rawData = component.data as any;
+
+				return {
+					hero: getDefaultDisclosureData().hero,
+					items: Array.isArray(rawData?.items)
+						? rawData.items
+						: getDefaultDisclosureData().items
+				};
 			} catch (error) {
 				console.error('Error fetching mandatory disclosure data:', error);
 				return getDefaultDisclosureData();
@@ -79,6 +100,11 @@ export async function updateMandatoryDisclosure(
 
 function getDefaultDisclosureData(): DisclosureData {
 	return {
+		hero: {
+			title: 'Mandatory Disclosure',
+			description:
+				'Important documents and disclosures in compliance with regulatory bodies.'
+		},
 		items: [
 			{
 				id: '1',
