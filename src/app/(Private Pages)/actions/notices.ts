@@ -5,7 +5,7 @@ import { z } from 'zod';
 import prisma from '@/lib/prisma';
 import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
 import { createAuditLog } from '@/lib/audit';
-import type { Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { revalidateTag, unstable_cache } from 'next/cache';
 
 const categoryValues = [
@@ -27,7 +27,7 @@ const noticeItemSchema = z.object({
 	subtitle: z.string().default(''),
 	date: z.string().min(1),
 	time: z.string().default(''),
-	image: z.string().min(1),
+	image: z.string().default(''),
 	priority: z.enum(priorityValues).default('medium'),
 	tags: z.array(z.string()).default([]),
 	description: z.string().default(''),
@@ -142,6 +142,63 @@ const normalizeSection = (
 	announcements: section.announcements.map(toNotice)
 });
 
+const getNextOrder = async (pageId: string): Promise<number> => {
+	const components = await prisma.component.findMany({
+		where: { pageId },
+		select: { order: true }
+	});
+	if (components.length === 0) {
+		return 0;
+	}
+	return (
+		components.reduce(
+			(max, component) => (component.order > max ? component.order : max),
+			components[0].order
+		) + 1
+	);
+};
+
+const getOrCreateComponent = async (
+	pageId: string,
+	key: string,
+	fallbackData: object
+) => {
+	let component = await prisma.component.findFirst({
+		where: { pageId, key }
+	});
+	if (!component) {
+		let attempt = 0;
+		while (!component && attempt < 3) {
+			const order = await getNextOrder(pageId);
+			try {
+				component = await prisma.component.create({
+					data: { pageId, key, order, data: fallbackData }
+				});
+			} catch (error) {
+				if (
+					error instanceof Prisma.PrismaClientKnownRequestError &&
+					error.code === 'P2002'
+				) {
+					attempt += 1;
+					continue;
+				}
+				throw error;
+			}
+		}
+		if (!component) {
+			component = await prisma.component.findFirst({
+				where: { pageId, key }
+			});
+		}
+	}
+	if (!component) {
+		throw new Error(
+			`Unable to initialize component with key ${key} for page ${pageId}`
+		);
+	}
+	return component;
+};
+
 async function getNoticesSectionUncached(
 	pageSlug: string
 ): Promise<NoticesSectionData> {
@@ -150,16 +207,16 @@ async function getNoticesSectionUncached(
 		return normalizeSection(defaultNoticesSection);
 	}
 
-	const component = await prisma.component.findFirst({
-		where: { pageId: page.id, key: 'NOTICES_SECTION' }
-	});
-	if (!component) {
-		return normalizeSection(defaultNoticesSection);
-	}
+	const defaultData = normalizeSection(defaultNoticesSection);
+	const component = await getOrCreateComponent(
+		page.id,
+		'NOTICES_SECTION',
+		defaultData
+	);
 
 	const parsed = noticesSectionSchema.safeParse(component.data);
 	if (!parsed.success) {
-		return normalizeSection(defaultNoticesSection);
+		return defaultData;
 	}
 
 	return normalizeSection(parsed.data);
@@ -193,12 +250,11 @@ export async function updateNoticesSection(
 		return { ok: false, error: 'page_not_found' };
 	}
 
-	const component = await prisma.component.findFirst({
-		where: { pageId: page.id, key: 'NOTICES_SECTION' }
-	});
-	if (!component) {
-		return { ok: false, error: 'component_not_found' };
-	}
+	const component = await getOrCreateComponent(
+		page.id,
+		'NOTICES_SECTION',
+		parsed.data
+	);
 
 	const previousData = component.data;
 

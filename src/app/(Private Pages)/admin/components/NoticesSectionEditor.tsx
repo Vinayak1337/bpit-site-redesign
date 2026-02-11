@@ -1,10 +1,9 @@
 'use client';
 import { useCallback, useMemo, useState } from 'react';
 import Editable from '@/components/ui/Editable';
-import NoticesSection from '@/components/carousel/notices-section';
-import NoticesSectionForm, {
-	toFormValuesFromSection
-} from '@/app/(Private Pages)/admin/components/NoticesSectionForm';
+import { AnnouncementsColumn } from '@/components/home/notices-events/announcements-column';
+import { NoticesColumn } from '@/components/home/notices-events/notices-column';
+import NoticesSectionForm from '@/app/(Private Pages)/admin/components/NoticesSectionForm';
 import { toNoticesSectionComponentData } from '@/lib/carousel-adapters';
 
 type NoticesSectionEditorProps = {
@@ -34,31 +33,53 @@ export default function NoticesSectionEditor({
 		() => normalizeSectionData(initialData),
 		[initialData]
 	);
-	const initialFormValues = useMemo(
-		() => toFormValuesFromSection(normalized),
-		[normalized]
-	);
-	const [previewData, setPreviewData] =
-		useState<NoticesSectionData>(normalized);
+	const [previewData, setPreviewData] = useState<NoticesSectionData>(normalized);
+	const [formVersion, setFormVersion] = useState(0);
 
-	const handlePreviewChange = useCallback((section: NoticesSectionData) => {
+	const handleSectionSaved = useCallback((section: NoticesSectionData) => {
 		const normalizedSection = normalizeSectionData(section);
 		setPreviewData(prev =>
 			sectionsEqual(prev, normalizedSection) ? prev : normalizedSection
 		);
+		setFormVersion(previous => previous + 1);
 	}, []);
 
+	const previewSection = useMemo(
+		() => toNoticesSectionComponentData(previewData),
+		[previewData]
+	);
+
 	return (
-		<Editable
-			label='Notices & Announcements'
-			formContent={
-				<NoticesSectionForm
-					initialValues={initialFormValues}
-					pageSlug={pageSlug}
-					onChange={handlePreviewChange}
-				/>
-			}>
-			<NoticesSection data={toNoticesSectionComponentData(previewData)} />
-		</Editable>
+		<div className='space-y-5'>
+			<Editable
+				label='Notices'
+				formContent={
+					<NoticesSectionForm
+						key={`notices-form-${formVersion}`}
+						mode='notices'
+						initialItems={previewData.notices}
+						otherItems={previewData.announcements}
+						pageSlug={pageSlug}
+						onSaved={handleSectionSaved}
+					/>
+				}>
+				<NoticesColumn items={previewSection.notices} />
+			</Editable>
+
+			<Editable
+				label='Announcements'
+				formContent={
+					<NoticesSectionForm
+						key={`announcements-form-${formVersion}`}
+						mode='announcements'
+						initialItems={previewData.announcements}
+						otherItems={previewData.notices}
+						pageSlug={pageSlug}
+						onSaved={handleSectionSaved}
+					/>
+				}>
+				<AnnouncementsColumn items={previewSection.announcements} />
+			</Editable>
+		</div>
 	);
 }

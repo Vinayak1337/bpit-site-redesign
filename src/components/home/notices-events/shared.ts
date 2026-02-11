@@ -2,12 +2,12 @@ import { useEffect, useState, type MutableRefObject } from 'react';
 import type { Easing } from 'framer-motion';
 import type { PhaseAwaiter } from './types';
 
-export const NOTICE_WAIT_MS = 800;
-export const NOTICE_SLIDE_MS = 440;
+export const NOTICE_WAIT_MS = 1500;
+export const NOTICE_SLIDE_MS = 360;
 export const NOTICE_RESET_MS = 620;
 export const NOTICE_CARD_HEIGHT_PX = 168;
 export const NOTICE_CARD_GAP_PX = 12;
-export const NOTICE_STEP_EASE: Easing = [0.22, 1, 0.36, 1];
+export const NOTICE_STEP_EASE: Easing = 'linear';
 export const NOTICE_RESET_EASE: Easing = [0.16, 1, 0.3, 1];
 
 export const EVENT_PHASE_DELAY_MS = 200;

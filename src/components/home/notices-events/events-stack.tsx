@@ -42,6 +42,8 @@ const rotateQueueToKey = (
 };
 
 const EVENT_VISIBLE_ROW_COUNT = 3;
+const EVENT_EXTRA_PEEK_ROWS = 1.5;
+const EVENT_STACK_VIEWPORT_FALLBACK_PX = 720;
 
 type EventStackRowProps = {
 	event: EventQueueItem;
@@ -167,7 +169,9 @@ export function RotatingEventsStack({ events }: RotatingEventsStackProps) {
 	const [resetOffsetY, setResetOffsetY] = useState(0);
 	const [slideOffsetY, setSlideOffsetY] = useState(0);
 	const [sequenceVersion, setSequenceVersion] = useState(0);
-	const [stackViewportHeight, setStackViewportHeight] = useState<number | null>(null);
+	const [stackViewportHeight, setStackViewportHeight] = useState<number>(
+		EVENT_STACK_VIEWPORT_FALLBACK_PX
+	);
 
 	const baseQueueRef = useRef<EventQueueItem[]>([]);
 	const queueRef = useRef<EventQueueItem[]>(queue);
@@ -179,6 +183,7 @@ export function RotatingEventsStack({ events }: RotatingEventsStackProps) {
 	const listRef = useRef<HTMLUListElement | null>(null);
 	const collapsedRowHeightRef = useRef(0);
 	const expandedRowHeightRef = useRef(0);
+	const hasLockedViewportRef = useRef(false);
 
 	const collapseTargetKeyRef = useRef<string | null>(null);
 	const expandTargetKeyRef = useRef<string | null>(null);
@@ -208,7 +213,8 @@ export function RotatingEventsStack({ events }: RotatingEventsStackProps) {
 		setQueue(normalized);
 		setActiveQueueKey(initialKey);
 		setSequenceVersion(previous => previous + 1);
-		setStackViewportHeight(null);
+		setStackViewportHeight(EVENT_STACK_VIEWPORT_FALLBACK_PX);
+		hasLockedViewportRef.current = false;
 	}, [events]);
 
 	useEffect(() => {
@@ -236,6 +242,10 @@ export function RotatingEventsStack({ events }: RotatingEventsStackProps) {
 	}, [isInteracting, isPageHidden]);
 
 	useLayoutEffect(() => {
+		if (hasLockedViewportRef.current || queue.length <= 1) {
+			return;
+		}
+
 		const listElement = listRef.current;
 		if (!listElement || queue.length === 0) {
 			return;
@@ -259,19 +269,24 @@ export function RotatingEventsStack({ events }: RotatingEventsStackProps) {
 		const expandedHeight = expandedRowHeightRef.current || rows[0].getBoundingClientRect().height;
 		const collapsedHeight = collapsedRowHeightRef.current || expandedHeight;
 		const visibleRows = Math.min(EVENT_VISIBLE_ROW_COUNT, rows.length);
+		const collapsedRowsInViewport = Math.max(
+			visibleRows - 1 + EVENT_EXTRA_PEEK_ROWS,
+			0
+		);
 		const nextHeight =
 			expandedHeight +
-			Math.max(visibleRows - 1, 0) * collapsedHeight +
-			Math.max(visibleRows - 1, 0) * EVENT_STACK_GAP_PX;
+			collapsedRowsInViewport * collapsedHeight +
+			collapsedRowsInViewport * EVENT_STACK_GAP_PX;
 
 		if (nextHeight <= 0) {
 			return;
 		}
 
-		setStackViewportHeight(previous =>
-			previous === null ? Math.ceil(nextHeight) : Math.max(previous, Math.ceil(nextHeight))
+		hasLockedViewportRef.current = true;
+		setStackViewportHeight(
+			Math.ceil(Math.max(nextHeight, EVENT_STACK_VIEWPORT_FALLBACK_PX))
 		);
-	}, [queue, activeQueueKey]);
+	}, [queue]);
 
 	useEffect(() => {
 		if (queue.length === 0) {
@@ -496,11 +511,7 @@ export function RotatingEventsStack({ events }: RotatingEventsStackProps) {
 						});
 					}}
 					className='space-y-3 overflow-hidden'
-					style={
-						queue.length > 1 && stackViewportHeight
-							? { height: `${stackViewportHeight}px` }
-							: undefined
-					}>
+					style={queue.length > 1 ? { height: `${stackViewportHeight}px` } : undefined}>
 					<motion.ul
 						ref={listRef}
 						animate={{ y: resetOffsetY + slideOffsetY }}

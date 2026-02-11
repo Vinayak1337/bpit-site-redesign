@@ -5,15 +5,19 @@ import { z } from 'zod';
 import prisma from '@/lib/prisma';
 import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
 import { createAuditLog } from '@/lib/audit';
-import type { Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { revalidateTag, unstable_cache } from 'next/cache';
+
+const EMPTY_EVENTS_SECTION: EventsSectionData = {
+	events: []
+};
 
 const eventSchema = z.object({
 	id: z.union([z.string(), z.number()]).optional(),
 	title: z.string().min(1),
 	subtitle: z.string().default(''),
 	description: z.string().default(''),
-	image: z.string().min(1),
+	image: z.string().default(''),
 	date: z.string().min(1),
 	time: z.string().default(''),
 	location: z.string().default(''),
@@ -99,24 +103,81 @@ const normalizeEvents = (
 	events: section?.events.map(toEvent) ?? []
 });
 
+const getNextOrder = async (pageId: string): Promise<number> => {
+	const components = await prisma.component.findMany({
+		where: { pageId },
+		select: { order: true }
+	});
+	if (components.length === 0) {
+		return 0;
+	}
+	return (
+		components.reduce(
+			(max, component) => (component.order > max ? component.order : max),
+			components[0].order
+		) + 1
+	);
+};
+
+const getOrCreateComponent = async (
+	pageId: string,
+	key: string,
+	fallbackData: object
+) => {
+	let component = await prisma.component.findFirst({
+		where: { pageId, key }
+	});
+	if (!component) {
+		let attempt = 0;
+		while (!component && attempt < 3) {
+			const order = await getNextOrder(pageId);
+			try {
+				component = await prisma.component.create({
+					data: { pageId, key, order, data: fallbackData }
+				});
+			} catch (error) {
+				if (
+					error instanceof Prisma.PrismaClientKnownRequestError &&
+					error.code === 'P2002'
+				) {
+					attempt += 1;
+					continue;
+				}
+				throw error;
+			}
+		}
+		if (!component) {
+			component = await prisma.component.findFirst({
+				where: { pageId, key }
+			});
+		}
+	}
+	if (!component) {
+		throw new Error(
+			`Unable to initialize component with key ${key} for page ${pageId}`
+		);
+	}
+	return component;
+};
+
 async function getEventsSectionUncached(
 	pageSlug: string
 ): Promise<EventsSectionData> {
 	const page = await prisma.page.findUnique({ where: { slug: pageSlug } });
 	if (!page) {
-		return normalizeEvents({ events: [] });
+		return normalizeEvents(EMPTY_EVENTS_SECTION);
 	}
 
-	const component = await prisma.component.findFirst({
-		where: { pageId: page.id, key: 'EVENTS_SECTION' }
-	});
-	if (!component) {
-		return normalizeEvents({ events: [] });
-	}
+	const defaultData = normalizeEvents(EMPTY_EVENTS_SECTION);
+	const component = await getOrCreateComponent(
+		page.id,
+		'EVENTS_SECTION',
+		defaultData
+	);
 
 	const parsed = eventsSectionSchema.safeParse(component.data);
 	if (!parsed.success) {
-		return normalizeEvents({ events: [] });
+		return defaultData;
 	}
 
 	return normalizeEvents(parsed.data);
@@ -145,12 +206,11 @@ export async function updateEventsSection(
 		return { ok: false, error: 'page_not_found' };
 	}
 
-	const component = await prisma.component.findFirst({
-		where: { pageId: page.id, key: 'EVENTS_SECTION' }
-	});
-	if (!component) {
-		return { ok: false, error: 'component_not_found' };
-	}
+	const component = await getOrCreateComponent(
+		page.id,
+		'EVENTS_SECTION',
+		parsed.data
+	);
 
 	const previousData = component.data;
 
@@ -182,5 +242,4 @@ export async function updateEventsSection(
 
 	return { ok: true };
 }
-
 
