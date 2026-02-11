@@ -241,7 +241,7 @@ export default function InternshipsForm({
 					contact: values.contact as any
 				};
 
-				const result = await updateInternshipsData(dataToSubmit);
+				const result = await updateInternshipsData(dataToSubmit, admin.id);
 
 				if (result.success) {
 					setMessage('Saved');
