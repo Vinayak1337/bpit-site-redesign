@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Trash2, Plus, Save, Loader2 } from 'lucide-react';
 import { updateInternalComplaints, type InternalComplaintsData } from '@/app/(Private Pages)/actions/statutory-committees';
-import { useTransition, useEffect } from 'react';
+import { useTransition, useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const schema = z.object({
@@ -67,16 +67,28 @@ type Props = {
 	initialData: InternalComplaintsData;
 	pageSlug: string;
 	onChange?: (data: InternalComplaintsData) => void;
+	visibleSections?: Array<
+		'hero' | 'definition' | 'members' | 'procedures' | 'support' | 'rights' | 'contacts'
+	>;
 };
 
-export default function InternalComplaintsForm({ initialData, pageSlug, onChange }: Props) {
+export default function InternalComplaintsForm({
+	initialData,
+	pageSlug,
+	onChange,
+	visibleSections
+}: Props) {
 	const [isPending, startTransition] = useTransition();
-	// @ts-ignore - omitting hero
-	const { hero, ...restData } = initialData;
+	const [statusMessage, setStatusMessage] = useState<{
+		type: 'success' | 'error';
+		text: string;
+	} | null>(null);
+	const restData = { ...initialData };
+	delete (restData as Partial<InternalComplaintsData>).hero;
 
-	const { register, control, handleSubmit, watch, formState: { errors } } = useForm<FormData>({
+	const { register, control, handleSubmit, watch } = useForm<FormData>({
 		resolver: zodResolver(schema),
-		defaultValues: restData
+		defaultValues: restData as FormData
 	});
 
 	const includesFields = useFieldArray({ control, name: 'definition.includes' as any });
@@ -94,14 +106,19 @@ export default function InternalComplaintsForm({ initialData, pageSlug, onChange
 		}
 	}, [watchedData, onChange, initialData]);
 
+	const showSection = (
+		section: 'hero' | 'definition' | 'members' | 'procedures' | 'support' | 'rights' | 'contacts'
+	) => !visibleSections || visibleSections.includes(section);
+
 	const onSubmit = (data: FormData) => {
+		setStatusMessage(null);
 		startTransition(async () => {
 			try {
 				await updateInternalComplaints({ ...initialData, ...data }, pageSlug);
-				alert('Saved successfully!');
+				setStatusMessage({ type: 'success', text: 'Saved successfully.' });
 			} catch (error) {
 				console.error(error);
-				alert('Failed to save.');
+				setStatusMessage({ type: 'error', text: 'Failed to save.' });
 			}
 		});
 	};
@@ -109,7 +126,14 @@ export default function InternalComplaintsForm({ initialData, pageSlug, onChange
 	return (
 		<form onSubmit={handleSubmit(onSubmit)} className='space-y-8 max-w-5xl mx-auto pb-24'>
 			
+			{showSection('hero') ? (
+				<div className='rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800'>
+					Hero content is edited from the internal complaints hero section.
+				</div>
+			) : null}
+
 			{/* Definition */}
+			{showSection('definition') && (
 			<Card>
 				<CardHeader>
 					<CardTitle>Definition & Scope</CardTitle>
@@ -136,8 +160,10 @@ export default function InternalComplaintsForm({ initialData, pageSlug, onChange
 					</div>
 				</CardContent>
 			</Card>
+			)}
 
 			{/* Committee Members */}
+			{showSection('members') && (
 			<div className='space-y-4'>
 				<div className='flex justify-between items-center'>
 					<h3 className='text-xl font-semibold'>Committee Members</h3>
@@ -166,8 +192,10 @@ export default function InternalComplaintsForm({ initialData, pageSlug, onChange
 					))}
 				</div>
 			</div>
+			)}
 
 			{/* Procedures */}
+			{showSection('procedures') && (
 			<div className='space-y-4'>
 				<div className='flex justify-between items-center'>
 					<h3 className='text-xl font-semibold'>Procedures</h3>
@@ -194,8 +222,10 @@ export default function InternalComplaintsForm({ initialData, pageSlug, onChange
 					))}
 				</div>
 			</div>
+			)}
 
 			{/* Support Services */}
+			{showSection('support') && (
 			<div className='space-y-4'>
 				<div className='flex justify-between items-center'>
 					<h3 className='text-xl font-semibold'>Support Services</h3>
@@ -219,8 +249,10 @@ export default function InternalComplaintsForm({ initialData, pageSlug, onChange
 					))}
 				</div>
 			</div>
+			)}
 
 			{/* Rights & Responsibilities */}
+			{showSection('rights') && (
 			<div className='grid md:grid-cols-2 gap-8'>
 				<Card>
 					<CardHeader>
@@ -264,8 +296,10 @@ export default function InternalComplaintsForm({ initialData, pageSlug, onChange
 					</CardContent>
 				</Card>
 			</div>
+			)}
 
 			{/* Contact Info */}
+			{showSection('contacts') && (
 			<div className='space-y-4'>
 				<div className='flex justify-between items-center'>
 					<h3 className='text-xl font-semibold'>Contact Info</h3>
@@ -290,8 +324,17 @@ export default function InternalComplaintsForm({ initialData, pageSlug, onChange
 					))}
 				</div>
 			</div>
+			)}
 
 			<div className="sticky bottom-4 bg-white p-4 border rounded-xl shadow-lg flex justify-end z-50">
+				{statusMessage ? (
+					<div
+						className={`mr-3 self-center text-sm font-medium ${
+							statusMessage.type === 'error' ? 'text-red-600' : 'text-emerald-600'
+						}`}>
+						{statusMessage.text}
+					</div>
+				) : null}
 				<Button type='submit' disabled={isPending} className='w-full md:w-auto min-w-[150px]'>
 					{isPending ? (
 						<>

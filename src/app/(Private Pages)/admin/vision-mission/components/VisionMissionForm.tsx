@@ -57,6 +57,7 @@ type Props = {
 	initialData: VisionMissionData;
 	pageSlug: string;
 	onChange?: (data: VisionMissionData) => void;
+	visibleSections?: Array<'hero' | 'visionStatement' | 'pillars' | 'aspirations'>;
 };
 
 const COLOR_OPTIONS: VisionMissionData['pillars'][number]['color'][] = [
@@ -133,7 +134,8 @@ const normalizeVisionMission = (values: Partial<FormValues>): VisionMissionData 
 export default function VisionMissionForm({
 	initialData,
 	pageSlug,
-	onChange
+	onChange,
+	visibleSections
 }: Props) {
 	const [isPending, startTransition] = useTransition();
 	const [message, setMessage] = useState<string | null>(null);
@@ -208,6 +210,9 @@ export default function VisionMissionForm({
 		const unique = new Set(SUPPORTED_ICON_NAMES);
 		return Array.from(unique);
 	}, []);
+	const showSection = (
+		section: 'hero' | 'visionStatement' | 'pillars' | 'aspirations'
+	) => !visibleSections || visibleSections.includes(section);
 
 	return (
 		<Form {...form}>
@@ -241,6 +246,7 @@ export default function VisionMissionForm({
 				</div>
 
 				{/* Hero Section */}
+				{showSection('hero') ? (
 				<Card>
 					<CardHeader>
 						<CardTitle>Hero Section</CardTitle>
@@ -304,8 +310,10 @@ export default function VisionMissionForm({
 						</div>
 					</CardContent>
 				</Card>
+				) : null}
 
 				{/* Vision Statement */}
+				{showSection('visionStatement') ? (
 				<Card>
 					<CardHeader>
 						<CardTitle>Vision Statement</CardTitle>
@@ -373,8 +381,10 @@ export default function VisionMissionForm({
 						</div>
 					</CardContent>
 				</Card>
+				) : null}
 
 				{/* Vision Pillars */}
+				{showSection('pillars') ? (
 				<div className='space-y-4'>
 					<div className='flex items-center justify-between'>
 						<h3 className='text-xl font-semibold'>Vision Pillars</h3>
@@ -497,8 +507,10 @@ export default function VisionMissionForm({
 						))}
 					</div>
 				</div>
+				) : null}
 
 				{/* Future Aspirations */}
+				{showSection('aspirations') ? (
 				<div className='space-y-4'>
 					<div className='flex items-center justify-between'>
 						<h3 className='text-xl font-semibold'>Future Aspirations</h3>
@@ -621,6 +633,7 @@ export default function VisionMissionForm({
 						))}
 					</div>
 				</div>
+				) : null}
 
 				<div className="sticky bottom-4 bg-white p-4 border rounded-xl shadow-lg flex justify-end z-50">
 					<Button type='submit' disabled={isPending} className='w-full md:w-auto min-w-[150px]'>

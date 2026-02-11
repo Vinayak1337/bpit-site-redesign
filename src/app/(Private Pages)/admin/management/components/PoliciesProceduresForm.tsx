@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useTransition, useEffect, useCallback } from 'react';
+import React, { useState, useTransition, useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -105,11 +105,20 @@ interface PoliciesProceduresFormProps {
 	initialData: PoliciesProceduresData;
 	pageSlug: string;
 	onChange?: (data: PoliciesProceduresData) => void;
+	visibleSections?: Array<'hero' | 'categories' | 'framework'>;
 }
 
-export default function PoliciesProceduresForm({ initialData, pageSlug, onChange }: PoliciesProceduresFormProps) {
+export default function PoliciesProceduresForm({
+	initialData,
+	pageSlug,
+	onChange,
+	visibleSections
+}: PoliciesProceduresFormProps) {
 	const [isPending, startTransition] = useTransition();
-	const [message, setMessage] = useState<string | null>(null);
+	const [message, setMessage] = useState<{
+		type: 'success' | 'error';
+		text: string;
+	} | null>(null);
 	
 	const form = useForm<FormValues>({
 		resolver: zodResolver(formSchema),
@@ -126,25 +135,30 @@ export default function PoliciesProceduresForm({ initialData, pageSlug, onChange
 		name: 'implementationFramework.steps'
 	});
 
-	const handleDataChange = useCallback((values: FormValues) => {
-		onChange?.(normalizePoliciesProcedures(values));
-	}, [onChange]);
-
 	const onSubmit = (values: FormValues) => {
 		setMessage(null);
 		const payload = normalizePoliciesProcedures(values);
 		
 		startTransition(async () => {
-			try {
-				await updatePoliciesProcedures(payload, pageSlug);
-				setMessage('Policies & procedures updated successfully!');
-				setTimeout(() => setMessage(null), 3000);
-			} catch (error) {
-				console.error('Error updating policies procedures data:', error);
-				setMessage('Save failed');
-			}
-		});
-	};
+				try {
+					await updatePoliciesProcedures(payload, pageSlug);
+					setMessage({
+						type: 'success',
+						text: 'Policies and procedures saved successfully.'
+					});
+					setTimeout(() => setMessage(null), 3000);
+				} catch (error) {
+					console.error('Error updating policies procedures data:', error);
+					setMessage({
+						type: 'error',
+						text: 'Failed to save policies and procedures.'
+					});
+				}
+			});
+		};
+
+	const showSection = (section: 'hero' | 'categories' | 'framework') =>
+		!visibleSections || visibleSections.includes(section);
 
 	useEffect(() => {
 		onChange?.(normalizePoliciesProcedures(form.getValues()));
@@ -163,12 +177,12 @@ export default function PoliciesProceduresForm({ initialData, pageSlug, onChange
 			{/* Header with Save Button */}
 			<div className="flex items-center justify-between border-b pb-4">
 				<h3 className="text-lg font-semibold text-gray-800">Edit Policies & Procedures</h3>
-				<div className="flex items-center gap-3">
-					{message && (
-						<Badge variant={message.includes('successfully') ? 'default' : 'destructive'}>
-							{message}
-						</Badge>
-					)}
+					<div className="flex items-center gap-3">
+						{message && (
+							<Badge variant={message.type === 'success' ? 'default' : 'destructive'}>
+								{message.text}
+							</Badge>
+						)}
 					<Button 
 						onClick={form.handleSubmit(onSubmit)}
 						disabled={isPending}
@@ -181,8 +195,9 @@ export default function PoliciesProceduresForm({ initialData, pageSlug, onChange
 
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
-					{/* Hero Section */}
-					<Card>
+						{/* Hero Section */}
+						{showSection('hero') && (
+						<Card>
 						<CardHeader>
 							<CardTitle>Hero Section</CardTitle>
 						</CardHeader>
@@ -320,10 +335,12 @@ export default function PoliciesProceduresForm({ initialData, pageSlug, onChange
 								/>
 							</div>
 						</CardContent>
-					</Card>
+						</Card>
+						)}
 
-					{/* Policy Categories */}
-					<Card>
+						{/* Policy Categories */}
+						{showSection('categories') && (
+						<Card>
 						<CardHeader>
 							<CardTitle className="flex items-center justify-between">
 								Policy Categories
@@ -356,10 +373,12 @@ export default function PoliciesProceduresForm({ initialData, pageSlug, onChange
 								/>
 							))}
 						</CardContent>
-					</Card>
+						</Card>
+						)}
 
-					{/* Implementation Framework */}
-					<Card>
+						{/* Implementation Framework */}
+						{showSection('framework') && (
+						<Card>
 						<CardHeader>
 							<CardTitle>Implementation Framework</CardTitle>
 						</CardHeader>
@@ -410,9 +429,10 @@ export default function PoliciesProceduresForm({ initialData, pageSlug, onChange
 								))}
 							</div>
 						</CardContent>
-					</Card>
-				</form>
-			</Form>
+						</Card>
+						)}
+					</form>
+				</Form>
 		</div>
 	);
 }

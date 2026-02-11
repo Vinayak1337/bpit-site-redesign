@@ -2,7 +2,11 @@
 
 import { useMemo, useState } from 'react';
 import Editable from '@/components/ui/Editable';
-import ManagementSection from '@/app/(Public Pages)/management/components/ManagementSection';
+import {
+	ManagementHeroBlock,
+	ManagementLeadersBlock,
+	ManagementVisionBlock
+} from '@/app/(Public Pages)/management/components/ManagementSection';
 import ManagementForm from './ManagementForm';
 import type { ManagementData } from '@/app/(Private Pages)/actions/management';
 
@@ -15,22 +19,46 @@ export default function ManagementEditor({ initialData, pageSlug }: Props) {
 	const initial = useMemo(() => initialData, [initialData]);
 	const [previewData, setPreviewData] = useState<ManagementData>(initial);
 
-	const formContent = useMemo(
-		() => (
-			<ManagementForm
-				initialData={initial}
-				pageSlug={pageSlug}
-				onChange={setPreviewData}
-			/>
-		),
-		[initial, pageSlug]
-	);
-
 	return (
-		<Editable
-			label='Management Team'
-			formContent={formContent}>
-			<ManagementSection data={previewData} />
-		</Editable>
+		<div className='space-y-8'>
+			<Editable
+				label='Management Hero'
+				formContent={
+					<ManagementForm
+						initialData={initial}
+						pageSlug={pageSlug}
+						onChange={setPreviewData}
+						visibleSections={['hero']}
+					/>
+				}>
+				<ManagementHeroBlock data={previewData} />
+			</Editable>
+
+			<Editable
+				label='Management Leaders'
+				formContent={
+					<ManagementForm
+						initialData={initial}
+						pageSlug={pageSlug}
+						onChange={setPreviewData}
+						visibleSections={['leaders']}
+					/>
+				}>
+				<ManagementLeadersBlock data={previewData} />
+			</Editable>
+
+			<Editable
+				label='Leadership Vision'
+				formContent={
+					<ManagementForm
+						initialData={initial}
+						pageSlug={pageSlug}
+						onChange={setPreviewData}
+						visibleSections={['vision']}
+					/>
+				}>
+				<ManagementVisionBlock data={previewData} />
+			</Editable>
+		</div>
 	);
 }

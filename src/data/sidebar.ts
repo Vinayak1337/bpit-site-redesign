@@ -413,10 +413,40 @@ export const adminStatutoryCommitteesSidebarData = {
 export const adminStudentLifeSidebarData = {
 	navItems: [
 		{
-			id: 'student-life-hero',
+			id: 'student-life-overview',
 			title: 'Student Life Overview',
 			icon: 'Smile',
-			href: '/admin/student-life'
+			href: '/admin/student-life/overview'
+		},
+		{
+			id: 'campus-facilities',
+			title: 'Campus Facilities',
+			icon: 'Home',
+			href: '/admin/student-life/facilities'
+		},
+		{
+			id: 'clubs-and-societies',
+			title: 'Clubs & Societies',
+			icon: 'Users',
+			href: '/admin/student-life/clubs'
+		},
+		{
+			id: 'events-and-festivals',
+			title: 'Events & Festivals',
+			icon: 'Music',
+			href: '/admin/student-life/events'
+		},
+		{
+			id: 'student-grievance-cell',
+			title: 'Student Grievance Cell',
+			icon: 'UserX',
+			href: '/admin/student-life/grievance'
+		},
+		{
+			id: 'code-of-conduct',
+			title: 'Code of Conduct',
+			icon: 'Scale',
+			href: '/admin/student-life/conduct'
 		}
 	],
 	theme: {

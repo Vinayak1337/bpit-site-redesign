@@ -3,34 +3,11 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ExternalLink } from 'lucide-react';
+import { resolvePublicPathFromAdminPath } from '@/data/admin-page-map';
 
 export default function AdminHeader() {
 	const pathname = usePathname();
-
-	const getTargetUrl = () => {
-		if (!pathname.startsWith('/admin')) return '/';
-
-		// Remove /admin prefix
-		const subPath = pathname.replace(/^\/admin/, '');
-
-		// If we are at root /admin or /admin/, return /
-		if (!subPath || subPath === '/') return '/';
-
-		// Special case: /admin/home -> /
-		if (subPath === '/home') return '/';
-
-		// Restricted paths that don't have public equivalents
-		const restrictedPrefixes = ['/pages', '/logs'];
-		
-		if (restrictedPrefixes.some(prefix => subPath.startsWith(prefix))) {
-			return '/';
-		}
-
-		// Otherwise, return the subPath (e.g. /about)
-		return subPath;
-	};
-
-	const targetUrl = getTargetUrl();
+	const targetUrl = resolvePublicPathFromAdminPath(pathname);
 
 	return (
 		<header className='h-16 bg-white/70 backdrop-blur-sm border-b border-slate-200 flex items-center justify-between px-4 md:px-6'>
@@ -66,4 +43,3 @@ export default function AdminHeader() {
 		</header>
 	);
 }
-

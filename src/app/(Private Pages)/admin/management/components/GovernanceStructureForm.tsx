@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useTransition, useEffect, useCallback } from 'react';
+import React, { useState, useTransition, useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -95,11 +95,20 @@ interface GovernanceStructureFormProps {
 	initialData: GovernanceStructureData;
 	pageSlug: string;
 	onChange?: (data: GovernanceStructureData) => void;
+	visibleSections?: Array<'hero' | 'sections'>;
 }
 
-export default function GovernanceStructureForm({ initialData, pageSlug, onChange }: GovernanceStructureFormProps) {
+export default function GovernanceStructureForm({
+	initialData,
+	pageSlug,
+	onChange,
+	visibleSections
+}: GovernanceStructureFormProps) {
 	const [isPending, startTransition] = useTransition();
-	const [message, setMessage] = useState<string | null>(null);
+	const [message, setMessage] = useState<{
+		type: 'success' | 'error';
+		text: string;
+	} | null>(null);
 	
 	const form = useForm<FormValues>({
 		resolver: zodResolver(formSchema),
@@ -111,25 +120,27 @@ export default function GovernanceStructureForm({ initialData, pageSlug, onChang
 		name: 'sections'
 	});
 
-	const handleDataChange = useCallback((values: FormValues) => {
-		onChange?.(normalizeGovernanceStructure(values));
-	}, [onChange]);
-
 	const onSubmit = (values: FormValues) => {
 		setMessage(null);
 		const payload = normalizeGovernanceStructure(values);
 		
 		startTransition(async () => {
-			try {
-				await updateGovernanceStructure(payload, pageSlug);
-				setMessage('Governance structure updated successfully!');
-				setTimeout(() => setMessage(null), 3000);
-			} catch (error) {
-				console.error('Error updating governance structure data:', error);
-				setMessage('Save failed');
-			}
-		});
-	};
+				try {
+					await updateGovernanceStructure(payload, pageSlug);
+					setMessage({
+						type: 'success',
+						text: 'Governance structure saved successfully.'
+					});
+					setTimeout(() => setMessage(null), 3000);
+				} catch (error) {
+					console.error('Error updating governance structure data:', error);
+					setMessage({ type: 'error', text: 'Failed to save governance structure.' });
+				}
+			});
+		};
+
+	const showSection = (section: 'hero' | 'sections') =>
+		!visibleSections || visibleSections.includes(section);
 
 	useEffect(() => {
 		onChange?.(normalizeGovernanceStructure(form.getValues()));
@@ -148,12 +159,12 @@ export default function GovernanceStructureForm({ initialData, pageSlug, onChang
 			{/* Header with Save Button */}
 			<div className="flex items-center justify-between border-b pb-4">
 				<h3 className="text-lg font-semibold text-gray-800">Edit Governance Structure</h3>
-				<div className="flex items-center gap-3">
-					{message && (
-						<Badge variant={message.includes('successfully') ? 'default' : 'destructive'}>
-							{message}
-						</Badge>
-					)}
+					<div className="flex items-center gap-3">
+						{message && (
+							<Badge variant={message.type === 'success' ? 'default' : 'destructive'}>
+								{message.text}
+							</Badge>
+						)}
 					<Button 
 						onClick={form.handleSubmit(onSubmit)}
 						disabled={isPending}
@@ -166,8 +177,9 @@ export default function GovernanceStructureForm({ initialData, pageSlug, onChang
 
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
-					{/* Hero Section */}
-					<Card>
+						{/* Hero Section */}
+						{showSection('hero') && (
+						<Card>
 						<CardHeader>
 							<CardTitle>Hero Section</CardTitle>
 						</CardHeader>
@@ -305,10 +317,12 @@ export default function GovernanceStructureForm({ initialData, pageSlug, onChang
 								/>
 							</div>
 						</CardContent>
-					</Card>
+						</Card>
+						)}
 
-					{/* Sections */}
-					<Card>
+						{/* Sections */}
+						{showSection('sections') && (
+						<Card>
 						<CardHeader>
 							<CardTitle className="flex items-center justify-between">
 								Sections
@@ -349,9 +363,10 @@ export default function GovernanceStructureForm({ initialData, pageSlug, onChang
 								/>
 							))}
 						</CardContent>
-					</Card>
-				</form>
-			</Form>
+						</Card>
+						)}
+					</form>
+				</Form>
 		</div>
 	);
 }

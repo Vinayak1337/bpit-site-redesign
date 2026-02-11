@@ -76,10 +76,10 @@ export default function AdmissionsHeroForm({
 		startTransition(async () => {
 			const result = await updateAdmissionsHero(pageSlug, payload);
 			if (!result.ok) {
-				setMessage('Save failed');
+				setMessage(result.error ?? 'Save failed');
 				return;
 			}
-			setMessage('Saved');
+			setMessage('Saved successfully');
 		});
 	};
 
@@ -88,19 +88,31 @@ export default function AdmissionsHeroForm({
 			<form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-6'>
 				<div className='flex items-center justify-between'>
 					<h3 className='text-lg font-semibold text-gray-900'>Admissions Hero</h3>
-					<Button type='submit' disabled={isPending}>
-						{isPending ? (
-							<>
-								<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-								Saving...
-							</>
-						) : (
-							<>
-								<Save className="mr-2 h-4 w-4" />
-								Save Changes
-							</>
-						)}
-					</Button>
+					<div className='flex items-center gap-3'>
+						{message ? (
+							<span
+								className={`text-sm font-medium ${
+									message.toLowerCase().includes('fail')
+										? 'text-red-600'
+										: 'text-emerald-600'
+								}`}>
+								{message}
+							</span>
+						) : null}
+						<Button type='submit' disabled={isPending}>
+							{isPending ? (
+								<>
+									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+									Saving...
+								</>
+							) : (
+								<>
+									<Save className="mr-2 h-4 w-4" />
+									Save Changes
+								</>
+							)}
+						</Button>
+					</div>
 				</div>
 
 				<Card>
@@ -210,6 +222,7 @@ export default function AdmissionsHeroForm({
 		</Form>
 	);
 }
+
 
 
 

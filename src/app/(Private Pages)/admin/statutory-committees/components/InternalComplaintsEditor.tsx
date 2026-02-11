@@ -3,7 +3,15 @@
 import { useMemo, useState } from 'react';
 import Editable from '@/components/ui/Editable';
 import InternalComplaintsForm from './InternalComplaintsForm';
-import InternalComplaintsView from '@/components/statutory-committees/InternalComplaintsView';
+import {
+	InternalComplaintsHeroSection,
+	InternalComplaintsDefinitionSection,
+	InternalComplaintsMembersSection,
+	InternalComplaintsProceduresSection,
+	InternalComplaintsSupportSection,
+	InternalComplaintsRightsSection,
+	InternalComplaintsContactsSection
+} from '@/components/statutory-committees/InternalComplaintsView';
 import type { InternalComplaintsData } from '@/app/(Private Pages)/actions/statutory-committees';
 
 type Props = {
@@ -15,27 +23,98 @@ export default function InternalComplaintsEditor({ initialData, pageSlug }: Prop
 	const initial = useMemo(() => initialData, [initialData]);
 	const [previewData, setPreviewData] = useState<InternalComplaintsData>(initial);
 
-	const formContent = useMemo(
-		() => (
-			<InternalComplaintsForm
-				initialData={initial}
-				pageSlug={pageSlug}
-				onChange={setPreviewData}
-			/>
-		),
-		[initial, pageSlug]
-	);
-
 	return (
-		<Editable
-			label='Internal Complaints Page Content'
-			formContent={formContent}>
-			<div className='border rounded-lg overflow-hidden bg-white'>
-				<div className='bg-gray-50 px-4 py-2 border-b text-xs font-medium text-gray-500 uppercase tracking-wider'>
-					Live Preview
-				</div>
-				<InternalComplaintsView data={previewData} />
-			</div>
-		</Editable>
+		<div className='space-y-8'>
+			<Editable
+				label='Internal Complaints Hero'
+				formContent={
+					<InternalComplaintsForm
+						initialData={initial}
+						pageSlug={pageSlug}
+						onChange={setPreviewData}
+						visibleSections={['hero']}
+					/>
+				}>
+				<InternalComplaintsHeroSection data={previewData.hero} />
+			</Editable>
+
+			<Editable
+				label='Definition and Scope'
+				formContent={
+					<InternalComplaintsForm
+						initialData={initial}
+						pageSlug={pageSlug}
+						onChange={setPreviewData}
+						visibleSections={['definition']}
+					/>
+				}>
+				<InternalComplaintsDefinitionSection data={previewData.definition} />
+			</Editable>
+
+			<Editable
+				label='Committee Members'
+				formContent={
+					<InternalComplaintsForm
+						initialData={initial}
+						pageSlug={pageSlug}
+						onChange={setPreviewData}
+						visibleSections={['members']}
+					/>
+				}>
+				<InternalComplaintsMembersSection data={previewData.committeeMembers} />
+			</Editable>
+
+			<Editable
+				label='Complaint Procedure'
+				formContent={
+					<InternalComplaintsForm
+						initialData={initial}
+						pageSlug={pageSlug}
+						onChange={setPreviewData}
+						visibleSections={['procedures']}
+					/>
+				}>
+				<InternalComplaintsProceduresSection data={previewData.procedures} />
+			</Editable>
+
+			<Editable
+				label='Support Services'
+				formContent={
+					<InternalComplaintsForm
+						initialData={initial}
+						pageSlug={pageSlug}
+						onChange={setPreviewData}
+						visibleSections={['support']}
+					/>
+				}>
+				<InternalComplaintsSupportSection data={previewData.supportServices} />
+			</Editable>
+
+			<Editable
+				label='Rights and Responsibilities'
+				formContent={
+					<InternalComplaintsForm
+						initialData={initial}
+						pageSlug={pageSlug}
+						onChange={setPreviewData}
+						visibleSections={['rights']}
+					/>
+				}>
+				<InternalComplaintsRightsSection data={previewData.rightsAndResponsibilities} />
+			</Editable>
+
+			<Editable
+				label='Contact and Reporting'
+				formContent={
+					<InternalComplaintsForm
+						initialData={initial}
+						pageSlug={pageSlug}
+						onChange={setPreviewData}
+						visibleSections={['contacts']}
+					/>
+				}>
+				<InternalComplaintsContactsSection data={previewData.contactInfo} />
+			</Editable>
+		</div>
 	);
 }

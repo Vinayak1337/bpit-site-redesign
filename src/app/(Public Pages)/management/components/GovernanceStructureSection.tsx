@@ -9,16 +9,29 @@ interface GovernanceStructureSectionProps {
 	data: GovernanceStructureData;
 }
 
+export function GovernanceStructureHeroBlock({
+	data
+}: GovernanceStructureSectionProps) {
+	return <PageHero data={data.hero} />;
+}
+
+export function GovernanceStructureSectionsBlock({
+	data
+}: GovernanceStructureSectionProps) {
+	return (
+		<div className='space-y-6'>
+			{data.sections.map(section => (
+				<ContentCard key={section.id} data={section} />
+			))}
+		</div>
+	);
+}
+
 export default function GovernanceStructureSection({ data }: GovernanceStructureSectionProps) {
 	return (
 		<div className='space-y-8'>
-			<PageHero data={data.hero} />
-
-			<div className='space-y-6'>
-				{data.sections.map(section => (
-					<ContentCard key={section.id} data={section} />
-				))}
-			</div>
+			<GovernanceStructureHeroBlock data={data} />
+			<GovernanceStructureSectionsBlock data={data} />
 		</div>
 	);
 }

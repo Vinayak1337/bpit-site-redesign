@@ -13,16 +13,18 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Loader2, Save, Plus, Trash2, Image as ImageIcon, ChevronDown } from 'lucide-react';
 import {
 	updateCampusFacilities,
 	type CampusFacilitiesData
 } from '@/app/(Private Pages)/actions/student-life';
+import UploadButton from '@/components/cloudinary/upload-button';
 
 interface Props {
 	initialData: CampusFacilitiesData;
 	onChange?: (data: CampusFacilitiesData) => void;
+	visibleSections?: Array<'header' | 'sections'>;
 }
 
 // Helper component for nested Items list
@@ -86,11 +88,28 @@ const FacilityItemsList = ({ nestIndex, control }: { nestIndex: number, control:
                                 name={`sections.${nestIndex}.items.${k}.image`}
                                 render={({ field }) => (
                                     <FormItem>
+										<FormLabel className='text-xs'>Image URL</FormLabel>
                                         <FormControl>
-                                            <div className="flex gap-2">
+                                            <div className="space-y-2">
+												<div className='flex gap-2'>
                                                 <ImageIcon className="w-4 h-4 mt-3 text-gray-400" />
                                                 <Input placeholder="Image URL" {...field} className="bg-white" />
-                                            </div>
+												</div>
+												<UploadButton
+													onUpload={url => field.onChange(url)}
+													buttonText='Upload Facility Image'
+													className='w-full'
+												/>
+												{field.value ? (
+													<div className='h-16 w-16 overflow-hidden rounded border'>
+														<img
+															src={field.value}
+															alt='Facility preview'
+															className='h-full w-full object-cover'
+														/>
+													</div>
+												) : null}
+											</div>
                                         </FormControl>
                                     </FormItem>
                                 )}
@@ -130,9 +149,16 @@ const FacilityItemsList = ({ nestIndex, control }: { nestIndex: number, control:
 	);
 };
 
-export default function FacilitiesForm({ initialData, onChange }: Props) {
+export default function FacilitiesForm({
+	initialData,
+	onChange,
+	visibleSections
+}: Props) {
 	const [isPending, startTransition] = useTransition();
-	const [message, setMessage] = useState<string | null>(null);
+	const [message, setMessage] = useState<{
+		type: 'success' | 'error';
+		text: string;
+	} | null>(null);
 
 	const form = useForm<CampusFacilitiesData>({
 		defaultValues: initialData
@@ -145,7 +171,6 @@ export default function FacilitiesForm({ initialData, onChange }: Props) {
 
 	useEffect(() => {
 		const subscription = form.watch((values) => {
-			// @ts-ignore
 			onChange?.(values as CampusFacilitiesData);
 		});
 		return () => subscription.unsubscribe();
@@ -156,13 +181,16 @@ export default function FacilitiesForm({ initialData, onChange }: Props) {
 		startTransition(async () => {
 			const result = await updateCampusFacilities('student-life-campus-facilities', values);
 			if (!result.ok) {
-				setMessage('Save failed');
+				setMessage({ type: 'error', text: result.error ?? 'Failed to save facilities data.' });
 				return;
 			}
-			setMessage('Saved successfully!');
-            setTimeout(() => setMessage(null), 3000);
+			setMessage({ type: 'success', text: 'Saved successfully.' });
+			setTimeout(() => setMessage(null), 3000);
 		});
 	};
+
+	const showSection = (section: 'header' | 'sections') =>
+		!visibleSections || visibleSections.includes(section);
 
 	return (
 		<Form {...form}>
@@ -171,8 +199,11 @@ export default function FacilitiesForm({ initialData, onChange }: Props) {
 					<h3 className="font-semibold text-gray-900">Content</h3>
 					<div className="flex items-center gap-4">
 						{message && (
-							<span className={`text-sm font-medium ${message.includes('failed') ? 'text-red-600' : 'text-green-600'}`}>
-								{message}
+							<span
+								className={`text-sm font-medium ${
+									message.type === 'error' ? 'text-red-600' : 'text-green-600'
+								}`}>
+								{message.text}
 							</span>
 						)}
 						<Button type="submit" disabled={isPending}>
@@ -182,30 +213,35 @@ export default function FacilitiesForm({ initialData, onChange }: Props) {
 					</div>
 				</div>
 
-				<FormField
-					control={form.control}
-					name="title"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Page Title</FormLabel>
-							<FormControl><Input {...field} /></FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+				{showSection('header') && (
+					<>
+						<FormField
+							control={form.control}
+							name="title"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Page Title</FormLabel>
+									<FormControl><Input {...field} /></FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 
-				<FormField
-					control={form.control}
-					name="description"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Description</FormLabel>
-							<FormControl><Textarea {...field} rows={3} /></FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+						<FormField
+							control={form.control}
+							name="description"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Description</FormLabel>
+									<FormControl><Textarea {...field} rows={3} /></FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</>
+				)}
 
+				{showSection('sections') && (
 				<div className="space-y-4">
 					<div className="flex items-center justify-between">
 						<FormLabel className="text-base">Facility Sections</FormLabel>
@@ -259,8 +295,8 @@ export default function FacilitiesForm({ initialData, onChange }: Props) {
                         ))}
                     </div>
 				</div>
+				)}
 			</form>
 		</Form>
 	);
 }
-

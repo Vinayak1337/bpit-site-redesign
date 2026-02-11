@@ -2,7 +2,11 @@
 
 import { useMemo, useState } from 'react';
 import Editable from '@/components/ui/Editable';
-import ChairmanMessageSection from '@/components/about/ChairmanMessageSection';
+import {
+	ChairmanMessageBodyBlock,
+	ChairmanMessageHeaderBlock,
+	ChairmanMessageSignatureBlock
+} from '@/components/about/ChairmanMessageSection';
 import ChairmanMessageForm from '@/app/(Private Pages)/admin/about/components/ChairmanMessageForm';
 import type { ChairmanMessageData } from '@/app/(Private Pages)/actions/about';
 
@@ -20,16 +24,37 @@ export default function ChairmanMessageEditor({
 		useState<ChairmanMessageData>(initial);
 
 	return (
-		<Editable
-			label="Chairman's Message"
-			formContent={
-				<ChairmanMessageForm
-					initialData={initial}
-					pageSlug={pageSlug}
-					onChange={setPreviewData}
-				/>
-			}>
-						<ChairmanMessageSection data={previewData} />
-		</Editable>
+		<div className='space-y-6'>
+			<Editable
+				label="Chairman's Header"
+				formContent={
+					<ChairmanMessageForm
+						initialData={initial}
+						pageSlug={pageSlug}
+						onChange={setPreviewData}
+						visibleSections={['header']}
+					/>
+				}>
+				<div className='bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 border border-purple-200'>
+					<ChairmanMessageHeaderBlock data={previewData} />
+				</div>
+			</Editable>
+
+			<Editable
+				label="Chairman's Message Content"
+				formContent={
+					<ChairmanMessageForm
+						initialData={initial}
+						pageSlug={pageSlug}
+						onChange={setPreviewData}
+						visibleSections={['content']}
+					/>
+				}>
+				<div className='bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 border border-purple-200 space-y-6 sm:space-y-8'>
+					<ChairmanMessageBodyBlock data={previewData} />
+					<ChairmanMessageSignatureBlock />
+				</div>
+			</Editable>
+		</div>
 	);
 }

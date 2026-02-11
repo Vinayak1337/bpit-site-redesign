@@ -108,9 +108,17 @@ interface QualityPolicyFormProps {
 	initialData: QualityPolicyData;
 	pageSlug: string;
 	onChange: (data: QualityPolicyData) => void;
+	visibleSections?: Array<
+		'hero' | 'policyStatement' | 'commitments' | 'framework' | 'assuranceBodies'
+	>;
 }
 
-export default function QualityPolicyForm({ initialData, pageSlug, onChange }: QualityPolicyFormProps) {
+export default function QualityPolicyForm({
+	initialData,
+	pageSlug,
+	onChange,
+	visibleSections
+}: QualityPolicyFormProps) {
 	const [isSaving, setIsSaving] = useState(false);
 	const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -189,6 +197,10 @@ export default function QualityPolicyForm({ initialData, pageSlug, onChange }: Q
 		form.setValue(`commitments.${commitmentIndex}.description`, newCommitments);
 	};
 
+	const showSection = (
+		section: 'hero' | 'policyStatement' | 'commitments' | 'framework' | 'assuranceBodies'
+	) => !visibleSections || visibleSections.includes(section);
+
 	return (
 		<div className="space-y-6">
 			{/* Header Section */}
@@ -234,6 +246,7 @@ export default function QualityPolicyForm({ initialData, pageSlug, onChange }: Q
 				<form className="space-y-6">
 					<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 						{/* Hero Section */}
+						{showSection('hero') ? (
 						<Card>
 							<CardHeader>
 								<CardTitle>Hero Section</CardTitle>
@@ -363,8 +376,10 @@ export default function QualityPolicyForm({ initialData, pageSlug, onChange }: Q
 								/>
 							</CardContent>
 						</Card>
+						) : null}
 
 						{/* Policy Statement */}
+						{showSection('policyStatement') ? (
 						<Card>
 							<CardHeader>
 								<CardTitle>Policy Statement</CardTitle>
@@ -402,9 +417,11 @@ export default function QualityPolicyForm({ initialData, pageSlug, onChange }: Q
 								/>
 							</CardContent>
 						</Card>
+						) : null}
 					</div>
 
 					{/* Commitments Section */}
+					{showSection('commitments') ? (
 					<Card>
 						<CardHeader>
 							<CardTitle className="flex items-center justify-between">
@@ -575,8 +592,10 @@ export default function QualityPolicyForm({ initialData, pageSlug, onChange }: Q
 							))}
 						</CardContent>
 					</Card>
+					) : null}
 
 					{/* Framework Section */}
+					{showSection('framework') ? (
 					<Card>
 						<CardHeader>
 							<CardTitle className="flex items-center justify-between">
@@ -762,8 +781,10 @@ export default function QualityPolicyForm({ initialData, pageSlug, onChange }: Q
 							))}
 						</CardContent>
 					</Card>
+					) : null}
 
 					{/* Assurance Bodies Section */}
+					{showSection('assuranceBodies') ? (
 					<Card>
 						<CardHeader>
 							<CardTitle className="flex items-center justify-between">
@@ -923,6 +944,7 @@ export default function QualityPolicyForm({ initialData, pageSlug, onChange }: Q
 							))}
 						</CardContent>
 					</Card>
+					) : null}
 				</form>
 			</Form>
 		</div>

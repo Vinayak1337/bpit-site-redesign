@@ -1,45 +1,37 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion } from 'framer-motion';
 
 export type Stat = { value: string; label: string };
 
 const StatsStrip = ({ stats }: { stats: Stat[] }) => {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+	return (
+		<section className='rounded-3xl border border-slate-200 bg-white p-5 shadow-sm md:p-7'>
+			<div className='mb-5 flex flex-col gap-2 md:mb-6'>
+				<p className='text-xs font-semibold uppercase tracking-[0.16em] text-blue-700'>
+					BPIT at a glance
+				</p>
+				<h2 className='text-xl font-semibold text-slate-900 md:text-2xl'>
+					Key performance highlights
+				</h2>
+			</div>
 
-  return (
-    <section className="relative bg-white">
-      <div className="container mx-auto px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          viewport={{ once: true, margin: "-80px" }}
-          className="-mt-10 md:-mt-12"
-        >
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-            {stats.map((s, i) => (
-              <motion.div
-                key={s.label}
-                initial={{ opacity: 0, y: 12 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: i * 0.05 }}
-                viewport={{ once: true }}
-                className="rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 to-white p-4 text-center shadow-sm"
-              >
-                <div className="text-lg md:text-xl font-bold text-blue-900">
-                  {mounted ? s.value : ""}
-                </div>
-                <div className="text-xs md:text-sm text-gray-600">{s.label}</div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-      </div>
-    </section>
-  );
+			<div className='grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4'>
+				{stats.map((stat, index) => (
+					<motion.article
+						key={stat.label}
+						initial={{ opacity: 0, y: 14 }}
+						whileInView={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.45, delay: index * 0.05 }}
+						viewport={{ once: true }}
+						className='rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-4'>
+						<p className='text-2xl font-bold text-blue-900 md:text-3xl'>{stat.value}</p>
+						<p className='mt-1 text-xs text-slate-600 md:text-sm'>{stat.label}</p>
+					</motion.article>
+				))}
+			</div>
+		</section>
+	);
 };
 
 export default StatsStrip;

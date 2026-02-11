@@ -21,6 +21,8 @@ if (isCloudinaryConfigured) {
 }
 
 const allowedResourceTypes = new Set(['image', 'video', 'auto']);
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+const MAX_VIDEO_BYTES = 50 * 1024 * 1024;
 
 export async function POST(request: Request) {
 	if (!isCloudinaryConfigured) {
@@ -42,9 +44,35 @@ export async function POST(request: Request) {
 	const folder = extractString(formData.get('folder'));
 	const uploadPreset = extractString(formData.get('uploadPreset'));
 	const resourceTypeEntry = extractString(formData.get('resourceType'));
-	const resourceType = allowedResourceTypes.has(resourceTypeEntry ?? '')
-		? (resourceTypeEntry as 'image' | 'video' | 'auto')
-		: 'image';
+	if (!resourceTypeEntry || !allowedResourceTypes.has(resourceTypeEntry)) {
+		return NextResponse.json(
+			{ error: { message: 'Invalid resource type. Use image, video, or auto.' } },
+			{ status: 400 }
+		);
+	}
+	const resourceType = resourceTypeEntry as 'image' | 'video' | 'auto';
+
+	if (!isValidMimeType(fileEntry.type, resourceType)) {
+		return NextResponse.json(
+			{ error: { message: 'Invalid file type for selected resource type.' } },
+			{ status: 415 }
+		);
+	}
+
+	const maxBytes = resourceType === 'video' ? MAX_VIDEO_BYTES : MAX_IMAGE_BYTES;
+	if (fileEntry.size <= 0 || fileEntry.size > maxBytes) {
+		return NextResponse.json(
+			{
+				error: {
+					message:
+						resourceType === 'video'
+							? 'File too large. Maximum video size is 50MB.'
+							: 'File too large. Maximum image size is 10MB.'
+				}
+			},
+			{ status: 413 }
+		);
+	}
 
 	const arrayBuffer = await fileEntry.arrayBuffer();
 	const buffer = Buffer.from(arrayBuffer);
@@ -74,6 +102,16 @@ const extractString = (value: FormDataEntryValue | null): string | undefined => 
 	if (typeof value !== 'string') return undefined;
 	const trimmed = value.trim();
 	return trimmed.length > 0 ? trimmed : undefined;
+};
+
+const isValidMimeType = (
+	mimeType: string,
+	resourceType: 'image' | 'video' | 'auto'
+): boolean => {
+	if (!mimeType) return false;
+	if (resourceType === 'image') return mimeType.startsWith('image/');
+	if (resourceType === 'video') return mimeType.startsWith('video/');
+	return mimeType.startsWith('image/') || mimeType.startsWith('video/');
 };
 
 const uploadBuffer = (
@@ -115,4 +153,3 @@ const extractUploadErrorMessage = (error: unknown): string => {
 	}
 	return 'Cloudinary upload failed';
 };
-

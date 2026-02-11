@@ -23,6 +23,7 @@ interface LeadershipCardData {
 	id: string;
 	name: string;
 	position: string;
+	image?: string;
 	icon: string;
 	iconColor: string;
 	iconTextColor: string;
@@ -56,18 +57,32 @@ const iconMap = {
 };
 
 const LeadershipCard: React.FC<LeadershipCardProps> = ({ data }) => {
-	const MainIconComponent = iconMap[data.icon as keyof typeof iconMap] || User;
+	const initials = data.name
+		.split(' ')
+		.map(part => part[0])
+		.filter(Boolean)
+		.slice(0, 2)
+		.join('')
+		.toUpperCase();
 
 	return (
 		<motion.div
 			whileHover={{ scale: 1.02 }}
 			className='bg-white rounded-lg sm:rounded-xl p-4 sm:p-6 shadow-lg border border-gray-200'>
 			<div className='flex flex-col sm:flex-row items-center sm:items-center gap-3 sm:gap-4 mb-3 sm:mb-4'>
-				<div
-					className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 ${data.iconColor} rounded-full flex items-center justify-center aspect-square flex-shrink-0`}>
-					<MainIconComponent
-						className={`w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 ${data.iconTextColor}`}
-					/>
+				<div className='w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full overflow-hidden flex items-center justify-center aspect-square flex-shrink-0 bg-slate-200'>
+					{data.image ? (
+						// eslint-disable-next-line @next/next/no-img-element
+						<img
+							src={data.image}
+							alt={data.name}
+							className='h-full w-full object-cover'
+						/>
+					) : (
+						<span className='text-sm sm:text-base font-semibold text-slate-700'>
+							{initials || 'NA'}
+						</span>
+					)}
 				</div>
 				<div className='text-center sm:text-left'>
 					<h3 className='text-lg sm:text-xl font-bold text-gray-900'>

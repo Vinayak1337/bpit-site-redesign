@@ -3,9 +3,8 @@ import Hero2 from '@/components/hero/hero2';
 import PlacementCompanies from '@/components/placement/placement-companies';
 
 import Testimonial from '@/components/carousel/testimonial';
-import EventsSection from '@/components/carousel/events-section';
-import NoticesSection from '@/components/carousel/notices-section';
 import TopPlacedStudents from '@/components/placement/top-placed-students';
+import NoticesEventsComparison from '@/components/home/notices-events-comparison';
 
 import { homeHero2Data } from '@/data/home';
 import {
@@ -80,9 +79,10 @@ export default async function Home() {
 		<>
 			<Hero2 data={heroData} />
 
-			<NoticesSection data={toNoticesSectionComponentData(noticesSection)} />
-
-			<EventsSection data={toEventsSectionComponentData(eventsSection)} />
+			<NoticesEventsComparison
+				noticesData={toNoticesSectionComponentData(noticesSection)}
+				eventsData={toEventsSectionComponentData(eventsSection)}
+			/>
 
 			<PlacementCompanies data={placementCompanies} />
 

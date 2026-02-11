@@ -1,10 +1,8 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import StudentLifeHero from '@/app/(Public Pages)/student-life/components/StudentLifeHero';
-import DynamicSidebar from '@/components/ui/DynamicSidebar';
 import StudentLifeContentWrapper from '@/app/(Public Pages)/student-life/components/StudentLifeContentWrapper';
 import { getStudentLifeHero } from '@/app/(Private Pages)/actions/student-life';
-import { studentLifeSidebarData } from '@/data/sidebar';
 
 export const metadata: Metadata = {
 	title: 'Student Life - Bhagwan Parshuram Institute of Technology',
@@ -27,11 +25,6 @@ const StudentLifeLayout = async ({
 			{/* Main Content with Sidebar */}
 			<div className='container mx-auto px-4 py-12'>
 				<div className='flex flex-col lg:flex-row gap-8'>
-					{/* Sidebar Navigation */}
-					<DynamicSidebar
-						navItems={studentLifeSidebarData.navItems}
-						theme={studentLifeSidebarData.theme}
-					/>
 
 					{/* Content Area */}
 					<StudentLifeContentWrapper>

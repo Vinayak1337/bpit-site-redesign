@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState, useTransition, useCallback } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -28,6 +28,7 @@ import { Trash2, Plus } from 'lucide-react';
 import type { LeadershipTeamData } from '@/app/(Private Pages)/actions/management';
 import { updateLeadershipTeam } from '@/app/(Private Pages)/actions/management';
 import { SUPPORTED_ICON_NAMES } from '@/components/about/icons';
+import UploadButton from '@/components/cloudinary/upload-button';
 
 const COLOR_OPTIONS = ['blue', 'green', 'purple', 'orange', 'red', 'indigo', 'gray', 'teal', 'pink'];
 
@@ -56,9 +57,10 @@ const formSchema = z.object({
 		id: z.string().min(1, 'Leader ID is required'),
 		name: z.string().min(1, 'Name is required'),
 		position: z.string().min(1, 'Position is required'),
-		icon: z.string().min(1, 'Icon is required'),
-		iconColor: z.string().min(1, 'Icon color is required'),
-		iconTextColor: z.string().min(1, 'Icon text color is required'),
+		image: z.string().optional(),
+		icon: z.string().optional(),
+		iconColor: z.string().optional(),
+		iconTextColor: z.string().optional(),
 		textColor: z.string().min(1, 'Text color is required'),
 		details: z.array(z.object({
 			icon: z.string().min(1, 'Detail icon is required'),
@@ -85,6 +87,7 @@ const normalizeLeadershipTeam = (values: any): LeadershipTeamData => {
 			id: (leader?.id ?? '').trim(),
 			name: (leader?.name ?? '').trim(),
 			position: (leader?.position ?? '').trim(),
+			image: (leader?.image ?? '').trim(),
 			description: (leader?.description ?? '').trim(),
 			icon: (leader?.icon ?? '').trim(),
 			iconColor: (leader?.iconColor ?? '').trim(),
@@ -102,11 +105,20 @@ interface LeadershipTeamFormProps {
 	initialData: LeadershipTeamData;
 	pageSlug: string;
 	onChange?: (data: LeadershipTeamData) => void;
+	visibleSections?: Array<'hero' | 'leaders'>;
 }
 
-export default function LeadershipTeamForm({ initialData, pageSlug, onChange }: LeadershipTeamFormProps) {
+export default function LeadershipTeamForm({
+	initialData,
+	pageSlug,
+	onChange,
+	visibleSections
+}: LeadershipTeamFormProps) {
 	const [isPending, startTransition] = useTransition();
-	const [message, setMessage] = useState<string>('');
+	const [message, setMessage] = useState<{
+		type: 'success' | 'error';
+		text: string;
+	} | null>(null);
 
 	const form = useForm<FormValues>({
 		resolver: zodResolver(formSchema),
@@ -117,10 +129,6 @@ export default function LeadershipTeamForm({ initialData, pageSlug, onChange }: 
 		control: form.control,
 		name: 'leaders'
 	});
-
-	const handleDataChange = useCallback((values: FormValues) => {
-		onChange?.(values);
-	}, [onChange]);
 
 	useEffect(() => {
 		onChange?.(normalizeLeadershipTeam(form.getValues()));
@@ -137,28 +145,31 @@ export default function LeadershipTeamForm({ initialData, pageSlug, onChange }: 
 	const onSubmit = (values: FormValues) => {
 		startTransition(async () => {
 			try {
-				await updateLeadershipTeam(values, pageSlug);
-				setMessage('Leadership team data updated successfully!');
-				setTimeout(() => setMessage(''), 3000);
+				await updateLeadershipTeam(normalizeLeadershipTeam(values), pageSlug);
+				setMessage({ type: 'success', text: 'Leadership team saved successfully.' });
+				setTimeout(() => setMessage(null), 3000);
 			} catch (error) {
 				console.error('Error updating leadership team data:', error);
-				setMessage('Failed to update leadership team data');
-				setTimeout(() => setMessage(''), 3000);
+				setMessage({ type: 'error', text: 'Failed to save leadership team.' });
+				setTimeout(() => setMessage(null), 3000);
 			}
 		});
 	};
+
+	const showSection = (section: 'hero' | 'leaders') =>
+		!visibleSections || visibleSections.includes(section);
 
 	return (
 		<div className="space-y-6">
 			{/* Header with Save Button */}
 			<div className="flex items-center justify-between border-b pb-4">
 				<h3 className="text-lg font-semibold text-gray-800">Edit Leadership Team</h3>
-				<div className="flex items-center gap-3">
-					{message && (
-						<Badge variant={message.includes('successfully') ? 'default' : 'destructive'}>
-							{message}
-						</Badge>
-					)}
+					<div className="flex items-center gap-3">
+						{message && (
+							<Badge variant={message.type === 'success' ? 'default' : 'destructive'}>
+								{message.text}
+							</Badge>
+						)}
 					<Button 
 						onClick={form.handleSubmit(onSubmit)}
 						disabled={isPending}
@@ -171,8 +182,9 @@ export default function LeadershipTeamForm({ initialData, pageSlug, onChange }: 
 
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
-					{/* Hero Section */}
-					<Card>
+						{/* Hero Section */}
+						{showSection('hero') && (
+						<Card>
 						<CardHeader>
 							<CardTitle>Hero Section</CardTitle>
 						</CardHeader>
@@ -310,10 +322,12 @@ export default function LeadershipTeamForm({ initialData, pageSlug, onChange }: 
 								/>
 							</div>
 						</CardContent>
-					</Card>
+						</Card>
+						)}
 
-					{/* Leaders Section */}
-					<Card>
+						{/* Leaders Section */}
+						{showSection('leaders') && (
+						<Card>
 						<CardHeader>
 							<CardTitle className="flex items-center justify-between">
 								Leaders
@@ -325,6 +339,7 @@ export default function LeadershipTeamForm({ initialData, pageSlug, onChange }: 
 										id: `leader-${Date.now()}`,
 										name: '',
 										position: '',
+										image: '',
 										icon: 'User',
 										iconColor: 'bg-blue-100',
 										iconTextColor: 'text-blue-600',
@@ -386,98 +401,51 @@ export default function LeadershipTeamForm({ initialData, pageSlug, onChange }: 
 											/>
 										</div>
 
-										{/* Icon Configuration Row */}
-										<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-											<FormField
-												control={form.control}
-												name={`leaders.${index}.icon`}
-												render={({ field }) => (
-													<FormItem>
-														<FormLabel>Icon</FormLabel>
-														<Select onValueChange={field.onChange} defaultValue={field.value}>
-															<FormControl>
-																<SelectTrigger>
-																	<SelectValue placeholder="Select icon" />
-																</SelectTrigger>
-															</FormControl>
-															<SelectContent>
-																{SUPPORTED_ICON_NAMES.map((icon) => (
-																	<SelectItem key={icon} value={icon}>
-																		{icon}
-																	</SelectItem>
-																))}
-															</SelectContent>
-														</Select>
-														<FormMessage />
-													</FormItem>
-												)}
-											/>
-											<FormField
-												control={form.control}
-												name={`leaders.${index}.iconColor`}
-												render={({ field }) => (
-													<FormItem>
-														<FormLabel>Icon Background Color</FormLabel>
-														<Select onValueChange={field.onChange} defaultValue={field.value}>
-															<FormControl>
-																<SelectTrigger>
-																	<SelectValue placeholder="Select background" />
-																</SelectTrigger>
-															</FormControl>
-															<SelectContent>
-																{COLOR_OPTIONS.map((color) => (
-																	<SelectItem key={color} value={`bg-${color}-100`}>
-																		bg-{color}-100
-																	</SelectItem>
-																))}
-															</SelectContent>
-														</Select>
-														<FormMessage />
-													</FormItem>
-												)}
-											/>
-										</div>
+										<FormField
+											control={form.control}
+											name={`leaders.${index}.image`}
+											render={({ field }) => (
+												<FormItem>
+													<FormLabel>Avatar Image</FormLabel>
+													<FormControl>
+														<div className='space-y-2'>
+															<Input {...field} placeholder='Image URL' />
+															<UploadButton
+																onUpload={url => field.onChange(url)}
+																buttonText='Upload Avatar'
+																className='w-full'
+															/>
+															{field.value ? (
+																<div className='h-16 w-16 overflow-hidden rounded-full border'>
+																	<img
+																		src={field.value}
+																		alt='Avatar preview'
+																		className='h-full w-full object-cover'
+																	/>
+																</div>
+															) : null}
+														</div>
+													</FormControl>
+													<FormMessage />
+												</FormItem>
+											)}
+										/>
 
-										{/* Text Color Configuration Row */}
-										<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-											<FormField
-												control={form.control}
-												name={`leaders.${index}.iconTextColor`}
-												render={({ field }) => (
-													<FormItem>
-														<FormLabel>Icon Text Color</FormLabel>
-														<Select onValueChange={field.onChange} defaultValue={field.value}>
-															<FormControl>
-																<SelectTrigger>
-																	<SelectValue placeholder="Select icon color" />
-																</SelectTrigger>
-															</FormControl>
-															<SelectContent>
-																{COLOR_OPTIONS.map((color) => (
-																	<SelectItem key={color} value={`text-${color}-600`}>
-																		text-{color}-600
-																	</SelectItem>
-																))}
-															</SelectContent>
-														</Select>
-														<FormMessage />
-													</FormItem>
-												)}
-											/>
+										<div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
 											<FormField
 												control={form.control}
 												name={`leaders.${index}.textColor`}
 												render={({ field }) => (
 													<FormItem>
-														<FormLabel>Text Color</FormLabel>
+														<FormLabel>Position Text Color</FormLabel>
 														<Select onValueChange={field.onChange} defaultValue={field.value}>
 															<FormControl>
 																<SelectTrigger>
-																	<SelectValue placeholder="Select text color" />
+																	<SelectValue placeholder='Select text color' />
 																</SelectTrigger>
 															</FormControl>
 															<SelectContent>
-																{COLOR_OPTIONS.map((color) => (
+																{COLOR_OPTIONS.map(color => (
 																	<SelectItem key={color} value={`text-${color}-600`}>
 																		text-{color}-600
 																	</SelectItem>
@@ -577,9 +545,10 @@ export default function LeadershipTeamForm({ initialData, pageSlug, onChange }: 
 								</Card>
 							))}
 						</CardContent>
-					</Card>
-				</form>
-			</Form>
-		</div>
+						</Card>
+						)}
+					</form>
+				</Form>
+			</div>
 	);
 }
