@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Trash2, Plus, Save, Loader2 } from 'lucide-react';
 import { updateStatutoryOverview, type StatutoryOverviewData } from '@/app/(Private Pages)/actions/statutory-committees';
-import { useTransition, useEffect } from 'react';
+import { useTransition, useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const schema = z.object({
@@ -35,10 +35,20 @@ type Props = {
 	initialData: StatutoryOverviewData;
 	pageSlug: string;
 	onChange?: (data: StatutoryOverviewData) => void;
+	visibleSections?: Array<'hero' | 'committees'>;
 };
 
-export default function StatutoryOverviewForm({ initialData, pageSlug, onChange }: Props) {
+export default function StatutoryOverviewForm({
+	initialData,
+	pageSlug,
+	onChange,
+	visibleSections
+}: Props) {
 	const [isPending, startTransition] = useTransition();
+	const [message, setMessage] = useState<{
+		type: 'success' | 'error';
+		text: string;
+	} | null>(null);
 	const { register, control, handleSubmit, watch, formState: { errors } } = useForm<FormData>({
 		resolver: zodResolver(schema),
 		defaultValues: initialData
@@ -58,19 +68,24 @@ export default function StatutoryOverviewForm({ initialData, pageSlug, onChange 
 	}, [watchedData, onChange]);
 
 	const onSubmit = (data: FormData) => {
+		setMessage(null);
 		startTransition(async () => {
 			try {
 				await updateStatutoryOverview(data, pageSlug);
-				alert('Saved successfully!');
+				setMessage({ type: 'success', text: 'Saved successfully.' });
 			} catch (error) {
 				console.error(error);
-				alert('Failed to save.');
+				setMessage({ type: 'error', text: 'Failed to save statutory overview.' });
 			}
 		});
 	};
 
+	const showSection = (section: 'hero' | 'committees') =>
+		!visibleSections || visibleSections.includes(section);
+
 	return (
 		<form onSubmit={handleSubmit(onSubmit)} className='space-y-8 max-w-4xl mx-auto'>
+			{showSection('hero') && (
 			<Card>
 				<CardHeader>
 					<CardTitle>Hero Section</CardTitle>
@@ -88,7 +103,9 @@ export default function StatutoryOverviewForm({ initialData, pageSlug, onChange 
 					</div>
 				</CardContent>
 			</Card>
+			)}
 
+			{showSection('committees') && (
 			<div className='space-y-4'>
 				<div className='flex items-center justify-between'>
 					<h3 className='text-lg font-semibold text-gray-900'>Committees List</h3>
@@ -162,8 +179,17 @@ export default function StatutoryOverviewForm({ initialData, pageSlug, onChange 
 					))}
 				</div>
 			</div>
+			)}
 
 			<div className="sticky bottom-4 bg-white p-4 border rounded-xl shadow-lg flex justify-end z-50">
+				{message ? (
+					<div
+						className={`mr-3 self-center text-sm font-medium ${
+							message.type === 'error' ? 'text-red-600' : 'text-emerald-600'
+						}`}>
+						{message.text}
+					</div>
+				) : null}
 				<Button type='submit' disabled={isPending} className='w-full md:w-auto min-w-[150px]'>
 					{isPending ? (
 						<>

@@ -2,8 +2,13 @@
 
 import { useState } from 'react';
 import ConductForm from './ConductForm';
-import CodeOfConduct from '@/components/student-life/CodeOfConduct';
+import {
+	CodeOfConductHeader,
+	CodeOfConductRules,
+	CodeOfConductNote
+} from '@/components/student-life/CodeOfConduct';
 import type { CodeOfConductData } from '@/app/(Private Pages)/actions/student-life';
+import Editable from '@/components/ui/Editable';
 
 interface Props {
 	initialData: CodeOfConductData;
@@ -13,21 +18,42 @@ export default function ConductEditor({ initialData }: Props) {
 	const [data, setData] = useState<CodeOfConductData>(initialData);
 
 	return (
-		<div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-			<div className="space-y-6">
-				<h2 className="text-lg font-semibold">Editor</h2>
-				<ConductForm
-					initialData={initialData}
-					onChange={setData}
-				/>
-			</div>
-			<div className="space-y-6">
-				<h2 className="text-lg font-semibold">Live Preview</h2>
-				<div className="border rounded-xl overflow-hidden bg-gray-50 p-4 h-fit sticky top-4 max-h-screen overflow-y-auto">
-					<CodeOfConduct data={data} />
-				</div>
-			</div>
+		<div className='space-y-8'>
+			<Editable
+				label='Conduct Header'
+				formContent={
+					<ConductForm
+						initialData={initialData}
+						onChange={setData}
+						visibleSections={['header']}
+					/>
+				}>
+				<CodeOfConductHeader data={data} />
+			</Editable>
+
+			<Editable
+				label='Conduct Rules'
+				formContent={
+					<ConductForm
+						initialData={initialData}
+						onChange={setData}
+						visibleSections={['rules']}
+					/>
+				}>
+				<CodeOfConductRules data={data} />
+			</Editable>
+
+			<Editable
+				label='Conduct Note'
+				formContent={
+					<ConductForm
+						initialData={initialData}
+						onChange={setData}
+						visibleSections={['note']}
+					/>
+				}>
+				<CodeOfConductNote />
+			</Editable>
 		</div>
 	);
 }
-

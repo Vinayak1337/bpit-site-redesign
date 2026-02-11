@@ -22,11 +22,19 @@ import {
 interface Props {
 	initialData: CodeOfConductData;
 	onChange?: (data: CodeOfConductData) => void;
+	visibleSections?: Array<'header' | 'rules' | 'note'>;
 }
 
-export default function ConductForm({ initialData, onChange }: Props) {
+export default function ConductForm({
+	initialData,
+	onChange,
+	visibleSections
+}: Props) {
 	const [isPending, startTransition] = useTransition();
-	const [message, setMessage] = useState<string | null>(null);
+	const [message, setMessage] = useState<{
+		type: 'success' | 'error';
+		text: string;
+	} | null>(null);
 
 	const form = useForm<CodeOfConductData>({
 		defaultValues: initialData
@@ -39,7 +47,6 @@ export default function ConductForm({ initialData, onChange }: Props) {
 
 	useEffect(() => {
 		const subscription = form.watch((values) => {
-			// @ts-ignore
 			onChange?.(values as CodeOfConductData);
 		});
 		return () => subscription.unsubscribe();
@@ -50,13 +57,16 @@ export default function ConductForm({ initialData, onChange }: Props) {
 		startTransition(async () => {
 			const result = await updateCodeOfConduct('student-life-code-of-conduct', values);
 			if (!result.ok) {
-				setMessage('Save failed');
+				setMessage({ type: 'error', text: result.error ?? 'Failed to save conduct data.' });
 				return;
 			}
-			setMessage('Saved successfully!');
-            setTimeout(() => setMessage(null), 3000);
+			setMessage({ type: 'success', text: 'Saved successfully.' });
+			setTimeout(() => setMessage(null), 3000);
 		});
 	};
+
+	const showSection = (section: 'header' | 'rules' | 'note') =>
+		!visibleSections || visibleSections.includes(section);
 
 	return (
 		<Form {...form}>
@@ -65,8 +75,11 @@ export default function ConductForm({ initialData, onChange }: Props) {
 					<h3 className="font-semibold text-gray-900">Content</h3>
 					<div className="flex items-center gap-4">
 						{message && (
-							<span className={`text-sm font-medium ${message.includes('failed') ? 'text-red-600' : 'text-green-600'}`}>
-								{message}
+							<span
+								className={`text-sm font-medium ${
+									message.type === 'error' ? 'text-red-600' : 'text-green-600'
+								}`}>
+								{message.text}
 							</span>
 						)}
 						<Button type="submit" disabled={isPending}>
@@ -76,30 +89,35 @@ export default function ConductForm({ initialData, onChange }: Props) {
 					</div>
 				</div>
 
-				<FormField
-					control={form.control}
-					name="title"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Page Title</FormLabel>
-							<FormControl><Input {...field} /></FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+				{showSection('header') && (
+					<>
+						<FormField
+							control={form.control}
+							name="title"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Page Title</FormLabel>
+									<FormControl><Input {...field} /></FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 
-				<FormField
-					control={form.control}
-					name="description"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Description</FormLabel>
-							<FormControl><Textarea {...field} rows={3} /></FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+						<FormField
+							control={form.control}
+							name="description"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Description</FormLabel>
+									<FormControl><Textarea {...field} rows={3} /></FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</>
+				)}
 
+				{showSection('rules') && (
 				<div className="space-y-4">
 					<div className="flex items-center justify-between">
 						<FormLabel className="text-base">Rule Sections</FormLabel>
@@ -185,6 +203,13 @@ export default function ConductForm({ initialData, onChange }: Props) {
                         ))}
                     </div>
 				</div>
+				)}
+
+				{showSection('note') ? (
+					<div className='rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800'>
+						Note card content is static and does not require additional fields.
+					</div>
+				) : null}
 			</form>
 		</Form>
 	);

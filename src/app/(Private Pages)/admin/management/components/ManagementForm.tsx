@@ -51,11 +51,20 @@ interface ManagementFormProps {
 	initialData: ManagementData;
 	pageSlug: string;
 	onChange?: (data: ManagementData) => void;
+	visibleSections?: Array<'hero' | 'leaders' | 'vision'>;
 }
 
-export default function ManagementForm({ initialData, pageSlug, onChange }: ManagementFormProps) {
+export default function ManagementForm({
+	initialData,
+	pageSlug,
+	onChange,
+	visibleSections
+}: ManagementFormProps) {
 	const [isPending, startTransition] = useTransition();
-	const [message, setMessage] = useState<string | null>(null);
+	const [message, setMessage] = useState<{
+		type: 'success' | 'error';
+		text: string;
+	} | null>(null);
 	
 	const form = useForm<FormValues>({
 		resolver: zodResolver(formSchema),
@@ -77,16 +86,22 @@ export default function ManagementForm({ initialData, pageSlug, onChange }: Mana
 			try {
 				const result = await updateManagement(values, pageSlug);
 				if (result.success) {
-					setMessage('Saved');
+					setMessage({ type: 'success', text: 'Saved successfully.' });
 				} else {
-					setMessage('Save failed');
+					setMessage({
+						type: 'error',
+						text: result.error ?? 'Failed to save changes.'
+					});
 				}
 			} catch (error) {
 				console.error('Error updating management data:', error);
-				setMessage('Save failed');
+				setMessage({ type: 'error', text: 'Failed to save changes.' });
 			}
 		});
 	};
+
+	const showSection = (section: 'hero' | 'leaders' | 'vision') =>
+		!visibleSections || visibleSections.includes(section);
 
 	// Call handleDataChange when form values change
 	React.useEffect(() => {
@@ -118,23 +133,29 @@ export default function ManagementForm({ initialData, pageSlug, onChange }: Mana
 							Edit leadership team, styling, and vision content.
 						</p>
 					</div>
-					<div className='flex items-center gap-2'>
-						{message && (
-							<span className='rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700'>
-								{message}
-							</span>
-						)}
-						<Button type='submit' disabled={isPending}>
+						<div className='flex items-center gap-2'>
+							{message && (
+								<span
+									className={`rounded-full px-3 py-1 text-xs font-medium ${
+										message.type === 'success'
+											? 'bg-emerald-100 text-emerald-700'
+											: 'bg-red-100 text-red-700'
+									}`}>
+									{message.text}
+								</span>
+							)}
+							<Button type='submit' disabled={isPending}>
 							{isPending ? 'Saving...' : 'Save changes'}
 						</Button>
 					</div>
 				</div>
 
-				{/* Title Section */}
-				<Card>
-					<CardHeader>
-						<CardTitle>Page Title & Hero Section</CardTitle>
-					</CardHeader>
+					{/* Title Section */}
+					{showSection('hero') && (
+					<Card>
+						<CardHeader>
+							<CardTitle>Page Title & Hero Section</CardTitle>
+						</CardHeader>
 					<CardContent className="space-y-4">
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 							<FormField
@@ -226,11 +247,13 @@ export default function ManagementForm({ initialData, pageSlug, onChange }: Mana
 								)}
 							/>
 						</div>
-					</CardContent>
-				</Card>
+						</CardContent>
+					</Card>
+					)}
 
-				{/* Leaders Section */}
-				<Card>
+					{/* Leaders Section */}
+					{showSection('leaders') && (
+					<Card>
 					<CardHeader>
 						<CardTitle className="flex items-center justify-between">
 							Leadership Team
@@ -456,11 +479,13 @@ export default function ManagementForm({ initialData, pageSlug, onChange }: Mana
 								</CardContent>
 							</Card>
 						))}
-					</CardContent>
-				</Card>
+						</CardContent>
+					</Card>
+					)}
 
-				{/* Vision Section */}
-				<Card>
+					{/* Vision Section */}
+					{showSection('vision') && (
+					<Card>
 					<CardHeader>
 						<CardTitle>Leadership Vision</CardTitle>
 					</CardHeader>
@@ -589,9 +614,10 @@ export default function ManagementForm({ initialData, pageSlug, onChange }: Mana
 								</FormItem>
 							)}
 						/>
-					</CardContent>
-				</Card>
-			</form>
-		</Form>
+						</CardContent>
+					</Card>
+					)}
+				</form>
+			</Form>
 	);
 }

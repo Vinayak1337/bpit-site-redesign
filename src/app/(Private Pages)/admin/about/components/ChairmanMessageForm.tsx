@@ -30,6 +30,7 @@ type Props = {
 	initialData: ChairmanMessageData;
 	pageSlug: string;
 	onChange?: (data: ChairmanMessageData) => void;
+	visibleSections?: Array<'header' | 'content'>;
 };
 
 const createParagraph = (value = ''): ParagraphFormValue => ({
@@ -60,7 +61,8 @@ const normalizeChairmanMessage = (values: Partial<FormValues>): ChairmanMessageD
 export default function ChairmanMessageForm({
 	initialData,
 	pageSlug,
-	onChange
+	onChange,
+	visibleSections
 }: Props) {
 	const [isPending, startTransition] = useTransition();
 	const [message, setMessage] = useState<string | null>(null);
@@ -117,6 +119,9 @@ export default function ChairmanMessageForm({
 		});
 	};
 
+	const showSection = (section: 'header' | 'content') =>
+		!visibleSections || visibleSections.includes(section);
+
 	return (
 		<Form {...form}>
 			<form
@@ -141,6 +146,7 @@ export default function ChairmanMessageForm({
 					</div>
 				</div>
 
+				{showSection('header') ? (
 				<div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
 					<FormField
 						control={form.control}
@@ -171,7 +177,10 @@ export default function ChairmanMessageForm({
 						)}
 					/>
 				</div>
+				) : null}
 
+				{showSection('content') ? (
+				<>
 				<FormField
 					control={form.control}
 					name='quote'
@@ -280,6 +289,8 @@ export default function ChairmanMessageForm({
 						))}
 					</div>
 				</div>
+				</>
+				) : null}
 			</form>
 		</Form>
 	);

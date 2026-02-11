@@ -19,15 +19,24 @@ import {
 	updateEventsFestivals,
 	type EventsFestivalsData
 } from '@/app/(Private Pages)/actions/student-life';
+import UploadButton from '@/components/cloudinary/upload-button';
 
 interface Props {
 	initialData: EventsFestivalsData;
 	onChange?: (data: EventsFestivalsData) => void;
+	visibleSections?: Array<'header' | 'events'>;
 }
 
-export default function EventsForm({ initialData, onChange }: Props) {
+export default function EventsForm({
+	initialData,
+	onChange,
+	visibleSections
+}: Props) {
 	const [isPending, startTransition] = useTransition();
-	const [message, setMessage] = useState<string | null>(null);
+	const [message, setMessage] = useState<{
+		type: 'success' | 'error';
+		text: string;
+	} | null>(null);
 
 	const form = useForm<EventsFestivalsData>({
 		defaultValues: initialData
@@ -40,7 +49,6 @@ export default function EventsForm({ initialData, onChange }: Props) {
 
 	useEffect(() => {
 		const subscription = form.watch((values) => {
-			// @ts-ignore
 			onChange?.(values as EventsFestivalsData);
 		});
 		return () => subscription.unsubscribe();
@@ -51,13 +59,16 @@ export default function EventsForm({ initialData, onChange }: Props) {
 		startTransition(async () => {
 			const result = await updateEventsFestivals('student-life-events-and-festivals', values);
 			if (!result.ok) {
-				setMessage('Save failed');
+				setMessage({ type: 'error', text: result.error ?? 'Failed to save events data.' });
 				return;
 			}
-			setMessage('Saved successfully!');
-            setTimeout(() => setMessage(null), 3000);
+			setMessage({ type: 'success', text: 'Saved successfully.' });
+			setTimeout(() => setMessage(null), 3000);
 		});
 	};
+
+	const showSection = (section: 'header' | 'events') =>
+		!visibleSections || visibleSections.includes(section);
 
 	return (
 		<Form {...form}>
@@ -66,8 +77,11 @@ export default function EventsForm({ initialData, onChange }: Props) {
 					<h3 className="font-semibold text-gray-900">Content</h3>
 					<div className="flex items-center gap-4">
 						{message && (
-							<span className={`text-sm font-medium ${message.includes('failed') ? 'text-red-600' : 'text-green-600'}`}>
-								{message}
+							<span
+								className={`text-sm font-medium ${
+									message.type === 'error' ? 'text-red-600' : 'text-green-600'
+								}`}>
+								{message.text}
 							</span>
 						)}
 						<Button type="submit" disabled={isPending}>
@@ -77,30 +91,35 @@ export default function EventsForm({ initialData, onChange }: Props) {
 					</div>
 				</div>
 
-				<FormField
-					control={form.control}
-					name="title"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Page Title</FormLabel>
-							<FormControl><Input {...field} /></FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+				{showSection('header') && (
+					<>
+						<FormField
+							control={form.control}
+							name="title"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Page Title</FormLabel>
+									<FormControl><Input {...field} /></FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 
-				<FormField
-					control={form.control}
-					name="description"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Description</FormLabel>
-							<FormControl><Textarea {...field} rows={3} /></FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+						<FormField
+							control={form.control}
+							name="description"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Description</FormLabel>
+									<FormControl><Textarea {...field} rows={3} /></FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</>
+				)}
 
+				{showSection('events') && (
 				<div className="space-y-4">
 					<div className="flex items-center justify-between">
 						<FormLabel className="text-base">Events</FormLabel>
@@ -185,9 +204,25 @@ export default function EventsForm({ initialData, onChange }: Props) {
                                             <FormItem>
                                                 <FormLabel className="text-xs">Image URL</FormLabel>
                                                 <FormControl>
-                                                    <div className="flex gap-2">
-                                                        <ImageIcon className="w-4 h-4 mt-3 text-gray-400" />
-                                                        <Input {...field} />
+                                                    <div className="space-y-2">
+														<div className='flex gap-2'>
+															<ImageIcon className="w-4 h-4 mt-3 text-gray-400" />
+															<Input {...field} />
+														</div>
+														<UploadButton
+															onUpload={url => field.onChange(url)}
+															buttonText='Upload Event Image'
+															className='w-full'
+														/>
+														{field.value ? (
+															<div className='h-16 w-16 overflow-hidden rounded border'>
+																<img
+																	src={field.value}
+																	alt='Event preview'
+																	className='h-full w-full object-cover'
+																/>
+															</div>
+														) : null}
                                                     </div>
                                                 </FormControl>
                                                 <FormMessage />
@@ -229,8 +264,8 @@ export default function EventsForm({ initialData, onChange }: Props) {
 						))}
 					</div>
 				</div>
+				)}
 			</form>
 		</Form>
 	);
 }
-

@@ -272,3 +272,9 @@ const InternalComplaintsContent = ({ data }: Props) => {
 export default InternalComplaintsContent;
 
 
+
+
+
+
+
+

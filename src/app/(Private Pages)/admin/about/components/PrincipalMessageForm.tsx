@@ -37,6 +37,7 @@ type Props = {
 	initialData: PrincipalMessageData;
 	pageSlug: string;
 	onChange?: (data: PrincipalMessageData) => void;
+	visibleSections?: Array<'hero' | 'content' | 'cards'>;
 };
 
 const createParagraph = (value = ''): ParagraphFormValue => ({
@@ -81,10 +82,14 @@ const normalizePrincipalMessage = (values: Partial<FormValues>): PrincipalMessag
 export default function PrincipalMessageForm({
 	initialData,
 	pageSlug,
-	onChange
+	onChange,
+	visibleSections
 }: Props) {
 	const [isPending, startTransition] = useTransition();
-	const [message, setMessage] = useState<string | null>(null);
+	const [message, setMessage] = useState<{
+		type: 'success' | 'error';
+		text: string;
+	} | null>(null);
 
 	const form = useForm<FormValues>({
 		defaultValues: {
@@ -137,25 +142,32 @@ export default function PrincipalMessageForm({
 			try {
 				const data = normalizePrincipalMessage(values);
 				await updatePrincipalMessage(pageSlug, data);
-				setMessage('Principal message updated successfully!');
+				setMessage({ type: 'success', text: 'Saved successfully.' });
 			} catch (error) {
 				console.error('Failed to update principal message:', error);
-				setMessage('Failed to update principal message. Please try again.');
+				setMessage({ type: 'error', text: 'Save failed.' });
 			}
 		});
 	};
 
+	const showSection = (section: 'hero' | 'content' | 'cards') =>
+		!visibleSections || visibleSections.includes(section);
+
 	return (
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-6'>
-				{message && (
-					<div className={`p-3 rounded-lg text-sm ${
-						message.includes('success') ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
-					}`}>
-						{message}
+				{message ? (
+					<div
+						className={`p-3 rounded-lg text-sm ${
+							message.type === 'success'
+								? 'bg-green-50 text-green-800'
+								: 'bg-red-50 text-red-800'
+						}`}>
+						{message.text}
 					</div>
-				)}
+				) : null}
 
+				{showSection('hero') ? (
 				<div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
 					<FormField
 						control={form.control}
@@ -184,7 +196,10 @@ export default function PrincipalMessageForm({
 						)}
 					/>
 				</div>
+				) : null}
 
+				{showSection('content') ? (
+				<>
 				<FormField
 					control={form.control}
 					name='quote'
@@ -286,7 +301,10 @@ export default function PrincipalMessageForm({
 						))}
 					</div>
 				</div>
+				</>
+				) : null}
 
+				{showSection('cards') ? (
 				<div className='space-y-6'>
 					<h3 className='text-lg font-semibold text-gray-900'>Cards Content</h3>
 					
@@ -404,6 +422,7 @@ export default function PrincipalMessageForm({
 						/>
 					</div>
 				</div>
+				) : null}
 
 				<Button type='submit' disabled={isPending} className='w-full'>
 					{isPending ? 'Saving...' : 'Save Changes'}

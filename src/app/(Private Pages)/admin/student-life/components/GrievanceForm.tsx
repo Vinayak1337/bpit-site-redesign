@@ -13,7 +13,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Loader2, Save, Plus, Trash2 } from 'lucide-react';
 import {
 	updateGrievanceCell,
@@ -23,11 +23,19 @@ import {
 interface Props {
 	initialData: GrievanceCellData;
 	onChange?: (data: GrievanceCellData) => void;
+	visibleSections?: Array<'header' | 'contacts' | 'process'>;
 }
 
-export default function GrievanceForm({ initialData, onChange }: Props) {
+export default function GrievanceForm({
+	initialData,
+	onChange,
+	visibleSections
+}: Props) {
 	const [isPending, startTransition] = useTransition();
-	const [message, setMessage] = useState<string | null>(null);
+	const [message, setMessage] = useState<{
+		type: 'success' | 'error';
+		text: string;
+	} | null>(null);
 
 	const form = useForm<GrievanceCellData>({
 		defaultValues: initialData
@@ -45,7 +53,6 @@ export default function GrievanceForm({ initialData, onChange }: Props) {
 
 	useEffect(() => {
 		const subscription = form.watch((values) => {
-			// @ts-ignore
 			onChange?.(values as GrievanceCellData);
 		});
 		return () => subscription.unsubscribe();
@@ -56,13 +63,19 @@ export default function GrievanceForm({ initialData, onChange }: Props) {
 		startTransition(async () => {
 			const result = await updateGrievanceCell('student-life-student-grievance-cell', values);
 			if (!result.ok) {
-				setMessage('Save failed');
+				setMessage({
+					type: 'error',
+					text: result.error ?? 'Failed to save grievance data.'
+				});
 				return;
 			}
-			setMessage('Saved successfully!');
-            setTimeout(() => setMessage(null), 3000);
+			setMessage({ type: 'success', text: 'Saved successfully.' });
+			setTimeout(() => setMessage(null), 3000);
 		});
 	};
+
+	const showSection = (section: 'header' | 'contacts' | 'process') =>
+		!visibleSections || visibleSections.includes(section);
 
 	return (
 		<Form {...form}>
@@ -71,8 +84,11 @@ export default function GrievanceForm({ initialData, onChange }: Props) {
 					<h3 className="font-semibold text-gray-900">Content</h3>
 					<div className="flex items-center gap-4">
 						{message && (
-							<span className={`text-sm font-medium ${message.includes('failed') ? 'text-red-600' : 'text-green-600'}`}>
-								{message}
+							<span
+								className={`text-sm font-medium ${
+									message.type === 'error' ? 'text-red-600' : 'text-green-600'
+								}`}>
+								{message.text}
 							</span>
 						)}
 						<Button type="submit" disabled={isPending}>
@@ -82,31 +98,36 @@ export default function GrievanceForm({ initialData, onChange }: Props) {
 					</div>
 				</div>
 
-				<FormField
-					control={form.control}
-					name="title"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Page Title</FormLabel>
-							<FormControl><Input {...field} /></FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+				{showSection('header') && (
+					<>
+						<FormField
+							control={form.control}
+							name="title"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Page Title</FormLabel>
+									<FormControl><Input {...field} /></FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 
-				<FormField
-					control={form.control}
-					name="description"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Description</FormLabel>
-							<FormControl><Textarea {...field} rows={3} /></FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+						<FormField
+							control={form.control}
+							name="description"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Description</FormLabel>
+									<FormControl><Textarea {...field} rows={3} /></FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</>
+				)}
 
                 {/* Contact Info */}
+				{showSection('contacts') && (
 				<div className="space-y-4">
 					<div className="flex items-center justify-between">
 						<FormLabel className="text-base">Contact Information</FormLabel>
@@ -189,8 +210,10 @@ export default function GrievanceForm({ initialData, onChange }: Props) {
 						))}
 					</div>
 				</div>
+				)}
 
                 {/* Process Steps */}
+                {showSection('process') && (
                 <div className="space-y-4 pt-6 border-t">
 					<div className="flex items-center justify-between">
 						<FormLabel className="text-base">Process Steps</FormLabel>
@@ -230,7 +253,15 @@ export default function GrievanceForm({ initialData, onChange }: Props) {
                                                 render={({ field }) => (
                                                     <FormItem>
                                                         <FormControl>
-                                                            <Input type="number" {...field} className="bg-white" onChange={e => field.onChange(parseInt(e.target.value))} />
+                                                            <Input
+                                                                type="number"
+                                                                {...field}
+                                                                className="bg-white"
+                                                                onChange={e => {
+                                                                    const parsed = Number(e.target.value);
+                                                                    field.onChange(Number.isFinite(parsed) ? parsed : 0);
+                                                                }}
+                                                            />
                                                         </FormControl>
                                                     </FormItem>
                                                 )}
@@ -262,8 +293,8 @@ export default function GrievanceForm({ initialData, onChange }: Props) {
 						))}
 					</div>
 				</div>
+				)}
 			</form>
 		</Form>
 	);
 }
-

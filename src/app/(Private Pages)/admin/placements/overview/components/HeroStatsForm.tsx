@@ -85,9 +85,15 @@ const createEmptyStat = (): StatFormValue => ({
 	textColor: 'black'
 });
 
-export default function HeroStatsForm({ initialData, pageSlug, onChange }: Props) {
+export default function HeroStatsForm({
+	initialData,
+	pageSlug,
+	onChange
+}: Props) {
 	const [isPending, startTransition] = useTransition();
-	const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+	const [saveStatus, setSaveStatus] = useState<
+		'idle' | 'saving' | 'saved' | 'error'
+	>('idle');
 
 	const form = useForm<FormValues>({
 		defaultValues: {
@@ -99,7 +105,8 @@ export default function HeroStatsForm({ initialData, pageSlug, onChange }: Props
 				iconColor: 'bg-blue-500',
 				textColor: 'text-white'
 			},
-			stats: initialData.stats.length > 0 ? initialData.stats : [createEmptyStat()]
+			stats:
+				initialData.stats.length > 0 ? initialData.stats : [createEmptyStat()]
 		}
 	});
 
@@ -111,7 +118,7 @@ export default function HeroStatsForm({ initialData, pageSlug, onChange }: Props
 	const iconOptions = SUPPORTED_ICON_NAMES;
 
 	useEffect(() => {
-		const subscription = form.watch((values) => {
+		const subscription = form.watch(values => {
 			if (onChange) {
 				const updatedData: PlacementOverviewData = {
 					...initialData,
@@ -125,7 +132,9 @@ export default function HeroStatsForm({ initialData, pageSlug, onChange }: Props
 					},
 					stats: (values.stats || [])
 						.map(stat => ({
-							icon: stat?.icon?.trim().length ? stat.icon.trim() : FALLBACK_ICON,
+							icon: stat?.icon?.trim().length
+								? stat.icon.trim()
+								: FALLBACK_ICON,
 							value: (stat?.value ?? '').trim(),
 							label: (stat?.label ?? '').trim(),
 							iconColor: stat?.iconColor ?? 'blue',
@@ -170,19 +179,19 @@ export default function HeroStatsForm({ initialData, pageSlug, onChange }: Props
 
 	return (
 		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+			<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
 				{/* Hero Section */}
-				<div className="space-y-4">
-					<h3 className="text-lg font-semibold text-slate-900">Hero Section</h3>
-					
+				<div className='space-y-4'>
+					<h3 className='text-lg font-semibold text-slate-900'>Hero Section</h3>
+
 					<FormField
 						control={form.control}
-						name="hero.title"
+						name='hero.title'
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>Title</FormLabel>
 								<FormControl>
-									<Input placeholder="Training & Placement Cell" {...field} />
+									<Input placeholder='Training & Placement Cell' {...field} />
 								</FormControl>
 								<FormMessage />
 							</FormItem>
@@ -191,15 +200,15 @@ export default function HeroStatsForm({ initialData, pageSlug, onChange }: Props
 
 					<FormField
 						control={form.control}
-						name="hero.subtitle"
+						name='hero.subtitle'
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>Subtitle</FormLabel>
 								<FormControl>
-									<Textarea 
-										placeholder="Bridging Academia and Industry Excellence"
+									<Textarea
+										placeholder='Bridging Academia and Industry Excellence'
 										rows={3}
-										{...field} 
+										{...field}
 									/>
 								</FormControl>
 								<FormMessage />
@@ -209,14 +218,14 @@ export default function HeroStatsForm({ initialData, pageSlug, onChange }: Props
 
 					<FormField
 						control={form.control}
-						name="hero.icon"
+						name='hero.icon'
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>Icon</FormLabel>
 								<FormControl>
 									<Select onValueChange={field.onChange} value={field.value}>
 										<SelectTrigger>
-											<SelectValue placeholder="Select icon" />
+											<SelectValue placeholder='Select icon' />
 										</SelectTrigger>
 										<SelectContent>
 											{iconOptions.map(option => (
@@ -234,14 +243,14 @@ export default function HeroStatsForm({ initialData, pageSlug, onChange }: Props
 
 					<FormField
 						control={form.control}
-						name="hero.gradient"
+						name='hero.gradient'
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>Gradient</FormLabel>
 								<FormControl>
 									<Select onValueChange={field.onChange} value={field.value}>
 										<SelectTrigger>
-											<SelectValue placeholder="Select gradient" />
+											<SelectValue placeholder='Select gradient' />
 										</SelectTrigger>
 										<SelectContent>
 											{GRADIENT_OPTIONS.map(option => (
@@ -259,12 +268,12 @@ export default function HeroStatsForm({ initialData, pageSlug, onChange }: Props
 
 					<FormField
 						control={form.control}
-						name="hero.iconColor"
+						name='hero.iconColor'
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>Icon Background Color</FormLabel>
 								<FormControl>
-									<Input placeholder="bg-blue-500" {...field} />
+									<Input placeholder='bg-blue-500' {...field} />
 								</FormControl>
 								<FormMessage />
 							</FormItem>
@@ -273,12 +282,12 @@ export default function HeroStatsForm({ initialData, pageSlug, onChange }: Props
 
 					<FormField
 						control={form.control}
-						name="hero.textColor"
+						name='hero.textColor'
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>Text Color</FormLabel>
 								<FormControl>
-									<Input placeholder="text-white" {...field} />
+									<Input placeholder='text-white' {...field} />
 								</FormControl>
 								<FormMessage />
 							</FormItem>
@@ -287,39 +296,36 @@ export default function HeroStatsForm({ initialData, pageSlug, onChange }: Props
 				</div>
 
 				{/* Stats Section */}
-				<div className="space-y-4">
-					<div className="flex items-center justify-between">
-						<h3 className="text-lg font-semibold text-slate-900">Statistics</h3>
+				<div className='space-y-4'>
+					<div className='flex items-center justify-between'>
+						<h3 className='text-lg font-semibold text-slate-900'>Statistics</h3>
 						<Button
-							type="button"
-							variant="outline"
-							size="sm"
-							onClick={() => statsArray.append(createEmptyStat())}
-						>
-							<Plus className="w-4 h-4 mr-2" />
+							type='button'
+							variant='outline'
+							size='sm'
+							onClick={() => statsArray.append(createEmptyStat())}>
+							<Plus className='w-4 h-4 mr-2' />
 							Add Stat
 						</Button>
 					</div>
-					<div className="space-y-4">
+					<div className='space-y-4'>
 						{statsArray.fields.map((field, index) => (
 							<div
 								key={field.id}
-								className="rounded-lg border border-slate-200 p-4 space-y-4 bg-slate-50/50"
-							>
-								<div className="flex items-center justify-between">
-									<span className="text-sm font-medium text-slate-700">
+								className='rounded-lg border border-slate-200 p-4 space-y-4 bg-slate-50/50'>
+								<div className='flex items-center justify-between'>
+									<span className='text-sm font-medium text-slate-700'>
 										Stat {index + 1}
 									</span>
 									<Button
-										type="button"
-										variant="ghost"
-										size="sm"
-										onClick={() => statsArray.remove(index)}
-									>
-										<Trash2 className="w-4 h-4" />
+										type='button'
+										variant='ghost'
+										size='sm'
+										onClick={() => statsArray.remove(index)}>
+										<Trash2 className='w-4 h-4' />
 									</Button>
 								</div>
-								<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+								<div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
 									<FormField
 										control={form.control}
 										name={`stats.${index}.value`}
@@ -328,7 +334,7 @@ export default function HeroStatsForm({ initialData, pageSlug, onChange }: Props
 											<FormItem>
 												<FormLabel>Value</FormLabel>
 												<FormControl>
-													<Input placeholder="500+" {...valueField} />
+													<Input placeholder='500+' {...valueField} />
 												</FormControl>
 												<FormMessage />
 											</FormItem>
@@ -342,7 +348,10 @@ export default function HeroStatsForm({ initialData, pageSlug, onChange }: Props
 											<FormItem>
 												<FormLabel>Label</FormLabel>
 												<FormControl>
-													<Input placeholder="Companies Visited" {...labelField} />
+													<Input
+														placeholder='Companies Visited'
+														{...labelField}
+													/>
 												</FormControl>
 												<FormMessage />
 											</FormItem>
@@ -357,10 +366,9 @@ export default function HeroStatsForm({ initialData, pageSlug, onChange }: Props
 												<FormControl>
 													<Select
 														onValueChange={iconField.onChange}
-														value={iconField.value}
-													>
+														value={iconField.value}>
 														<SelectTrigger>
-															<SelectValue placeholder="Select icon" />
+															<SelectValue placeholder='Select icon' />
 														</SelectTrigger>
 														<SelectContent>
 															{iconOptions.map(option => (
@@ -382,7 +390,7 @@ export default function HeroStatsForm({ initialData, pageSlug, onChange }: Props
 											<FormItem>
 												<FormLabel>Icon Color</FormLabel>
 												<FormControl>
-													<Input placeholder="bg-blue-500" {...colorField} />
+													<Input placeholder='bg-blue-500' {...colorField} />
 												</FormControl>
 												<FormMessage />
 											</FormItem>
@@ -394,16 +402,18 @@ export default function HeroStatsForm({ initialData, pageSlug, onChange }: Props
 					</div>
 				</div>
 
-				<div className="flex items-center justify-between pt-6 border-t">
+				<div className='flex items-center justify-between pt-6 border-t'>
 					<div>
 						{saveStatus === 'saved' && (
-							<p className="text-sm text-green-600">Changes saved successfully!</p>
+							<p className='text-sm text-green-600'>
+								Changes saved successfully!
+							</p>
 						)}
 						{saveStatus === 'error' && (
-							<p className="text-sm text-red-600">Failed to save changes.</p>
+							<p className='text-sm text-red-600'>Failed to save changes.</p>
 						)}
 					</div>
-					<Button type="submit" disabled={isPending || saveStatus === 'saving'}>
+					<Button type='submit' disabled={isPending || saveStatus === 'saving'}>
 						{saveStatus === 'saving' ? 'Saving...' : 'Save Changes'}
 					</Button>
 				</div>

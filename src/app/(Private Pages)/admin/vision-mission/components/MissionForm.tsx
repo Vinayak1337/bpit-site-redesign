@@ -56,6 +56,7 @@ type Props = {
 	initialData: MissionData;
 	pageSlug: string;
 	onChange?: (data: MissionData) => void;
+	visibleSections?: Array<'hero' | 'missionStatement' | 'objectives' | 'impact'>;
 };
 
 const COLOR_OPTIONS: MissionData['objectives'][number]['color'][] = [
@@ -133,7 +134,8 @@ const normalizeMission = (values: Partial<FormValues>): MissionData => {
 export default function MissionForm({
 	initialData,
 	pageSlug,
-	onChange
+	onChange,
+	visibleSections
 }: Props) {
 	const [isPending, startTransition] = useTransition();
 	const [message, setMessage] = useState<string | null>(null);
@@ -215,6 +217,10 @@ export default function MissionForm({
 		});
 	};
 
+	const showSection = (
+		section: 'hero' | 'missionStatement' | 'objectives' | 'impact'
+	) => !visibleSections || visibleSections.includes(section);
+
 	return (
 		<Form {...form}>
 			<form
@@ -243,6 +249,7 @@ export default function MissionForm({
 				</div>
 
 				{/* Hero Section */}
+				{showSection('hero') ? (
 				<div className='space-y-4'>
 					<h4 className='text-sm font-semibold text-slate-700'>Hero Section</h4>
 					<div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
@@ -298,8 +305,10 @@ export default function MissionForm({
 						/>
 					</div>
 				</div>
+				) : null}
 
 				{/* Mission Statement */}
+				{showSection('missionStatement') ? (
 				<div className="space-y-4">
 					<h3 className="text-lg font-semibold text-gray-900">Mission Statement</h3>
 					<div className="grid grid-cols-1 gap-4">
@@ -359,8 +368,10 @@ export default function MissionForm({
 						/>
 					</div>
 				</div>
+				) : null}
 
 				{/* Objectives */}
+				{showSection('objectives') ? (
 				<div className="space-y-4">
 					<div className="flex justify-between items-center">
 						<h3 className="text-lg font-semibold text-gray-900">Mission Objectives</h3>
@@ -474,8 +485,10 @@ export default function MissionForm({
 						</div>
 					))}
 				</div>
+				) : null}
 
 				{/* Impact Section */}
+				{showSection('impact') ? (
 				<div className="space-y-4">
 					<h3 className="text-lg font-semibold text-gray-900">Mission Impact</h3>
 					<div className="grid grid-cols-1 gap-4">
@@ -591,6 +604,7 @@ export default function MissionForm({
 						))}
 					</div>
 				</div>
+				) : null}
 			</form>
 		</Form>
 	);

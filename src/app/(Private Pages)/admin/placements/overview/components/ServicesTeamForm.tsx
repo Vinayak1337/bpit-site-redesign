@@ -24,7 +24,6 @@ import type { PlacementOverviewData } from '@/app/(Private Pages)/actions/placem
 import { updatePlacementOverview } from '@/app/(Private Pages)/actions/placement-overview';
 import { SUPPORTED_ICON_NAMES } from '@/components/about/icons';
 import { Plus, Trash2 } from 'lucide-react';
-import UploadButton from '@/components/cloudinary/upload-button';
 
 type FeatureFormValue = {
 	id: string;
@@ -79,22 +78,34 @@ const createEmptyTeamMember = (): TeamMemberFormValue => ({
 	position: '',
 	email: '',
 	initials: '',
-	gradientColor: 'blue',
-	textColor: 'white'
+	gradientColor: 'bg-gradient-to-br from-blue-500 to-blue-600',
+	textColor: 'text-white'
 });
 
-export default function ServicesTeamForm({ initialData, pageSlug, onChange }: Props) {
+export default function ServicesTeamForm({
+	initialData,
+	pageSlug,
+	onChange
+}: Props) {
 	const [isPending, startTransition] = useTransition();
-	const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+	const [saveStatus, setSaveStatus] = useState<
+		'idle' | 'saving' | 'saved' | 'error'
+	>('idle');
 
 	const form = useForm<FormValues>({
 		defaultValues: {
 			servicesTitle: initialData.servicesTitle || '',
 			servicesDescription: initialData.servicesDescription || '',
-			features: initialData.features.length > 0 ? initialData.features : [createEmptyFeature()],
+			features:
+				initialData.features.length > 0
+					? initialData.features
+					: [createEmptyFeature()],
 			teamTitle: initialData.teamTitle || '',
 			teamDescription: initialData.teamDescription || '',
-			teamMembers: initialData.teamMembers.length > 0 ? initialData.teamMembers : [createEmptyTeamMember()]
+			teamMembers:
+				initialData.teamMembers.length > 0
+					? initialData.teamMembers
+					: [createEmptyTeamMember()]
 		}
 	});
 
@@ -111,7 +122,7 @@ export default function ServicesTeamForm({ initialData, pageSlug, onChange }: Pr
 	const iconOptions = SUPPORTED_ICON_NAMES;
 
 	useEffect(() => {
-		const subscription = form.watch((values) => {
+		const subscription = form.watch(values => {
 			if (onChange) {
 				const updatedData: PlacementOverviewData = {
 					...initialData,
@@ -120,14 +131,19 @@ export default function ServicesTeamForm({ initialData, pageSlug, onChange }: Pr
 					features: (values.features || [])
 						.map(feature => ({
 							id: feature?.id || crypto.randomUUID(),
-							icon: feature?.icon?.trim().length ? feature.icon.trim() : FALLBACK_ICON,
+							icon: feature?.icon?.trim().length
+								? feature.icon.trim()
+								: FALLBACK_ICON,
 							title: (feature?.title ?? '').trim(),
 							description: (feature?.description ?? '').trim(),
 							color: feature?.color ?? 'blue',
 							iconColor: feature?.iconColor ?? 'blue',
 							textColor: feature?.textColor ?? 'black'
 						}))
-						.filter(feature => feature.title.length > 0 && feature.description.length > 0),
+						.filter(
+							feature =>
+								feature.title.length > 0 && feature.description.length > 0
+						),
 					teamTitle: values.teamTitle || '',
 					teamDescription: values.teamDescription || '',
 					teamMembers: (values.teamMembers || [])
@@ -137,10 +153,14 @@ export default function ServicesTeamForm({ initialData, pageSlug, onChange }: Pr
 							position: (member?.position ?? '').trim(),
 							email: (member?.email ?? '').trim(),
 							initials: (member?.initials ?? '').trim(),
-							gradientColor: member?.gradientColor ?? 'blue',
-							textColor: member?.textColor ?? 'white'
+							gradientColor:
+								member?.gradientColor ??
+								'bg-gradient-to-br from-blue-500 to-blue-600',
+							textColor: member?.textColor ?? 'text-white'
 						}))
-						.filter(member => member.name.length > 0 && member.position.length > 0)
+						.filter(
+							member => member.name.length > 0 && member.position.length > 0
+						)
 				};
 				onChange(updatedData);
 			}
@@ -159,14 +179,19 @@ export default function ServicesTeamForm({ initialData, pageSlug, onChange }: Pr
 					features: values.features
 						.map(feature => ({
 							id: feature.id,
-							icon: feature.icon?.trim().length ? feature.icon.trim() : FALLBACK_ICON,
+							icon: feature.icon?.trim().length
+								? feature.icon.trim()
+								: FALLBACK_ICON,
 							title: (feature.title ?? '').trim(),
 							description: (feature.description ?? '').trim(),
 							color: feature.color ?? 'blue',
 							iconColor: feature.iconColor ?? 'blue',
 							textColor: feature.textColor ?? 'black'
 						}))
-						.filter(feature => feature.title.length > 0 && feature.description.length > 0),
+						.filter(
+							feature =>
+								feature.title.length > 0 && feature.description.length > 0
+						),
 					teamTitle: values.teamTitle,
 					teamDescription: values.teamDescription,
 					teamMembers: values.teamMembers
@@ -176,10 +201,14 @@ export default function ServicesTeamForm({ initialData, pageSlug, onChange }: Pr
 							position: (member.position ?? '').trim(),
 							email: (member.email ?? '').trim(),
 							initials: (member.initials ?? '').trim(),
-							gradientColor: member.gradientColor ?? 'blue',
-							textColor: member.textColor ?? 'white'
+							gradientColor:
+								member.gradientColor ??
+								'bg-gradient-to-br from-blue-500 to-blue-600',
+							textColor: member.textColor ?? 'text-white'
 						}))
-						.filter(member => member.name.length > 0 && member.position.length > 0)
+						.filter(
+							member => member.name.length > 0 && member.position.length > 0
+						)
 				};
 
 				await updatePlacementOverview(pageSlug, updatedData);
@@ -195,19 +224,21 @@ export default function ServicesTeamForm({ initialData, pageSlug, onChange }: Pr
 
 	return (
 		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+			<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
 				{/* Services Section */}
-				<div className="space-y-4">
-					<h3 className="text-lg font-semibold text-slate-900">Services Section</h3>
-					
+				<div className='space-y-4'>
+					<h3 className='text-lg font-semibold text-slate-900'>
+						Services Section
+					</h3>
+
 					<FormField
 						control={form.control}
-						name="servicesTitle"
+						name='servicesTitle'
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>Services Title</FormLabel>
 								<FormControl>
-									<Input placeholder="Our Services" {...field} />
+									<Input placeholder='Our Services' {...field} />
 								</FormControl>
 								<FormMessage />
 							</FormItem>
@@ -216,15 +247,15 @@ export default function ServicesTeamForm({ initialData, pageSlug, onChange }: Pr
 
 					<FormField
 						control={form.control}
-						name="servicesDescription"
+						name='servicesDescription'
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>Services Description</FormLabel>
 								<FormControl>
-									<Textarea 
-										placeholder="Brief description of services"
+									<Textarea
+										placeholder='Brief description of services'
 										rows={3}
-										{...field} 
+										{...field}
 									/>
 								</FormControl>
 								<FormMessage />
@@ -234,39 +265,36 @@ export default function ServicesTeamForm({ initialData, pageSlug, onChange }: Pr
 				</div>
 
 				{/* Features */}
-				<div className="space-y-4">
-					<div className="flex items-center justify-between">
-						<h3 className="text-lg font-semibold text-slate-900">Features</h3>
+				<div className='space-y-4'>
+					<div className='flex items-center justify-between'>
+						<h3 className='text-lg font-semibold text-slate-900'>Features</h3>
 						<Button
-							type="button"
-							variant="outline"
-							size="sm"
-							onClick={() => featuresArray.append(createEmptyFeature())}
-						>
-							<Plus className="w-4 h-4 mr-2" />
+							type='button'
+							variant='outline'
+							size='sm'
+							onClick={() => featuresArray.append(createEmptyFeature())}>
+							<Plus className='w-4 h-4 mr-2' />
 							Add Feature
 						</Button>
 					</div>
-					<div className="space-y-4">
+					<div className='space-y-4'>
 						{featuresArray.fields.map((field, index) => (
 							<div
 								key={field.id}
-								className="rounded-lg border border-slate-200 p-4 space-y-4 bg-slate-50/50"
-							>
-								<div className="flex items-center justify-between">
-									<span className="text-sm font-medium text-slate-700">
+								className='rounded-lg border border-slate-200 p-4 space-y-4 bg-slate-50/50'>
+								<div className='flex items-center justify-between'>
+									<span className='text-sm font-medium text-slate-700'>
 										Feature {index + 1}
 									</span>
 									<Button
-										type="button"
-										variant="ghost"
-										size="sm"
-										onClick={() => featuresArray.remove(index)}
-									>
-										<Trash2 className="w-4 h-4" />
+										type='button'
+										variant='ghost'
+										size='sm'
+										onClick={() => featuresArray.remove(index)}>
+										<Trash2 className='w-4 h-4' />
 									</Button>
 								</div>
-								<div className="grid grid-cols-1 gap-4">
+								<div className='grid grid-cols-1 gap-4'>
 									<FormField
 										control={form.control}
 										name={`features.${index}.title`}
@@ -275,7 +303,7 @@ export default function ServicesTeamForm({ initialData, pageSlug, onChange }: Pr
 											<FormItem>
 												<FormLabel>Title</FormLabel>
 												<FormControl>
-													<Input placeholder="Feature title" {...titleField} />
+													<Input placeholder='Feature title' {...titleField} />
 												</FormControl>
 												<FormMessage />
 											</FormItem>
@@ -289,7 +317,11 @@ export default function ServicesTeamForm({ initialData, pageSlug, onChange }: Pr
 											<FormItem>
 												<FormLabel>Description</FormLabel>
 												<FormControl>
-													<Textarea placeholder="Feature description" rows={3} {...descField} />
+													<Textarea
+														placeholder='Feature description'
+														rows={3}
+														{...descField}
+													/>
 												</FormControl>
 												<FormMessage />
 											</FormItem>
@@ -304,10 +336,9 @@ export default function ServicesTeamForm({ initialData, pageSlug, onChange }: Pr
 												<FormControl>
 													<Select
 														onValueChange={iconField.onChange}
-														value={iconField.value}
-													>
+														value={iconField.value}>
 														<SelectTrigger>
-															<SelectValue placeholder="Select icon" />
+															<SelectValue placeholder='Select icon' />
 														</SelectTrigger>
 														<SelectContent>
 															{iconOptions.map(option => (
@@ -329,7 +360,10 @@ export default function ServicesTeamForm({ initialData, pageSlug, onChange }: Pr
 											<FormItem>
 												<FormLabel>Icon Color</FormLabel>
 												<FormControl>
-													<Input placeholder="from-blue-500 to-blue-700" {...colorField} />
+													<Input
+														placeholder='from-blue-500 to-blue-700'
+														{...colorField}
+													/>
 												</FormControl>
 												<FormMessage />
 											</FormItem>
@@ -342,17 +376,17 @@ export default function ServicesTeamForm({ initialData, pageSlug, onChange }: Pr
 				</div>
 
 				{/* Team Section */}
-				<div className="space-y-4">
-					<h3 className="text-lg font-semibold text-slate-900">Team Section</h3>
-					
+				<div className='space-y-4'>
+					<h3 className='text-lg font-semibold text-slate-900'>Team Section</h3>
+
 					<FormField
 						control={form.control}
-						name="teamTitle"
+						name='teamTitle'
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>Team Title</FormLabel>
 								<FormControl>
-									<Input placeholder="Our Team" {...field} />
+									<Input placeholder='Our Team' {...field} />
 								</FormControl>
 								<FormMessage />
 							</FormItem>
@@ -361,15 +395,15 @@ export default function ServicesTeamForm({ initialData, pageSlug, onChange }: Pr
 
 					<FormField
 						control={form.control}
-						name="teamDescription"
+						name='teamDescription'
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>Team Description</FormLabel>
 								<FormControl>
-									<Textarea 
-										placeholder="Brief description of the team"
+									<Textarea
+										placeholder='Brief description of the team'
 										rows={3}
-										{...field} 
+										{...field}
 									/>
 								</FormControl>
 								<FormMessage />
@@ -379,39 +413,38 @@ export default function ServicesTeamForm({ initialData, pageSlug, onChange }: Pr
 				</div>
 
 				{/* Team Members */}
-				<div className="space-y-4">
-					<div className="flex items-center justify-between">
-						<h3 className="text-lg font-semibold text-slate-900">Team Members</h3>
+				<div className='space-y-4'>
+					<div className='flex items-center justify-between'>
+						<h3 className='text-lg font-semibold text-slate-900'>
+							Team Members
+						</h3>
 						<Button
-							type="button"
-							variant="outline"
-							size="sm"
-							onClick={() => teamMembersArray.append(createEmptyTeamMember())}
-						>
-							<Plus className="w-4 h-4 mr-2" />
+							type='button'
+							variant='outline'
+							size='sm'
+							onClick={() => teamMembersArray.append(createEmptyTeamMember())}>
+							<Plus className='w-4 h-4 mr-2' />
 							Add Member
 						</Button>
 					</div>
-					<div className="space-y-4">
+					<div className='space-y-4'>
 						{teamMembersArray.fields.map((field, index) => (
 							<div
 								key={field.id}
-								className="rounded-lg border border-slate-200 p-4 space-y-4 bg-slate-50/50"
-							>
-								<div className="flex items-center justify-between">
-									<span className="text-sm font-medium text-slate-700">
+								className='rounded-lg border border-slate-200 p-4 space-y-4 bg-slate-50/50'>
+								<div className='flex items-center justify-between'>
+									<span className='text-sm font-medium text-slate-700'>
 										Member {index + 1}
 									</span>
 									<Button
-										type="button"
-										variant="ghost"
-										size="sm"
-										onClick={() => teamMembersArray.remove(index)}
-									>
-										<Trash2 className="w-4 h-4" />
+										type='button'
+										variant='ghost'
+										size='sm'
+										onClick={() => teamMembersArray.remove(index)}>
+										<Trash2 className='w-4 h-4' />
 									</Button>
 								</div>
-								<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+								<div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
 									<FormField
 										control={form.control}
 										name={`teamMembers.${index}.name`}
@@ -420,7 +453,7 @@ export default function ServicesTeamForm({ initialData, pageSlug, onChange }: Pr
 											<FormItem>
 												<FormLabel>Name</FormLabel>
 												<FormControl>
-													<Input placeholder="Member name" {...nameField} />
+													<Input placeholder='Member name' {...nameField} />
 												</FormControl>
 												<FormMessage />
 											</FormItem>
@@ -434,7 +467,7 @@ export default function ServicesTeamForm({ initialData, pageSlug, onChange }: Pr
 											<FormItem>
 												<FormLabel>Position</FormLabel>
 												<FormControl>
-													<Input placeholder="Position/Role" {...posField} />
+													<Input placeholder='Position/Role' {...posField} />
 												</FormControl>
 												<FormMessage />
 											</FormItem>
@@ -448,7 +481,10 @@ export default function ServicesTeamForm({ initialData, pageSlug, onChange }: Pr
 											<FormItem>
 												<FormLabel>Email</FormLabel>
 												<FormControl>
-													<Input placeholder="email@example.com" {...emailField} />
+													<Input
+														placeholder='email@example.com'
+														{...emailField}
+													/>
 												</FormControl>
 												<FormMessage />
 											</FormItem>
@@ -462,7 +498,43 @@ export default function ServicesTeamForm({ initialData, pageSlug, onChange }: Pr
 											<FormItem>
 												<FormLabel>Initials</FormLabel>
 												<FormControl>
-													<Input placeholder="Initials (e.g. JD)" {...initialsField} />
+													<Input
+														placeholder='e.g. JD'
+														maxLength={3}
+														{...initialsField}
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+									<FormField
+										control={form.control}
+										name={`teamMembers.${index}.gradientColor`}
+										render={({ field: gradientField }) => (
+											<FormItem>
+												<FormLabel>Avatar Color</FormLabel>
+												<FormControl>
+													<Input
+														placeholder='e.g. bg-gradient-to-br from-blue-500 to-blue-600'
+														{...gradientField}
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+									<FormField
+										control={form.control}
+										name={`teamMembers.${index}.textColor`}
+										render={({ field: textColorField }) => (
+											<FormItem>
+												<FormLabel>Initials Text Color</FormLabel>
+												<FormControl>
+													<Input
+														placeholder='e.g. text-white'
+														{...textColorField}
+													/>
 												</FormControl>
 												<FormMessage />
 											</FormItem>
@@ -474,16 +546,18 @@ export default function ServicesTeamForm({ initialData, pageSlug, onChange }: Pr
 					</div>
 				</div>
 
-				<div className="flex items-center justify-between pt-6 border-t">
+				<div className='flex items-center justify-between pt-6 border-t'>
 					<div>
 						{saveStatus === 'saved' && (
-							<p className="text-sm text-green-600">Changes saved successfully!</p>
+							<p className='text-sm text-green-600'>
+								Changes saved successfully!
+							</p>
 						)}
 						{saveStatus === 'error' && (
-							<p className="text-sm text-red-600">Failed to save changes.</p>
+							<p className='text-sm text-red-600'>Failed to save changes.</p>
 						)}
 					</div>
-					<Button type="submit" disabled={isPending || saveStatus === 'saving'}>
+					<Button type='submit' disabled={isPending || saveStatus === 'saving'}>
 						{saveStatus === 'saving' ? 'Saving...' : 'Save Changes'}
 					</Button>
 				</div>

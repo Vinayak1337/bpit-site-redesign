@@ -32,6 +32,7 @@ type Props = {
 	initialData: FounderTributeData;
 	pageSlug: string;
 	onChange?: (data: FounderTributeData) => void;
+	visibleSections?: Array<'hero' | 'content' | 'values'>;
 };
 
 const createStringValue = (value = ''): StringFormValue => ({
@@ -72,7 +73,8 @@ const normalizeFounderTribute = (values: Partial<FormValues>): FounderTributeDat
 export default function FounderTributeForm({
 	initialData,
 	pageSlug,
-	onChange
+	onChange,
+	visibleSections
 }: Props) {
 	const [isPending, startTransition] = useTransition();
 	const [message, setMessage] = useState<string | null>(null);
@@ -149,6 +151,9 @@ export default function FounderTributeForm({
 		});
 	};
 
+	const showSection = (section: 'hero' | 'content' | 'values') =>
+		!visibleSections || visibleSections.includes(section);
+
 	return (
 		<Form {...form}>
 			<form
@@ -173,6 +178,7 @@ export default function FounderTributeForm({
 					</div>
 				</div>
 
+				{showSection('hero') ? (
 				<div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
 					<FormField
 						control={form.control}
@@ -203,7 +209,10 @@ export default function FounderTributeForm({
 						)}
 					/>
 				</div>
+				) : null}
 
+				{showSection('content') ? (
+				<>
 				<div className='space-y-3'>
 					<div className='flex items-center justify-between'>
 						<h4 className='text-sm font-semibold text-slate-700'>
@@ -320,7 +329,10 @@ export default function FounderTributeForm({
 						))}
 					</div>
 				</div>
+				</>
+				) : null}
 
+				{showSection('values') ? (
 				<div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
 					<div className='space-y-3'>
 						<div className='flex items-center justify-between'>
@@ -412,6 +424,7 @@ export default function FounderTributeForm({
 						</div>
 					</div>
 				</div>
+				) : null}
 			</form>
 		</Form>
 	);

@@ -215,6 +215,7 @@ export interface LeadershipTeamData {
 		id: string;
 		name: string;
 		position: string;
+		image?: string;
 		icon: string;
 		iconColor: string;
 		iconTextColor: string;
@@ -329,6 +330,7 @@ function getDefaultLeadershipTeamData(): LeadershipTeamData {
 				id: 'principal',
 				name: 'Dr. [Principal Name]',
 				position: 'Principal',
+				image: '',
 				icon: 'Building2',
 				iconColor: 'bg-blue-100',
 				iconTextColor: 'text-blue-600',
@@ -353,6 +355,7 @@ function getDefaultLeadershipTeamData(): LeadershipTeamData {
 				id: 'vice-principal',
 				name: 'Dr. [Vice Principal Name]',
 				position: 'Vice Principal',
+				image: '',
 				icon: 'Users',
 				iconColor: 'bg-blue-100',
 				iconTextColor: 'text-blue-600',
@@ -377,6 +380,7 @@ function getDefaultLeadershipTeamData(): LeadershipTeamData {
 				id: 'dean-academics',
 				name: 'Dr. [Dean Name]',
 				position: 'Dean (Academics)',
+				image: '',
 				icon: 'BookOpen',
 				iconColor: 'bg-green-100',
 				iconTextColor: 'text-green-600',
@@ -401,6 +405,7 @@ function getDefaultLeadershipTeamData(): LeadershipTeamData {
 				id: 'dean-admin',
 				name: 'Dr. [Admin Dean Name]',
 				position: 'Dean (Administration)',
+				image: '',
 				icon: 'Settings',
 				iconColor: 'bg-purple-100',
 				iconTextColor: 'text-purple-600',

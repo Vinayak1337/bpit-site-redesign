@@ -1,12 +1,14 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { toast } from 'react-toastify';
 import { Loader2, Plus, Trash2, Save, Image as ImageIcon, GripVertical } from 'lucide-react';
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd';
+import { toast } from 'react-toastify';
 
+import Editable from '@/components/ui/Editable';
+import GalleryCollage from '@/components/gallery/GalleryCollage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,23 +22,38 @@ import {
 } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-	updateGallery
-} from '@/app/(Private Pages)/actions/gallery';
-import { galleryDataSchema, GalleryData } from '@/lib/schemas/gallery';
+import { updateGallery } from '@/app/(Private Pages)/actions/gallery';
+import { galleryDataSchema, type GalleryData } from '@/lib/schemas/gallery';
 
 interface GalleryEditorProps {
 	initialData: GalleryData;
 }
 
-export default function GalleryEditor({ initialData }: GalleryEditorProps) {
-	const [isSaving, setIsSaving] = useState(false);
-	const [activeTab, setActiveTab] = useState('items');
-    const [isMounted, setIsMounted] = useState(false);
+type GalleryTab = 'items' | 'categories';
+type GalleryItemSize = NonNullable<GalleryData['items'][number]['size']>;
 
-    useEffect(() => {
-        setIsMounted(true);
-    }, []);
+type GalleryFormPanelProps = {
+	initialData: GalleryData;
+	onChange?: (data: GalleryData) => void;
+	visibleTabs?: GalleryTab[];
+};
+
+function GalleryFormPanel({
+	initialData,
+	onChange,
+	visibleTabs
+}: GalleryFormPanelProps) {
+	const [isSaving, setIsSaving] = useState(false);
+	const [message, setMessage] = useState<{
+		type: 'success' | 'error';
+		text: string;
+	} | null>(null);
+	const [activeTab, setActiveTab] = useState<GalleryTab>('items');
+	const [isMounted, setIsMounted] = useState(false);
+
+	useEffect(() => {
+		setIsMounted(true);
+	}, []);
 
 	const form = useForm<GalleryData>({
 		resolver: zodResolver(galleryDataSchema),
@@ -57,233 +74,310 @@ export default function GalleryEditor({ initialData }: GalleryEditorProps) {
 
 	const categories = watch('categories');
 
+	useEffect(() => {
+		const subscription = form.watch(values => {
+			onChange?.(values as GalleryData);
+		});
+		return () => subscription.unsubscribe();
+	}, [form, onChange]);
+
+	useEffect(() => {
+		form.reset(initialData);
+	}, [form, initialData]);
+
+	useEffect(() => {
+		if (!visibleTabs || visibleTabs.length === 0) return;
+		if (!visibleTabs.includes(activeTab)) {
+			setActiveTab(visibleTabs[0]);
+		}
+	}, [activeTab, visibleTabs]);
+
+	const showTab = (tab: GalleryTab) => !visibleTabs || visibleTabs.includes(tab);
+
 	async function onSubmit(data: GalleryData) {
+		setMessage(null);
 		setIsSaving(true);
 		try {
 			await updateGallery(data);
 			toast.success('Gallery updated successfully');
+			setMessage({ type: 'success', text: 'Saved successfully.' });
 		} catch (error) {
 			console.error(error);
 			toast.error('Failed to update gallery');
+			setMessage({ type: 'error', text: 'Failed to save gallery changes.' });
 		} finally {
 			setIsSaving(false);
 		}
 	}
 
-    const handleDragEnd = (result: any) => {
-        if (!result.destination) return;
-        moveItem(result.source.index, result.destination.index);
-    };
+	const handleDragEnd = (result: DropResult) => {
+		if (!result.destination) return;
+		moveItem(result.source.index, result.destination.index);
+	};
 
-    if (!isMounted) {
-        return null; // Or a loading skeleton
-    }
+	if (!isMounted) {
+		return null;
+	}
 
 	return (
-		<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-			<div className="flex justify-end space-x-4">
-				<Button type="submit" disabled={isSaving}>
-					{isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-					<Save className="mr-2 h-4 w-4" />
-					Save Changes
-				</Button>
+		<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
+			<div className='sticky top-0 z-10 -mx-4 -mt-4 mb-2 border-b bg-white p-4 shadow-sm'>
+				<div className='flex items-center justify-between gap-3'>
+					{message ? (
+						<span
+							className={`text-sm font-medium ${
+								message.type === 'error' ? 'text-red-600' : 'text-emerald-600'
+							}`}>
+							{message.text}
+						</span>
+					) : (
+						<span className='text-sm text-slate-500'>Edit and save this section.</span>
+					)}
+					<Button type='submit' disabled={isSaving}>
+						{isSaving ? <Loader2 className='mr-2 h-4 w-4 animate-spin' /> : <Save className='mr-2 h-4 w-4' />}
+						Save
+					</Button>
+				</div>
 			</div>
 
-			<Tabs value={activeTab} onValueChange={setActiveTab}>
-				<TabsList className="grid w-full grid-cols-2 max-w-[400px]">
-					<TabsTrigger value="items">Gallery Items</TabsTrigger>
-					<TabsTrigger value="categories">Categories</TabsTrigger>
+			<Tabs value={activeTab} onValueChange={value => setActiveTab(value as GalleryTab)}>
+				<TabsList className='grid w-full max-w-[400px] grid-cols-2'>
+					{showTab('items') ? <TabsTrigger value='items'>Gallery Items</TabsTrigger> : null}
+					{showTab('categories') ? <TabsTrigger value='categories'>Categories</TabsTrigger> : null}
 				</TabsList>
 
-				<TabsContent value="items" className="space-y-6">
-                    <DragDropContext onDragEnd={handleDragEnd}>
-                        <Droppable droppableId="gallery-items">
-                            {(provided) => (
-                                <div 
-                                    {...provided.droppableProps} 
-                                    ref={provided.innerRef}
-                                    className="space-y-4"
-                                >
-                                    {itemFields.map((field, index) => (
-                                        <Draggable key={field.id} draggableId={field.id} index={index}>
-                                            {(provided) => (
-                                                <div
-                                                    ref={provided.innerRef}
-                                                    {...provided.draggableProps}
-                                                    className="bg-white border rounded-lg shadow-sm"
-                                                >
-                                                    <div className="flex items-center p-4 gap-4">
-                                                        <div {...provided.dragHandleProps} className="cursor-move text-gray-400 hover:text-gray-600">
-                                                            <GripVertical className="h-5 w-5" />
-                                                        </div>
-                                                        
-                                                        <div className="flex-1 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                                                            {/* Image Preview & URL */}
-                                                            <div className="space-y-2 row-span-2">
-                                                                <Label>Image Source</Label>
-                                                                <div className="flex gap-2">
-                                                                    <div className="relative w-20 h-20 bg-gray-100 rounded overflow-hidden flex-shrink-0 border">
-                                                                        {watch(`items.${index}.src`) ? (
-                                                                            // eslint-disable-next-line @next/next/no-img-element
-                                                                            <img 
-                                                                                src={watch(`items.${index}.src`)} 
-                                                                                alt="Preview" 
-                                                                                className="w-full h-full object-cover"
-                                                                            />
-                                                                        ) : (
-                                                                            <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                                                                <ImageIcon className="h-8 w-8" />
-                                                                            </div>
-                                                                        )}
-                                                                    </div>
-                                                                    <Input 
-                                                                        {...register(`items.${index}.src`)} 
-                                                                        placeholder="Image URL"
-                                                                        className="h-9"
-                                                                    />
-                                                                </div>
-                                                            </div>
+				{showTab('items') ? (
+					<TabsContent value='items' className='space-y-6'>
+						<DragDropContext onDragEnd={handleDragEnd}>
+							<Droppable droppableId='gallery-items'>
+								{provided => (
+									<div {...provided.droppableProps} ref={provided.innerRef} className='space-y-4'>
+										{itemFields.map((field, index) => (
+											<Draggable key={field.id} draggableId={field.id} index={index}>
+												{dragProvided => (
+													<div
+														ref={dragProvided.innerRef}
+														{...dragProvided.draggableProps}
+														className='rounded-lg border bg-white shadow-sm'>
+														<div className='flex items-center gap-4 p-4'>
+															<div
+																{...dragProvided.dragHandleProps}
+																className='cursor-move text-gray-400 hover:text-gray-600'>
+																<GripVertical className='h-5 w-5' />
+															</div>
 
-                                                            <div className="space-y-2">
-                                                                <Label>Title</Label>
-                                                                <Input {...register(`items.${index}.title`)} placeholder="Event Title" className="h-9" />
-                                                            </div>
+															<div className='grid flex-1 gap-4 md:grid-cols-2 lg:grid-cols-3'>
+																<div className='row-span-2 space-y-2'>
+																	<Label>Image Source</Label>
+																	<div className='flex gap-2'>
+																		<div className='relative h-20 w-20 flex-shrink-0 overflow-hidden rounded border bg-gray-100'>
+																			{watch(`items.${index}.src`) ? (
+																				// eslint-disable-next-line @next/next/no-img-element
+																				<img
+																					src={watch(`items.${index}.src`)}
+																					alt='Preview'
+																					className='h-full w-full object-cover'
+																				/>
+																			) : (
+																				<div className='flex h-full w-full items-center justify-center text-gray-400'>
+																					<ImageIcon className='h-8 w-8' />
+																				</div>
+																			)}
+																		</div>
+																		<Input
+																			{...register(`items.${index}.src`)}
+																			placeholder='Image URL'
+																			className='h-9'
+																		/>
+																	</div>
+																</div>
 
-                                                            <div className="space-y-2">
-                                                                <Label>Category</Label>
-                                                                <Select
-                                                                    onValueChange={(value) => setValue(`items.${index}.category`, value)}
-                                                                    defaultValue={field.category}
-                                                                >
-                                                                    <SelectTrigger className="h-9">
-                                                                        <SelectValue placeholder="Select Category" />
-                                                                    </SelectTrigger>
-                                                                    <SelectContent>
-                                                                        {categories.map((cat) => (
-                                                                            <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                                                                        ))}
-                                                                    </SelectContent>
-                                                                </Select>
-                                                            </div>
+																<div className='space-y-2'>
+																	<Label>Title</Label>
+																	<Input {...register(`items.${index}.title`)} placeholder='Event Title' className='h-9' />
+																</div>
 
-                                                            <div className="space-y-2">
-                                                                <Label>Date</Label>
-                                                                <Input {...register(`items.${index}.date`)} placeholder="e.g. 24 Nov 2022" className="h-9" />
-                                                            </div>
+																<div className='space-y-2'>
+																	<Label>Category</Label>
+																	<Select
+																		onValueChange={value => setValue(`items.${index}.category`, value)}
+																		defaultValue={field.category}>
+																		<SelectTrigger className='h-9'>
+																			<SelectValue placeholder='Select Category' />
+																		</SelectTrigger>
+																		<SelectContent>
+																			{categories.map(cat => (
+																				<SelectItem key={cat} value={cat}>
+																					{cat}
+																				</SelectItem>
+																			))}
+																		</SelectContent>
+																	</Select>
+																</div>
 
-                                                            <div className="space-y-2">
-                                                                <Label>Size (Layout)</Label>
-                                                                <Select
-                                                                    onValueChange={(value: any) => setValue(`items.${index}.size`, value)}
-                                                                    defaultValue={field.size || 'small'}
-                                                                >
-                                                                    <SelectTrigger className="h-9">
-                                                                        <SelectValue placeholder="Select Size" />
-                                                                    </SelectTrigger>
-                                                                    <SelectContent>
-                                                                        <SelectItem value="small">Small (1x1)</SelectItem>
-                                                                        <SelectItem value="medium">Medium (1x1)</SelectItem>
-                                                                        <SelectItem value="large">Large (2x2)</SelectItem>
-                                                                        <SelectItem value="wide">Wide (2x1)</SelectItem>
-                                                                        <SelectItem value="tall">Tall (1x2)</SelectItem>
-                                                                    </SelectContent>
-                                                                </Select>
-                                                            </div>
-                                                            
-                                                            <div className="col-span-full">
-                                                                <Label>Description</Label>
-                                                                <Textarea 
-                                                                    {...register(`items.${index}.description`)} 
-                                                                    placeholder="Short description..." 
-                                                                    className="h-16 resize-none" 
-                                                                />
-                                                            </div>
-                                                        </div>
+																<div className='space-y-2'>
+																	<Label>Date</Label>
+																	<Input {...register(`items.${index}.date`)} placeholder='e.g. 24 Nov 2022' className='h-9' />
+																</div>
 
-                                                        <Button
-                                                            type="button"
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            onClick={() => removeItem(index)}
-                                                            className="text-red-500 hover:text-red-700 hover:bg-red-50 self-start"
-                                                        >
-                                                            <Trash2 className="h-4 w-4" />
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </Draggable>
-                                    ))}
-                                    {provided.placeholder}
-                                </div>
-                            )}
-                        </Droppable>
-                    </DragDropContext>
+																<div className='space-y-2'>
+																	<Label>Size (Layout)</Label>
+																	<Select
+																		onValueChange={value =>
+																			setValue(`items.${index}.size`, value as GalleryItemSize)
+																		}
+																		defaultValue={field.size || 'small'}>
+																		<SelectTrigger className='h-9'>
+																			<SelectValue placeholder='Select Size' />
+																		</SelectTrigger>
+																		<SelectContent>
+																			<SelectItem value='small'>Small (1x1)</SelectItem>
+																			<SelectItem value='medium'>Medium (1x1)</SelectItem>
+																			<SelectItem value='large'>Large (2x2)</SelectItem>
+																			<SelectItem value='wide'>Wide (2x1)</SelectItem>
+																			<SelectItem value='tall'>Tall (1x2)</SelectItem>
+																		</SelectContent>
+																	</Select>
+																</div>
 
-					<Button
-						type="button"
-						variant="outline"
-						onClick={() => appendItem({
-                            id: `new-${Date.now()}`,
-                            src: '',
-                            title: '',
-                            category: categories[0] || 'All',
-                            description: '',
-                            date: '',
-                            size: 'small'
-                        })}
-						className="w-full border-dashed"
-					>
-						<Plus className="mr-2 h-4 w-4" />
-						Add Gallery Item
-					</Button>
-				</TabsContent>
+																<div className='col-span-full'>
+																	<Label>Description</Label>
+																	<Textarea
+																		{...register(`items.${index}.description`)}
+																		placeholder='Short description...'
+																		className='h-16 resize-none'
+																	/>
+																</div>
+															</div>
 
-				<TabsContent value="categories">
-					<Card>
-						<CardHeader>
-							<CardTitle>Manage Categories</CardTitle>
-						</CardHeader>
-						<CardContent className="space-y-4">
-							<div className="grid gap-4">
-								{categories.map((cat, index) => (
-									<div key={index} className="flex items-center gap-2">
-										<Input
-											{...register(`categories.${index}`)}
-                                            placeholder="Category Name"
-										/>
-										<Button
-											type="button"
-											variant="ghost"
-											size="icon"
-											onClick={() => {
-                                                const newCats = [...categories];
-                                                newCats.splice(index, 1);
-                                                setValue('categories', newCats);
-                                            }}
-                                            disabled={categories.length <= 1}
-											className="text-red-500 hover:text-red-700"
-										>
-											<Trash2 className="h-4 w-4" />
-										</Button>
+															<Button
+																type='button'
+																variant='ghost'
+																size='icon'
+																onClick={() => removeItem(index)}
+																className='self-start text-red-500 hover:bg-red-50 hover:text-red-700'>
+																<Trash2 className='h-4 w-4' />
+															</Button>
+														</div>
+													</div>
+												)}
+											</Draggable>
+										))}
+										{provided.placeholder}
 									</div>
-								))}
-							</div>
-							<Button
-								type="button"
-								variant="outline"
-								onClick={() => {
-                                    const newCats = [...categories, 'New Category'];
-                                    setValue('categories', newCats);
-                                }}
-							>
-								<Plus className="mr-2 h-4 w-4" />
-								Add Category
-							</Button>
-						</CardContent>
-					</Card>
-				</TabsContent>
+								)}
+							</Droppable>
+						</DragDropContext>
+
+						<Button
+							type='button'
+							variant='outline'
+							onClick={() =>
+								appendItem({
+									id: `new-${Date.now()}`,
+									src: '',
+									title: '',
+									category: categories[0] || 'All',
+									description: '',
+									date: '',
+									size: 'small'
+								})
+							}
+							className='w-full border-dashed'>
+							<Plus className='mr-2 h-4 w-4' />
+							Add Gallery Item
+						</Button>
+					</TabsContent>
+				) : null}
+
+				{showTab('categories') ? (
+					<TabsContent value='categories'>
+						<Card>
+							<CardHeader>
+								<CardTitle>Manage Categories</CardTitle>
+							</CardHeader>
+							<CardContent className='space-y-4'>
+								<div className='grid gap-4'>
+									{categories.map((cat, index) => (
+										<div key={index} className='flex items-center gap-2'>
+											<Input {...register(`categories.${index}`)} placeholder='Category Name' />
+											<Button
+												type='button'
+												variant='ghost'
+												size='icon'
+												onClick={() => {
+													const newCats = [...categories];
+													newCats.splice(index, 1);
+													setValue('categories', newCats);
+												}}
+												disabled={categories.length <= 1}
+												className='text-red-500 hover:text-red-700'>
+												<Trash2 className='h-4 w-4' />
+											</Button>
+										</div>
+									))}
+								</div>
+								<Button
+									type='button'
+									variant='outline'
+									onClick={() => {
+										const newCats = [...categories, 'New Category'];
+										setValue('categories', newCats);
+									}}>
+									<Plus className='mr-2 h-4 w-4' />
+									Add Category
+								</Button>
+							</CardContent>
+						</Card>
+					</TabsContent>
+				) : null}
 			</Tabs>
 		</form>
+	);
+}
+
+export default function GalleryEditor({ initialData }: GalleryEditorProps) {
+	const [previewData, setPreviewData] = useState<GalleryData>(initialData);
+
+	const initial = useMemo(() => initialData, [initialData]);
+
+	return (
+		<div className='space-y-8'>
+			<Editable
+				label='Gallery Filters'
+				formContent={
+					<GalleryFormPanel
+						initialData={initial}
+						onChange={setPreviewData}
+						visibleTabs={['categories']}
+					/>
+				}>
+				<div className='rounded-xl border bg-white p-4'>
+					<GalleryCollage
+						items={previewData.items}
+						categories={previewData.categories}
+						visibleSections={['filters']}
+					/>
+				</div>
+			</Editable>
+
+			<Editable
+				label='Gallery Collage'
+				formContent={
+					<GalleryFormPanel
+						initialData={initial}
+						onChange={setPreviewData}
+						visibleTabs={['items']}
+					/>
+				}>
+				<div className='rounded-xl border bg-white p-4'>
+					<GalleryCollage
+						items={previewData.items}
+						categories={previewData.categories}
+						visibleSections={['grid']}
+					/>
+				</div>
+			</Editable>
+		</div>
 	);
 }

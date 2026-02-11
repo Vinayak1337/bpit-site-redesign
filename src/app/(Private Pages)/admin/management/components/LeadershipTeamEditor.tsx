@@ -2,7 +2,10 @@
 
 import { useMemo, useState } from 'react';
 import Editable from '@/components/ui/Editable';
-import LeadershipTeamSection from '@/app/(Public Pages)/management/leadership-team/components/LeadershipTeamSection';
+import {
+	LeadershipTeamHeroBlock,
+	LeadershipTeamLeadersBlock
+} from '@/app/(Public Pages)/management/leadership-team/components/LeadershipTeamSection';
 import LeadershipTeamForm from './LeadershipTeamForm';
 import type { LeadershipTeamData } from '@/app/(Private Pages)/actions/management';
 
@@ -16,16 +19,32 @@ export default function LeadershipTeamEditor({ initialData, pageSlug }: Leadersh
 	const [previewData, setPreviewData] = useState<LeadershipTeamData>(initial);
 
 	return (
-		<Editable
-			label='Leadership Team'
-			formContent={
-				<LeadershipTeamForm
-					initialData={initial}
-					pageSlug={pageSlug}
-					onChange={setPreviewData}
-				/>
-			}>
-			<LeadershipTeamSection data={previewData} />
-		</Editable>
+		<div className='space-y-8'>
+			<Editable
+				label='Leadership Team Hero'
+				formContent={
+					<LeadershipTeamForm
+						initialData={initial}
+						pageSlug={pageSlug}
+						onChange={setPreviewData}
+						visibleSections={['hero']}
+					/>
+				}>
+				<LeadershipTeamHeroBlock data={previewData} />
+			</Editable>
+
+			<Editable
+				label='Leadership Profiles'
+				formContent={
+					<LeadershipTeamForm
+						initialData={initial}
+						pageSlug={pageSlug}
+						onChange={setPreviewData}
+						visibleSections={['leaders']}
+					/>
+				}>
+				<LeadershipTeamLeadersBlock data={previewData} />
+			</Editable>
+		</div>
 	);
 }

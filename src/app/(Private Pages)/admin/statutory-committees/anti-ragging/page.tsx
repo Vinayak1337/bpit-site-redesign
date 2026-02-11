@@ -1,6 +1,13 @@
 import { getAntiRagging } from '@/app/(Private Pages)/actions/statutory-committees';
 import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
-import AntiRaggingEditor from '../components/AntiRaggingEditor';
+import {
+	AntiRaggingHeroEditor,
+	AntiRaggingDefinitionEditor,
+	AntiRaggingMembersEditor,
+	AntiRaggingMeasuresEditor,
+	AntiRaggingPunishmentsEditor,
+	AntiRaggingContactsEditor
+} from '../components/AntiRaggingEditors';
 
 const ANTI_RAGGING_SLUG = 'statutory-committees-anti-ragging';
 
@@ -11,17 +18,36 @@ export default async function AntiRaggingAdminPage() {
 	return (
 		<div className='space-y-8'>
 			<div className='bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-sm text-blue-900 shadow-sm'>
-				Edit the Anti-Ragging page content below. Changes apply immediately after saving.
+				Edit the Anti-Ragging page content below. Click on a section to edit it.
+				Changes apply immediately after saving.
 			</div>
-			
-			<div>
-				<h2 className='text-2xl font-bold text-gray-900 mb-4'>Anti-Ragging Content</h2>
-				<AntiRaggingEditor 
-					initialData={antiRaggingData} 
-					pageSlug={ANTI_RAGGING_SLUG} 
+
+			<div className='space-y-8'>
+				<AntiRaggingHeroEditor
+					initialData={antiRaggingData}
+					pageSlug={ANTI_RAGGING_SLUG}
+				/>
+				<AntiRaggingDefinitionEditor
+					initialData={antiRaggingData}
+					pageSlug={ANTI_RAGGING_SLUG}
+				/>
+				<AntiRaggingMembersEditor
+					initialData={antiRaggingData}
+					pageSlug={ANTI_RAGGING_SLUG}
+				/>
+				<AntiRaggingMeasuresEditor
+					initialData={antiRaggingData}
+					pageSlug={ANTI_RAGGING_SLUG}
+				/>
+				<AntiRaggingPunishmentsEditor
+					initialData={antiRaggingData}
+					pageSlug={ANTI_RAGGING_SLUG}
+				/>
+				<AntiRaggingContactsEditor
+					initialData={antiRaggingData}
+					pageSlug={ANTI_RAGGING_SLUG}
 				/>
 			</div>
 		</div>
 	);
 }
-

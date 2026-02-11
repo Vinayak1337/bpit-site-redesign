@@ -50,131 +50,143 @@ const MissionSection: React.FC<MissionSectionProps> = ({ data }) => {
 
 	return (
 		<div className='space-y-6 sm:space-y-8'>
-			{/* Hero Section */}
-			<motion.div
-				initial={{ opacity: 0, y: 20 }}
-				animate={{ opacity: 1, y: 0 }}
-				transition={{ duration: 0.6 }}
-				className={`bg-gradient-to-r ${data.hero.gradient} rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 border ${data.hero.borderColor}`}>
-				<div className='text-center mb-6 sm:mb-8'>
-					<div
-						className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 ${data.hero.iconBg} rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 aspect-square`}>
-						{React.createElement(getIcon(data.hero.icon), {
-							className: 'w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-white'
-						})}
-					</div>
-					<h1 className='text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-1 sm:mb-2'>
-						{data.hero.title}
-					</h1>
-					<p className='text-gray-600 font-medium text-sm sm:text-base'>
-						{data.hero.subtitle}
-					</p>
-				</div>
-			</motion.div>
+			<MissionHeroBlock data={data} />
 
-			{/* Mission Statement */}
-			<motion.div
-				initial={{ opacity: 0, y: 20 }}
-				animate={{ opacity: 1, y: 0 }}
-				transition={{ duration: 0.6, delay: 0.2 }}
-				className='bg-white rounded-lg sm:rounded-xl p-4 sm:p-6 md:p-8 shadow-lg border border-gray-200'>
-				<div className='text-center mb-6 sm:mb-8'>
-					<div className='w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center mx-auto mb-3 sm:mb-4 aspect-square'>
-						{React.createElement(getIcon(data.missionStatement.icon), {
-							className: 'w-5 h-5 sm:w-6 sm:h-6 text-white'
-						})}
-					</div>
-					<h2 className='text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-4 sm:mb-6'>
-						{data.missionStatement.title}
-					</h2>
-					<div
-						className={`bg-gradient-to-r ${data.missionStatement.gradient} rounded-lg sm:rounded-xl p-4 sm:p-6 border ${data.missionStatement.borderColor}`}>
-						<p className='text-sm sm:text-base md:text-lg text-gray-800 leading-relaxed font-medium italic'>
-							&ldquo;{data.missionStatement.quote}&rdquo;
-						</p>
-					</div>
-				</div>
-			</motion.div>
+			<MissionStatementBlock data={data} />
 
-			{/* Mission Objectives */}
-			<motion.div
-				initial={{ opacity: 0, y: 20 }}
-				animate={{ opacity: 1, y: 0 }}
-				transition={{ duration: 0.6, delay: 0.3 }}
-				className='space-y-4 sm:space-y-6'>
-				<h3 className='text-xl sm:text-2xl font-bold text-gray-900 text-center mb-6 sm:mb-8'>
-					Mission Objectives
-				</h3>
+			<MissionObjectivesBlock data={data} />
 
-				<div className='space-y-3 sm:space-y-4'>
-					{data.objectives.map((objective, index) => {
-						const cls = getColorClasses(objective.color || 'blue');
-						return (
-							<motion.div
-								key={index}
-								initial={{ opacity: 0, x: -20 }}
-								animate={{ opacity: 1, x: 0 }}
-								transition={{ duration: 0.6, delay: 0.4 + index * 0.1 }}
-								className='bg-white rounded-lg sm:rounded-xl p-4 sm:p-6 md:p-8 shadow-lg border border-gray-200 hover:shadow-xl transition-shadow duration-300'>
-								<div className='flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4'>
-									<div className={`w-10 h-10 sm:w-12 sm:h-12 ${cls.bg} rounded-lg flex items-center justify-center shrink-0`}>
-										{React.createElement(getIcon(objective.icon), {
-											className: `w-5 h-5 sm:w-6 sm:h-6 ${cls.icon}`
-										})}
-									</div>
-									<div className='flex-1'>
-										<h4 className='text-base sm:text-lg font-semibold text-gray-900 mb-2'>
-											{objective.title}
-										</h4>
-										<p className='text-sm sm:text-base text-gray-600 leading-relaxed'>
-											{objective.description}
-										</p>
-									</div>
-								</div>
-							</motion.div>
-						);
-					})}
-				</div>
-			</motion.div>
-
-			{/* Mission Impact */}
-			<motion.div
-				initial={{ opacity: 0, y: 20 }}
-				animate={{ opacity: 1, y: 0 }}
-				transition={{ duration: 0.6, delay: 0.4 }}
-				className='bg-white rounded-lg sm:rounded-xl p-4 sm:p-6 md:p-8 shadow-lg border border-gray-200'>
-				<div className='text-center mb-4 sm:mb-6'>
-					<div
-						className={`w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r ${data.impact.gradient} rounded-lg flex items-center justify-center mx-auto mb-3 sm:mb-4 aspect-square`}>
-						{React.createElement(getIcon(data.impact.icon), {
-							className: 'w-5 h-5 sm:w-6 sm:h-6 text-white'
-						})}
-					</div>
-					<h3 className='text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-3 sm:mb-4'>
-						{data.impact.title}
-					</h3>
-				</div>
-
-				<div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6'>
-					{data.impact.stats.map((stat, index) => (
-						<motion.div
-							key={index}
-							initial={{ opacity: 0, scale: 0.9 }}
-							animate={{ opacity: 1, scale: 1 }}
-							transition={{ duration: 0.6, delay: 0.5 + index * 0.1 }}
-							className='text-center p-3 sm:p-4 bg-gray-50 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors duration-300'>
-							<div className={`text-xl sm:text-2xl md:text-3xl font-bold ${stat.color} mb-1 sm:mb-2`}>
-								{stat.number}
-							</div>
-							<div className='text-xs sm:text-sm text-gray-600 font-medium'>
-								{stat.label}
-							</div>
-						</motion.div>
-					))}
-				</div>
-			</motion.div>
+			<MissionImpactBlock data={data} />
 		</div>
 	);
 };
 
 export default MissionSection;
+
+export const MissionHeroBlock: React.FC<MissionSectionProps> = ({ data }) => (
+	<motion.div
+		initial={{ opacity: 0, y: 20 }}
+		animate={{ opacity: 1, y: 0 }}
+		transition={{ duration: 0.6 }}
+		className={`bg-gradient-to-r ${data.hero.gradient} rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 border ${data.hero.borderColor}`}>
+		<div className='text-center mb-6 sm:mb-8'>
+			<div
+				className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 ${data.hero.iconBg} rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 aspect-square`}>
+				{React.createElement(getIcon(data.hero.icon), {
+					className: 'w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-white'
+				})}
+			</div>
+			<h1 className='text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-1 sm:mb-2'>
+				{data.hero.title}
+			</h1>
+			<p className='text-gray-600 font-medium text-sm sm:text-base'>
+				{data.hero.subtitle}
+			</p>
+		</div>
+	</motion.div>
+);
+
+export const MissionStatementBlock: React.FC<MissionSectionProps> = ({ data }) => (
+	<motion.div
+		initial={{ opacity: 0, y: 20 }}
+		animate={{ opacity: 1, y: 0 }}
+		transition={{ duration: 0.6, delay: 0.2 }}
+		className='bg-white rounded-lg sm:rounded-xl p-4 sm:p-6 md:p-8 shadow-lg border border-gray-200'>
+		<div className='text-center mb-6 sm:mb-8'>
+			<div className='w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center mx-auto mb-3 sm:mb-4 aspect-square'>
+				{React.createElement(getIcon(data.missionStatement.icon), {
+					className: 'w-5 h-5 sm:w-6 sm:h-6 text-white'
+				})}
+			</div>
+			<h2 className='text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-4 sm:mb-6'>
+				{data.missionStatement.title}
+			</h2>
+			<div
+				className={`bg-gradient-to-r ${data.missionStatement.gradient} rounded-lg sm:rounded-xl p-4 sm:p-6 border ${data.missionStatement.borderColor}`}>
+				<p className='text-sm sm:text-base md:text-lg text-gray-800 leading-relaxed font-medium italic'>
+					&ldquo;{data.missionStatement.quote}&rdquo;
+				</p>
+			</div>
+		</div>
+	</motion.div>
+);
+
+export const MissionObjectivesBlock: React.FC<MissionSectionProps> = ({ data }) => (
+	<motion.div
+		initial={{ opacity: 0, y: 20 }}
+		animate={{ opacity: 1, y: 0 }}
+		transition={{ duration: 0.6, delay: 0.3 }}
+		className='space-y-4 sm:space-y-6'>
+		<h3 className='text-xl sm:text-2xl font-bold text-gray-900 text-center mb-6 sm:mb-8'>
+			Mission Objectives
+		</h3>
+
+		<div className='space-y-3 sm:space-y-4'>
+			{data.objectives.map((objective, index) => {
+				const cls = getColorClasses(objective.color || 'blue');
+				return (
+					<motion.div
+						key={index}
+						initial={{ opacity: 0, x: -20 }}
+						animate={{ opacity: 1, x: 0 }}
+						transition={{ duration: 0.6, delay: 0.4 + index * 0.1 }}
+						className='bg-white rounded-lg sm:rounded-xl p-4 sm:p-6 md:p-8 shadow-lg border border-gray-200 hover:shadow-xl transition-shadow duration-300'>
+						<div className='flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4'>
+							<div className={`w-10 h-10 sm:w-12 sm:h-12 ${cls.bg} rounded-lg flex items-center justify-center shrink-0`}>
+								{React.createElement(getIcon(objective.icon), {
+									className: `w-5 h-5 sm:w-6 sm:h-6 ${cls.icon}`
+								})}
+							</div>
+							<div className='flex-1'>
+								<h4 className='text-base sm:text-lg font-semibold text-gray-900 mb-2'>
+									{objective.title}
+								</h4>
+								<p className='text-sm sm:text-base text-gray-600 leading-relaxed'>
+									{objective.description}
+								</p>
+							</div>
+						</div>
+					</motion.div>
+				);
+			})}
+		</div>
+	</motion.div>
+);
+
+export const MissionImpactBlock: React.FC<MissionSectionProps> = ({ data }) => (
+	<motion.div
+		initial={{ opacity: 0, y: 20 }}
+		animate={{ opacity: 1, y: 0 }}
+		transition={{ duration: 0.6, delay: 0.4 }}
+		className='bg-white rounded-lg sm:rounded-xl p-4 sm:p-6 md:p-8 shadow-lg border border-gray-200'>
+		<div className='text-center mb-4 sm:mb-6'>
+			<div
+				className={`w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r ${data.impact.gradient} rounded-lg flex items-center justify-center mx-auto mb-3 sm:mb-4 aspect-square`}>
+				{React.createElement(getIcon(data.impact.icon), {
+					className: 'w-5 h-5 sm:w-6 sm:h-6 text-white'
+				})}
+			</div>
+			<h3 className='text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-3 sm:mb-4'>
+				{data.impact.title}
+			</h3>
+		</div>
+
+		<div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6'>
+			{data.impact.stats.map((stat, index) => (
+				<motion.div
+					key={index}
+					initial={{ opacity: 0, scale: 0.9 }}
+					animate={{ opacity: 1, scale: 1 }}
+					transition={{ duration: 0.6, delay: 0.5 + index * 0.1 }}
+					className='text-center p-3 sm:p-4 bg-gray-50 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors duration-300'>
+					<div className={`text-xl sm:text-2xl md:text-3xl font-bold ${stat.color} mb-1 sm:mb-2`}>
+						{stat.number}
+					</div>
+					<div className='text-xs sm:text-sm text-gray-600 font-medium'>
+						{stat.label}
+					</div>
+				</motion.div>
+			))}
+		</div>
+	</motion.div>
+);

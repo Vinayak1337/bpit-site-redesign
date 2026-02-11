@@ -38,23 +38,15 @@ interface PlacementStatisticsSectionProps {
 export default function PlacementStatisticsSection({
 	data
 }: PlacementStatisticsSectionProps) {
-	if (!data) {
-		return (
-			<div className='min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center'>
-				<p className='text-gray-500'>No placement statistics data available.</p>
-			</div>
-		);
-	}
-
 	const [selectedYear, setSelectedYear] = useState(
-		data.years?.[0] || '2024'
+		data?.years?.[0] || '2024'
 	);
 	const [selectedDepartment, setSelectedDepartment] = useState('All');
 	const [animatedStats, setAnimatedStats] = useState(false);
 
 	// Student filters
 	const [studentFilters, setStudentFilters] = useState({
-		year: data.years?.[0] || '2024',
+		year: data?.years?.[0] || '2024',
 		department: 'All',
 		company: 'All',
 		minSalary: 0
@@ -68,6 +60,14 @@ export default function PlacementStatisticsSection({
 		}, 1000);
 		return () => clearTimeout(timer);
 	}, []);
+
+	if (!data) {
+		return (
+			<div className='min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center'>
+				<p className='text-gray-500'>No placement statistics data available.</p>
+			</div>
+		);
+	}
 
 	const currentStats =
 		data.overallStats?.[selectedYear as keyof typeof data.overallStats];

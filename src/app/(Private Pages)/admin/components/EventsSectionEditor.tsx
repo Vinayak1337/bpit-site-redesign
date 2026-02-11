@@ -1,7 +1,7 @@
 'use client';
 import { useCallback, useMemo, useState } from 'react';
 import Editable from '@/components/ui/Editable';
-import EventsSection from '@/components/carousel/events-section';
+import { RotatingEventsStack } from '@/components/home/notices-events/events-stack';
 import EventsSectionForm, {
 	toFormValuesFromEventsSection
 } from '@/app/(Private Pages)/admin/components/EventsSectionForm';
@@ -54,7 +54,9 @@ export default function EventsSectionEditor({
 		<Editable
 			label='Events'
 			formContent={formContent}>
-			<EventsSection data={toEventsSectionComponentData(previewData)} />
+			<RotatingEventsStack
+				events={toEventsSectionComponentData(previewData).events}
+			/>
 		</Editable>
 	);
 }

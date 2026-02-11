@@ -532,7 +532,6 @@ export default function EventsSectionForm({
 							<FormField
 								control={form.control}
 								name={`events.${index}.image` as const}
-								rules={{ required: 'Image URL is required' }}
 								render={({ field: imageField }) => (
 									<FormItem>
 										<FormLabel>Image URL</FormLabel>
@@ -573,5 +572,4 @@ export const toFormValuesFromEventsSection = (
 ): FormValues => ({
 	events: section.events.map(toFormValue)
 });
-
 

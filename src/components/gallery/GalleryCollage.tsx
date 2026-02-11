@@ -11,11 +11,13 @@ import { Button } from '@/components/ui/button';
 interface GalleryCollageProps {
 	items: GalleryItem[];
 	categories: string[];
+	visibleSections?: Array<'filters' | 'grid'>;
 }
 
 export default function GalleryCollage({
 	items,
-	categories
+	categories,
+	visibleSections
 }: GalleryCollageProps) {
 	const [selectedCategory, setSelectedCategory] = useState<string>('All');
 	const [filteredItems, setFilteredItems] = useState<GalleryItem[]>(items);
@@ -80,9 +82,13 @@ export default function GalleryCollage({
 		}
 	};
 
+	const showSection = (section: 'filters' | 'grid') =>
+		!visibleSections || visibleSections.includes(section);
+
 	return (
 		<div className='space-y-8'>
 			{/* Filter Navigation */}
+			{showSection('filters') && (
 			<div className='sticky top-20 z-30 flex justify-center pb-4'>
 				<div className='bg-white/80 backdrop-blur-md p-1.5 rounded-full shadow-lg border border-gray-200/50 flex flex-wrap justify-center gap-1'>
 					{categories.map(category => (
@@ -103,8 +109,10 @@ export default function GalleryCollage({
 					))}
 				</div>
 			</div>
+			)}
 
 			{/* Collage Grid */}
+			{showSection('grid') && (
 			<div className='relative p-4 sm:p-8 rounded-3xl bg-slate-50 border border-slate-100 shadow-inner overflow-hidden'>
 				{/* Background Pattern */}
 				<div
@@ -173,10 +181,11 @@ export default function GalleryCollage({
 					</AnimatePresence>
 				</motion.div>
 			</div>
+			)}
 
 			{/* Lightbox */}
 			<AnimatePresence>
-				{selectedImage && (
+				{showSection('grid') && selectedImage && (
 					<motion.div
 						initial={{ opacity: 0 }}
 						animate={{ opacity: 1 }}
