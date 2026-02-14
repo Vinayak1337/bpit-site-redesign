@@ -251,23 +251,31 @@ export default function PlacementOverviewSection({
 								whileInView={{ opacity: 1, y: 0 }}
 								transition={{ duration: 0.6, delay: index * 0.1 }}
 								className='bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-8 text-center shadow-lg'>
-								<div
-									className={`w-24 h-24 rounded-full mx-auto mb-6 flex items-center justify-center border-4 border-white shadow-lg ${
-										member.gradientColor ||
-										'bg-gradient-to-br from-blue-500 to-blue-600'
-									}`}>
-									<span
-										className={`text-2xl font-bold ${
-											member.textColor || 'text-white'
+								{member.image ? (
+									<img
+										src={member.image}
+										alt={member.name}
+										className='w-24 h-24 rounded-full mx-auto mb-6 object-cover border-4 border-white shadow-lg'
+									/>
+								) : (
+									<div
+										className={`w-24 h-24 rounded-full mx-auto mb-6 flex items-center justify-center border-4 border-white shadow-lg ${
+											member.gradientColor ||
+											'bg-gradient-to-br from-blue-500 to-blue-600'
 										}`}>
-										{member.initials ||
-											member.name
-												.split(' ')
-												.map(n => n[0])
-												.join('')
-												.toUpperCase()}
-									</span>
-								</div>
+										<span
+											className={`text-2xl font-bold ${
+												member.textColor || 'text-white'
+											}`}>
+											{member.initials ||
+												member.name
+													.split(' ')
+													.map(n => n[0])
+													.join('')
+													.toUpperCase()}
+										</span>
+									</div>
+								)}
 								<h3 className='text-2xl font-bold text-gray-900 mb-2'>
 									{member.name}
 								</h3>

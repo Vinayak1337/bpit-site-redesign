@@ -90,16 +90,16 @@ export const PUBLIC_TO_ADMIN_PAGE_MAP: Record<string, AdminPageCoverage> = {
 		editingMode: 'live'
 	},
 	'/statutory-committees/student-welfare': {
-		adminHref: null,
+		adminHref: '/admin/statutory-committees/student-welfare',
 		status: 'missing',
 		editingMode: 'none',
-		note: 'Page-level admin editor is not finished yet.'
+		note: 'Admin route exists, but page-level editor is still under construction.'
 	},
 	'/statutory-committees/grievance-redressal': {
-		adminHref: null,
+		adminHref: '/admin/statutory-committees/grievance-redressal',
 		status: 'missing',
 		editingMode: 'none',
-		note: 'Page-level admin editor is not finished yet.'
+		note: 'Admin route exists, but page-level editor is still under construction.'
 	},
 	'/mandatory-disclosure': {
 		adminHref: '/admin/mandatory-disclosure',
@@ -289,6 +289,10 @@ const ADMIN_TO_PUBLIC_EXACT_MAP: Record<string, string> = {
 		'/statutory-committees/anti-ragging',
 	'/admin/statutory-committees/internal-complaints':
 		'/statutory-committees/internal-complaints',
+	'/admin/statutory-committees/student-welfare':
+		'/statutory-committees/student-welfare',
+	'/admin/statutory-committees/grievance-redressal':
+		'/statutory-committees/grievance-redressal',
 	'/admin/mandatory-disclosure': '/mandatory-disclosure',
 	'/admin/gallery': '/gallery',
 	'/admin/admissions': '/admissions',

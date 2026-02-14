@@ -23,6 +23,7 @@ import {
 import type { PlacementOverviewData } from '@/app/(Private Pages)/actions/placement-overview';
 import { updatePlacementOverview } from '@/app/(Private Pages)/actions/placement-overview';
 import { SUPPORTED_ICON_NAMES } from '@/components/about/icons';
+import UploadButton from '@/components/cloudinary/upload-button';
 import { Plus, Trash2 } from 'lucide-react';
 
 type FeatureFormValue = {
@@ -40,6 +41,7 @@ type TeamMemberFormValue = {
 	name: string;
 	position: string;
 	email: string;
+	image?: string;
 	initials: string;
 	gradientColor: string;
 	textColor: string;
@@ -77,6 +79,7 @@ const createEmptyTeamMember = (): TeamMemberFormValue => ({
 	name: '',
 	position: '',
 	email: '',
+	image: '',
 	initials: '',
 	gradientColor: 'bg-gradient-to-br from-blue-500 to-blue-600',
 	textColor: 'text-white'
@@ -152,6 +155,7 @@ export default function ServicesTeamForm({
 							name: (member?.name ?? '').trim(),
 							position: (member?.position ?? '').trim(),
 							email: (member?.email ?? '').trim(),
+							image: (member?.image ?? '').trim(),
 							initials: (member?.initials ?? '').trim(),
 							gradientColor:
 								member?.gradientColor ??
@@ -200,6 +204,7 @@ export default function ServicesTeamForm({
 							name: (member.name ?? '').trim(),
 							position: (member.position ?? '').trim(),
 							email: (member.email ?? '').trim(),
+							image: (member.image ?? '').trim(),
 							initials: (member.initials ?? '').trim(),
 							gradientColor:
 								member.gradientColor ??
@@ -485,6 +490,47 @@ export default function ServicesTeamForm({
 														placeholder='email@example.com'
 														{...emailField}
 													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+									<FormField
+										control={form.control}
+										name={`teamMembers.${index}.image`}
+										render={({ field: imageField }) => (
+											<FormItem className='sm:col-span-2'>
+												<FormLabel>Profile Image</FormLabel>
+												<FormControl>
+													<div className='space-y-2'>
+														<Input
+															placeholder='Image URL (optional)'
+															{...imageField}
+														/>
+														<UploadButton
+															onUpload={url => {
+																imageField.onChange(url);
+																form.setValue(`teamMembers.${index}.image`, url, {
+																	shouldDirty: true
+																});
+															}}
+															buttonText='Upload Profile Image'
+															className='sm:w-auto'
+														/>
+														{imageField.value ? (
+															<div className='mt-2'>
+																<img
+																	src={imageField.value}
+																	alt='Profile preview'
+																	className='w-20 h-20 rounded-full object-cover border-2 border-blue-200'
+																/>
+															</div>
+														) : (
+															<p className='text-sm text-gray-500'>
+																Initials will be shown as avatar if no image is uploaded
+															</p>
+														)}
+													</div>
 												</FormControl>
 												<FormMessage />
 											</FormItem>

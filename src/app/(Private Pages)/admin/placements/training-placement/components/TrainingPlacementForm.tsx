@@ -228,7 +228,8 @@ function createUpdatedData(
 					initials: formValues.directorMessage.initials,
 					gradientColor: formValues.directorMessage.gradientColor,
 					message1: formValues.directorMessage.message1,
-					message2: formValues.directorMessage.message2
+					message2: formValues.directorMessage.message2,
+					image: formValues.directorMessage.image
 			  }
 			: currentData.directorMessage,
 		teamTitle: formValues.teamTitle ?? currentData.teamTitle,
@@ -242,7 +243,8 @@ function createUpdatedData(
 							name: member.name,
 							position: member.position,
 							qualifications: member.qualifications,
-							specialization: member.specialization
+							specialization: member.specialization,
+							image: member.image
 						}))
 				: currentData.teamMembers,
 		departmentsTitle: formValues.departmentsTitle ?? currentData.departmentsTitle,
@@ -357,7 +359,8 @@ export default function TrainingPlacementForm({
 							name: member.name,
 							position: member.position,
 							qualifications: member.qualifications,
-							specialization: member.specialization
+							specialization: member.specialization,
+							image: member.image ?? ''
 					  }))
 					: [createEmptyTeamMember()],
 			departmentsTitle:
