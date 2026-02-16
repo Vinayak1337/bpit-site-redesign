@@ -1,330 +1,316 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Download, FileText, GraduationCap, Calendar, ExternalLink, RefreshCw } from 'lucide-react';
+import {
+	Calendar,
+	Download,
+	ExternalLink,
+	FileText,
+	GraduationCap,
+	RefreshCw
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface BrochureInfo {
-    id: string;
-    title: string;
-    description: string;
-    icon: React.ReactElement;
-    color: string;
-    url: string;
-    lastUpdated?: string;
-    size?: string;
-    isAutoDetected?: boolean;
-    detectedText?: string;
+	id: string;
+	title: string;
+	description: string;
+	icon: React.ReactElement;
+	url: string;
+	lastUpdated?: string;
+	isAutoDetected?: boolean;
+	detectedText?: string;
 }
 
 interface ScrapedBrochures {
-    undergraduate?: string;
-    postgraduate?: string;
-    ugText?: string;
-    pgText?: string;
+	undergraduate?: string;
+	postgraduate?: string;
+	ugText?: string;
+	pgText?: string;
 }
 
+type BrochureFetchResult = {
+	urls: ScrapedBrochures;
+	autoDetected: boolean;
+	status: string;
+};
+
+const getCurrentBrochureUrls = (): ScrapedBrochures => {
+	const currentYear = new Date().getFullYear();
+
+	if (currentYear === 2025) {
+		return {
+			undergraduate: 'http://www.ipu.ac.in/Pubinfo2025/adm25brug310125.pdf',
+			postgraduate: 'http://www.ipu.ac.in/Pubinfo2025/adm25brPG310125.pdf'
+		};
+	}
+
+	const yearSuffix = currentYear.toString().slice(2);
+	return {
+		undergraduate: `http://www.ipu.ac.in/Pubinfo${currentYear}/adm${yearSuffix}brug.pdf`,
+		postgraduate: `http://www.ipu.ac.in/Pubinfo${currentYear}/adm${yearSuffix}brPG.pdf`
+	};
+};
+
+const normalizeIpuUrl = (url: string | undefined): string | undefined => {
+	if (!url) return undefined;
+	const trimmed = url.trim();
+	if (!trimmed) return undefined;
+	if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+		return trimmed;
+	}
+	return `http://www.ipu.ac.in/${trimmed.replace(/^\/+/, '')}`;
+};
+
 export default function BrochurePage() {
-    const [brochures, setBrochures] = useState<BrochureInfo[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [lastChecked, setLastChecked] = useState<string>('');
-    const [isRefreshing, setIsRefreshing] = useState(false);
-    const [scrapingStatus, setScrapingStatus] = useState<string>('');
-    const [autoDetected, setAutoDetected] = useState<boolean>(false);
+	const [brochures, setBrochures] = useState<BrochureInfo[]>([]);
+	const [isLoading, setIsLoading] = useState(true);
+	const [isRefreshing, setIsRefreshing] = useState(false);
+	const [lastChecked, setLastChecked] = useState('');
+	const [scrapingStatus, setScrapingStatus] = useState('');
+	const [autoDetected, setAutoDetected] = useState(false);
 
-    // Function to get current year's brochure URLs (fallback)
-    const getCurrentBrochureUrls = (): ScrapedBrochures => {
-        const currentYear = new Date().getFullYear();
-        
-        // For 2025, use the actual URLs provided
-        if (currentYear === 2025) {
-            return {
-                undergraduate: 'http://www.ipu.ac.in/Pubinfo2025/adm25brug310125.pdf',
-                postgraduate: 'http://www.ipu.ac.in/Pubinfo2025/adm25brPG310125.pdf'
-            };
-        }
-        
-        // For other years, attempt to generate URLs based on pattern
-        const yearSuffix = currentYear.toString().slice(2);
-        return {
-            undergraduate: `http://www.ipu.ac.in/Pubinfo${currentYear}/adm${yearSuffix}brug.pdf`,
-            postgraduate: `http://www.ipu.ac.in/Pubinfo${currentYear}/adm${yearSuffix}brPG.pdf`
-        };
-    };
+	const currentYear = useMemo(() => new Date().getFullYear(), []);
 
-    const initializeBrochures = useCallback(async () => {
-        setIsLoading(true);
-        
-        // Inline the fetchBrochuresFromIPU logic
-        const fetchBrochuresFromIPU = async (): Promise<ScrapedBrochures> => {
-            try {
-                const response = await fetch('/api/scrape-brochures');
-                const data = await response.json();
-                
-                if (data.success && data.brochures) {
-                    setScrapingStatus('✅ Successfully found brochures on IPU website');
-                    setAutoDetected(true);
-                    return data.brochures;
-                } else {
-                    setScrapingStatus('⚠ Could not find brochures automatically, using fallback URLs');
-                    setAutoDetected(false);
-                    return data.fallback || getCurrentBrochureUrls();
-                }
-            } catch {
-                setScrapingStatus('❌ Error scanning website, using fallback URLs');
-                setAutoDetected(false);
-                return getCurrentBrochureUrls();
-            }
-        };
-        
-        const urls = await fetchBrochuresFromIPU();
-        const currentYear = new Date().getFullYear();
-        
-        const brochureData: BrochureInfo[] = [
-            {
-                id: 'undergraduate',
-                title: 'Undergraduate Admissions Brochure',
-                description: `Complete information about B.Tech, BBA, and other undergraduate programs for Academic Year ${currentYear}-${currentYear + 1}`,
-                icon: <GraduationCap className="w-8 h-8" />,
-                color: 'bg-blue-500',
-                url: urls.undergraduate || 'http://www.ipu.ac.in/Pubinfo2025/adm25brug310125.pdf',
-                lastUpdated: 'Auto-detected from IPU website',
-                isAutoDetected: autoDetected && !!urls.undergraduate,
-                detectedText: urls.ugText
-            },
-            {
-                id: 'postgraduate',
-                title: 'Postgraduate Admissions Brochure',
-                description: `Complete information about MBA, M.Tech, and other postgraduate programs for Academic Year ${currentYear}-${currentYear + 1}`,
-                icon: <FileText className="w-8 h-8" />,
-                color: 'bg-purple-500',
-                url: urls.postgraduate || 'http://www.ipu.ac.in/Pubinfo2025/adm25brPG310125.pdf',
-                lastUpdated: 'Auto-detected from IPU website',
-                isAutoDetected: autoDetected && !!urls.postgraduate,
-                detectedText: urls.pgText
-            }
-        ];
+	const fetchBrochuresFromIPU = useCallback(async (): Promise<BrochureFetchResult> => {
+		try {
+			const response = await fetch('/api/scrape-brochures', {
+				cache: 'no-store'
+			});
+			const data = await response.json();
 
-        setBrochures(brochureData);
-        setLastChecked(new Date().toLocaleString());
-        setIsLoading(false);
-    }, [autoDetected]);
+			if (data.success && data.brochures) {
+				return {
+					urls: {
+						undergraduate: normalizeIpuUrl(data.brochures.undergraduate),
+						postgraduate: normalizeIpuUrl(data.brochures.postgraduate),
+						ugText: data.brochures.ugText,
+						pgText: data.brochures.pgText
+					},
+					autoDetected: true,
+					status: 'Live brochure links loaded from IPU website.'
+				};
+			}
 
-    const refreshBrochureUrls = async () => {
-        setIsRefreshing(true);
-        setIsLoading(true);
-        setScrapingStatus('Refreshing brochure links...');
-        
-        // Add a small delay to show the rotation animation
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // Fetch fresh URLs from IPU website
-        await initializeBrochures();
-        
-        setTimeout(() => {
-            setIsRefreshing(false);
-        }, 200);
-    };
+			const fallback = data.fallback || getCurrentBrochureUrls();
+			return {
+				urls: {
+					undergraduate: normalizeIpuUrl(fallback.undergraduate),
+					postgraduate: normalizeIpuUrl(fallback.postgraduate),
+					ugText: fallback.ugText,
+					pgText: fallback.pgText
+				},
+				autoDetected: false,
+				status: 'Using fallback brochure links (auto-detection unavailable).'
+			};
+		} catch {
+			const fallback = getCurrentBrochureUrls();
+			return {
+				urls: {
+					undergraduate: normalizeIpuUrl(fallback.undergraduate),
+					postgraduate: normalizeIpuUrl(fallback.postgraduate)
+				},
+				autoDetected: false,
+				status: 'Could not reach IPU scan endpoint. Using fallback links.'
+			};
+		}
+	}, []);
 
-    const downloadBrochure = (brochure: BrochureInfo) => {
-        // Create a temporary anchor element to trigger download
-        const link = document.createElement('a');
-        link.href = brochure.url;
-        link.download = `${brochure.title.replace(/\s+/g, '_')}_${new Date().getFullYear()}.pdf`;
-        link.target = '_blank';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    };
+	const initializeBrochures = useCallback(async () => {
+		setIsLoading(true);
+		const { urls, autoDetected: detected, status } = await fetchBrochuresFromIPU();
 
-    const openBrochure = (brochure: BrochureInfo) => {
-        window.open(brochure.url, '_blank');
-    };
+		const data: BrochureInfo[] = [
+			{
+				id: 'undergraduate',
+				title: 'Undergraduate Admissions Brochure',
+				description: `B.Tech, BBA and other undergraduate programs for Academic Year ${currentYear}-${currentYear + 1}.`,
+				icon: <GraduationCap className='h-7 w-7' />,
+				url:
+					urls.undergraduate ||
+					'http://www.ipu.ac.in/Pubinfo2025/adm25brug310125.pdf',
+				lastUpdated: new Date().toLocaleString(),
+				isAutoDetected: detected && Boolean(urls.undergraduate),
+				detectedText: urls.ugText
+			},
+			{
+				id: 'postgraduate',
+				title: 'Postgraduate Admissions Brochure',
+				description: `MBA, M.Tech and other postgraduate programs for Academic Year ${currentYear}-${currentYear + 1}.`,
+				icon: <FileText className='h-7 w-7' />,
+				url:
+					urls.postgraduate ||
+					'http://www.ipu.ac.in/Pubinfo2025/adm25brPG310125.pdf',
+				lastUpdated: new Date().toLocaleString(),
+				isAutoDetected: detected && Boolean(urls.postgraduate),
+				detectedText: urls.pgText
+			}
+		];
 
-    useEffect(() => {
-        initializeBrochures();
-    }, [initializeBrochures]);
+		setBrochures(data);
+		setAutoDetected(detected);
+		setScrapingStatus(status);
+		setLastChecked(new Date().toLocaleString());
+		setIsLoading(false);
+	}, [currentYear, fetchBrochuresFromIPU]);
 
-    return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-            {/* Hero Section */}
-            <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-12 sm:py-16 md:py-20">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8 }}
-                        className="text-center"
-                    >
-                        <div className="flex flex-col sm:flex-row items-center justify-center mb-4 sm:mb-6">
-                            <FileText className="w-10 h-10 sm:w-12 sm:h-12 mb-2 sm:mb-0 sm:mr-4" />
-                            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
-                                Admissions Brochure 2025-26
-                            </h1>
-                        </div>
-                        <p className="text-lg sm:text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto px-4">
-                            Download Official University Brochures for All Programs
-                        </p>
-                        <p className="text-base sm:text-lg text-blue-200 mt-2 sm:mt-4 max-w-2xl mx-auto px-4">
-                            Get comprehensive information about admissions, programs, and university policies
-                        </p>
-                    </motion.div>
-                </div>
-            </div>
+	const refreshBrochureUrls = async () => {
+		setIsRefreshing(true);
+		setScrapingStatus('Refreshing brochure links from IPU...');
+		await initializeBrochures();
+		setIsRefreshing(false);
+	};
 
-            {/* Main Content */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-                {/* Refresh Section */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6 }}
-                    className="mb-6 sm:mb-8 bg-white rounded-xl shadow-md p-4 sm:p-6 border border-gray-200"
-                >
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                        <div className="flex items-center gap-3">
-                            <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 flex-shrink-0" />
-                            <div className="min-w-0">
-                                <h3 className="text-base sm:text-lg font-semibold text-gray-800 truncate">
-                                    Academic Year {new Date().getFullYear()}-{new Date().getFullYear() + 1}
-                                </h3>
-                                <p className="text-xs sm:text-sm text-gray-600 break-all">
-                                    Last checked: {lastChecked}
-                                </p>
-                                {scrapingStatus && (
-                                    <p className="text-xs sm:text-sm text-blue-600 mt-1">
-                                        {scrapingStatus}
-                                    </p>
-                                )}
-                            </div>
-                        </div>
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
-                            {autoDetected && (
-                                <div className="bg-green-100 text-green-800 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap">
-                                    ✓ Auto-detected
-                                </div>
-                            )}
-                            <Button
-                                onClick={refreshBrochureUrls}
-                                disabled={isRefreshing || isLoading}
-                                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 sm:px-4 py-2 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95 text-sm sm:text-base w-full sm:w-auto justify-center"
-                                trackingEvent="brochure_refresh_clicked"
-                            >
-                                <RefreshCw className={`w-4 h-4 transition-transform duration-700 ${isRefreshing ? 'animate-spin' : ''}`} />
-                                <span className="whitespace-nowrap">
-                                    {isRefreshing ? 'Scanning IPU...' : 'Refresh from IPU'}
-                                </span>
-                            </Button>
-                        </div>
-                    </div>
-                </motion.div>
+	const brochureProxyUrl = (brochure: BrochureInfo, mode: 'download' | 'view') => {
+		const params = new URLSearchParams({
+			url: brochure.url,
+			title: brochure.title,
+			mode
+		});
+		return `/api/brochure-download?${params.toString()}`;
+	};
 
-                {/* Brochure Cards */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-8 sm:mb-12">
-                    {brochures.map((brochure, index) => (
-                        <motion.div
-                            key={brochure.id}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: index * 0.1 }}
-                            className="bg-white rounded-xl sm:rounded-2xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-all duration-300"
-                        >
-                            <div className={`${brochure.color} p-4 sm:p-6 text-white`}>
-                                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                                    <div className="flex items-center gap-3 sm:gap-4">
-                                        <div className="flex-shrink-0">
-                                            {brochure.icon}
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <h3 className="text-lg sm:text-xl lg:text-2xl font-bold leading-tight">
-                                                {brochure.title}
-                                            </h3>
-                                            <p className="text-xs sm:text-sm opacity-90 mt-1">
-                                                {brochure.isAutoDetected ? 'Auto-detected from IPU website' : 'Using fallback URL'}
-                                            </p>
-                                            {brochure.detectedText && (
-                                                <p className="text-xs opacity-75 mt-1 break-words">
-                                                    Source: &quot;{brochure.detectedText}&quot;
-                                                </p>
-                                            )}
-                                        </div>
-                                    </div>
-                                    {brochure.isAutoDetected && (
-                                        <div className="bg-white/20 px-2 py-1 rounded text-xs font-medium self-start sm:self-center whitespace-nowrap">
-                                            ✓ Live
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                            
-                            <div className="p-4 sm:p-6">
-                                <p className="text-gray-600 mb-4 sm:mb-6 leading-relaxed text-sm sm:text-base">
-                                    {brochure.description}
-                                </p>
-                                
-                                <div className="bg-gray-50 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
-                                    <h4 className="font-semibold text-gray-800 mb-2 text-sm sm:text-base">What&apos;s Included:</h4>
-                                    <ul className="text-xs sm:text-sm text-gray-600 space-y-1">
-                                        <li>• Program details and curriculum</li>
-                                        <li>• Admission requirements and eligibility</li>
-                                        <li>• Application process and deadlines</li>
-                                        <li>• Fee structure and payment options</li>
-                                        <li>• Campus facilities and amenities</li>
-                                        <li>• Placement statistics and career support</li>
-                                    </ul>
-                                </div>
-                                
-                                <div className="flex flex-col sm:flex-row gap-3">
-                                    <Button
-                                        onClick={() => downloadBrochure(brochure)}
-                                        className="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors duration-200 text-sm sm:text-base"
-                                        trackingEvent="brochure_download_clicked"
-                                        trackingData={{ brochure: brochure.title, url: brochure.url }}
-                                    >
-                                        <Download className="w-4 h-4 sm:w-5 sm:h-5" />
-                                        Download PDF
-                                    </Button>
-                                    <Button
-                                        onClick={() => openBrochure(brochure)}
-                                        className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors duration-200 text-sm sm:text-base"
-                                        trackingEvent="brochure_view_clicked"
-                                        trackingData={{ brochure: brochure.title, url: brochure.url }}
-                                    >
-                                        <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />
-                                        View Online
-                                    </Button>
-                                </div>
-                            </div>
-                        </motion.div>
-                    ))}
-                </div>
+	const downloadBrochure = (brochure: BrochureInfo) => {
+		window.location.assign(brochureProxyUrl(brochure, 'download'));
+	};
 
-                {/* Contact Information */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.5 }}
-                    className="mt-6 sm:mt-8 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 text-center"
-                >
-                    <h3 className="text-lg sm:text-xl lg:text-2xl font-bold mb-2 sm:mb-4">Need Help with Brochure Information?</h3>
-                    <p className="text-sm sm:text-base lg:text-lg mb-4 sm:mb-6">Contact our admissions team for assistance</p>
-                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-                        <div className="bg-white/20 px-3 sm:px-4 lg:px-6 py-2 sm:py-3 rounded-lg">
-                            <p className="font-medium text-sm sm:text-base">Admissions Office</p>
-                            <p className="text-blue-100 text-xs sm:text-sm break-all">admissions@bpit.ac.in</p>
-                        </div>
-                        <div className="bg-white/20 px-3 sm:px-4 lg:px-6 py-2 sm:py-3 rounded-lg">
-                            <p className="font-medium text-sm sm:text-base">Phone</p>
-                            <p className="text-blue-100 text-xs sm:text-sm">+91-11-2757-1101</p>
-                        </div>
-                        <div className="bg-white/20 px-3 sm:px-4 lg:px-6 py-2 sm:py-3 rounded-lg">
-                            <p className="font-medium text-sm sm:text-base">University Website</p>
-                            <p className="text-blue-100 text-xs sm:text-sm break-all">www.ipu.ac.in</p>
-                        </div>
-                    </div>
-                </motion.div>
-            </div>
-        </div>
-    );
+	const openBrochure = (brochure: BrochureInfo) => {
+		window.open(brochureProxyUrl(brochure, 'view'), '_blank', 'noopener,noreferrer');
+	};
+
+	useEffect(() => {
+		initializeBrochures();
+	}, [initializeBrochures]);
+
+	return (
+		<main className='min-h-screen bg-slate-50'>
+			<section className='relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-800 to-slate-900 py-16 text-white md:py-20'>
+				<div className='absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.14),transparent_58%)]' />
+				<div className='absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent' />
+				<div className='container relative z-10 mx-auto px-4 text-center'>
+					<div className='mx-auto max-w-4xl space-y-4'>
+						<div className='inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm'>
+							<FileText className='h-4 w-4' />
+							Admissions Brochure
+						</div>
+						<h1 className='text-3xl font-bold tracking-tight md:text-5xl'>
+							Brochure {currentYear}-{currentYear + 1}
+						</h1>
+						<p className='text-base text-slate-200 md:text-xl'>
+							Official brochure links with direct download and view support.
+						</p>
+					</div>
+				</div>
+			</section>
+
+			<div className='container mx-auto space-y-6 px-4 py-8 md:py-12'>
+				<section className='rounded-xl border border-slate-200 bg-white p-4 shadow-sm md:p-6'>
+					<div className='flex flex-col gap-4 md:flex-row md:items-center md:justify-between'>
+						<div className='space-y-1'>
+							<div className='flex items-center gap-2 text-slate-800'>
+								<Calendar className='h-5 w-5 text-blue-700' />
+								<span className='font-semibold'>
+									Academic Year {currentYear}-{currentYear + 1}
+								</span>
+							</div>
+							<p className='text-xs text-slate-500'>Last checked: {lastChecked}</p>
+							<p className='text-xs text-blue-700'>{scrapingStatus}</p>
+						</div>
+						<div className='flex flex-wrap items-center gap-2'>
+							{autoDetected ? (
+								<span className='rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700'>
+									Live links detected
+								</span>
+							) : (
+								<span className='rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-700'>
+									Fallback links in use
+								</span>
+							)}
+							<Button
+								onClick={refreshBrochureUrls}
+								disabled={isRefreshing || isLoading}
+								className='bg-blue-700 hover:bg-blue-800'
+								trackingEvent='brochure_refresh_clicked'>
+								<RefreshCw
+									className={`mr-2 h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`}
+								/>
+								Refresh
+							</Button>
+						</div>
+					</div>
+				</section>
+
+				<div className='grid gap-6 lg:grid-cols-2'>
+					{brochures.map((brochure, index) => (
+						<motion.section
+							key={brochure.id}
+							initial={{ opacity: 0, y: 12 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ duration: 0.45, delay: index * 0.08 }}
+							className='overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm'>
+							<div className='border-b border-slate-200 bg-slate-50 p-5'>
+								<div className='flex items-start gap-3'>
+									<div className='rounded-lg bg-blue-100 p-2 text-blue-700'>
+										{brochure.icon}
+									</div>
+									<div className='space-y-1'>
+										<h3 className='text-xl font-semibold text-slate-900'>
+											{brochure.title}
+										</h3>
+										<p className='text-xs text-slate-500'>
+											{brochure.isAutoDetected
+												? 'Detected from IPU website'
+												: 'Using fallback source'}
+										</p>
+										{brochure.detectedText ? (
+											<p className='text-xs text-slate-500'>
+												Source: &quot;{brochure.detectedText}&quot;
+											</p>
+										) : null}
+									</div>
+								</div>
+							</div>
+
+							<div className='space-y-5 p-5'>
+								<p className='text-sm leading-relaxed text-slate-600'>
+									{brochure.description}
+								</p>
+								<div className='rounded-lg border border-slate-200 bg-slate-50 p-4'>
+									<h4 className='mb-2 text-sm font-semibold text-slate-800'>
+										Includes
+									</h4>
+									<ul className='space-y-1 text-xs text-slate-600'>
+										<li>• Programs and eligibility details</li>
+										<li>• Admission process and timeline</li>
+										<li>• Fee structure and policies</li>
+										<li>• Infrastructure and support services</li>
+									</ul>
+								</div>
+								<div className='flex flex-col gap-3 sm:flex-row'>
+									<Button
+										onClick={() => downloadBrochure(brochure)}
+										className='flex-1 bg-blue-700 hover:bg-blue-800'
+										trackingEvent='brochure_download_clicked'
+										trackingData={{ brochure: brochure.title, url: brochure.url }}>
+										<Download className='mr-2 h-4 w-4' />
+										Download PDF
+									</Button>
+									<Button
+										variant='outline'
+										onClick={() => openBrochure(brochure)}
+										className='flex-1 border-slate-300'
+										trackingEvent='brochure_view_clicked'
+										trackingData={{ brochure: brochure.title, url: brochure.url }}>
+										<ExternalLink className='mr-2 h-4 w-4' />
+										View Online
+									</Button>
+								</div>
+							</div>
+						</motion.section>
+					))}
+				</div>
+			</div>
+		</main>
+	);
 }

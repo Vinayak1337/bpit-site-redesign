@@ -1,12 +1,21 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronLeft, ChevronRight, ZoomIn, Calendar } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { GalleryItem } from '@/lib/schemas/gallery';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import {
+	Calendar,
+	ChevronLeft,
+	ChevronRight,
+	Film,
+	Image as ImageIcon,
+	Play,
+	X
+} from 'lucide-react';
+
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import type { GalleryItem } from '@/lib/schemas/gallery';
 
 interface GalleryCollageProps {
 	items: GalleryItem[];
@@ -14,261 +23,481 @@ interface GalleryCollageProps {
 	visibleSections?: Array<'filters' | 'grid'>;
 }
 
+type MediaFilter = 'all' | 'image' | 'video';
+
+const VIDEO_URL_PATTERN = /\.(mp4|webm|ogg|mov|m4v)(\?|$)/i;
+const FALLBACK_IMAGE_URL =
+	'https://images.unsplash.com/photo-1562774053-701939374585?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80';
+
+const isVideoItem = (item: GalleryItem): boolean => {
+	if (item.mediaType === 'video') return true;
+	return VIDEO_URL_PATTERN.test(item.src);
+};
+
+const getGridClasses = (size?: string) => {
+	switch (size) {
+		case 'large':
+			return 'md:col-span-2 md:row-span-2';
+		case 'wide':
+			return 'md:col-span-2 md:row-span-1';
+		case 'tall':
+			return 'md:col-span-1 md:row-span-2';
+		default:
+			return 'md:col-span-1 md:row-span-1';
+	}
+};
+
+const getYouTubeEmbedUrl = (url: string): string | null => {
+	try {
+		const parsed = new URL(url);
+		if (parsed.hostname.includes('youtu.be')) {
+			const id = parsed.pathname.replace('/', '').trim();
+			return id ? `https://www.youtube.com/embed/${id}?autoplay=1&rel=0` : null;
+		}
+		if (
+			parsed.hostname.includes('youtube.com') ||
+			parsed.hostname.includes('www.youtube.com')
+		) {
+			const id = parsed.searchParams.get('v');
+			return id ? `https://www.youtube.com/embed/${id}?autoplay=1&rel=0` : null;
+		}
+		return null;
+	} catch {
+		return null;
+	}
+};
+
 export default function GalleryCollage({
 	items,
 	categories,
 	visibleSections
 }: GalleryCollageProps) {
 	const [selectedCategory, setSelectedCategory] = useState<string>('All');
-	const [filteredItems, setFilteredItems] = useState<GalleryItem[]>(items);
-	const [selectedImage, setSelectedImage] = useState<GalleryItem | null>(null);
+	const [mediaFilter, setMediaFilter] = useState<MediaFilter>('all');
+	const [selectedItem, setSelectedItem] = useState<GalleryItem | null>(null);
 	const [currentIndex, setCurrentIndex] = useState<number>(0);
+	const [brokenUrls, setBrokenUrls] = useState<Record<string, true>>({});
+
+	const normalizedCategories = useMemo(() => {
+		const sanitizedProvided = categories
+			.map(category => category.trim())
+			.filter(category => category.length > 0);
+		const fromItems = items
+			.map(item => item.category.trim())
+			.filter(category => category.length > 0);
+		return Array.from(
+			new Set([
+				'All',
+				...sanitizedProvided.filter(category => category !== 'All'),
+				...fromItems.filter(category => category !== 'All')
+			])
+		);
+	}, [categories, items]);
+
+	const filteredItems = useMemo(() => {
+		return items.filter(item => {
+			const matchesCategory =
+				selectedCategory === 'All' || item.category === selectedCategory;
+
+			if (mediaFilter === 'all') return matchesCategory;
+			if (mediaFilter === 'video') return matchesCategory && isVideoItem(item);
+			return matchesCategory && !isVideoItem(item);
+		});
+	}, [items, mediaFilter, selectedCategory]);
+
+	const totals = useMemo(() => {
+		const videos = items.filter(isVideoItem).length;
+		return {
+			all: items.length,
+			videos,
+			photos: items.length - videos,
+			categories: normalizedCategories.filter(category => category !== 'All').length
+		};
+	}, [items, normalizedCategories]);
+
+	const closeLightbox = useCallback(() => {
+		setSelectedItem(null);
+		document.body.style.overflow = '';
+	}, []);
+
+	const openLightbox = useCallback(
+		(item: GalleryItem) => {
+			const index = filteredItems.findIndex(filteredItem => filteredItem.id === item.id);
+			setSelectedItem(item);
+			setCurrentIndex(index >= 0 ? index : 0);
+			document.body.style.overflow = 'hidden';
+		},
+		[filteredItems]
+	);
+
+	const navigateLightbox = useCallback(
+		(direction: 'prev' | 'next') => {
+			if (filteredItems.length === 0) return;
+			const newIndex =
+				direction === 'next'
+					? (currentIndex + 1) % filteredItems.length
+					: (currentIndex - 1 + filteredItems.length) % filteredItems.length;
+			setCurrentIndex(newIndex);
+			setSelectedItem(filteredItems[newIndex]);
+		},
+		[currentIndex, filteredItems]
+	);
 
 	useEffect(() => {
-		if (selectedCategory === 'All') {
-			setFilteredItems(items);
-		} else {
-			setFilteredItems(
-				items.filter(item => item.category === selectedCategory)
-			);
-		}
-	}, [selectedCategory, items]);
-
-	const openLightbox = (item: GalleryItem) => {
-		const index = filteredItems.findIndex(i => i.id === item.id);
-		setSelectedImage(item);
-		setCurrentIndex(index);
-		document.body.style.overflow = 'hidden';
-	};
-
-	const closeLightbox = () => {
-		setSelectedImage(null);
-		document.body.style.overflow = 'auto';
-	};
-
-	const navigateLightbox = (direction: 'prev' | 'next') => {
-		const newIndex =
-			direction === 'next'
-				? (currentIndex + 1) % filteredItems.length
-				: (currentIndex - 1 + filteredItems.length) % filteredItems.length;
-
-		setCurrentIndex(newIndex);
-		setSelectedImage(filteredItems[newIndex]);
-	};
+		return () => {
+			document.body.style.overflow = '';
+		};
+	}, []);
 
 	useEffect(() => {
-		const handleKeyDown = (e: KeyboardEvent) => {
-			if (!selectedImage) return;
-			if (e.key === 'Escape') closeLightbox();
-			if (e.key === 'ArrowRight') navigateLightbox('next');
-			if (e.key === 'ArrowLeft') navigateLightbox('prev');
+		const handleKeyDown = (event: KeyboardEvent) => {
+			if (!selectedItem) return;
+			if (event.key === 'Escape') closeLightbox();
+			if (event.key === 'ArrowRight') navigateLightbox('next');
+			if (event.key === 'ArrowLeft') navigateLightbox('prev');
 		};
 
 		window.addEventListener('keydown', handleKeyDown);
 		return () => window.removeEventListener('keydown', handleKeyDown);
-	}, [selectedImage, currentIndex]); // eslint-disable-line react-hooks/exhaustive-deps
+	}, [closeLightbox, navigateLightbox, selectedItem]);
 
-	// Helper to get grid classes based on size
-	const getGridClasses = (size?: string) => {
-		switch (size) {
-			case 'large':
-				return 'md:col-span-2 md:row-span-2';
-			case 'wide':
-				return 'md:col-span-2 md:row-span-1';
-			case 'tall':
-				return 'md:col-span-1 md:row-span-2';
-			default:
-				return 'md:col-span-1 md:row-span-1';
-		}
+	const showSection = (section: 'hero' | 'filters' | 'grid') => {
+		if (!visibleSections) return true;
+		if (section === 'hero') return false;
+		return visibleSections.includes(section);
 	};
 
-	const showSection = (section: 'filters' | 'grid') =>
-		!visibleSections || visibleSections.includes(section);
+	const markUrlBroken = useCallback((url: string | undefined) => {
+		if (!url) return;
+		setBrokenUrls(previous => {
+			if (previous[url]) return previous;
+			return { ...previous, [url]: true };
+		});
+	}, []);
+
+	const resolveImageUrl = useCallback(
+		(url: string | undefined) => {
+			if (!url) return FALLBACK_IMAGE_URL;
+			if (brokenUrls[url]) return FALLBACK_IMAGE_URL;
+			return url;
+		},
+		[brokenUrls]
+	);
+
+	const lightboxYouTubeUrl = selectedItem
+		? getYouTubeEmbedUrl(selectedItem.src)
+		: null;
 
 	return (
 		<div className='space-y-8'>
-			{/* Filter Navigation */}
-			{showSection('filters') && (
-			<div className='sticky top-20 z-30 flex justify-center pb-4'>
-				<div className='bg-white/80 backdrop-blur-md p-1.5 rounded-full shadow-lg border border-gray-200/50 flex flex-wrap justify-center gap-1'>
-					{categories.map(category => (
-						<Button
-							key={category}
-							variant={selectedCategory === category ? 'default' : 'ghost'}
-							onClick={() => setSelectedCategory(category)}
-							className={cn(
-								'px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 h-auto',
-								selectedCategory === category
-									? 'bg-blue-600 text-white shadow-md hover:bg-blue-700'
-									: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-							)}
-							trackingEvent="gallery_filter_category"
-							trackingData={{ category }}>
-							{category}
-						</Button>
-					))}
-				</div>
-			</div>
-			)}
+			{showSection('hero') ? (
+				<section className='relative overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-blue-700 via-blue-800 to-slate-900 px-6 py-10 text-white md:px-10'>
+					<div className='absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.14),transparent_60%)]' />
+					<div className='absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent' />
+					<div className='relative space-y-6'>
+						<div className='inline-flex items-center rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold tracking-wide text-blue-100'>
+							BPIT Media Archive
+						</div>
+						<div className='space-y-3'>
+							<h1 className='text-3xl font-bold tracking-tight md:text-4xl'>
+								Photo & Video Library
+							</h1>
+							<p className='max-w-3xl text-sm text-slate-200 md:text-base'>
+								Explore festivals, campus moments, technical events, and institutional
+								milestones in one curated library.
+							</p>
+						</div>
+						<div className='grid grid-cols-2 gap-3 md:grid-cols-4'>
+							<div className='rounded-xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur'>
+								<div className='text-xl font-semibold'>{totals.all}</div>
+								<div className='text-xs text-blue-100/85'>Media Items</div>
+							</div>
+							<div className='rounded-xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur'>
+								<div className='text-xl font-semibold'>{totals.photos}</div>
+								<div className='text-xs text-blue-100/85'>Photos</div>
+							</div>
+							<div className='rounded-xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur'>
+								<div className='text-xl font-semibold'>{totals.videos}</div>
+								<div className='text-xs text-blue-100/85'>Videos</div>
+							</div>
+							<div className='rounded-xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur'>
+								<div className='text-xl font-semibold'>{totals.categories}</div>
+								<div className='text-xs text-blue-100/85'>Collections</div>
+							</div>
+						</div>
+					</div>
+				</section>
+			) : null}
 
-			{/* Collage Grid */}
-			{showSection('grid') && (
-			<div className='relative p-4 sm:p-8 rounded-3xl bg-slate-50 border border-slate-100 shadow-inner overflow-hidden'>
-				{/* Background Pattern */}
-				<div
-					className='absolute inset-0 opacity-[0.4] pointer-events-none'
-					style={{
-						backgroundImage:
-							'radial-gradient(#94a3b8 1.5px, transparent 1.5px)',
-						backgroundSize: '24px 24px'
-					}}
-				/>
+			{showSection('filters') ? (
+				<section className='space-y-4 rounded-2xl border border-slate-200 bg-white p-4 md:p-5'>
+					<div className='flex flex-col gap-3 md:flex-row md:items-center md:justify-between'>
+						<div className='flex flex-wrap items-center gap-2'>
+							<Badge variant='secondary' className='bg-slate-100 text-slate-700'>
+								Media Type
+							</Badge>
+							<Button
+								type='button'
+								size='sm'
+								variant={mediaFilter === 'all' ? 'default' : 'outline'}
+								onClick={() => setMediaFilter('all')}>
+								All
+							</Button>
+							<Button
+								type='button'
+								size='sm'
+								variant={mediaFilter === 'image' ? 'default' : 'outline'}
+								onClick={() => setMediaFilter('image')}>
+								<ImageIcon className='h-4 w-4' />
+								Photos
+							</Button>
+							<Button
+								type='button'
+								size='sm'
+								variant={mediaFilter === 'video' ? 'default' : 'outline'}
+								onClick={() => setMediaFilter('video')}>
+								<Film className='h-4 w-4' />
+								Videos
+							</Button>
+						</div>
+						<p className='text-xs text-slate-500'>{filteredItems.length} items shown</p>
+					</div>
 
-				<motion.div
-					layout
-					className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 auto-rows-[250px] gap-6 relative z-10'>
-					<AnimatePresence mode='popLayout'>
-						{filteredItems.map(item => (
-							<motion.div
-								key={item.id}
-								layout
-								initial={{ opacity: 0, scale: 0.9 }}
-								animate={{ opacity: 1, scale: 1 }}
-								exit={{ opacity: 0, scale: 0.9 }}
-								transition={{ duration: 0.4 }}
-								className={cn(
-									'relative group rounded-2xl overflow-hidden cursor-pointer bg-gray-100 shadow-sm hover:shadow-xl hover:z-10 transition-all duration-500 hover:-translate-y-1',
-									getGridClasses(item.size)
-								)}
-								onClick={() => openLightbox(item)}>
-								<Image
-									src={item.src}
-									alt={item.title}
-									fill
-									className='object-cover transition-transform duration-700 group-hover:scale-110'
-									sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
-								/>
-
-								{/* Hover Overlay */}
-								<div className='absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6'>
-									<div className='transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300'>
-										<div className='flex items-center gap-2 text-blue-300 text-xs font-medium mb-1 uppercase tracking-wider'>
-											<span>{item.category}</span>
-											{item.date && (
-												<>
-													<span className='w-1 h-1 bg-blue-300 rounded-full' />
-													<span className='flex items-center gap-1'>
-														<Calendar className='w-3 h-3' /> {item.date}
-													</span>
-												</>
-											)}
-										</div>
-										<h3 className='text-white font-bold text-xl leading-tight mb-1'>
-											{item.title}
-										</h3>
-										{item.description && (
-											<p className='text-white/80 text-sm line-clamp-2'>
-												{item.description}
-											</p>
-										)}
-									</div>
-									<div className='absolute top-4 right-4 bg-white/20 backdrop-blur-sm p-2 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100'>
-										<ZoomIn className='w-5 h-5' />
-									</div>
-								</div>
-							</motion.div>
+					<div className='flex flex-wrap gap-2'>
+						{normalizedCategories.map(category => (
+							<Button
+								key={category}
+								type='button'
+								size='sm'
+								variant={selectedCategory === category ? 'default' : 'outline'}
+								className='rounded-full'
+								onClick={() => setSelectedCategory(category)}
+								trackingEvent='gallery_filter_category'
+								trackingData={{ category }}>
+								{category}
+							</Button>
 						))}
-					</AnimatePresence>
-				</motion.div>
-			</div>
-			)}
+					</div>
+				</section>
+			) : null}
 
-			{/* Lightbox */}
+			{showSection('grid') ? (
+				<section className='rounded-2xl border border-slate-200 bg-slate-50 p-4 md:p-6'>
+					{filteredItems.length === 0 ? (
+						<div className='rounded-xl border border-dashed border-slate-300 bg-white p-10 text-center'>
+							<p className='text-sm font-medium text-slate-700'>
+								No media found for this selection.
+							</p>
+							<p className='mt-1 text-sm text-slate-500'>
+								Try a different category or media type.
+							</p>
+						</div>
+					) : (
+						<motion.div
+							layout
+							className='grid auto-rows-[220px] grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4'>
+							<AnimatePresence mode='popLayout'>
+								{filteredItems.map(item => {
+									const isVideo = isVideoItem(item);
+									const cardImageUrl = isVideo
+										? resolveImageUrl(item.thumbnail)
+										: resolveImageUrl(item.src);
+									return (
+										<motion.button
+											key={item.id}
+											layout
+											type='button'
+											initial={{ opacity: 0, y: 12 }}
+											animate={{ opacity: 1, y: 0 }}
+											exit={{ opacity: 0, y: 12 }}
+											transition={{ duration: 0.24 }}
+											className={cn(
+												'group relative overflow-hidden rounded-xl border border-slate-200 bg-slate-100 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md',
+												getGridClasses(item.size)
+											)}
+											onClick={() => openLightbox(item)}>
+											{isVideo && item.thumbnail ? (
+												// eslint-disable-next-line @next/next/no-img-element
+												<img
+													src={cardImageUrl}
+													alt={item.title}
+													className='h-full w-full object-cover transition-transform duration-500 group-hover:scale-105'
+													loading='lazy'
+													onError={() => markUrlBroken(item.thumbnail)}
+												/>
+											) : !isVideo ? (
+												// eslint-disable-next-line @next/next/no-img-element
+												<img
+													src={cardImageUrl}
+													alt={item.title}
+													className='h-full w-full object-cover transition-transform duration-500 group-hover:scale-105'
+													loading='lazy'
+													onError={() => markUrlBroken(item.src)}
+												/>
+											) : (
+												<div className='absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 text-white'>
+													<div className='flex flex-col items-center gap-2 opacity-90'>
+														<Film className='h-10 w-10' />
+														<span className='text-xs font-medium tracking-wide'>
+															Video Preview
+														</span>
+													</div>
+												</div>
+											)}
+
+											<div className='absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100' />
+											<div className='absolute inset-x-0 bottom-0 space-y-2 p-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 translate-y-3'>
+												<div className='flex items-center gap-2 text-[11px] text-blue-100'>
+													<Badge className='border border-white/20 bg-white/10 text-white hover:bg-white/10'>
+														{item.category}
+													</Badge>
+													{isVideo ? (
+														<Badge className='border border-white/20 bg-white/10 text-white hover:bg-white/10'>
+															Video
+														</Badge>
+													) : null}
+													{item.date ? (
+														<span className='inline-flex items-center gap-1 text-blue-100/90'>
+															<Calendar className='h-3 w-3' />
+															{item.date}
+														</span>
+													) : null}
+												</div>
+												<h3 className='line-clamp-1 text-base font-semibold text-white'>
+													{item.title}
+												</h3>
+												{item.description ? (
+													<p className='line-clamp-2 text-xs text-slate-200'>
+														{item.description}
+													</p>
+												) : null}
+											</div>
+
+											{isVideo ? (
+												<div className='absolute right-4 top-4 rounded-full border border-white/30 bg-black/40 p-2 text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100'>
+													<Play className='h-4 w-4 fill-white' />
+												</div>
+											) : null}
+										</motion.button>
+									);
+								})}
+							</AnimatePresence>
+						</motion.div>
+					)}
+				</section>
+			) : null}
+
 			<AnimatePresence>
-				{showSection('grid') && selectedImage && (
+				{selectedItem ? (
 					<motion.div
 						initial={{ opacity: 0 }}
 						animate={{ opacity: 1 }}
 						exit={{ opacity: 0 }}
-						className='fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-xl p-4'
+						className='fixed inset-0 z-50 bg-black/90 p-4 backdrop-blur-sm'
 						onClick={closeLightbox}>
-						{/* Close Button */}
-						<Button
-							variant="ghost"
-							size="icon"
-							onClick={closeLightbox}
-							aria-label='Close lightbox'
-							className='absolute top-6 right-6 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors z-50 group h-auto w-auto'
-							trackingEvent="gallery_lightbox_close">
-							<X className='w-6 h-6 group-hover:rotate-90 transition-transform duration-300' />
-						</Button>
+						<div className='relative mx-auto flex h-full max-w-7xl items-center justify-center'>
+							<Button
+								type='button'
+								variant='ghost'
+								size='icon'
+								className='absolute right-0 top-0 z-50 text-white hover:bg-white/20'
+								onClick={closeLightbox}
+								trackingEvent='gallery_lightbox_close'>
+								<X className='h-5 w-5' />
+							</Button>
 
-						{/* Navigation Buttons */}
-						<Button
-							variant="ghost"
-							size="icon"
-							onClick={e => {
-								e.stopPropagation();
-								navigateLightbox('prev');
-							}}
-							aria-label='Previous image'
-							className='absolute left-6 top-1/2 -translate-y-1/2 p-4 bg-white/10 hover:bg-white/20 rounded-full text-white transition-all z-50 hover:scale-110 hidden sm:flex h-auto w-auto'
-							trackingEvent="gallery_lightbox_prev">
-							<ChevronLeft className='w-8 h-8' />
-						</Button>
-						<Button
-							variant="ghost"
-							size="icon"
-							onClick={e => {
-								e.stopPropagation();
-								navigateLightbox('next');
-							}}
-							aria-label='Next image'
-							className='absolute right-6 top-1/2 -translate-y-1/2 p-4 bg-white/10 hover:bg-white/20 rounded-full text-white transition-all z-50 hover:scale-110 hidden sm:flex h-auto w-auto'
-							trackingEvent="gallery_lightbox_next">
-							<ChevronRight className='w-8 h-8' />
-						</Button>
+							{filteredItems.length > 1 ? (
+								<>
+									<Button
+										type='button'
+										variant='ghost'
+										size='icon'
+										className='absolute left-0 top-1/2 z-50 -translate-y-1/2 text-white hover:bg-white/20'
+										onClick={event => {
+											event.stopPropagation();
+											navigateLightbox('prev');
+										}}
+										trackingEvent='gallery_lightbox_prev'>
+										<ChevronLeft className='h-6 w-6' />
+									</Button>
+									<Button
+										type='button'
+										variant='ghost'
+										size='icon'
+										className='absolute right-0 top-1/2 z-50 -translate-y-1/2 text-white hover:bg-white/20'
+										onClick={event => {
+											event.stopPropagation();
+											navigateLightbox('next');
+										}}
+										trackingEvent='gallery_lightbox_next'>
+										<ChevronRight className='h-6 w-6' />
+									</Button>
+								</>
+							) : null}
 
-						{/* Image Container */}
-						<motion.div
-							key={selectedImage.id}
-							initial={{ opacity: 0, scale: 0.9, y: 20 }}
-							animate={{ opacity: 1, scale: 1, y: 0 }}
-							exit={{ opacity: 0, scale: 0.9, y: 20 }}
-							transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-							className='relative max-w-7xl w-full flex flex-col items-center'
-							onClick={e => e.stopPropagation()}>
-							<div className='relative w-full h-[80vh] rounded-lg overflow-hidden shadow-2xl bg-black/50 ring-1 ring-white/10'>
-								<Image
-									src={selectedImage.src}
-									alt={selectedImage.title}
-									fill
-									className='object-contain'
-									priority
-								/>
-							</div>
-
-							<div className='mt-6 text-center text-white max-w-2xl animate-in fade-in slide-in-from-bottom-4 duration-500'>
-								<div className='flex items-center justify-center gap-3 text-blue-300 text-sm font-medium mb-2'>
-									<span className='bg-blue-500/20 px-3 py-1 rounded-full border border-blue-500/30'>
-										{selectedImage.category}
-									</span>
-									{selectedImage.date && (
-										<span className='flex items-center gap-1 opacity-80'>
-											<Calendar className='w-4 h-4' /> {selectedImage.date}
-										</span>
+							<motion.div
+								key={selectedItem.id}
+								initial={{ opacity: 0, scale: 0.96 }}
+								animate={{ opacity: 1, scale: 1 }}
+								exit={{ opacity: 0, scale: 0.96 }}
+								className='w-full max-w-5xl space-y-4'
+								onClick={event => event.stopPropagation()}>
+								<div className='relative h-[70vh] overflow-hidden rounded-xl border border-white/20 bg-black'>
+									{isVideoItem(selectedItem) ? (
+										lightboxYouTubeUrl ? (
+											<iframe
+												src={lightboxYouTubeUrl}
+												title={selectedItem.title}
+												className='h-full w-full'
+												allow='autoplay; encrypted-media; picture-in-picture'
+												allowFullScreen
+											/>
+										) : (
+											<video
+												src={selectedItem.src}
+												poster={selectedItem.thumbnail}
+												controls
+												autoPlay
+												playsInline
+												className='h-full w-full bg-black object-contain'
+											/>
+										)
+									) : (
+										// eslint-disable-next-line @next/next/no-img-element
+										<img
+											src={resolveImageUrl(selectedItem.src)}
+											alt={selectedItem.title}
+											className='h-full w-full object-contain'
+											onError={() => markUrlBroken(selectedItem.src)}
+										/>
 									)}
 								</div>
-								<h3 className='text-3xl font-bold mb-2 tracking-tight'>
-									{selectedImage.title}
-								</h3>
-								<p className='text-gray-400 leading-relaxed'>
-									{selectedImage.description}
-								</p>
-							</div>
-						</motion.div>
+
+								<div className='space-y-2 text-center text-white'>
+									<div className='flex items-center justify-center gap-2'>
+										<Badge className='bg-white/15 text-white hover:bg-white/15'>
+											{selectedItem.category}
+										</Badge>
+										{selectedItem.date ? (
+											<span className='inline-flex items-center gap-1 text-sm text-slate-300'>
+												<Calendar className='h-4 w-4' />
+												{selectedItem.date}
+											</span>
+										) : null}
+									</div>
+									<h3 className='text-2xl font-semibold tracking-tight'>
+										{selectedItem.title}
+									</h3>
+									{selectedItem.description ? (
+										<p className='mx-auto max-w-2xl text-sm text-slate-300'>
+											{selectedItem.description}
+										</p>
+									) : null}
+								</div>
+							</motion.div>
+						</div>
 					</motion.div>
-				)}
+				) : null}
 			</AnimatePresence>
 		</div>
 	);

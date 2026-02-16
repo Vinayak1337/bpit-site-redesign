@@ -122,7 +122,7 @@ export default function FeesPage() {
             name: 'B.Tech (Lateral Entry)',
             duration: '3 Years',
             icon: <GraduationCap className="w-6 h-6" />,
-            color: 'bg-green-500',
+            color: 'bg-sky-600',
             years: [
                 {
                     year: 2,
@@ -187,7 +187,7 @@ export default function FeesPage() {
             name: 'Bachelor of Business Administration (BBA)',
             duration: '3 Years',
             icon: <FileText className="w-6 h-6" />,
-            color: 'bg-purple-500',
+            color: 'bg-indigo-600',
             years: [
                 {
                     year: 1,
@@ -246,7 +246,7 @@ export default function FeesPage() {
             name: 'Master of Business Administration (MBA)',
             duration: '2 Years',
             icon: <CreditCard className="w-6 h-6" />,
-            color: 'bg-red-500',
+            color: 'bg-slate-700',
             years: [
                 {
                     year: 1,
@@ -490,9 +490,9 @@ export default function FeesPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
+        <div className="min-h-screen bg-slate-50">
             {/* Hero Section */}
-            <div className="bg-gradient-to-r from-green-600 to-blue-600 text-white py-20">
+            <div className="bg-gradient-to-br from-blue-700 via-blue-800 to-slate-900 text-white py-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
@@ -506,10 +506,10 @@ export default function FeesPage() {
                                 Fee Structure
                             </h1>
                         </div>
-                        <p className="text-xl md:text-2xl text-green-100 max-w-3xl mx-auto">
+                        <p className="text-xl md:text-2xl text-slate-200 max-w-3xl mx-auto">
                             Complete Year-wise Fee Structure for All Programs
                         </p>
-                        <p className="text-lg text-green-200 mt-4 max-w-2xl mx-auto">
+                        <p className="text-lg text-slate-300 mt-4 max-w-2xl mx-auto">
                             Transparent and detailed breakdown of all fees and charges
                         </p>
                     </motion.div>
@@ -736,38 +736,38 @@ export default function FeesPage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.3 }}
-                    className="mt-12 bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-2xl p-8"
+                    className="mt-12 bg-blue-50 border border-blue-200 rounded-2xl p-8"
                 >
                     <div className="flex items-center mb-6">
-                        <Info className="w-8 h-8 text-orange-600 mr-3" />
-                        <h3 className="text-2xl font-bold text-orange-800">Important Information</h3>
+                        <Info className="w-8 h-8 text-blue-700 mr-3" />
+                        <h3 className="text-2xl font-bold text-blue-900">Important Information</h3>
                     </div>
-                    <div className="grid md:grid-cols-2 gap-6 text-gray-700">
+                    <div className="grid md:grid-cols-2 gap-6 text-blue-900/90">
                         <div className="space-y-3">
                             <p className="flex items-start">
-                                <span className="text-orange-600 mr-2">•</span>
+                                <span className="text-blue-700 mr-2">•</span>
                                 Fees are subject to annual revision and approval by the university.
                             </p>
                             <p className="flex items-start">
-                                <span className="text-orange-600 mr-2">•</span>
+                                <span className="text-blue-700 mr-2">•</span>
                                 Payment can be made semester-wise or annually as per student preference.
                             </p>
                             <p className="flex items-start">
-                                <span className="text-orange-600 mr-2">•</span>
+                                <span className="text-blue-700 mr-2">•</span>
                                 Late payment charges may apply for payments made after the due date.
                             </p>
                         </div>
                         <div className="space-y-3">
                             <p className="flex items-start">
-                                <span className="text-orange-600 mr-2">•</span>
+                                <span className="text-blue-700 mr-2">•</span>
                                 Scholarships and fee waivers are available for eligible students.
                             </p>
                             <p className="flex items-start">
-                                <span className="text-orange-600 mr-2">•</span>
+                                <span className="text-blue-700 mr-2">•</span>
                                 Additional charges may apply for supplementary examinations.
                             </p>
                             <p className="flex items-start">
-                                <span className="text-orange-600 mr-2">•</span>
+                                <span className="text-blue-700 mr-2">•</span>
                                 Fee refund policy as per university guidelines.
                             </p>
                         </div>
@@ -779,18 +779,18 @@ export default function FeesPage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.4 }}
-                    className="mt-8 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-2xl p-8 text-center"
+                    className="mt-8 bg-gradient-to-r from-blue-700 to-slate-900 text-white rounded-2xl p-8 text-center"
                 >
                     <h3 className="text-2xl font-bold mb-4">Fee Related Queries?</h3>
                     <p className="text-lg mb-6">Contact our accounts office for any fee-related assistance</p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <div className="bg-white/20 px-6 py-3 rounded-lg">
                             <p className="font-medium">Accounts Office</p>
-                            <p className="text-blue-100">accounts@bpit.ac.in</p>
+                            <p className="text-slate-200">accounts@bpit.ac.in</p>
                         </div>
                         <div className="bg-white/20 px-6 py-3 rounded-lg">
                             <p className="font-medium">Phone</p>
-                            <p className="text-blue-100">+91-11-2757-1101</p>
+                            <p className="text-slate-200">+91-11-2757-1101</p>
                         </div>
                     </div>
                 </motion.div>

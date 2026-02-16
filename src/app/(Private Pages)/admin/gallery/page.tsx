@@ -11,7 +11,7 @@ export default async function AdminGalleryPage() {
 				<div>
 					<h1 className="text-3xl font-bold tracking-tight">Photo & Video Gallery</h1>
 					<p className="text-muted-foreground mt-2">
-						Manage your gallery images and categories.
+						Manage gallery photos, videos, and category collections.
 					</p>
 				</div>
 			</div>
@@ -19,4 +19,3 @@ export default async function AdminGalleryPage() {
 		</div>
 	);
 }
-
