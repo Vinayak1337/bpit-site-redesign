@@ -6,6 +6,7 @@ import {
 	Calendar,
 	ChevronLeft,
 	ChevronRight,
+	Expand,
 	Film,
 	Image as ImageIcon,
 	Play,
@@ -115,6 +116,14 @@ export default function GalleryCollage({
 		};
 	}, [items, normalizedCategories]);
 
+	const categoryCounts = useMemo(() => {
+		const counts: Record<string, number> = { All: items.length };
+		for (const item of items) {
+			counts[item.category] = (counts[item.category] ?? 0) + 1;
+		}
+		return counts;
+	}, [items]);
+
 	const closeLightbox = useCallback(() => {
 		setSelectedItem(null);
 		document.body.style.overflow = '';
@@ -216,10 +225,12 @@ export default function GalleryCollage({
 								<div className='text-xl font-semibold'>{totals.photos}</div>
 								<div className='text-xs text-blue-100/85'>Photos</div>
 							</div>
-							<div className='rounded-xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur'>
-								<div className='text-xl font-semibold'>{totals.videos}</div>
-								<div className='text-xs text-blue-100/85'>Videos</div>
-							</div>
+							{totals.videos > 0 ? (
+								<div className='rounded-xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur'>
+									<div className='text-xl font-semibold'>{totals.videos}</div>
+									<div className='text-xs text-blue-100/85'>Videos</div>
+								</div>
+							) : null}
 							<div className='rounded-xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur'>
 								<div className='text-xl font-semibold'>{totals.categories}</div>
 								<div className='text-xs text-blue-100/85'>Collections</div>
@@ -275,6 +286,16 @@ export default function GalleryCollage({
 								trackingEvent='gallery_filter_category'
 								trackingData={{ category }}>
 								{category}
+								{categoryCounts[category] != null ? (
+									<span className={cn(
+										'ml-1 rounded-full px-1.5 py-0.5 text-[10px] font-semibold leading-none',
+										selectedCategory === category
+											? 'bg-white/20 text-white'
+											: 'bg-slate-100 text-slate-500'
+									)}>
+										{categoryCounts[category]}
+									</span>
+								) : null}
 							</Button>
 						))}
 					</div>
@@ -295,7 +316,7 @@ export default function GalleryCollage({
 					) : (
 						<motion.div
 							layout
-							className='grid auto-rows-[220px] grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4'>
+							className='grid auto-rows-[220px] grid-flow-dense grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4'>
 							<AnimatePresence mode='popLayout'>
 								{filteredItems.map(item => {
 									const isVideo = isVideoItem(item);
@@ -377,7 +398,11 @@ export default function GalleryCollage({
 												<div className='absolute right-4 top-4 rounded-full border border-white/30 bg-black/40 p-2 text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100'>
 													<Play className='h-4 w-4 fill-white' />
 												</div>
-											) : null}
+											) : (
+												<div className='absolute right-4 top-4 rounded-full border border-white/30 bg-black/40 p-2 text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100'>
+													<Expand className='h-4 w-4' />
+												</div>
+											)}
 										</motion.button>
 									);
 								})}
