@@ -224,18 +224,37 @@ const PlacementCompanies = ({ data }: PlacementCompaniesProps) => {
 					</motion.p>
 				</div>
 
-				{/* Infinite Scrolling Companies */}
-				<div ref={containerRef} className='relative'>
-					<div className='overflow-hidden'>
-						{/* Gradient Fade Effect - hidden on mobile */}
-						<div className='absolute top-0 left-0 w-0 sm:w-16 lg:w-20 h-full bg-gradient-to-r from-gray-50 to-transparent pointer-events-none z-10'></div>
-						<div className='absolute top-0 right-0 w-0 sm:w-16 lg:w-20 h-full bg-gradient-to-l from-gray-50 to-transparent pointer-events-none z-10'></div>
+				{/* Smaller screens use a simple grid for easier scanning */}
+				<div className='grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:hidden'>
+					{companiesToRender.map((company, index) => (
+						<div
+							key={`${company.name}-${index}`}
+							className='flex min-h-16 items-center justify-center rounded-lg bg-white p-4 shadow-sm'>
+							<Image
+								src={company.logo}
+								alt={`${company.name} logo`}
+								width={128}
+								height={64}
+								className='max-h-[40px] max-w-[96px] object-contain opacity-80'
+								onError={() => {
+									// Handle image loading error silently
+								}}
+							/>
+						</div>
+					))}
+				</div>
 
-						<div ref={scope} className='flex gap-6 sm:gap-8 lg:gap-12 w-max'>
+				{/* Infinite Scrolling Companies */}
+				<div ref={containerRef} className='relative hidden lg:block'>
+					<div className='overflow-hidden'>
+						<div className='absolute top-0 left-0 h-full w-20 bg-gradient-to-r from-gray-50 to-transparent pointer-events-none z-10'></div>
+						<div className='absolute top-0 right-0 h-full w-20 bg-gradient-to-l from-gray-50 to-transparent pointer-events-none z-10'></div>
+
+						<div ref={scope} className='flex w-max gap-12'>
 							{companiesToRender.map((company, index) => (
 								<motion.div
 									key={`${company.name}-${index}`}
-									className='flex-shrink-0 flex items-center justify-center w-[120px] sm:w-[140px] lg:w-[160px] h-16 lg:h-20 bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 group'
+									className='group flex h-20 w-[160px] flex-shrink-0 items-center justify-center rounded-lg bg-white shadow-sm transition-all duration-300 hover:shadow-md'
 									whileHover={{ scale: 1.05 }}
 									onMouseEnter={() => handleCardHover(true)}
 									onMouseLeave={() => handleCardHover(false)}>
@@ -244,7 +263,7 @@ const PlacementCompanies = ({ data }: PlacementCompaniesProps) => {
 										alt={`${company.name} logo`}
 										width={128}
 										height={64}
-										className='object-contain filter grayscale hover:grayscale-0 transition-all duration-300 opacity-70 group-hover:opacity-100 max-w-[80px] sm:max-w-[100px] lg:max-w-[120px] max-h-[40px] lg:max-h-[50px]'
+										className='max-h-[50px] max-w-[120px] object-contain opacity-70 grayscale transition-all duration-300 group-hover:opacity-100 group-hover:grayscale-0'
 										onError={() => {
 											// Handle image loading error silently
 										}}

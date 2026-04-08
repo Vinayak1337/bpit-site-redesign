@@ -5,40 +5,45 @@ import WhyHero from './components/WhyHero';
 import StatsStrip from './components/StatsStrip';
 import PlacementCompanies from '@/components/placement/placement-companies';
 import WhyBpitTestimonials from './components/WhyBpitTestimonials';
-import {
-	whyBpitHeroData,
-	whyBpitStats,
-	whyBpitFinalCta
-} from '@/data/why-bpit';
 import { getPlacementCompanies } from '@/app/(Private Pages)/actions/placement';
 import { getTestimonials } from '@/app/(Private Pages)/actions/testimonials';
+import {
+	getAdmissionsHero,
+	getAdmissionsWhyBpitPageData
+} from '@/app/(Private Pages)/actions/admissions';
+import { ADMISSIONS_SLUGS } from '@/lib/admissions-cms';
+import AdmissionsPageShell from '@/app/(Public Pages)/admissions/components/AdmissionsPageShell';
 
-const pageSlug = 'main';
+const pageSlug = ADMISSIONS_SLUGS.whyBpit;
 
 const WhyBPITPage = async () => {
-	const [placementData, testimonials] = await Promise.all([
+	const [pageHero, content, placementData, testimonials] = await Promise.all([
+		getAdmissionsHero(pageSlug),
+		getAdmissionsWhyBpitPageData(),
 		getPlacementCompanies(pageSlug),
 		getTestimonials(pageSlug)
 	]);
 
 	return (
-		<div className='space-y-6 md:space-y-8'>
-			<WhyHero data={whyBpitHeroData} />
-			<StatsStrip stats={whyBpitStats} />
-			<WhyBPITHighlights />
+		<AdmissionsPageShell hero={pageHero}>
+			<div className='space-y-6 md:space-y-8'>
+				<WhyHero data={content.hero} />
+				<StatsStrip data={content.stats} />
+				<WhyBPITHighlights data={content.highlights} />
 
-			<section className='overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm'>
-				<PlacementCompanies data={placementData} />
-			</section>
+				<section className='overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm'>
+					<PlacementCompanies data={placementData} />
+				</section>
 
-			<Accreditations />
+				<Accreditations data={content.accreditations} />
 
-			{testimonials.testimonials.length > 0 ? (
-				<WhyBpitTestimonials data={testimonials} />
-			) : null}
+				{testimonials.testimonials.length > 0 ? (
+					<WhyBpitTestimonials data={testimonials} />
+				) : null}
 
-			<FinalCTA data={whyBpitFinalCta} />
-		</div>
+				<FinalCTA data={content.finalCta} />
+			</div>
+		</AdmissionsPageShell>
 	);
 };
 

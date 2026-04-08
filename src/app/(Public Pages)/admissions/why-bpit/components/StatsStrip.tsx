@@ -1,23 +1,33 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import type { WhyBpitStatsSection } from '@/app/(Private Pages)/actions/admissions';
 
-export type Stat = { value: string; label: string };
+const StatsStrip = ({ data }: { data?: WhyBpitStatsSection | null }) => {
+	if (!data || data.items.length === 0) {
+		return null;
+	}
 
-const StatsStrip = ({ stats }: { stats: Stat[] }) => {
 	return (
 		<section className='rounded-3xl border border-slate-200 bg-white p-5 shadow-sm md:p-7'>
 			<div className='mb-5 flex flex-col gap-2 md:mb-6'>
-				<p className='text-xs font-semibold uppercase tracking-[0.16em] text-blue-700'>
-					BPIT at a glance
-				</p>
-				<h2 className='text-xl font-semibold text-slate-900 md:text-2xl'>
-					Key performance highlights
-				</h2>
+				{data.eyebrow ? (
+					<p className='text-xs font-semibold uppercase tracking-[0.16em] text-blue-700'>
+						{data.eyebrow}
+					</p>
+				) : null}
+				{data.title ? (
+					<h2 className='text-xl font-semibold text-slate-900 md:text-2xl'>
+						{data.title}
+					</h2>
+				) : null}
+				{data.description ? (
+					<p className='max-w-3xl text-sm text-slate-600 md:text-base'>{data.description}</p>
+				) : null}
 			</div>
 
 			<div className='grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4'>
-				{stats.map((stat, index) => (
+				{data.items.map((stat, index) => (
 					<motion.article
 						key={stat.label}
 						initial={{ opacity: 0, y: 14 }}

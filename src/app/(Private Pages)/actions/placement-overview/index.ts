@@ -38,6 +38,7 @@ export interface PlacementTeamMemberData {
 	name: string;
 	position: string;
 	email: string;
+	image?: string;
 	initials: string;
 	gradientColor: string;
 	textColor: string;
@@ -132,7 +133,13 @@ function normalizePlacementOverview(values: any): PlacementOverviewData {
 		features: values.features || [],
 		teamTitle: values.teamTitle || '',
 		teamDescription: values.teamDescription || '',
-		teamMembers: values.teamMembers || [],
+		teamMembers: Array.isArray(values.teamMembers)
+			? values.teamMembers.map((member: any) => ({
+					...member,
+					image:
+						typeof member?.image === 'string' ? member.image : undefined
+			  }))
+			: [],
 		trainingTitle: values.trainingTitle || '',
 		trainingDescription: values.trainingDescription || '',
 		trainingAreas: values.trainingAreas || [],

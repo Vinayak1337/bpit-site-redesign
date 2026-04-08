@@ -277,6 +277,7 @@ const createUpdatedData = (currentData: PlacementOverviewData, formValues: Parti
 				name: (member.name ?? '').trim(),
 				position: (member.position ?? '').trim(),
 				email: (member.email ?? '').trim(),
+				image: (member.image ?? '').trim(),
 				initials: (member.initials ?? '').trim(),
 				gradientColor: member.gradientColor ?? 'blue',
 				textColor: member.textColor ?? 'white'
@@ -419,6 +420,7 @@ export default function PlacementOverviewForm({
 							name: member.name,
 							position: member.position,
 							email: member.email,
+							image: member.image ?? '',
 							initials: member.initials,
 							gradientColor: member.gradientColor,
 							textColor: member.textColor

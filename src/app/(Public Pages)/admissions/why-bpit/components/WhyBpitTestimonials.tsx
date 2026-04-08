@@ -2,7 +2,7 @@ import Image from 'next/image';
 import { Quote, Star } from 'lucide-react';
 
 type WhyBpitTestimonialsProps = {
-	data: TestimonialsData;
+	data?: TestimonialsData | null;
 };
 
 const getInitials = (name: string) =>
@@ -14,15 +14,17 @@ const getInitials = (name: string) =>
 		.join('') || 'BP';
 
 const WhyBpitTestimonials = ({ data }: WhyBpitTestimonialsProps) => {
+	if (!data || data.testimonials.length === 0) {
+		return null;
+	}
+
 	return (
 		<section className='rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8'>
 			<div className='mb-7'>
 				<p className='text-xs font-semibold uppercase tracking-[0.16em] text-blue-700'>
 					Student voices
 				</p>
-				<h2 className='mt-2 text-2xl font-semibold text-slate-900 md:text-3xl'>
-					{data.title || 'What our students and alumni say'}
-				</h2>
+				<h2 className='mt-2 text-2xl font-semibold text-slate-900 md:text-3xl'>{data.title}</h2>
 				{data.subtitle ? (
 					<p className='mt-3 max-w-3xl text-sm text-slate-600 md:text-base'>
 						{data.subtitle}

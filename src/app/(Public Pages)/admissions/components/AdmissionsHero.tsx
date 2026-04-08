@@ -5,10 +5,14 @@ import { motion } from 'framer-motion';
 import type { AdmissionsHeroData } from '@/app/(Private Pages)/actions/admissions';
 
 interface AdmissionsHeroProps {
-	data: AdmissionsHeroData;
+	data?: AdmissionsHeroData | null;
 }
 
 const AdmissionsHero = ({ data }: AdmissionsHeroProps) => {
+	if (!data || (!data.title && !data.subtitle)) {
+		return null;
+	}
+
 	const backgroundStyles =
 		data.backgroundImage && data.backgroundImage.length > 0
 			? {
@@ -70,6 +74,5 @@ const AdmissionsHero = ({ data }: AdmissionsHeroProps) => {
 };
 
 export default AdmissionsHero;
-
 
 

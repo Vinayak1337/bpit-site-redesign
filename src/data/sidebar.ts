@@ -459,13 +459,13 @@ export const adminStudentLifeSidebarData = {
 	}
 };
 
-export const adminAdmissionsSidebarData = {
+export const adminAcademiaSidebarData = {
 	navItems: [
 		{
-			id: 'admissions-hero',
-			title: 'Admissions Overview',
-			icon: 'GraduationCap',
-			href: '/admin/admissions'
+			id: 'academia-hero',
+			title: 'Academia Overview',
+			icon: 'BookOpen',
+			href: '/admin/academia'
 		}
 	],
 	theme: {
@@ -478,13 +478,49 @@ export const adminAdmissionsSidebarData = {
 	}
 };
 
-export const adminAcademiaSidebarData = {
+export const adminAdmissionsSidebarData = {
 	navItems: [
 		{
-			id: 'academia-hero',
-			title: 'Academia Overview',
+			id: 'admissions-overview',
+			title: 'Admissions Overview',
+			icon: 'GraduationCap',
+			href: '/admin/admissions'
+		},
+		{
+			id: 'why-bpit',
+			title: 'Why BPIT',
+			icon: 'Star',
+			href: '/admin/admissions/why-bpit'
+		},
+		{
+			id: 'process',
+			title: 'Admission Process',
+			icon: 'FileText',
+			href: '/admin/admissions/process'
+		},
+		{
+			id: 'fees',
+			title: 'Fee Structure',
+			icon: 'Banknote',
+			href: '/admin/admissions/fees'
+		},
+		{
+			id: 'scholarship',
+			title: 'Scholarships',
+			icon: 'Award',
+			href: '/admin/admissions/scholarship'
+		},
+		{
+			id: 'brochure',
+			title: 'Information Brochure',
 			icon: 'BookOpen',
-			href: '/admin/academia'
+			href: '/admin/admissions/brochure'
+		},
+		{
+			id: 'faqs',
+			title: 'FAQs',
+			icon: 'HelpCircle',
+			href: '/admin/admissions/faqs'
 		}
 	],
 	theme: {

@@ -1,69 +1,88 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 
-const admissionsHeroData = {
-	title: 'Admissions',
-	subtitle: 'Join us to embark on a journey of excellence and innovation.',
-	backgroundImage: null,
-	gradient: 'from-blue-600 to-blue-800'
-};
+const admissionsPages = [
+	require('../src/data/admissions/overview'),
+	require('../src/data/admissions/why-bpit'),
+	require('../src/data/admissions/process'),
+	require('../src/data/admissions/fees'),
+	require('../src/data/admissions/scholarship'),
+	require('../src/data/admissions/brochure'),
+	require('../src/data/admissions/faqs')
+];
 
-async function seedAdmissions() {
-	try {
-		console.log('🌱 Seeding Admissions data...');
+async function upsertPage(slug, title) {
+	const existing = await prisma.page.findUnique({ where: { slug } });
+	if (existing) {
+		return prisma.page.update({
+			where: { id: existing.id },
+			data: { title, kind: 'PAGE', status: 'PUBLISHED' }
+		});
+	}
 
-		let page = await prisma.page.findUnique({ where: { slug: 'admissions' } });
-
-		if (!page) {
-			page = await prisma.page.create({
-				data: {
-					slug: 'admissions',
-					title: 'Admissions',
-					kind: 'PAGE',
-					status: 'PUBLISHED'
-				}
-			});
+	return prisma.page.create({
+		data: {
+			slug,
+			title,
+			kind: 'PAGE',
+			status: 'PUBLISHED'
 		}
+	});
+}
 
-		await prisma.component.upsert({
-			where: {
-				pageId_order: {
-					pageId: page.id,
-					order: 0
-				}
-			},
-			update: {
-				data: admissionsHeroData,
-				key: 'HERO'
-			},
-			create: {
-				pageId: page.id,
-				data: admissionsHeroData,
-				order: 0,
-				key: 'HERO'
+async function upsertComponent(pageId, key, data, order) {
+	const existing = await prisma.component.findFirst({
+		where: { pageId, key }
+	});
+
+	if (existing) {
+		return prisma.component.update({
+			where: { id: existing.id },
+			data: {
+				data
 			}
 		});
-
-		console.log('✅ Admissions data seeded successfully');
-	} catch (error) {
-		console.error('❌ Error seeding Admissions data:', error);
-		throw error;
 	}
+
+	return prisma.component.create({
+		data: {
+			pageId,
+			key,
+			order,
+			data
+		}
+	});
+}
+
+async function seedAdmissionsPage(pageConfig) {
+	const page = await upsertPage(pageConfig.slug, pageConfig.title);
+	const components = Object.entries(pageConfig.components);
+
+	for (const [index, [key, data]] of components.entries()) {
+		await upsertComponent(page.id, key, data, index);
+	}
+
+	console.log(
+		`Seeded ${pageConfig.slug} with ${components.length} admissions component${
+			components.length === 1 ? '' : 's'
+		}.`
+	);
 }
 
 async function main() {
-	await seedAdmissions();
+	for (const pageConfig of admissionsPages) {
+		await seedAdmissionsPage(pageConfig);
+	}
 }
 
 main()
-	.catch((e) => {
-		console.error(e);
-		process.exit(1);
-	})
-	.finally(async () => {
+	.then(async () => {
 		await prisma.$disconnect();
+	})
+	.catch(async error => {
+		console.error('Admissions seed failed:', error);
+		await prisma.$disconnect();
+		process.exit(1);
 	});
-
-
-
