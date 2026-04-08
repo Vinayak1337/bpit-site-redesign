@@ -116,41 +116,40 @@ export const PUBLIC_TO_ADMIN_PAGE_MAP: Record<string, AdminPageCoverage> = {
 		status: 'complete',
 		editingMode: 'live'
 	},
+	'/admissions': {
+		adminHref: '/admin/admissions',
+		status: 'complete',
+		editingMode: 'live'
+	},
 	'/admissions/why-bpit': {
-		adminHref: null,
-		status: 'missing',
-		editingMode: 'none',
-		note: 'Page-level admin editor is not finished yet.'
+		adminHref: '/admin/admissions/why-bpit',
+		status: 'complete',
+		editingMode: 'live'
 	},
 	'/admissions/process': {
-		adminHref: null,
-		status: 'missing',
-		editingMode: 'none',
-		note: 'Page-level admin editor is not finished yet.'
+		adminHref: '/admin/admissions/process',
+		status: 'complete',
+		editingMode: 'live'
 	},
 	'/admissions/fees': {
-		adminHref: null,
-		status: 'missing',
-		editingMode: 'none',
-		note: 'Page-level admin editor is not finished yet.'
+		adminHref: '/admin/admissions/fees',
+		status: 'complete',
+		editingMode: 'live'
 	},
 	'/admissions/scholarship': {
-		adminHref: null,
-		status: 'missing',
-		editingMode: 'none',
-		note: 'Page-level admin editor is not finished yet.'
+		adminHref: '/admin/admissions/scholarship',
+		status: 'complete',
+		editingMode: 'live'
 	},
 	'/admissions/brochure': {
-		adminHref: null,
-		status: 'missing',
-		editingMode: 'none',
-		note: 'Page-level admin editor is not finished yet.'
+		adminHref: '/admin/admissions/brochure',
+		status: 'complete',
+		editingMode: 'live'
 	},
 	'/admissions/faqs': {
-		adminHref: null,
-		status: 'missing',
-		editingMode: 'none',
-		note: 'Page-level admin editor is not finished yet.'
+		adminHref: '/admin/admissions/faqs',
+		status: 'complete',
+		editingMode: 'live'
 	},
 	'/academia/academic-calendar': {
 		adminHref: null,
@@ -295,7 +294,6 @@ const ADMIN_TO_PUBLIC_EXACT_MAP: Record<string, string> = {
 		'/statutory-committees/grievance-redressal',
 	'/admin/mandatory-disclosure': '/mandatory-disclosure',
 	'/admin/gallery': '/gallery',
-	'/admin/admissions': '/admissions',
 	'/admin/academia': '/academia',
 	'/admin/placements/overview': '/placements/overview',
 	'/admin/placements/training-placement': '/placements/training-placement',

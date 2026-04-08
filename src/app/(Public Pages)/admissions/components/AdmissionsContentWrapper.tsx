@@ -14,12 +14,12 @@ const AdmissionsContentWrapper = ({ children }: AdmissionsContentWrapperProps) =
 			animate={{ opacity: 1, x: 0 }}
 			transition={{ duration: 0.6 }}
 			className='flex-1 max-w-full overflow-hidden'>
-			<div className='bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden w-full max-w-full hover:shadow-xl transition-all duration-300'>
+			<div className='w-full max-w-full overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg transition-all duration-300 hover:shadow-xl'>
 				<motion.div
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.4 }}
-					className='p-8'>
+					className='p-4 sm:p-6 lg:p-8'>
 					{children}
 				</motion.div>
 			</div>

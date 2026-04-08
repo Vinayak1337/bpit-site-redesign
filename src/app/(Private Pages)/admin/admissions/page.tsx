@@ -1,32 +1,38 @@
 import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
-import { getAdmissionsHero } from '@/app/(Private Pages)/actions/admissions';
-import AdmissionsHeroEditor from '@/app/(Private Pages)/admin/admissions/components/AdmissionsHeroEditor';
+import {
+	getAdmissionsHero,
+	getAdmissionsOverviewPageData,
+	getAdmissionsProgramCatalog
+} from '@/app/(Private Pages)/actions/admissions';
+import { ADMISSIONS_SLUGS } from '@/lib/admissions-cms';
+import AdmissionsHeroBannerEditor from '@/app/(Private Pages)/admin/admissions/components/AdmissionsHeroBannerEditor';
+import AdmissionsOverviewEditor from '@/app/(Private Pages)/admin/admissions/components/AdmissionsOverviewEditor';
 
-export default async function AdminAdmissionsPage() {
+export default async function AdminAdmissionsOverviewPage() {
 	await requireAdmin();
-	const heroData = await getAdmissionsHero('admissions');
+
+	const [pageHero, overview, programs] = await Promise.all([
+		getAdmissionsHero(ADMISSIONS_SLUGS.overview),
+		getAdmissionsOverviewPageData(),
+		getAdmissionsProgramCatalog()
+	]);
 
 	return (
 		<div className='space-y-8'>
-			<div>
-				<h1 className='text-2xl font-bold text-gray-900 mb-2'>
-					Admissions Overview
-				</h1>
-				<p className='text-gray-600'>
-					Manage the main hero banner for the Admissions section.
-				</p>
+			<div className='rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900 shadow-sm'>
+				Edit the admissions overview page live. Each section opens its own form drawer and updates the public page after save.
 			</div>
 
-			<AdmissionsHeroEditor initialData={heroData} pageSlug='admissions' />
+			<AdmissionsHeroBannerEditor
+				initialData={pageHero}
+				pageSlug={ADMISSIONS_SLUGS.overview}
+				label='Admissions Overview Banner'
+			/>
+
+			<AdmissionsOverviewEditor
+				initialData={overview}
+				programCount={programs.length}
+			/>
 		</div>
 	);
 }
-
-
-
-
-
-
-
-
-

@@ -1,38 +1,16 @@
-import React from 'react';
 import type { Metadata } from 'next';
-import AdmissionsHero from '@/app/(Public Pages)/admissions/components/AdmissionsHero';
-import AdmissionsContentWrapper from '@/app/(Public Pages)/admissions/components/AdmissionsContentWrapper';
-import { getAdmissionsHero } from '@/app/(Private Pages)/actions/admissions';
+import type { ReactNode } from 'react';
 
 export const metadata: Metadata = {
 	title: 'Admissions - Bhagwan Parshuram Institute of Technology',
 	description:
-		'Join BPIT to pursue excellence in engineering and management. Explore our programs, admission process, and scholarship opportunities.',
+		'Join BPIT to pursue excellence in engineering and management. Explore our programs, admission process, and scholarship opportunities.'
 };
 
-const AdmissionsLayout = async ({
+export default function AdmissionsLayout({
 	children
 }: Readonly<{
-	children: React.ReactNode;
-}>) => {
-	const heroData = await getAdmissionsHero('admissions');
-
-	return (
-		<main className='min-h-screen bg-gray-50'>
-			{/* Hero Section */}
-			<AdmissionsHero data={heroData} />
-
-			{/* Main Content with Sidebar */}
-			<div className='container mx-auto px-4 py-12'>
-				<div className='flex flex-col lg:flex-row gap-8'>
-
-					<AdmissionsContentWrapper>
-						{children}
-					</AdmissionsContentWrapper>
-				</div>
-			</div>
-		</main>
-	);
-};
-
-export default AdmissionsLayout;
+	children: ReactNode;
+}>) {
+	return children;
+}

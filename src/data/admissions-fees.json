@@ -1,0 +1,456 @@
+{
+	"meta": {
+		"title": "Fee Structure",
+		"subtitle": "Detailed year-wise and head-wise fee details",
+		"description": "Explore the complete program fee structure with annual totals, detailed charge heads, and payment guidance for each course.",
+		"academicSession": "Academic Session 2025-26",
+		"billingNote": "Breakdowns may appear semester-wise or as annual account heads depending on the official fee sheet available for that program.",
+		"importantNotes": [
+			"Fees are subject to annual revision and approval by the university.",
+			"Payment can be made semester-wise or annually as per student preference.",
+			"Late payment charges may apply for payments made after the due date.",
+			"Scholarships and fee waivers are available for eligible students.",
+			"Additional charges may apply for supplementary examinations.",
+			"Fee refund policy is governed by applicable university guidelines."
+		],
+		"supportMessage": "Contact the accounts office for fee clarifications, payment assistance, or document support.",
+		"supportEmail": "accounts@bpit.ac.in",
+		"supportPhone": "+91-11-2757-1101"
+	},
+	"programs": [
+		{
+			"id": "btech",
+			"name": "B.Tech (Engineering)",
+			"shortName": "B.Tech",
+			"duration": "4 Years",
+			"icon": "Cpu",
+			"description": "Four-year engineering program with semester-level tuition, laboratory, library, and examination charges.",
+			"paymentNote": "Year 1 includes a one-time registration fee in Semester 1.",
+			"totalProgramFee": 765000,
+			"years": [
+				{
+					"year": 1,
+					"title": "First Year",
+					"note": "Includes one-time registration at admission.",
+					"totalYearFee": 195000,
+					"breakdowns": [
+						{
+							"id": "year-1-sem-1",
+							"title": "Semester 1",
+							"shortLabel": "Sem 1",
+							"description": "Payable at admission.",
+							"totalAmount": 100000,
+							"components": [
+								{ "name": "Tuition Fee", "amount": 65000, "description": "Academic instruction fee" },
+								{ "name": "Development Fee", "amount": 10000, "description": "Infrastructure development" },
+								{ "name": "Library Fee", "amount": 2000, "description": "Library access and resources" },
+								{ "name": "Laboratory Fee", "amount": 15000, "description": "Lab equipment and materials" },
+								{ "name": "Examination Fee", "amount": 3000, "description": "Examination and evaluation" },
+								{ "name": "Registration Fee", "amount": 5000, "description": "One-time registration" }
+							]
+						},
+						{
+							"id": "year-1-sem-2",
+							"title": "Semester 2",
+							"shortLabel": "Sem 2",
+							"description": "Recurring academic charges.",
+							"totalAmount": 95000,
+							"components": [
+								{ "name": "Tuition Fee", "amount": 65000, "description": "Academic instruction fee" },
+								{ "name": "Development Fee", "amount": 10000, "description": "Infrastructure development" },
+								{ "name": "Library Fee", "amount": 2000, "description": "Library access and resources" },
+								{ "name": "Laboratory Fee", "amount": 15000, "description": "Lab equipment and materials" },
+								{ "name": "Examination Fee", "amount": 3000, "description": "Examination and evaluation" }
+							]
+						}
+					]
+				},
+				{
+					"year": 2,
+					"title": "Second Year",
+					"note": "Standard recurring academic charges.",
+					"totalYearFee": 190000,
+					"breakdowns": [
+						{
+							"id": "year-2-sem-1",
+							"title": "Semester 1",
+							"shortLabel": "Sem 1",
+							"description": "Recurring academic charges.",
+							"totalAmount": 95000,
+							"components": [
+								{ "name": "Tuition Fee", "amount": 65000, "description": "Academic instruction fee" },
+								{ "name": "Development Fee", "amount": 10000, "description": "Infrastructure development" },
+								{ "name": "Library Fee", "amount": 2000, "description": "Library access and resources" },
+								{ "name": "Laboratory Fee", "amount": 15000, "description": "Lab equipment and materials" },
+								{ "name": "Examination Fee", "amount": 3000, "description": "Examination and evaluation" }
+							]
+						},
+						{
+							"id": "year-2-sem-2",
+							"title": "Semester 2",
+							"shortLabel": "Sem 2",
+							"description": "Recurring academic charges.",
+							"totalAmount": 95000,
+							"components": [
+								{ "name": "Tuition Fee", "amount": 65000, "description": "Academic instruction fee" },
+								{ "name": "Development Fee", "amount": 10000, "description": "Infrastructure development" },
+								{ "name": "Library Fee", "amount": 2000, "description": "Library access and resources" },
+								{ "name": "Laboratory Fee", "amount": 15000, "description": "Lab equipment and materials" },
+								{ "name": "Examination Fee", "amount": 3000, "description": "Examination and evaluation" }
+							]
+						}
+					]
+				},
+				{
+					"year": 3,
+					"title": "Third Year",
+					"note": "Standard recurring academic charges.",
+					"totalYearFee": 190000,
+					"breakdowns": [
+						{
+							"id": "year-3-sem-1",
+							"title": "Semester 1",
+							"shortLabel": "Sem 1",
+							"description": "Recurring academic charges.",
+							"totalAmount": 95000,
+							"components": [
+								{ "name": "Tuition Fee", "amount": 65000, "description": "Academic instruction fee" },
+								{ "name": "Development Fee", "amount": 10000, "description": "Infrastructure development" },
+								{ "name": "Library Fee", "amount": 2000, "description": "Library access and resources" },
+								{ "name": "Laboratory Fee", "amount": 15000, "description": "Lab equipment and materials" },
+								{ "name": "Examination Fee", "amount": 3000, "description": "Examination and evaluation" }
+							]
+						},
+						{
+							"id": "year-3-sem-2",
+							"title": "Semester 2",
+							"shortLabel": "Sem 2",
+							"description": "Recurring academic charges.",
+							"totalAmount": 95000,
+							"components": [
+								{ "name": "Tuition Fee", "amount": 65000, "description": "Academic instruction fee" },
+								{ "name": "Development Fee", "amount": 10000, "description": "Infrastructure development" },
+								{ "name": "Library Fee", "amount": 2000, "description": "Library access and resources" },
+								{ "name": "Laboratory Fee", "amount": 15000, "description": "Lab equipment and materials" },
+								{ "name": "Examination Fee", "amount": 3000, "description": "Examination and evaluation" }
+							]
+						}
+					]
+				},
+				{
+					"year": 4,
+					"title": "Fourth Year",
+					"note": "Standard recurring academic charges.",
+					"totalYearFee": 190000,
+					"breakdowns": [
+						{
+							"id": "year-4-sem-1",
+							"title": "Semester 1",
+							"shortLabel": "Sem 1",
+							"description": "Recurring academic charges.",
+							"totalAmount": 95000,
+							"components": [
+								{ "name": "Tuition Fee", "amount": 65000, "description": "Academic instruction fee" },
+								{ "name": "Development Fee", "amount": 10000, "description": "Infrastructure development" },
+								{ "name": "Library Fee", "amount": 2000, "description": "Library access and resources" },
+								{ "name": "Laboratory Fee", "amount": 15000, "description": "Lab equipment and materials" },
+								{ "name": "Examination Fee", "amount": 3000, "description": "Examination and evaluation" }
+							]
+						},
+						{
+							"id": "year-4-sem-2",
+							"title": "Semester 2",
+							"shortLabel": "Sem 2",
+							"description": "Recurring academic charges.",
+							"totalAmount": 95000,
+							"components": [
+								{ "name": "Tuition Fee", "amount": 65000, "description": "Academic instruction fee" },
+								{ "name": "Development Fee", "amount": 10000, "description": "Infrastructure development" },
+								{ "name": "Library Fee", "amount": 2000, "description": "Library access and resources" },
+								{ "name": "Laboratory Fee", "amount": 15000, "description": "Lab equipment and materials" },
+								{ "name": "Examination Fee", "amount": 3000, "description": "Examination and evaluation" }
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"id": "btech-lateral",
+			"name": "B.Tech (Lateral Entry)",
+			"shortName": "B.Tech LE",
+			"duration": "3 Years",
+			"icon": "TrendingUp",
+			"description": "Direct second-year entry track shown with annual account-head breakup based on the provided sample fee certificate.",
+			"paymentNote": "Lateral entry begins from Year 2. The entry year includes one-time heads such as alumni contribution fund, security fee, and book bank charges.",
+			"totalProgramFee": 524000,
+			"years": [
+				{
+					"year": 2,
+					"title": "Second Year (Entry Year)",
+					"note": "Annual head-wise breakup for entry year. One-time charges apply only in this year.",
+					"totalYearFee": 188000,
+					"breakdowns": [
+						{
+							"id": "lateral-year-2-heads",
+							"title": "Annual Fee Heads",
+							"shortLabel": "Year 2 heads",
+							"description": "Provided as annual account heads in the sample document.",
+							"totalAmount": 188000,
+							"components": [
+								{ "name": "Tuition Fee (Per Annum)", "amount": 139500, "description": "Recurring annual tuition" },
+								{ "name": "University Charges (Per Annum)", "amount": 20000, "description": "University-related annual charges" },
+								{ "name": "Alumni Contribution Fund (One Time)", "amount": 2000, "description": "One-time charge in entry year" },
+								{ "name": "Security Fee (Refundable)", "amount": 10000, "description": "Refundable security deposit" },
+								{ "name": "Examination Fee Per Student (Per Annum)", "amount": 3000, "description": "Annual examination fee" },
+								{ "name": "Innovation & Incubation Fee (Per Annum)", "amount": 500, "description": "Annual innovation and incubation charge" },
+								{ "name": "Book Bank Charges", "amount": 8000, "description": "One-time book bank charge in entry year" },
+								{ "name": "Other Dues (Per Annum)", "amount": 5000, "description": "Recurring annual miscellaneous dues" }
+							]
+						}
+					]
+				},
+				{
+					"year": 3,
+					"title": "Third Year",
+					"note": "Annual head-wise breakup with only recurring charges.",
+					"totalYearFee": 168000,
+					"breakdowns": [
+						{
+							"id": "lateral-year-3-heads",
+							"title": "Annual Fee Heads",
+							"shortLabel": "Year 3 heads",
+							"description": "Provided as annual account heads in the sample document.",
+							"totalAmount": 168000,
+							"components": [
+								{ "name": "Tuition Fee (Per Annum)", "amount": 139500, "description": "Recurring annual tuition" },
+								{ "name": "University Charges (Per Annum)", "amount": 20000, "description": "University-related annual charges" },
+								{ "name": "Examination Fee Per Student (Per Annum)", "amount": 3000, "description": "Annual examination fee" },
+								{ "name": "Innovation & Incubation Fee (Per Annum)", "amount": 500, "description": "Annual innovation and incubation charge" },
+								{ "name": "Other Dues (Per Annum)", "amount": 5000, "description": "Recurring annual miscellaneous dues" }
+							]
+						}
+					]
+				},
+				{
+					"year": 4,
+					"title": "Fourth Year",
+					"note": "Annual head-wise breakup with only recurring charges.",
+					"totalYearFee": 168000,
+					"breakdowns": [
+						{
+							"id": "lateral-year-4-heads",
+							"title": "Annual Fee Heads",
+							"shortLabel": "Year 4 heads",
+							"description": "Provided as annual account heads in the sample document.",
+							"totalAmount": 168000,
+							"components": [
+								{ "name": "Tuition Fee (Per Annum)", "amount": 139500, "description": "Recurring annual tuition" },
+								{ "name": "University Charges (Per Annum)", "amount": 20000, "description": "University-related annual charges" },
+								{ "name": "Examination Fee Per Student (Per Annum)", "amount": 3000, "description": "Annual examination fee" },
+								{ "name": "Innovation & Incubation Fee (Per Annum)", "amount": 500, "description": "Annual innovation and incubation charge" },
+								{ "name": "Other Dues (Per Annum)", "amount": 5000, "description": "Recurring annual miscellaneous dues" }
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"id": "bba",
+			"name": "Bachelor of Business Administration (BBA)",
+			"shortName": "BBA",
+			"duration": "3 Years",
+			"icon": "FileText",
+			"description": "Three-year management program with semester-level tuition, development, library, and examination charges.",
+			"paymentNote": "Year 1 includes a one-time registration fee in Semester 1.",
+			"totalProgramFee": 345000,
+			"years": [
+				{
+					"year": 1,
+					"title": "First Year",
+					"note": "Includes one-time registration at admission.",
+					"totalYearFee": 117000,
+					"breakdowns": [
+						{
+							"id": "bba-year-1-sem-1",
+							"title": "Semester 1",
+							"shortLabel": "Sem 1",
+							"description": "Payable at admission.",
+							"totalAmount": 60000,
+							"components": [
+								{ "name": "Tuition Fee", "amount": 45000, "description": "Academic instruction fee" },
+								{ "name": "Development Fee", "amount": 8000, "description": "Infrastructure development" },
+								{ "name": "Library Fee", "amount": 2000, "description": "Library access and resources" },
+								{ "name": "Examination Fee", "amount": 2000, "description": "Examination and evaluation" },
+								{ "name": "Registration Fee", "amount": 3000, "description": "One-time registration" }
+							]
+						},
+						{
+							"id": "bba-year-1-sem-2",
+							"title": "Semester 2",
+							"shortLabel": "Sem 2",
+							"description": "Recurring academic charges.",
+							"totalAmount": 57000,
+							"components": [
+								{ "name": "Tuition Fee", "amount": 45000, "description": "Academic instruction fee" },
+								{ "name": "Development Fee", "amount": 8000, "description": "Infrastructure development" },
+								{ "name": "Library Fee", "amount": 2000, "description": "Library access and resources" },
+								{ "name": "Examination Fee", "amount": 2000, "description": "Examination and evaluation" }
+							]
+						}
+					]
+				},
+				{
+					"year": 2,
+					"title": "Second Year",
+					"note": "Standard recurring academic charges.",
+					"totalYearFee": 114000,
+					"breakdowns": [
+						{
+							"id": "bba-year-2-sem-1",
+							"title": "Semester 1",
+							"shortLabel": "Sem 1",
+							"description": "Recurring academic charges.",
+							"totalAmount": 57000,
+							"components": [
+								{ "name": "Tuition Fee", "amount": 45000, "description": "Academic instruction fee" },
+								{ "name": "Development Fee", "amount": 8000, "description": "Infrastructure development" },
+								{ "name": "Library Fee", "amount": 2000, "description": "Library access and resources" },
+								{ "name": "Examination Fee", "amount": 2000, "description": "Examination and evaluation" }
+							]
+						},
+						{
+							"id": "bba-year-2-sem-2",
+							"title": "Semester 2",
+							"shortLabel": "Sem 2",
+							"description": "Recurring academic charges.",
+							"totalAmount": 57000,
+							"components": [
+								{ "name": "Tuition Fee", "amount": 45000, "description": "Academic instruction fee" },
+								{ "name": "Development Fee", "amount": 8000, "description": "Infrastructure development" },
+								{ "name": "Library Fee", "amount": 2000, "description": "Library access and resources" },
+								{ "name": "Examination Fee", "amount": 2000, "description": "Examination and evaluation" }
+							]
+						}
+					]
+				},
+				{
+					"year": 3,
+					"title": "Third Year",
+					"note": "Standard recurring academic charges.",
+					"totalYearFee": 114000,
+					"breakdowns": [
+						{
+							"id": "bba-year-3-sem-1",
+							"title": "Semester 1",
+							"shortLabel": "Sem 1",
+							"description": "Recurring academic charges.",
+							"totalAmount": 57000,
+							"components": [
+								{ "name": "Tuition Fee", "amount": 45000, "description": "Academic instruction fee" },
+								{ "name": "Development Fee", "amount": 8000, "description": "Infrastructure development" },
+								{ "name": "Library Fee", "amount": 2000, "description": "Library access and resources" },
+								{ "name": "Examination Fee", "amount": 2000, "description": "Examination and evaluation" }
+							]
+						},
+						{
+							"id": "bba-year-3-sem-2",
+							"title": "Semester 2",
+							"shortLabel": "Sem 2",
+							"description": "Recurring academic charges.",
+							"totalAmount": 57000,
+							"components": [
+								{ "name": "Tuition Fee", "amount": 45000, "description": "Academic instruction fee" },
+								{ "name": "Development Fee", "amount": 8000, "description": "Infrastructure development" },
+								{ "name": "Library Fee", "amount": 2000, "description": "Library access and resources" },
+								{ "name": "Examination Fee", "amount": 2000, "description": "Examination and evaluation" }
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"id": "mba",
+			"name": "Master of Business Administration (MBA)",
+			"shortName": "MBA",
+			"duration": "2 Years",
+			"icon": "Building2",
+			"description": "Two-year postgraduate management program with intensive semester billing and first-year registration at entry.",
+			"paymentNote": "Year 1 includes a one-time registration fee in Semester 1.",
+			"totalProgramFee": 379000,
+			"years": [
+				{
+					"year": 1,
+					"title": "First Year",
+					"note": "Includes one-time registration at admission.",
+					"totalYearFee": 193000,
+					"breakdowns": [
+						{
+							"id": "mba-year-1-sem-1",
+							"title": "Semester 1",
+							"shortLabel": "Sem 1",
+							"description": "Payable at admission.",
+							"totalAmount": 100000,
+							"components": [
+								{ "name": "Tuition Fee", "amount": 75000, "description": "Academic instruction fee" },
+								{ "name": "Development Fee", "amount": 12000, "description": "Infrastructure development" },
+								{ "name": "Library Fee", "amount": 3000, "description": "Library access and resources" },
+								{ "name": "Examination Fee", "amount": 3000, "description": "Examination and evaluation" },
+								{ "name": "Registration Fee", "amount": 7000, "description": "One-time registration" }
+							]
+						},
+						{
+							"id": "mba-year-1-sem-2",
+							"title": "Semester 2",
+							"shortLabel": "Sem 2",
+							"description": "Recurring academic charges.",
+							"totalAmount": 93000,
+							"components": [
+								{ "name": "Tuition Fee", "amount": 75000, "description": "Academic instruction fee" },
+								{ "name": "Development Fee", "amount": 12000, "description": "Infrastructure development" },
+								{ "name": "Library Fee", "amount": 3000, "description": "Library access and resources" },
+								{ "name": "Examination Fee", "amount": 3000, "description": "Examination and evaluation" }
+							]
+						}
+					]
+				},
+				{
+					"year": 2,
+					"title": "Second Year",
+					"note": "Standard recurring academic charges.",
+					"totalYearFee": 186000,
+					"breakdowns": [
+						{
+							"id": "mba-year-2-sem-1",
+							"title": "Semester 1",
+							"shortLabel": "Sem 1",
+							"description": "Recurring academic charges.",
+							"totalAmount": 93000,
+							"components": [
+								{ "name": "Tuition Fee", "amount": 75000, "description": "Academic instruction fee" },
+								{ "name": "Development Fee", "amount": 12000, "description": "Infrastructure development" },
+								{ "name": "Library Fee", "amount": 3000, "description": "Library access and resources" },
+								{ "name": "Examination Fee", "amount": 3000, "description": "Examination and evaluation" }
+							]
+						},
+						{
+							"id": "mba-year-2-sem-2",
+							"title": "Semester 2",
+							"shortLabel": "Sem 2",
+							"description": "Recurring academic charges.",
+							"totalAmount": 93000,
+							"components": [
+								{ "name": "Tuition Fee", "amount": 75000, "description": "Academic instruction fee" },
+								{ "name": "Development Fee", "amount": 12000, "description": "Infrastructure development" },
+								{ "name": "Library Fee", "amount": 3000, "description": "Library access and resources" },
+								{ "name": "Examination Fee", "amount": 3000, "description": "Examination and evaluation" }
+							]
+						}
+					]
+				}
+			]
+		}
+	]
+}

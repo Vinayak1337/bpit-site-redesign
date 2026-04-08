@@ -1,37 +1,13 @@
-import React from 'react';
-import DynamicSidebar from '@/components/ui/DynamicSidebar';
-import { adminAdmissionsSidebarData } from '@/data/sidebar';
+import type { ReactNode } from 'react';
 
-const AdminAdmissionsLayout = ({
+export default function AdminAdmissionsLayout({
 	children
 }: Readonly<{
-	children: React.ReactNode;
-}>) => {
+	children: ReactNode;
+}>) {
 	return (
-		<div className='flex flex-col lg:flex-row gap-8'>
-			{/* Sidebar Navigation */}
-			<DynamicSidebar
-				navItems={adminAdmissionsSidebarData.navItems}
-				theme={adminAdmissionsSidebarData.theme}
-			/>
-
-			{/* Content Area */}
-			<div className='flex-1'>
-				<div className='bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden p-8'>
-					{children}
-				</div>
-			</div>
+		<div className='overflow-hidden rounded-2xl border border-gray-200 bg-white p-8 shadow-lg'>
+			{children}
 		</div>
 	);
-};
-
-export default AdminAdmissionsLayout;
-
-
-
-
-
-
-
-
-
+}
