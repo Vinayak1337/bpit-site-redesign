@@ -9,7 +9,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { updateRecruitersData, type RecruitersData } from '@/app/(Private Pages)/actions/recruiters';
-import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
 
 const TYPE_OPTIONS = ['MNC', 'Product Giant', 'Consulting', 'Banking', 'Unicorn', 'R&D', 'Fintech', 'Startup'];
 
@@ -52,14 +51,12 @@ export default function PartnersForm({ initialData, pageSlug, onChange }: Partne
 		setSaveStatus('saving');
 		startTransition(async () => {
 			try {
-				const admin = await requireAdmin();
-
 				const updatedData: RecruitersData = {
 					...initialData,
 					recruiters: values.recruiters
 				};
 
-				await updateRecruitersData(updatedData, admin.id);
+				await updateRecruitersData(updatedData);
 				
 				if (onChange) {
 					onChange(updatedData);

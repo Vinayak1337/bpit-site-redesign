@@ -1,7 +1,9 @@
 'use server';
+import 'server-only';
 
 import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
+import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
 
 export interface TeamMember {
 	id?: string;
@@ -108,6 +110,7 @@ export async function updateTrainingPlacement(
 	data: TrainingPlacementData
 ): Promise<{ success: boolean; error?: string }> {
 	try {
+		await requireAdmin();
 		const page = await prisma.page.findUnique({
 			where: { slug: 'training-placement' },
 			include: { components: true }

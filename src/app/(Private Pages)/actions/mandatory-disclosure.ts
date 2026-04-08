@@ -1,4 +1,5 @@
 'use server';
+import 'server-only';
 
 import { revalidatePath, unstable_cache } from 'next/cache';
 import { prisma } from '@/lib/prisma';
@@ -6,6 +7,7 @@ import {
 	disclosureDataSchema,
 	DisclosureData
 } from '@/lib/schemas/mandatory-disclosure';
+import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
 
 // --- Actions ---
 
@@ -62,6 +64,7 @@ export async function updateMandatoryDisclosure(
 	slug = 'mandatory-disclosure'
 ) {
 	try {
+		await requireAdmin();
 		// Validate data
 		const validatedData = disclosureDataSchema.parse(data);
 

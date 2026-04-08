@@ -1,8 +1,10 @@
 'use server';
+import 'server-only';
 
 import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 import { galleryDataSchema, GalleryData } from '@/lib/schemas/gallery';
+import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
 
 const VIDEO_URL_PATTERN = /\.(mp4|webm|ogg|mov|m4v)(\?|$)/i;
 const VALID_SIZES = new Set(['small', 'medium', 'large', 'tall', 'wide']);
@@ -113,6 +115,7 @@ export async function getGallery(slug = 'gallery-page'): Promise<GalleryData> {
 
 export async function updateGallery(data: GalleryData, slug = 'gallery-page') {
 	try {
+		await requireAdmin();
 		const validatedData = normalizeGalleryData(data);
 
 		let page = await prisma.page.findUnique({ where: { slug } });

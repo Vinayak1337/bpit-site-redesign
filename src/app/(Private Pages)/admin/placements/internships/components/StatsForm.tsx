@@ -61,12 +61,11 @@ export default function StatsForm({ initialData, pageSlug, onChange }: StatsForm
 	const onSubmit = async (values: any) => {
 		try {
 			setSaveStatus('saving');
-			const admin = await requireAdmin();
 
 			const result = await updateInternshipsData({
 				...initialData,
 				stats: values.stats
-			}, admin.id);
+			});
 
 			if (result.success) {
 				const freshData = await getInternshipsData();

@@ -23,7 +23,10 @@ const colorClasses: Record<
 > = {
 	blue: { text: 'text-blue-600', bg: 'bg-blue-100' },
 	green: { text: 'text-green-600', bg: 'bg-green-100' },
-	purple: { text: 'text-purple-600', bg: 'bg-purple-100' }
+	purple: { text: 'text-purple-600', bg: 'bg-purple-100' },
+	orange: { text: 'text-orange-600', bg: 'bg-orange-100' },
+	red: { text: 'text-red-600', bg: 'bg-red-100' },
+	indigo: { text: 'text-indigo-600', bg: 'bg-indigo-100' }
 };
 
 function AboutOverviewSectionComponent({ data }: Props) {

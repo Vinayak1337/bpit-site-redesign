@@ -51,13 +51,12 @@ export default function PartnersForm({ initialData, pageSlug, onChange }: Partne
 	const onSubmit = async (values: any) => {
 		try {
 			setSaveStatus('saving');
-			const admin = await requireAdmin();
 
 			const result = await updateInternshipsData({
 				...initialData,
 				opportunities: values.opportunities,
 				filters: filters
-			}, admin.id);
+			});
 
 			if (result.success) {
 				const freshData = await getInternshipsData();

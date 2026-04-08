@@ -20,8 +20,8 @@ import {
 	SelectTrigger,
 	SelectValue
 } from '@/components/ui/select';
-import type { MissionData } from '@/app/(Private Pages)/actions/vision-mission';
-import { updateMission } from '@/app/(Private Pages)/actions/vision-mission';
+import type { MissionData, ImpactStatColor } from '@/app/(Private Pages)/actions/vision-mission';
+import { updateMission, IMPACT_STAT_COLOR_OPTIONS } from '@/app/(Private Pages)/actions/vision-mission';
 import { SUPPORTED_ICON_NAMES } from '@/components/about/icons';
 
 type ObjectiveFormValue = {
@@ -97,11 +97,12 @@ const normalizeMission = (values: Partial<FormValues>): MissionData => {
 		}))
 		.filter(objective => objective.title.length > 0 && objective.description.length > 0);
 
+	const validImpactColors = new Set<string>(IMPACT_STAT_COLOR_OPTIONS);
 	const impactStats = (values.impactStats ?? [])
 		.map(stat => ({
 			number: (stat.number ?? '').trim(),
 			label: (stat.label ?? '').trim(),
-			color: (stat.color ?? '').trim() || 'text-green-600'
+			color: (validImpactColors.has(stat.color ?? '') ? stat.color : 'text-green-600') as ImpactStatColor
 		}))
 		.filter(stat => stat.number.length > 0 && stat.label.length > 0);
 

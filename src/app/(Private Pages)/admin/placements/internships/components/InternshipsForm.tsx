@@ -20,7 +20,6 @@ import {
 	SelectTrigger,
 	SelectValue
 } from '@/components/ui/select';
-import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
 import {
 	updateInternshipsData,
 	type InternshipsData,
@@ -218,8 +217,6 @@ export default function InternshipsForm({
 		setMessage('');
 		startTransition(async () => {
 			try {
-				const admin = await requireAdmin();
-
 				const dataToSubmit: InternshipsData = {
 					hero: values.hero as any,
 					stats: values.stats as any,
@@ -241,7 +238,7 @@ export default function InternshipsForm({
 					contact: values.contact as any
 				};
 
-				const result = await updateInternshipsData(dataToSubmit, admin.id);
+				const result = await updateInternshipsData(dataToSubmit);
 
 				if (result.success) {
 					setMessage('Saved');

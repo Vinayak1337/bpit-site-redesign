@@ -1,8 +1,10 @@
 'use server';
+import 'server-only';
 
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { createAuditLog } from '@/lib/audit';
+import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
 
 // TypeScript interfaces
 export interface InternshipHero {
@@ -148,10 +150,10 @@ export async function getInternshipsData(): Promise<InternshipsData | null> {
  * Update internships data in database
  */
 export async function updateInternshipsData(
-	data: InternshipsData,
-	userId: string
+	data: InternshipsData
 ): Promise<{ success: boolean; message?: string }> {
 	try {
+		const admin = await requireAdmin();
 		// Validate required fields
 		if (!data.hero || !data.hero.title) {
 			return { success: false, message: 'Hero data is required' };
@@ -193,7 +195,7 @@ export async function updateInternshipsData(
 
 		// Create audit log
 		await createAuditLog({
-			actorId: userId,
+			actorId: admin.id,
 			action: 'UPDATE',
 			resourceType: 'PAGE',
 			summary: 'Updated internships page data',
@@ -201,7 +203,7 @@ export async function updateInternshipsData(
 				resourceId: page.id,
 				resourceType: 'PAGE',
 				field: 'internships-data',
-				newData: data as any
+				newData: data as unknown as import('@prisma/client').Prisma.InputJsonValue
 			}]
 		});
 
@@ -210,8 +212,7 @@ export async function updateInternshipsData(
 		revalidatePath('/admin/placements/internships');
 
 		return { success: true };
-	} catch (error) {
-		console.error('Error updating internships data:', error);
+	} catch {
 		return { success: false, message: 'Failed to update data' };
 	}
 }

@@ -64,12 +64,11 @@ export default function ContactForm({ initialData, pageSlug, onChange }: Contact
 	const onSubmit = async (values: any) => {
 		try {
 			setSaveStatus('saving');
-			const admin = await requireAdmin();
 
 			const result = await updateInternshipsData({
 				...initialData,
 				contact: values.contact
-			}, admin.id);
+			});
 
 			if (result.success) {
 				const freshData = await getInternshipsData();

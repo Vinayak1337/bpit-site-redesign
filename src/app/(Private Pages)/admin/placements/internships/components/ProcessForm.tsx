@@ -56,12 +56,11 @@ export default function ProcessForm({ initialData, pageSlug, onChange }: Process
 	const onSubmit = async (values: any) => {
 		try {
 			setSaveStatus('saving');
-			const admin = await requireAdmin();
 
 			const result = await updateInternshipsData({
 				...initialData,
 				process: values.process
-			}, admin.id);
+			});
 
 			if (result.success) {
 				const freshData = await getInternshipsData();

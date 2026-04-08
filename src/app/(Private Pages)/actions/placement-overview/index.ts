@@ -1,7 +1,10 @@
 'use server';
+import 'server-only';
 
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
+import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
+import { createAuditLog } from '@/lib/audit';
 
 const PLACEMENT_OVERVIEW_SLUG = 'placement-overview';
 
@@ -180,12 +183,9 @@ export async function getPlacementOverview(): Promise<PlacementOverviewData> {
 	}
 }
 
-import { createAuditLog } from '@/lib/audit';
-
-// ... existing interfaces ...
-
-export async function updatePlacementOverview(pageSlug: string, data: PlacementOverviewData, userId?: string): Promise<void> {
+export async function updatePlacementOverview(pageSlug: string, data: PlacementOverviewData): Promise<void> {
 	try {
+		const admin = await requireAdmin();
 		// Find or create the page
 		const page = await prisma.page.upsert({
 			where: { slug: pageSlug },
@@ -218,24 +218,21 @@ export async function updatePlacementOverview(pageSlug: string, data: PlacementO
 			}
 		});
 
-		if (userId) {
-			await createAuditLog({
-				actorId: userId,
-				action: 'UPDATE',
+		await createAuditLog({
+			actorId: admin.id,
+			action: 'UPDATE',
+			resourceType: 'PAGE',
+			summary: 'Updated placement overview page data',
+			changes: [{
+				resourceId: page.id,
 				resourceType: 'PAGE',
-				summary: 'Updated placement overview page data',
-				changes: [{
-					resourceId: page.id,
-					resourceType: 'PAGE',
-					field: 'PLACEMENT_OVERVIEW',
-					newData: data as any
-				}]
-			});
-		}
+				field: 'PLACEMENT_OVERVIEW',
+				newData: data as unknown as import('@prisma/client').Prisma.InputJsonValue
+			}]
+		});
 
 		revalidatePath('/placements/overview');
 	} catch (error) {
-		console.error('Error updating placement overview data:', error);
 		throw error;
 	}
 }

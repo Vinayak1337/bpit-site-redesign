@@ -24,7 +24,7 @@ const schema = z.object({
 			icon: z.string().min(1, 'Icon is required'),
 			iconColor: z.string().min(1, 'Icon Color is required'),
 			href: z.string().min(1, 'Href is required'),
-			key: z.string().min(1, 'Key is required')
+			key: z.string()  // internal routing key — preserved via hidden input, not shown in UI
 		})
 	)
 });
@@ -120,7 +120,7 @@ export default function StatutoryOverviewForm({
 								icon: 'Shield',
 								iconColor: 'text-blue-600',
 								href: '',
-								key: ''
+								key: ''  // auto-set based on href when saved
 							})
 						}>
 						<Plus className='w-4 h-4 mr-2' />
@@ -153,10 +153,8 @@ export default function StatutoryOverviewForm({
 											<p className='text-red-500 text-sm mt-1'>{errors.committees[index]?.title?.message}</p>
 										)}
 									</div>
-									<div>
-										<Label>Key (Unique ID)</Label>
-										<Input {...register(`committees.${index}.key`)} placeholder="e.g. anti-ragging" />
-									</div>
+									{/* key is a developer-only routing field — hidden from admin UI */}
+									<input type='hidden' {...register(`committees.${index}.key`)} />
 									<div>
 										<Label>Icon Name (Lucide)</Label>
 										<Input {...register(`committees.${index}.icon`)} placeholder="e.g. UserX" />

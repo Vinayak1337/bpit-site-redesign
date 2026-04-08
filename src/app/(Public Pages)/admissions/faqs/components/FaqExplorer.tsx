@@ -107,12 +107,12 @@ export default function FaqExplorer({ intro, items = [], contact }: Props) {
 
 			<section className='space-y-3'>
 				{filteredItems.map(item => {
-					const isOpen = openId === item.id;
+					const isOpen = item.id !== undefined && openId === item.id;
 					return (
 						<article key={item.id} className='overflow-hidden rounded-xl border border-slate-200 bg-white'>
 							<button
 								type='button'
-								onClick={() => setOpenId(isOpen ? null : item.id)}
+								onClick={() => setOpenId(isOpen ? null : (item.id ?? null))}
 								className='flex w-full items-center justify-between gap-4 px-5 py-4 text-left'>
 								<div>
 									<h3 className='text-sm font-semibold text-slate-900 md:text-base'>{item.question}</h3>

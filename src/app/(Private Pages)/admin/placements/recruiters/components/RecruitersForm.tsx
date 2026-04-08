@@ -21,7 +21,6 @@ import {
 	SelectTrigger,
 	SelectValue
 } from '@/components/ui/select';
-import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
 import {
 	updateRecruitersData,
 	type RecruitersData,
@@ -172,8 +171,6 @@ export default function RecruitersForm({
 		setMessage('');
 		startTransition(async () => {
 			try {
-				const admin = await requireAdmin();
-
 				const dataToSubmit: RecruitersData = {
 					hero: values.hero,
 					stats: values.stats,
@@ -182,7 +179,7 @@ export default function RecruitersForm({
 					cta: values.cta
 				};
 
-				const result = await updateRecruitersData(dataToSubmit, admin.id);
+				const result = await updateRecruitersData(dataToSubmit);
 
 				if (result.success) {
 					setMessage('Saved');
