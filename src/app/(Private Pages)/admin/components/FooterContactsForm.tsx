@@ -150,7 +150,7 @@ export default function FooterContactsForm({
 		<Form {...form}>
 			<form
 				onSubmit={form.handleSubmit(handleSubmit)}
-				className='space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm max-h-[70vh] overflow-y-auto'>
+				className='space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm'>
 				<div>
 					<h3 className='text-lg font-semibold text-slate-900'>
 						Footer Contacts

@@ -95,7 +95,7 @@ export default function MetricsEditor({ initialData, pageSlug }: MetricsEditorPr
 	};
 
 	return (
-		<Editable label="Key Metrics Section" formContent={formContent}>
+		<Editable label="Key Metrics Section" presentation="dialog" formContent={formContent}>
 			<section className='py-16'>
 				<div className='container mx-auto px-4'>
 					<motion.div

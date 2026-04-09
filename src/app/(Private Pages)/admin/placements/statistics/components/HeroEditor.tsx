@@ -28,7 +28,7 @@ export default function HeroEditor({ initialData, pageSlug }: HeroEditorProps) {
 	);
 
 	return (
-		<Editable label="Hero Section" formContent={formContent}>
+		<Editable label="Hero Section" presentation="dialog" formContent={formContent}>
 			<section className={`relative py-20 bg-gradient-to-r ${currentData.hero?.gradient || 'from-blue-900 via-blue-800 to-blue-900'}`}>
 				<div className='absolute inset-0'></div>
 				<div className='relative z-10 container mx-auto px-4'>

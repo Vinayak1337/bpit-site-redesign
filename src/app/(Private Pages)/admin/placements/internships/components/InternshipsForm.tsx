@@ -257,7 +257,7 @@ export default function InternshipsForm({
 		<Form {...form}>
 			<form
 				onSubmit={form.handleSubmit(onSubmit)}
-				className='space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm max-h-[70vh] overflow-y-auto overflow-x-hidden'>
+				className='space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm'>
 				<div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
 					<div>
 						<h3 className='text-lg font-semibold text-slate-900'>

@@ -28,7 +28,7 @@ export default function CoordinatorsEditor({ initialData, pageSlug }: Coordinato
 	);
 
 	return (
-		<Editable label="Placement Coordinators" formContent={formContent}>
+		<Editable label="Placement Coordinators" presentation="dialog" formContent={formContent}>
 			{currentData.departments && currentData.departments.length > 0 ? (
 			<section className='py-20 bg-white'>
 				<div className='container mx-auto px-4'>

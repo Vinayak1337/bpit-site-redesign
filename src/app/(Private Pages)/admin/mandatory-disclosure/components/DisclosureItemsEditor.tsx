@@ -22,7 +22,7 @@ export default function DisclosureItemsEditor({ initialData }: Props) {
 	);
 
 	return (
-		<Editable label='Disclosure Documents' formContent={formContent}>
+		<Editable label='Disclosure Documents' presentation='dialog' formContent={formContent}>
 			<DisclosureListSection data={previewData} />
 		</Editable>
 	);

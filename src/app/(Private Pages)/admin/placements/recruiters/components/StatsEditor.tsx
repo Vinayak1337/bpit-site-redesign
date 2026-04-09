@@ -28,7 +28,7 @@ export default function StatsEditor({ initialData, pageSlug }: StatsEditorProps)
 	);
 
 	return (
-		<Editable label="Stats Cards Section" formContent={formContent}>
+		<Editable label="Stats Cards Section" presentation="dialog" formContent={formContent}>
 			<section className="py-16 -mt-10 relative z-20">
 				<div className="container mx-auto px-4">
 					{currentData.stats && currentData.stats.length > 0 ? (

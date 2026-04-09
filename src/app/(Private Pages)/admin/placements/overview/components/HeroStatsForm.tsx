@@ -272,9 +272,18 @@ export default function HeroStatsForm({
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>Icon Background Color</FormLabel>
-								<FormControl>
-									<Input placeholder='bg-blue-500' {...field} />
-								</FormControl>
+								<Select onValueChange={field.onChange} value={field.value}>
+									<FormControl>
+										<SelectTrigger>
+											<SelectValue placeholder='Select color' />
+										</SelectTrigger>
+									</FormControl>
+									<SelectContent>
+										{COLOR_OPTIONS.map(c => (
+											<SelectItem key={c} value={c}>{c}</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
 								<FormMessage />
 							</FormItem>
 						)}
@@ -389,9 +398,18 @@ export default function HeroStatsForm({
 										render={({ field: colorField }) => (
 											<FormItem>
 												<FormLabel>Icon Color</FormLabel>
-												<FormControl>
-													<Input placeholder='bg-blue-500' {...colorField} />
-												</FormControl>
+												<Select onValueChange={colorField.onChange} value={colorField.value}>
+													<FormControl>
+														<SelectTrigger>
+															<SelectValue placeholder='Select color' />
+														</SelectTrigger>
+													</FormControl>
+													<SelectContent>
+														{COLOR_OPTIONS.map(c => (
+															<SelectItem key={c} value={c}>{c}</SelectItem>
+														))}
+													</SelectContent>
+												</Select>
 												<FormMessage />
 											</FormItem>
 										)}

@@ -25,6 +25,17 @@ import { updatePlacementOverview } from '@/app/(Private Pages)/actions/placement
 import { SUPPORTED_ICON_NAMES } from '@/components/about/icons';
 import { Plus, Trash2 } from 'lucide-react';
 
+const GRADIENT_OPTIONS = [
+	{ label: 'Blue', value: 'from-blue-500 to-blue-700' },
+	{ label: 'Green', value: 'from-green-500 to-green-700' },
+	{ label: 'Purple', value: 'from-purple-500 to-purple-700' },
+	{ label: 'Orange', value: 'from-orange-500 to-orange-700' },
+	{ label: 'Red', value: 'from-red-500 to-red-700' },
+	{ label: 'Indigo', value: 'from-indigo-500 to-indigo-700' },
+	{ label: 'Teal', value: 'from-teal-500 to-teal-700' },
+	{ label: 'Pink', value: 'from-pink-500 to-pink-700' },
+];
+
 type AchievementFormValue = {
 	id: string;
 	title: string;
@@ -360,9 +371,18 @@ export default function AchievementsHighlightsForm({ initialData, pageSlug, onCh
 										render={({ field: colorField }) => (
 											<FormItem>
 												<FormLabel>Icon Color</FormLabel>
-												<FormControl>
-													<Input placeholder="from-blue-500 to-blue-700" {...colorField} />
-												</FormControl>
+												<Select onValueChange={colorField.onChange} value={colorField.value ?? ''}>
+													<FormControl>
+														<SelectTrigger>
+															<SelectValue placeholder='Select gradient' />
+														</SelectTrigger>
+													</FormControl>
+													<SelectContent>
+														{GRADIENT_OPTIONS.map(opt => (
+															<SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+														))}
+													</SelectContent>
+												</Select>
 												<FormMessage />
 											</FormItem>
 										)}
@@ -516,9 +536,18 @@ export default function AchievementsHighlightsForm({ initialData, pageSlug, onCh
 										render={({ field: colorField }) => (
 											<FormItem>
 												<FormLabel>Color</FormLabel>
-												<FormControl>
-													<Input placeholder="from-blue-500 to-blue-700" {...colorField} />
-												</FormControl>
+												<Select onValueChange={colorField.onChange} value={colorField.value ?? ''}>
+													<FormControl>
+														<SelectTrigger>
+															<SelectValue placeholder='Select gradient' />
+														</SelectTrigger>
+													</FormControl>
+													<SelectContent>
+														{GRADIENT_OPTIONS.map(opt => (
+															<SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+														))}
+													</SelectContent>
+												</Select>
 												<FormMessage />
 											</FormItem>
 										)}

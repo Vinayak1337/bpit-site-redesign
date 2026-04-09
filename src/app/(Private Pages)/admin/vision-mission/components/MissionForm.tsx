@@ -225,7 +225,7 @@ export default function MissionForm({
 	return (
 		<Form {...form}>
 			<form
-				className='space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm max-h-[70vh] overflow-y-auto overflow-x-hidden'
+				className='space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm'
 				onSubmit={form.handleSubmit(onSubmit)}>
 				
 				<div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
@@ -592,10 +592,19 @@ export default function MissionForm({
 										name={`impactStats.${index}.color`}
 										render={({ field }) => (
 											<FormItem>
-												<FormLabel>Color (Tailwind class)</FormLabel>
-												<FormControl>
-													<Input placeholder="text-green-600" {...field} />
-												</FormControl>
+												<FormLabel>Color</FormLabel>
+												<Select onValueChange={field.onChange} value={field.value}>
+													<FormControl>
+														<SelectTrigger>
+															<SelectValue placeholder='Select color' />
+														</SelectTrigger>
+													</FormControl>
+													<SelectContent>
+														{IMPACT_STAT_COLOR_OPTIONS.map(c => (
+															<SelectItem key={c} value={c}>{c}</SelectItem>
+														))}
+													</SelectContent>
+												</Select>
 												<FormMessage />
 											</FormItem>
 										)}

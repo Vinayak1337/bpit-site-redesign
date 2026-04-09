@@ -1,16 +1,23 @@
 'use client';
 
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Trash2, Plus, Save, Loader2 } from 'lucide-react';
 import { updateStatutoryOverview, type StatutoryOverviewData } from '@/app/(Private Pages)/actions/statutory-committees';
 import { useTransition, useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
+const ICON_COLOR_OPTIONS = [
+	'text-blue-600', 'text-green-600', 'text-purple-600',
+	'text-orange-600', 'text-red-600', 'text-indigo-600',
+	'text-teal-600', 'text-pink-600', 'text-yellow-600', 'text-gray-600'
+] as const;
 
 const schema = z.object({
 	hero: z.object({
@@ -160,8 +167,23 @@ export default function StatutoryOverviewForm({
 										<Input {...register(`committees.${index}.icon`)} placeholder="e.g. UserX" />
 									</div>
 									<div>
-										<Label>Icon Color Class</Label>
-										<Input {...register(`committees.${index}.iconColor`)} placeholder="e.g. text-red-600" />
+										<Label>Icon Color</Label>
+										<Controller
+											control={control}
+											name={`committees.${index}.iconColor`}
+											render={({ field }) => (
+												<Select onValueChange={field.onChange} value={field.value}>
+													<SelectTrigger>
+														<SelectValue placeholder='Select color' />
+													</SelectTrigger>
+													<SelectContent>
+														{ICON_COLOR_OPTIONS.map(c => (
+															<SelectItem key={c} value={c}>{c}</SelectItem>
+														))}
+													</SelectContent>
+												</Select>
+											)}
+										/>
 									</div>
 									<div className='md:col-span-2'>
 										<Label>Link Href</Label>

@@ -27,7 +27,7 @@ export default function TrendsEditor({ initialData, pageSlug }: TrendsEditorProp
 	);
 
 	return (
-		<Editable label="Yearly Trends Section" formContent={formContent}>
+		<Editable label="Yearly Trends Section" presentation="dialog" formContent={formContent}>
 			<section className='py-16 bg-white'>
 				<div className='container mx-auto px-4'>
 					<motion.div

@@ -27,7 +27,7 @@ export default function MetricsEditor({ initialData, pageSlug }: MetricsEditorPr
 	);
 
 	return (
-		<Editable label="Metrics & Statistics" formContent={formContent}>
+		<Editable label="Metrics & Statistics" presentation="dialog" formContent={formContent}>
 			{currentData.statistics && currentData.statistics.length > 0 ? (
 			<section className='py-20 bg-gradient-to-br from-gray-50 to-blue-50'>
 				<div className='container mx-auto px-4'>

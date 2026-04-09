@@ -34,7 +34,7 @@ export default function DepartmentEditor({
 	const departmentStats = currentData.departmentStats?.[selectedYear] || {};
 
 	return (
-		<Editable label="Department-wise Statistics Section" formContent={formContent}>
+		<Editable label="Department-wise Statistics Section" presentation="dialog" formContent={formContent}>
 			<section className='py-16 bg-white'>
 				<div className='container mx-auto px-4'>
 					<motion.div

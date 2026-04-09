@@ -28,7 +28,7 @@ export default function TeamEditor({ initialData, pageSlug }: TeamEditorProps) {
 	);
 
 	return (
-		<Editable label="Dedicated Team" formContent={formContent}>
+		<Editable label="Dedicated Team" presentation="dialog" formContent={formContent}>
 			{currentData.teamMembers && currentData.teamMembers.length > 0 ? (
 			<section className='py-20 bg-gradient-to-br from-gray-50 to-blue-50'>
 				<div className='container mx-auto px-4'>

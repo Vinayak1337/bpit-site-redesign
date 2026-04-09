@@ -28,7 +28,7 @@ export default function CTAEditor({ initialData, pageSlug }: CTAEditorProps) {
 	);
 
 	return (
-		<Editable label="Partnership CTA Section" formContent={formContent}>
+		<Editable label="Partnership CTA Section" presentation="dialog" formContent={formContent}>
 			<section className={`py-20 bg-gradient-to-r ${currentData.cta?.gradient || 'from-blue-900 via-blue-800 to-blue-900'}`}>
 				<div className="container mx-auto px-4">
 					<motion.div

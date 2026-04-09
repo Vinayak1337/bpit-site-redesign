@@ -30,7 +30,7 @@ export default function HeroEditor({ initialData, pageSlug }: HeroEditorProps) {
 	const HeroIcon = (Icons as any)[currentData.hero.icon] || Icons.Briefcase;
 
 	return (
-		<Editable label="Hero Section" formContent={formContent}>
+		<Editable label="Hero Section" presentation="dialog" formContent={formContent}>
 			<section className={`relative py-20 bg-gradient-to-r ${currentData.hero.gradient}`}>
 				<div className="relative z-10 container mx-auto px-4">
 					<motion.div
