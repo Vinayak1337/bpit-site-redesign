@@ -131,12 +131,24 @@ export default function DepartmentForm({
 		}
 	};
 
+	const deptFields = form.watch('departments') || [];
+	const avgRate = deptFields.length > 0
+		? Math.round(deptFields.reduce((sum, d) => sum + (d.total > 0 ? (d.placed / d.total) * 100 : 0), 0) / deptFields.length)
+		: 0;
+
 	return (
 		<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6 p-6'>
 			<div className='flex items-center justify-between border-b pb-4'>
 				<div className='flex items-center space-x-3'>
 					<Building2 className='w-6 h-6 text-blue-600' />
-					<h3 className='text-2xl font-bold'>Department-wise Statistics</h3>
+					<div>
+						<h3 className='text-2xl font-bold'>Department-wise Statistics</h3>
+						{deptFields.length > 0 && (
+							<p className='text-sm text-gray-500 mt-0.5'>
+								{deptFields.length} departments • avg {avgRate}% placement rate
+							</p>
+						)}
+					</div>
 				</div>
 				<Select value={selectedYear} onValueChange={setSelectedYear}>
 					<SelectTrigger className='w-32'>
