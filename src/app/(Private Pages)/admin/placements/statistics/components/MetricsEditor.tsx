@@ -9,7 +9,6 @@ import {
 	DollarSign,
 	ArrowUp,
 	ArrowDown,
-	Download,
 	Calendar
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -128,10 +127,6 @@ export default function MetricsEditor({ initialData, pageSlug }: MetricsEditorPr
 									))}
 								</SelectContent>
 							</Select>
-							<Button className='bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl shadow-lg transition-all duration-300'>
-								<Download className='w-4 h-4 mr-2' />
-								Download Report
-							</Button>
 						</div>
 					</div>
 
