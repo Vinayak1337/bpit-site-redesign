@@ -1,34 +1,47 @@
 'use server';
+import 'server-only';
 
+import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag, unstable_cache } from 'next/cache';
+import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
+import { createAuditLog } from '@/lib/audit';
+import type { Prisma } from '@prisma/client';
 
 const MANAGEMENT_SLUG = 'management';
 
-export interface ManagementData {
-	title: string;
-	titleIcon?: string;
-	titleIconColor?: string;
-	titleGradient?: string;
-	leaders: Array<{
-		id: string;
-		name: string;
-		position: string;
-		description: string[];
-		delay: number;
-		image?: string;
-		iconColor?: string;
-		bgColor?: string;
-	}>;
-	vision: {
-		title: string;
-		quote: string;
-		delay: number;
-		icon?: string;
-		iconColor?: string;
-		bgColor?: string;
-	};
-}
+// --- Schemas ---
+
+const managementLeaderSchema = z.object({
+	id: z.string().min(1),
+	name: z.string().min(1),
+	position: z.string().min(1),
+	description: z.array(z.string()),
+	delay: z.number().default(0),
+	image: z.string().optional(),
+	iconColor: z.string().optional(),
+	bgColor: z.string().optional()
+});
+
+const managementVisionSchema = z.object({
+	title: z.string().min(1),
+	quote: z.string().min(1),
+	delay: z.number().default(0),
+	icon: z.string().optional(),
+	iconColor: z.string().optional(),
+	bgColor: z.string().optional()
+});
+
+const managementDataSchema = z.object({
+	title: z.string().min(1),
+	titleIcon: z.string().optional(),
+	titleIconColor: z.string().optional(),
+	titleGradient: z.string().optional(),
+	leaders: z.array(managementLeaderSchema).default([]),
+	vision: managementVisionSchema
+});
+
+export type ManagementData = z.infer<typeof managementDataSchema>;
 
 export async function getManagement(slug = MANAGEMENT_SLUG): Promise<ManagementData> {
 	try {
@@ -46,65 +59,48 @@ export async function getManagement(slug = MANAGEMENT_SLUG): Promise<ManagementD
 		});
 
 		if (!page || !page.components[0]) {
-			console.log('No management data found in DB, returning default data');
-			// Return default data if no page found
 			return getDefaultManagementData();
 		}
 
-		console.log('Retrieved management data from DB:', JSON.stringify(page.components[0].data, null, 2));
 		return page.components[0].data as unknown as ManagementData;
-	} catch (error) {
-		console.error('Error fetching management data:', error);
+	} catch {
 		return getDefaultManagementData();
 	}
 }
 
 export async function updateManagement(data: ManagementData, slug = MANAGEMENT_SLUG) {
 	try {
-		console.log('Updating management data:', JSON.stringify(data, null, 2));
-		
-		// Ensure page exists
-		let page = await prisma.page.findUnique({
-			where: { slug }
-		});
+		const admin = await requireAdmin();
+		const validated = managementDataSchema.parse(data);
+
+		let page = await prisma.page.findUnique({ where: { slug } });
 
 		if (!page) {
 			page = await prisma.page.create({
-				data: {
-					slug,
-					title: 'Management',
-					kind: 'PAGE',
-					status: 'PUBLISHED'
-				}
+				data: { slug, title: 'Management', kind: 'PAGE', status: 'PUBLISHED' }
 			});
 		}
 
-		// Upsert the management component
 		await prisma.component.upsert({
-			where: {
-				pageId_order: {
-					pageId: page.id,
-					order: 1
-				}
-			},
-			update: {
-				data: data as any,
-				key: 'MANAGEMENT_DATA'
-			},
-			create: {
-				pageId: page.id,
-				data: data as any,
-				order: 1,
-				key: 'MANAGEMENT_DATA'
-			}
+			where: { pageId_order: { pageId: page.id, order: 1 } },
+			update: { data: validated as unknown as Prisma.InputJsonValue, key: 'MANAGEMENT_DATA' },
+			create: { pageId: page.id, data: validated as unknown as Prisma.InputJsonValue, order: 1, key: 'MANAGEMENT_DATA' }
+		});
+
+		await createAuditLog({
+			actorId: admin.id,
+			action: 'UPDATE',
+			resourceType: 'PAGE',
+			summary: 'Updated management page data',
+			changes: [{ resourceId: page.id, resourceType: 'PAGE', field: 'MANAGEMENT_DATA', newData: validated as unknown as Prisma.InputJsonValue }]
 		});
 
 		revalidatePath('/management');
 		revalidatePath('/admin/management');
+		revalidateTag('management');
 
 		return { success: true };
-	} catch (error) {
-		console.error('Error updating management data:', error);
+	} catch {
 		return { success: false, error: 'Failed to update management data' };
 	}
 }
@@ -201,32 +197,41 @@ function getDefaultManagementData(): ManagementData {
 	};
 }
 
-// Leadership Team Interface
-export interface LeadershipTeamData {
-	hero: {
-		icon: string;
-		title: string;
-		subtitle: string;
-		gradient: string;
-		iconColor: string;
-		textColor: string;
-	};
-	leaders: Array<{
-		id: string;
-		name: string;
-		position: string;
-		image?: string;
-		icon: string;
-		iconColor: string;
-		iconTextColor: string;
-		textColor: string;
-		details: Array<{
-			icon: string;
-			text: string;
-		}>;
-		description: string;
-	}>;
-}
+// --- Leadership Team ---
+
+const leadershipHeroSchema = z.object({
+	icon: z.string().min(1),
+	title: z.string().min(1),
+	subtitle: z.string().min(1),
+	gradient: z.string().min(1),
+	iconColor: z.string().min(1),
+	textColor: z.string().min(1)
+});
+
+const leaderDetailSchema = z.object({
+	icon: z.string().min(1),
+	text: z.string().min(1)
+});
+
+const leaderSchema = z.object({
+	id: z.string().min(1),
+	name: z.string().min(1),
+	position: z.string().min(1),
+	image: z.string().optional(),
+	icon: z.string().min(1),
+	iconColor: z.string().min(1),
+	iconTextColor: z.string().min(1),
+	textColor: z.string().min(1),
+	details: z.array(leaderDetailSchema).default([]),
+	description: z.string().min(1)
+});
+
+const leadershipTeamSchema = z.object({
+	hero: leadershipHeroSchema,
+	leaders: z.array(leaderSchema).default([])
+});
+
+export type LeadershipTeamData = z.infer<typeof leadershipTeamSchema>;
 
 const LEADERSHIP_TEAM_SLUG = 'leadership-team';
 
@@ -246,71 +251,57 @@ export async function getLeadershipTeam(slug = LEADERSHIP_TEAM_SLUG): Promise<Le
 		});
 
 		if (!page || !page.components[0]) {
-			console.log('No leadership team data found in DB, returning default data');
 			return getDefaultLeadershipTeamData();
 		}
 
-		console.log('Retrieved leadership team data from DB:', JSON.stringify(page.components[0].data, null, 2));
 		return page.components[0].data as unknown as LeadershipTeamData;
-	} catch (error) {
-		console.error('Error fetching leadership team data:', error);
+	} catch {
 		return getDefaultLeadershipTeamData();
 	}
 }
 
 export async function updateLeadershipTeam(data: LeadershipTeamData, slug = LEADERSHIP_TEAM_SLUG) {
 	try {
-		console.log('Updating leadership team data:', JSON.stringify(data, null, 2));
-		
-		// Ensure page exists
-		let page = await prisma.page.findUnique({
-			where: { slug }
-		});
+		const admin = await requireAdmin();
+		const validated = leadershipTeamSchema.parse(data);
+
+		let page = await prisma.page.findUnique({ where: { slug } });
 
 		if (!page) {
 			page = await prisma.page.create({
-				data: {
-					slug,
-					title: 'Leadership Team',
-					kind: 'PAGE',
-					status: 'PUBLISHED'
-				}
+				data: { slug, title: 'Leadership Team', kind: 'PAGE', status: 'PUBLISHED' }
 			});
 		}
 
-		// Update or create component
 		const existingComponent = await prisma.component.findFirst({
-			where: {
-				pageId: page.id,
-				key: 'LEADERSHIP_TEAM_DATA'
-			}
+			where: { pageId: page.id, key: 'LEADERSHIP_TEAM_DATA' }
 		});
 
 		if (existingComponent) {
 			await prisma.component.update({
 				where: { id: existingComponent.id },
-				data: {
-					data: data as any,
-				}
+				data: { data: validated as unknown as Prisma.InputJsonValue }
 			});
 		} else {
 			await prisma.component.create({
-				data: {
-					pageId: page.id,
-					key: 'LEADERSHIP_TEAM_DATA',
-					data: data as any,
-					order: 0
-				}
+				data: { pageId: page.id, key: 'LEADERSHIP_TEAM_DATA', data: validated as unknown as Prisma.InputJsonValue, order: 0 }
 			});
 		}
 
-		revalidatePath(`/management/leadership-team`);
-		revalidatePath(`/admin/management`);
-		
-		console.log('Leadership team data updated successfully');
+		await createAuditLog({
+			actorId: admin.id,
+			action: 'UPDATE',
+			resourceType: 'PAGE',
+			summary: 'Updated leadership team data',
+			changes: [{ resourceId: page.id, resourceType: 'PAGE', field: 'LEADERSHIP_TEAM_DATA', newData: validated as unknown as Prisma.InputJsonValue }]
+		});
+
+		revalidatePath('/management/leadership-team');
+		revalidatePath('/admin/management');
+		revalidateTag('management');
+
 		return { success: true };
-	} catch (error) {
-		console.error('Error updating leadership team data:', error);
+	} catch {
 		throw new Error('Failed to update leadership team data');
 	}
 }
@@ -430,31 +421,31 @@ function getDefaultLeadershipTeamData(): LeadershipTeamData {
 	};
 }
 
-// Governance Structure interfaces and functions
-export interface GovernanceStructureData {
-	hero: {
-		icon: string;
-		title: string;
-		subtitle: string;
-		gradient: string;
-		iconColor: string;
-		textColor: string;
-	};
-	sections: Array<{
-		id: string;
-		title: string;
-		icon: string;
-		iconColor: string;
-		description: string;
-		cards: Array<{
-			title: string;
-			bgColor: string;
-			textColor: string;
-			listColor: string;
-			items: string[];
-		}>;
-	}>;
-}
+// --- Governance Structure ---
+
+const govCardSchema = z.object({
+	title: z.string().min(1),
+	bgColor: z.string().min(1),
+	textColor: z.string().min(1),
+	listColor: z.string().min(1),
+	items: z.array(z.string().min(1)).default([])
+});
+
+const govSectionSchema = z.object({
+	id: z.string().min(1),
+	title: z.string().min(1),
+	icon: z.string().min(1),
+	iconColor: z.string().min(1),
+	description: z.string().min(1),
+	cards: z.array(govCardSchema).default([])
+});
+
+const governanceStructureSchema = z.object({
+	hero: leadershipHeroSchema,
+	sections: z.array(govSectionSchema).default([])
+});
+
+export type GovernanceStructureData = z.infer<typeof governanceStructureSchema>;
 
 export async function getGovernanceStructure(slug = 'governance-structure'): Promise<GovernanceStructureData> {
 	try {
@@ -472,62 +463,46 @@ export async function getGovernanceStructure(slug = 'governance-structure'): Pro
 		});
 
 		if (!page || !page.components[0]) {
-			console.log('No governance structure data found in DB, returning default data');
 			return getDefaultGovernanceStructureData();
 		}
 
-		console.log('Retrieved governance structure data from DB:', JSON.stringify(page.components[0].data, null, 2));
 		return page.components[0].data as unknown as GovernanceStructureData;
-	} catch (error) {
-		console.error('Error fetching governance structure data:', error);
+	} catch {
 		return getDefaultGovernanceStructureData();
 	}
 }
 
 export async function updateGovernanceStructure(data: GovernanceStructureData, slug = 'governance-structure') {
 	try {
-		console.log('Updating governance structure data:', JSON.stringify(data, null, 2));
-		
-		// Ensure page exists
-		let page = await prisma.page.findUnique({
-			where: { slug }
-		});
+		const admin = await requireAdmin();
+		const validated = governanceStructureSchema.parse(data);
+
+		let page = await prisma.page.findUnique({ where: { slug } });
 
 		if (!page) {
 			page = await prisma.page.create({
-				data: {
-					slug,
-					title: 'Governance Structure',
-					kind: 'PAGE',
-					status: 'PUBLISHED'
-				}
+				data: { slug, title: 'Governance Structure', kind: 'PAGE', status: 'PUBLISHED' }
 			});
 		}
 
-		// Upsert the governance structure component
 		await prisma.component.upsert({
-			where: {
-				pageId_order: {
-					pageId: page.id,
-					order: 1
-				}
-			},
-			update: {
-				data: data as any,
-				key: 'GOVERNANCE_STRUCTURE_DATA'
-			},
-			create: {
-				pageId: page.id,
-				data: data as any,
-				order: 1,
-				key: 'GOVERNANCE_STRUCTURE_DATA'
-			}
+			where: { pageId_order: { pageId: page.id, order: 1 } },
+			update: { data: validated as unknown as Prisma.InputJsonValue, key: 'GOVERNANCE_STRUCTURE_DATA' },
+			create: { pageId: page.id, data: validated as unknown as Prisma.InputJsonValue, order: 1, key: 'GOVERNANCE_STRUCTURE_DATA' }
+		});
+
+		await createAuditLog({
+			actorId: admin.id,
+			action: 'UPDATE',
+			resourceType: 'PAGE',
+			summary: 'Updated governance structure data',
+			changes: [{ resourceId: page.id, resourceType: 'PAGE', field: 'GOVERNANCE_STRUCTURE_DATA', newData: validated as unknown as Prisma.InputJsonValue }]
 		});
 
 		revalidatePath('/management/governance-structure');
 		revalidatePath('/admin/management');
+		revalidateTag('management');
 	} catch (error) {
-		console.error('Error updating governance structure data:', error);
 		throw error;
 	}
 }
@@ -568,36 +543,36 @@ function getDefaultGovernanceStructureData(): GovernanceStructureData {
 	};
 }
 
-// Policies & Procedures interfaces and functions
-export interface PoliciesProceduresData {
-	hero: {
-		icon: string;
-		title: string;
-		subtitle: string;
-		gradient: string;
-		iconColor: string;
-		textColor: string;
-	};
-	policyCategories: Array<{
-		id: string;
-		title: string;
-		icon: string;
-		iconColor: string;
-		bulletColor: string;
-		policies: string[];
-	}>;
-	implementationFramework: {
-		title: string;
-		steps: Array<{
-			id: string;
-			title: string;
-			description: string;
-			icon: string;
-			iconColor: string;
-			iconTextColor: string;
-		}>;
-	};
-}
+// --- Policies & Procedures ---
+
+const policyCategorySchema = z.object({
+	id: z.string().min(1),
+	title: z.string().min(1),
+	icon: z.string().min(1),
+	iconColor: z.string().min(1),
+	bulletColor: z.string().min(1),
+	policies: z.array(z.string().min(1)).default([])
+});
+
+const frameworkStepSchema = z.object({
+	id: z.string().min(1),
+	title: z.string().min(1),
+	description: z.string().min(1),
+	icon: z.string().min(1),
+	iconColor: z.string().min(1),
+	iconTextColor: z.string().min(1)
+});
+
+const policiesProceduresSchema = z.object({
+	hero: leadershipHeroSchema,
+	policyCategories: z.array(policyCategorySchema).default([]),
+	implementationFramework: z.object({
+		title: z.string().min(1),
+		steps: z.array(frameworkStepSchema).default([])
+	})
+});
+
+export type PoliciesProceduresData = z.infer<typeof policiesProceduresSchema>;
 
 export async function getPoliciesProcedures(slug = 'policies-procedures'): Promise<PoliciesProceduresData> {
 	try {
@@ -615,62 +590,46 @@ export async function getPoliciesProcedures(slug = 'policies-procedures'): Promi
 		});
 
 		if (!page || !page.components[0]) {
-			console.log('No policies procedures data found in DB, returning default data');
 			return getDefaultPoliciesProceduresData();
 		}
 
-		console.log('Retrieved policies procedures data from DB:', JSON.stringify(page.components[0].data, null, 2));
 		return page.components[0].data as unknown as PoliciesProceduresData;
-	} catch (error) {
-		console.error('Error fetching policies procedures data:', error);
+	} catch {
 		return getDefaultPoliciesProceduresData();
 	}
 }
 
 export async function updatePoliciesProcedures(data: PoliciesProceduresData, slug = 'policies-procedures') {
 	try {
-		console.log('Updating policies procedures data:', JSON.stringify(data, null, 2));
-		
-		// Ensure page exists
-		let page = await prisma.page.findUnique({
-			where: { slug }
-		});
+		const admin = await requireAdmin();
+		const validated = policiesProceduresSchema.parse(data);
+
+		let page = await prisma.page.findUnique({ where: { slug } });
 
 		if (!page) {
 			page = await prisma.page.create({
-				data: {
-					slug,
-					title: 'Policies & Procedures',
-					kind: 'PAGE',
-					status: 'PUBLISHED'
-				}
+				data: { slug, title: 'Policies & Procedures', kind: 'PAGE', status: 'PUBLISHED' }
 			});
 		}
 
-		// Upsert the policies procedures component
 		await prisma.component.upsert({
-			where: {
-				pageId_order: {
-					pageId: page.id,
-					order: 1
-				}
-			},
-			update: {
-				data: data as any,
-				key: 'POLICIES_PROCEDURES_DATA'
-			},
-			create: {
-				pageId: page.id,
-				data: data as any,
-				order: 1,
-				key: 'POLICIES_PROCEDURES_DATA'
-			}
+			where: { pageId_order: { pageId: page.id, order: 1 } },
+			update: { data: validated as unknown as Prisma.InputJsonValue, key: 'POLICIES_PROCEDURES_DATA' },
+			create: { pageId: page.id, data: validated as unknown as Prisma.InputJsonValue, order: 1, key: 'POLICIES_PROCEDURES_DATA' }
+		});
+
+		await createAuditLog({
+			actorId: admin.id,
+			action: 'UPDATE',
+			resourceType: 'PAGE',
+			summary: 'Updated policies & procedures data',
+			changes: [{ resourceId: page.id, resourceType: 'PAGE', field: 'POLICIES_PROCEDURES_DATA', newData: validated as unknown as Prisma.InputJsonValue }]
 		});
 
 		revalidatePath('/management/policies-procedures');
 		revalidatePath('/admin/management');
+		revalidateTag('management');
 	} catch (error) {
-		console.error('Error updating policies procedures data:', error);
 		throw error;
 	}
 }

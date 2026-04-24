@@ -61,10 +61,10 @@ const RecruitersClient = ({ data }: RecruitersClientProps) => {
 							</div>
 						</motion.div>
 
-						<h1 className='text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent'>
+						<h1 className='text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent'>
 							{data.hero.title}
 						</h1>
-						<p className='text-xl md:text-2xl text-blue-200 mb-8 leading-relaxed'>
+						<p className='text-base sm:text-lg md:text-xl lg:text-2xl text-blue-200 mb-8 leading-relaxed'>
 							{data.hero.subtitle}
 						</p>
 						<div className='w-24 h-1 bg-gradient-to-r from-blue-400 to-blue-600 mx-auto rounded-full' />
@@ -85,7 +85,7 @@ const RecruitersClient = ({ data }: RecruitersClientProps) => {
 									initial={{ opacity: 0, y: 30 }}
 									whileInView={{ opacity: 1, y: 0 }}
 									transition={{ duration: 0.6, delay: index * 0.1 }}
-									className='bg-white rounded-2xl p-8 shadow-xl border border-gray-100'>
+									className='bg-white rounded-2xl p-4 sm:p-6 md:p-8 shadow-xl border border-gray-100'>
 									<div
 										className={`w-16 h-16 bg-gradient-to-r ${stat.color} rounded-2xl flex items-center justify-center mx-auto mb-6 text-white`}>
 										<StatIcon className='w-8 h-8' />
@@ -159,7 +159,7 @@ const RecruitersClient = ({ data }: RecruitersClientProps) => {
 						whileInView={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.8 }}
 						className='text-center mb-12'>
-						<h2 className='text-4xl md:text-5xl font-bold text-gray-900 mb-6'>
+						<h2 className='text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6'>
 							Industry Partners
 						</h2>
 						<p className='text-xl text-gray-600 max-w-3xl mx-auto'>
@@ -175,7 +175,7 @@ const RecruitersClient = ({ data }: RecruitersClientProps) => {
 							animate={{ opacity: 1, y: 0 }}
 							exit={{ opacity: 0, y: -20 }}
 							transition={{ duration: 0.5 }}
-							className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
+							className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8'>
 							{filteredRecruiters.map((recruiter, index) => {
 								const ExternalLinkIcon = Icons.ExternalLink;
 								const Building2Icon = Icons.Building2;
@@ -189,7 +189,7 @@ const RecruitersClient = ({ data }: RecruitersClientProps) => {
 										initial={{ opacity: 0, y: 30 }}
 										whileInView={{ opacity: 1, y: 0 }}
 										transition={{ duration: 0.6, delay: index * 0.1 }}
-										className='bg-white rounded-2xl p-8 shadow-lg border border-gray-100'>
+										className='bg-white rounded-2xl p-4 sm:p-6 md:p-8 shadow-lg border border-gray-100'>
 										{/* Company Header */}
 										<div className='flex items-start justify-between mb-6'>
 											<div className='flex items-center space-x-4'>
@@ -299,7 +299,7 @@ const RecruitersClient = ({ data }: RecruitersClientProps) => {
 						whileInView={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.8 }}
 						className='text-center text-white max-w-4xl mx-auto'>
-						<h2 className='text-4xl md:text-5xl font-bold mb-6'>
+						<h2 className='text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-6'>
 							{data.cta.title}
 						</h2>
 						<p className='text-xl text-blue-200 mb-8 leading-relaxed'>

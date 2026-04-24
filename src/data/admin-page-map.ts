@@ -152,34 +152,134 @@ export const PUBLIC_TO_ADMIN_PAGE_MAP: Record<string, AdminPageCoverage> = {
 		editingMode: 'live'
 	},
 	'/academia/academic-calendar': {
-		adminHref: null,
-		status: 'missing',
-		editingMode: 'none',
-		note: 'Page-level admin editor is not finished yet.'
+		adminHref: '/admin/academia/academic-calendar',
+		status: 'complete',
+		editingMode: 'live'
 	},
 	'/academia/examination': {
-		adminHref: null,
-		status: 'missing',
-		editingMode: 'none',
-		note: 'Page-level admin editor is not finished yet.'
+		adminHref: '/admin/academia/examination',
+		status: 'complete',
+		editingMode: 'live'
 	},
 	'/academia/syllabus-ordinance': {
-		adminHref: null,
-		status: 'missing',
-		editingMode: 'none',
-		note: 'Page-level admin editor is not finished yet.'
+		adminHref: '/admin/academia/syllabus-ordinance',
+		status: 'complete',
+		editingMode: 'live'
 	},
 	'/academia/library': {
-		adminHref: null,
-		status: 'missing',
-		editingMode: 'none',
-		note: 'Page-level admin editor is not finished yet.'
+		adminHref: '/admin/academia/library',
+		status: 'complete',
+		editingMode: 'live'
+	},
+	'/academia/library/rules': {
+		adminHref: '/admin/academia/library/rules',
+		status: 'complete',
+		editingMode: 'live'
+	},
+	'/academia/library/timings': {
+		adminHref: '/admin/academia/library/timings',
+		status: 'complete',
+		editingMode: 'live'
+	},
+	'/academia/library/moocs': {
+		adminHref: '/admin/academia/library/moocs',
+		status: 'complete',
+		editingMode: 'live'
+	},
+	'/academia/library/delnet': {
+		adminHref: '/admin/academia/library/delnet',
+		status: 'complete',
+		editingMode: 'live'
+	},
+	'/academia/library/ndli': {
+		adminHref: '/admin/academia/library/ndli',
+		status: 'complete',
+		editingMode: 'live'
+	},
+	'/academia/library/newspapers': {
+		adminHref: '/admin/academia/library/newspapers',
+		status: 'complete',
+		editingMode: 'live'
+	},
+	'/academia/library/photocopy-service': {
+		adminHref: '/admin/academia/library/photocopy-service',
+		status: 'complete',
+		editingMode: 'live'
+	},
+	'/academia/library/information': {
+		adminHref: '/admin/academia/library/information',
+		status: 'complete',
+		editingMode: 'live'
+	},
+	'/academia/library/weeding-out': {
+		adminHref: '/admin/academia/library/weeding-out',
+		status: 'complete',
+		editingMode: 'live'
+	},
+	'/academia/library/self-learning': {
+		adminHref: '/admin/academia/library/self-learning',
+		status: 'complete',
+		editingMode: 'live'
+	},
+	'/academia/library/digital-library': {
+		adminHref: '/admin/academia/library/digital-library',
+		status: 'complete',
+		editingMode: 'live'
+	},
+	'/academia/library/book-acquisition': {
+		adminHref: '/admin/academia/library/book-acquisition',
+		status: 'complete',
+		editingMode: 'live'
+	},
+	'/academia/library/book-bank': {
+		adminHref: '/admin/academia/library/book-bank',
+		status: 'complete',
+		editingMode: 'live'
+	},
+	'/academia/library/e-resources': {
+		adminHref: '/admin/academia/library/e-resources',
+		status: 'complete',
+		editingMode: 'live'
+	},
+	'/academia/library/services': {
+		adminHref: '/admin/academia/library/services',
+		status: 'complete',
+		editingMode: 'live'
+	},
+	'/academia/library/collection': {
+		adminHref: '/admin/academia/library/collection',
+		status: 'complete',
+		editingMode: 'live'
+	},
+	'/academia/library/staff': {
+		adminHref: '/admin/academia/library/staff',
+		status: 'complete',
+		editingMode: 'live'
+	},
+	'/academia/library/advisory-committee': {
+		adminHref: '/admin/academia/library/advisory-committee',
+		status: 'complete',
+		editingMode: 'live'
+	},
+	'/academia/library/downloads': {
+		adminHref: '/admin/academia/library/downloads',
+		status: 'complete',
+		editingMode: 'live'
+	},
+	'/academia/library/useful-links': {
+		adminHref: '/admin/academia/library/useful-links',
+		status: 'complete',
+		editingMode: 'live'
+	},
+	'/academia/library/contact': {
+		adminHref: '/admin/academia/library/contact',
+		status: 'complete',
+		editingMode: 'live'
 	},
 	'/academia/notices-circulars': {
-		adminHref: null,
-		status: 'missing',
-		editingMode: 'none',
-		note: 'Page-level admin editor is not finished yet.'
+		adminHref: '/admin/academia/notices-circulars',
+		status: 'complete',
+		editingMode: 'live'
 	},
 	'/placements/overview': {
 		adminHref: '/admin/placements/overview',
@@ -295,6 +395,36 @@ const ADMIN_TO_PUBLIC_EXACT_MAP: Record<string, string> = {
 	'/admin/mandatory-disclosure': '/mandatory-disclosure',
 	'/admin/gallery': '/gallery',
 	'/admin/academia': '/academia',
+	'/admin/academia/academic-calendar': '/academia/academic-calendar',
+	'/admin/academia/examination': '/academia/examination',
+	'/admin/academia/notices-circulars': '/academia/notices-circulars',
+	'/admin/academia/syllabus-ordinance': '/academia/syllabus-ordinance',
+	'/admin/academia/library': '/academia/library',
+	'/admin/academia/library/rules': '/academia/library/rules',
+	'/admin/academia/library/timings': '/academia/library/timings',
+	'/admin/academia/library/moocs': '/academia/library/moocs',
+	'/admin/academia/library/delnet': '/academia/library/delnet',
+	'/admin/academia/library/ndli': '/academia/library/ndli',
+	'/admin/academia/library/newspapers': '/academia/library/newspapers',
+	'/admin/academia/library/photocopy-service':
+		'/academia/library/photocopy-service',
+	'/admin/academia/library/information': '/academia/library/information',
+	'/admin/academia/library/weeding-out': '/academia/library/weeding-out',
+	'/admin/academia/library/self-learning': '/academia/library/self-learning',
+	'/admin/academia/library/digital-library':
+		'/academia/library/digital-library',
+	'/admin/academia/library/book-acquisition':
+		'/academia/library/book-acquisition',
+	'/admin/academia/library/book-bank': '/academia/library/book-bank',
+	'/admin/academia/library/e-resources': '/academia/library/e-resources',
+	'/admin/academia/library/services': '/academia/library/services',
+	'/admin/academia/library/collection': '/academia/library/collection',
+	'/admin/academia/library/staff': '/academia/library/staff',
+	'/admin/academia/library/advisory-committee':
+		'/academia/library/advisory-committee',
+	'/admin/academia/library/downloads': '/academia/library/downloads',
+	'/admin/academia/library/useful-links': '/academia/library/useful-links',
+	'/admin/academia/library/contact': '/academia/library/contact',
 	'/admin/placements/overview': '/placements/overview',
 	'/admin/placements/training-placement': '/placements/training-placement',
 	'/admin/placements/recruiters': '/placements/recruiters',

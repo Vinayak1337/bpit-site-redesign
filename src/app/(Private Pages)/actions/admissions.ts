@@ -582,13 +582,13 @@ const scholarshipCategorySchema = z.object({
 	accent: z.string().min(1),
 	scholarships: z.array(z.string().min(1)).default([]),
 	portal: z.string().optional().default(''),
-	portalUrl: z.string().optional().default('')
+	portalUrl: z.string().url().optional().or(z.literal('')).default('')
 });
 
 const scholarshipSupportSchema = z.object({
 	title: z.string().min(1),
 	description: z.string().min(1),
-	email: z.string().min(1),
+	email: z.string().email(),
 	phone: z.string().min(1)
 });
 
@@ -606,7 +606,7 @@ const brochureItemSchema = z.object({
 	title: z.string().min(1),
 	description: z.string().min(1),
 	icon: iconStringSchema.default('FileText'),
-	url: z.string().min(1),
+	url: z.string().url().or(z.literal('/')).or(z.string().startsWith('/')),
 	lastUpdated: z.string().optional().default('')
 });
 
@@ -618,7 +618,8 @@ const faqIntroSchema = z.object({
 });
 
 const faqItemSchema = z.object({
-	id: z.number().int().positive(),
+	// id is auto-assigned server-side when missing; kept optional for backward-compat with stored data
+	id: z.number().int().positive().optional(),
 	question: z.string().min(1),
 	answer: z.string().min(1),
 	category: z.string().min(1)
@@ -628,7 +629,7 @@ const faqContactSchema = z.object({
 	title: z.string().min(1),
 	description: z.string().min(1),
 	phone: z.string().min(1),
-	email: z.string().min(1),
+	email: z.string().email(),
 	address: z.string().min(1)
 });
 

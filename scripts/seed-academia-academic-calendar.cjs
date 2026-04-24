@@ -1,0 +1,477 @@
+const { PrismaClient } = require('@prisma/client');
+
+const prisma = new PrismaClient();
+
+const PAGE_SLUG = 'academia-academic-calendar';
+
+const heroData = {
+	title: 'Academic Calendar 2025-26',
+	subtitle:
+		'Complete academic year calendar with examinations, holidays, festivals, and important events'
+};
+
+const eventsData = {
+	items: [
+		{
+			id: 1,
+			title: 'Winter Break',
+			description: 'Winter vacation for all students and faculty',
+			date: '2025-01-01',
+			endDate: '2025-01-07',
+			time: '',
+			location: '',
+			type: 'holiday',
+			semester: '',
+			department: '',
+			priority: 'low'
+		},
+		{
+			id: 2,
+			title: 'Classes Resume',
+			description: 'Regular classes resume after winter break',
+			date: '2025-01-08',
+			endDate: '',
+			time: '9:00 AM',
+			location: 'All Departments',
+			type: 'academic',
+			semester: 'All Semesters',
+			department: '',
+			priority: 'high'
+		},
+		{
+			id: 3,
+			title: 'Mid-Semester Exams',
+			description:
+				'Mid-semester examinations for all undergraduate programs',
+			date: '2025-01-15',
+			endDate: '2025-01-25',
+			time: '9:00 AM',
+			location: 'Examination Halls',
+			type: 'exam',
+			semester: 'All Semesters',
+			department: '',
+			priority: 'high'
+		},
+		{
+			id: 4,
+			title: 'Spring Semester Registration',
+			description: 'Course registration for Spring semester 2025',
+			date: '2025-01-20',
+			endDate: '2025-01-22',
+			time: '9:00 AM - 5:00 PM',
+			location: 'Academic Office',
+			type: 'academic',
+			semester: 'All Semesters',
+			department: '',
+			priority: 'high'
+		},
+		{
+			id: 5,
+			title: 'Republic Day',
+			description: 'National holiday - Republic Day celebration',
+			date: '2025-01-26',
+			endDate: '',
+			time: '',
+			location: '',
+			type: 'holiday',
+			semester: '',
+			department: '',
+			priority: 'medium'
+		},
+		{
+			id: 6,
+			title: 'Industry Lecture Series',
+			description: 'Guest lectures by industry experts and professionals',
+			date: '2025-02-05',
+			endDate: '2025-02-07',
+			time: '2:00 PM - 4:00 PM',
+			location: 'Main Auditorium',
+			type: 'academic',
+			semester: '',
+			department: '',
+			priority: 'medium'
+		},
+		{
+			id: 7,
+			title: 'TECHNOVANZA 2025',
+			description:
+				'Annual technical festival with competitions, workshops, and tech talks',
+			date: '2025-02-10',
+			endDate: '2025-02-12',
+			time: '10:00 AM - 6:00 PM',
+			location: 'Campus Wide',
+			type: 'fest',
+			semester: '',
+			department: '',
+			priority: 'medium'
+		},
+		{
+			id: 8,
+			title: "Fresher's Welcome Program",
+			description: 'Welcome program for newly admitted students',
+			date: '2025-02-15',
+			endDate: '2025-02-16',
+			time: '10:00 AM - 4:00 PM',
+			location: 'Main Auditorium',
+			type: 'orientation',
+			semester: '1st Semester',
+			department: '',
+			priority: 'high'
+		},
+		{
+			id: 9,
+			title: 'Project Presentation Week',
+			description: 'Final year project presentations and evaluations',
+			date: '2025-02-20',
+			endDate: '2025-02-24',
+			time: '9:00 AM - 5:00 PM',
+			location: 'Various Labs',
+			type: 'academic',
+			semester: 'Final Year',
+			department: '',
+			priority: 'high'
+		},
+		{
+			id: 10,
+			title: 'Annual Sports Day',
+			description:
+				'Inter-department sports competitions and cultural activities',
+			date: '2025-02-28',
+			endDate: '',
+			time: '8:00 AM - 6:00 PM',
+			location: 'Sports Complex',
+			type: 'fest',
+			semester: '',
+			department: '',
+			priority: 'medium'
+		},
+		{
+			id: 11,
+			title: 'Holi Festival',
+			description: 'Festival of colors - campus celebration',
+			date: '2025-03-14',
+			endDate: '',
+			time: '',
+			location: '',
+			type: 'holiday',
+			semester: '',
+			department: '',
+			priority: 'low'
+		},
+		{
+			id: 12,
+			title: 'End-Semester Examinations',
+			description: 'Final examinations for Spring semester 2025',
+			date: '2025-03-15',
+			endDate: '2025-03-30',
+			time: '9:00 AM - 12:00 PM',
+			location: 'Examination Halls',
+			type: 'exam',
+			semester: 'All Semesters',
+			department: '',
+			priority: 'high'
+		},
+		{
+			id: 13,
+			title: 'Spring Break',
+			description: 'Spring vacation after semester examinations',
+			date: '2025-04-01',
+			endDate: '2025-04-15',
+			time: '',
+			location: '',
+			type: 'holiday',
+			semester: '',
+			department: '',
+			priority: 'low'
+		},
+		{
+			id: 14,
+			title: 'Summer Semester Registration',
+			description: 'Registration for summer courses and supplementary exams',
+			date: '2025-04-16',
+			endDate: '2025-04-18',
+			time: '9:00 AM - 4:00 PM',
+			location: 'Academic Office',
+			type: 'academic',
+			semester: '',
+			department: '',
+			priority: 'medium'
+		},
+		{
+			id: 15,
+			title: 'Summer Semester Classes Begin',
+			description: 'Commencement of summer semester courses',
+			date: '2025-04-20',
+			endDate: '',
+			time: '9:00 AM',
+			location: 'All Departments',
+			type: 'academic',
+			semester: 'Summer Semester',
+			department: '',
+			priority: 'high'
+		},
+		{
+			id: 16,
+			title: 'Labour Day',
+			description: "International Workers' Day - Holiday",
+			date: '2025-05-01',
+			endDate: '',
+			time: '',
+			location: '',
+			type: 'holiday',
+			semester: '',
+			department: '',
+			priority: 'low'
+		},
+		{
+			id: 17,
+			title: 'Mid-Summer Assessments',
+			description: 'Mid-term assessments for summer semester',
+			date: '2025-05-15',
+			endDate: '2025-05-20',
+			time: '9:00 AM',
+			location: 'Examination Halls',
+			type: 'exam',
+			semester: 'Summer Semester',
+			department: '',
+			priority: 'high'
+		},
+		{
+			id: 18,
+			title: 'Industry Internship Program',
+			description: 'Summer internship program with industry partners',
+			date: '2025-05-25',
+			endDate: '2025-07-25',
+			time: '',
+			location: '',
+			type: 'academic',
+			semester: 'Pre-final Year',
+			department: '',
+			priority: 'medium'
+		},
+		{
+			id: 19,
+			title: 'Summer Semester End Exams',
+			description: 'Final examinations for summer semester',
+			date: '2025-06-10',
+			endDate: '2025-06-20',
+			time: '9:00 AM',
+			location: 'Examination Halls',
+			type: 'exam',
+			semester: 'Summer Semester',
+			department: '',
+			priority: 'high'
+		},
+		{
+			id: 20,
+			title: 'Summer Break',
+			description: 'Summer vacation for students and faculty',
+			date: '2025-06-21',
+			endDate: '2025-07-15',
+			time: '',
+			location: '',
+			type: 'holiday',
+			semester: '',
+			department: '',
+			priority: 'low'
+		},
+		{
+			id: 21,
+			title: 'Faculty Development Program',
+			description: 'Professional development workshops for faculty',
+			date: '2025-07-01',
+			endDate: '2025-07-10',
+			time: '9:00 AM - 4:00 PM',
+			location: 'Conference Hall',
+			type: 'academic',
+			semester: '',
+			department: '',
+			priority: 'medium'
+		},
+		{
+			id: 22,
+			title: 'New Academic Year 2025-26',
+			description: 'Commencement of new academic year 2025-26',
+			date: '2025-07-16',
+			endDate: '',
+			time: '9:00 AM',
+			location: 'Main Auditorium',
+			type: 'academic',
+			semester: 'All Semesters',
+			department: '',
+			priority: 'high'
+		},
+		{
+			id: 23,
+			title: 'Freshman Orientation Week',
+			description: 'Orientation program for newly admitted students',
+			date: '2025-07-20',
+			endDate: '2025-07-26',
+			time: '9:00 AM - 5:00 PM',
+			location: 'Various Venues',
+			type: 'orientation',
+			semester: '1st Semester',
+			department: '',
+			priority: 'high'
+		},
+		{
+			id: 24,
+			title: 'Independence Day',
+			description: 'National holiday - Independence Day celebration',
+			date: '2025-08-15',
+			endDate: '',
+			time: '8:00 AM',
+			location: 'Main Campus',
+			type: 'holiday',
+			semester: '',
+			department: '',
+			priority: 'medium'
+		},
+		{
+			id: 25,
+			title: 'Mid-Semester Tests',
+			description: 'Mid-semester examinations for Fall semester',
+			date: '2025-09-15',
+			endDate: '2025-09-25',
+			time: '9:00 AM',
+			location: 'Examination Halls',
+			type: 'exam',
+			semester: 'All Semesters',
+			department: '',
+			priority: 'high'
+		},
+		{
+			id: 26,
+			title: 'Ganesh Chaturthi',
+			description: 'Festival celebration on campus',
+			date: '2025-08-29',
+			endDate: '',
+			time: '',
+			location: '',
+			type: 'holiday',
+			semester: '',
+			department: '',
+			priority: 'low'
+		},
+		{
+			id: 27,
+			title: 'Gandhi Jayanti',
+			description: "Mahatma Gandhi's birth anniversary",
+			date: '2025-10-02',
+			endDate: '',
+			time: '',
+			location: '',
+			type: 'holiday',
+			semester: '',
+			department: '',
+			priority: 'medium'
+		},
+		{
+			id: 28,
+			title: 'Diwali Celebration',
+			description: 'Festival of lights celebration',
+			date: '2025-10-20',
+			endDate: '2025-10-24',
+			time: '',
+			location: '',
+			type: 'holiday',
+			semester: '',
+			department: '',
+			priority: 'low'
+		},
+		{
+			id: 29,
+			title: 'Fall Semester End Exams',
+			description: 'Final examinations for Fall semester 2025',
+			date: '2025-11-20',
+			endDate: '2025-12-15',
+			time: '9:00 AM',
+			location: 'Examination Halls',
+			type: 'exam',
+			semester: 'All Semesters',
+			department: '',
+			priority: 'high'
+		},
+		{
+			id: 30,
+			title: 'Annual Cultural Fest',
+			description: 'Inter-college cultural festival and competitions',
+			date: '2025-11-05',
+			endDate: '2025-11-07',
+			time: '10:00 AM - 8:00 PM',
+			location: 'Campus Wide',
+			type: 'fest',
+			semester: '',
+			department: '',
+			priority: 'medium'
+		},
+		{
+			id: 31,
+			title: 'Christmas Holiday',
+			description: 'Christmas and New Year break',
+			date: '2025-12-24',
+			endDate: '2025-12-31',
+			time: '',
+			location: '',
+			type: 'holiday',
+			semester: '',
+			department: '',
+			priority: 'low'
+		},
+		{
+			id: 32,
+			title: 'Convocation Ceremony',
+			description: 'Annual graduation ceremony for outgoing students',
+			date: '2025-12-20',
+			endDate: '',
+			time: '10:00 AM',
+			location: 'Main Auditorium',
+			type: 'academic',
+			semester: 'Final Year',
+			department: '',
+			priority: 'high'
+		}
+	]
+};
+
+async function seed() {
+	console.log('🌱 Seeding Academia — Academic Calendar...');
+
+	const page = await prisma.page.upsert({
+		where: { slug: PAGE_SLUG },
+		update: {
+			title: 'Academic Calendar',
+			kind: 'PAGE',
+			status: 'PUBLISHED'
+		},
+		create: {
+			slug: PAGE_SLUG,
+			title: 'Academic Calendar',
+			kind: 'PAGE',
+			status: 'PUBLISHED'
+		}
+	});
+
+	await prisma.component.upsert({
+		where: { pageId_order: { pageId: page.id, order: 0 } },
+		update: { data: heroData, key: 'HERO' },
+		create: { pageId: page.id, order: 0, key: 'HERO', data: heroData }
+	});
+
+	await prisma.component.upsert({
+		where: { pageId_order: { pageId: page.id, order: 1 } },
+		update: { data: eventsData, key: 'EVENTS' },
+		create: { pageId: page.id, order: 1, key: 'EVENTS', data: eventsData }
+	});
+
+	console.log('✅ Academia — Academic Calendar seeded');
+}
+
+seed()
+	.catch(e => {
+		console.error(e);
+		process.exit(1);
+	})
+	.finally(async () => {
+		await prisma.$disconnect();
+	});

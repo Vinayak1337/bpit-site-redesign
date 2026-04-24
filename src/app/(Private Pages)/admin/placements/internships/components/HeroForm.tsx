@@ -65,7 +65,6 @@ export default function HeroForm({ initialData, pageSlug, onChange }: HeroFormPr
 	const onSubmit = async (values: any) => {
 		try {
 			setSaveStatus('saving');
-			const admin = await requireAdmin();
 
 			const result = await updateInternshipsData({
 				...initialData,
@@ -75,7 +74,7 @@ export default function HeroForm({ initialData, pageSlug, onChange }: HeroFormPr
 					subtitle: values.subtitle,
 					gradient: values.gradient
 				}
-			}, admin.id);
+			});
 
 			if (result.success) {
 				// Fetch fresh data

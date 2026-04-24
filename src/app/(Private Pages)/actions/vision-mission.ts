@@ -1,8 +1,12 @@
 'use server';
+import 'server-only';
 
 import { z } from 'zod';
-import { revalidatePath, unstable_cache } from 'next/cache';
+import { revalidateTag, unstable_cache } from 'next/cache';
 import { prisma } from '@/lib/prisma';
+import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
+import { createAuditLog } from '@/lib/audit';
+import type { Prisma } from '@prisma/client';
 
 // Vision Mission schemas
 const heroSchema = z.object({
@@ -52,10 +56,13 @@ const objectiveSchema = z.object({
 	color: z.enum(['blue', 'green', 'purple', 'orange', 'red', 'indigo'])
 });
 
+import { IMPACT_STAT_COLORS } from './vision-mission-constants';
+export type { ImpactStatColor } from './vision-mission-constants';
+
 const impactStatSchema = z.object({
 	number: z.string().min(1),
 	label: z.string().min(1),
-	color: z.string().min(1)
+	color: z.enum(IMPACT_STAT_COLORS).default('text-green-600')
 });
 
 const impactSchema = z.object({
@@ -228,6 +235,8 @@ const normalizeMission = (data: Partial<MissionData>): MissionData => {
 	};
 };
 
+const VISION_MISSION_CACHE_TAG = 'vision-mission-data';
+
 // Get vision mission data
 export const getVisionMission = unstable_cache(
 	async (slug: string): Promise<VisionMissionData> => {
@@ -246,15 +255,14 @@ export const getVisionMission = unstable_cache(
 				return normalizeVisionMission({});
 			}
 
-			const componentData = page.components[0].data as any;
+			const componentData = page.components[0].data as Partial<VisionMissionData>;
 			return normalizeVisionMission(componentData);
-		} catch (error) {
-			console.error('Error fetching vision mission:', error);
+		} catch {
 			return normalizeVisionMission({});
 		}
 	},
 	['vision-mission'],
-	{ revalidate: 3600 }
+	{ tags: [VISION_MISSION_CACHE_TAG] }
 );
 
 // Update vision mission data
@@ -262,50 +270,59 @@ export async function updateVisionMission(
 	slug: string,
 	data: VisionMissionData
 ): Promise<void> {
-	try {
-		const validatedData = visionMissionSchema.parse(data);
+	const admin = await requireAdmin();
+	const validatedData = visionMissionSchema.parse(data);
 
-		const page = await prisma.page.upsert({
-			where: { slug },
-			update: {},
-			create: {
-				slug,
-				title: 'Vision & Mission',
-				kind: 'PAGE',
-				status: 'PUBLISHED'
-			}
-		});
-
-		// Find existing component or create new one
-		const existingComponent = await prisma.component.findFirst({
-			where: {
-				pageId: page.id,
-				key: 'VISION_MISSION'
-			}
-		});
-
-		if (existingComponent) {
-			await prisma.component.update({
-				where: { id: existingComponent.id },
-				data: { data: validatedData }
-			});
-		} else {
-			await prisma.component.create({
-				data: {
-					pageId: page.id,
-					key: 'VISION_MISSION',
-					order: 1,
-					data: validatedData
-				}
-			});
+	const page = await prisma.page.upsert({
+		where: { slug },
+		update: {},
+		create: {
+			slug,
+			title: 'Vision & Mission',
+			kind: 'PAGE',
+			status: 'PUBLISHED'
 		}
+	});
 
-		revalidatePath(`/${slug}`);
-		revalidatePath('/admin/vision-mission');
-	} catch (error) {
-		console.error('Error updating vision mission:', error);
-		throw new Error('Failed to update vision mission');
+	const existingComponent = await prisma.component.findFirst({
+		where: { pageId: page.id, key: 'VISION_MISSION' }
+	});
+
+	const previousData = existingComponent?.data ?? null;
+
+	if (existingComponent) {
+		await prisma.component.update({
+			where: { id: existingComponent.id },
+			data: { data: validatedData as unknown as Prisma.InputJsonValue }
+		});
+	} else {
+		await prisma.component.create({
+			data: {
+				pageId: page.id,
+				key: 'VISION_MISSION',
+				order: 1,
+				data: validatedData as unknown as Prisma.InputJsonValue
+			}
+		});
 	}
+
+	if (existingComponent) {
+		await createAuditLog({
+			actorId: admin.id,
+			action: 'UPDATE',
+			resourceType: 'COMPONENT',
+			summary: `Updated Vision & Mission for page ${slug}`,
+			changes: [{
+				resourceId: existingComponent.id,
+				resourceType: 'COMPONENT',
+				field: 'data',
+				previousData: previousData as unknown as Prisma.InputJsonValue ?? undefined,
+				newData: validatedData as unknown as Prisma.InputJsonValue
+			}]
+		});
+	}
+
+	revalidateTag(VISION_MISSION_CACHE_TAG);
 }
 
 // Get mission data
@@ -323,22 +340,17 @@ export const getMission = unstable_cache(
 			});
 
 			if (!page?.components?.[0]?.data) {
-				console.log('No mission data found, returning default');
 				return normalizeMission({});
 			}
 
-			const componentData = page.components[0].data as any;
-			console.log('Found mission data:', JSON.stringify(componentData, null, 2));
-			
-			// Return the actual data from database, don't normalize it
-			return componentData as MissionData;
-		} catch (error) {
-			console.error('Error fetching mission:', error);
+			const componentData = page.components[0].data as Partial<MissionData>;
+			return normalizeMission(componentData);
+		} catch {
 			return normalizeMission({});
 		}
 	},
 	['mission-data'],
-	{ revalidate: 60 } // Shorter revalidation for testing
+	{ tags: ['mission-data'] }
 );
 
 // Update mission data
@@ -346,50 +358,59 @@ export async function updateMission(
 	slug: string,
 	data: MissionData
 ): Promise<void> {
-	try {
-		const validatedData = missionSchema.parse(data);
+	const admin = await requireAdmin();
+	const validatedData = missionSchema.parse(data);
 
-		const page = await prisma.page.upsert({
-			where: { slug },
-			update: {},
-			create: {
-				slug,
-				title: 'Mission',
-				kind: 'PAGE',
-				status: 'PUBLISHED'
-			}
-		});
-
-		// Find existing component or create new one
-		const existingComponent = await prisma.component.findFirst({
-			where: {
-				pageId: page.id,
-				key: 'MISSION'
-			}
-		});
-
-		if (existingComponent) {
-			await prisma.component.update({
-				where: { id: existingComponent.id },
-				data: { data: validatedData }
-			});
-		} else {
-			await prisma.component.create({
-				data: {
-					pageId: page.id,
-					key: 'MISSION',
-					order: 1,
-					data: validatedData
-				}
-			});
+	const page = await prisma.page.upsert({
+		where: { slug },
+		update: {},
+		create: {
+			slug,
+			title: 'Mission',
+			kind: 'PAGE',
+			status: 'PUBLISHED'
 		}
+	});
 
-		revalidatePath(`/${slug}`);
-		revalidatePath('/admin/vision-mission');
-	} catch (error) {
-		console.error('Error updating mission:', error);
-		throw new Error('Failed to update mission');
+	const existingComponent = await prisma.component.findFirst({
+		where: { pageId: page.id, key: 'MISSION' }
+	});
+
+	const previousData = existingComponent?.data ?? null;
+
+	if (existingComponent) {
+		await prisma.component.update({
+			where: { id: existingComponent.id },
+			data: { data: validatedData as unknown as Prisma.InputJsonValue }
+		});
+	} else {
+		await prisma.component.create({
+			data: {
+				pageId: page.id,
+				key: 'MISSION',
+				order: 1,
+				data: validatedData as unknown as Prisma.InputJsonValue
+			}
+		});
 	}
+
+	if (existingComponent) {
+		await createAuditLog({
+			actorId: admin.id,
+			action: 'UPDATE',
+			resourceType: 'COMPONENT',
+			summary: `Updated Mission for page ${slug}`,
+			changes: [{
+				resourceId: existingComponent.id,
+				resourceType: 'COMPONENT',
+				field: 'data',
+				previousData: previousData as unknown as Prisma.InputJsonValue ?? undefined,
+				newData: validatedData as unknown as Prisma.InputJsonValue
+			}]
+		});
+	}
+
+	revalidateTag('mission-data');
 }
 
 // Normalize Quality Policy function
@@ -463,22 +484,17 @@ export const getQualityPolicy = unstable_cache(
 			});
 
 			if (!page?.components?.[0]?.data) {
-				console.log('No quality policy data found, returning default');
 				return normalizeQualityPolicy({});
 			}
 
-			const componentData = page.components[0].data as any;
-			console.log('Found quality policy data:', JSON.stringify(componentData, null, 2));
-			
-			// Return the actual data from database, don't normalize it
-			return componentData as QualityPolicyData;
-		} catch (error) {
-			console.error('Error fetching quality policy:', error);
+			const componentData = page.components[0].data as Partial<QualityPolicyData>;
+			return normalizeQualityPolicy(componentData);
+		} catch {
 			return normalizeQualityPolicy({});
 		}
 	},
 	['quality-policy-data'],
-	{ revalidate: 60 }
+	{ tags: ['quality-policy-data'] }
 );
 
 // Update quality policy data
@@ -486,48 +502,57 @@ export async function updateQualityPolicy(
 	slug: string,
 	data: QualityPolicyData
 ): Promise<void> {
-	try {
-		const validatedData = qualityPolicySchema.parse(data);
+	const admin = await requireAdmin();
+	const validatedData = qualityPolicySchema.parse(data);
 
-		const page = await prisma.page.upsert({
-			where: { slug },
-			update: {},
-			create: {
-				slug,
-				title: 'Quality Policy',
-				kind: 'PAGE',
-				status: 'PUBLISHED'
-			}
-		});
-
-		// Find existing component or create new one
-		const existingComponent = await prisma.component.findFirst({
-			where: {
-				pageId: page.id,
-				key: 'QUALITY_POLICY'
-			}
-		});
-
-		if (existingComponent) {
-			await prisma.component.update({
-				where: { id: existingComponent.id },
-				data: { data: validatedData }
-			});
-		} else {
-			await prisma.component.create({
-				data: {
-					pageId: page.id,
-					key: 'QUALITY_POLICY',
-					order: 1,
-					data: validatedData
-				}
-			});
+	const page = await prisma.page.upsert({
+		where: { slug },
+		update: {},
+		create: {
+			slug,
+			title: 'Quality Policy',
+			kind: 'PAGE',
+			status: 'PUBLISHED'
 		}
+	});
 
-		revalidatePath(`/${slug}`);
-		revalidatePath('/admin/vision-mission');
-	} catch (error) {
-		console.error('Error updating quality policy:', error);
-		throw new Error('Failed to update quality policy');
+	const existingComponent = await prisma.component.findFirst({
+		where: { pageId: page.id, key: 'QUALITY_POLICY' }
+	});
+
+	const previousData = existingComponent?.data ?? null;
+
+	if (existingComponent) {
+		await prisma.component.update({
+			where: { id: existingComponent.id },
+			data: { data: validatedData as unknown as Prisma.InputJsonValue }
+		});
+	} else {
+		await prisma.component.create({
+			data: {
+				pageId: page.id,
+				key: 'QUALITY_POLICY',
+				order: 1,
+				data: validatedData as unknown as Prisma.InputJsonValue
+			}
+		});
 	}
+
+	if (existingComponent) {
+		await createAuditLog({
+			actorId: admin.id,
+			action: 'UPDATE',
+			resourceType: 'COMPONENT',
+			summary: `Updated Quality Policy for page ${slug}`,
+			changes: [{
+				resourceId: existingComponent.id,
+				resourceType: 'COMPONENT',
+				field: 'data',
+				previousData: previousData as unknown as Prisma.InputJsonValue ?? undefined,
+				newData: validatedData as unknown as Prisma.InputJsonValue
+			}]
+		});
+	}
+
+	revalidateTag('quality-policy-data');
 }

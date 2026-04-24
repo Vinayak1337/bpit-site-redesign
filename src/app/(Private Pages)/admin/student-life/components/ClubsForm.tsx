@@ -20,6 +20,8 @@ import {
 	type ClubsSocietiesData
 } from '@/app/(Private Pages)/actions/student-life';
 import UploadButton from '@/components/cloudinary/upload-button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { SUPPORTED_ICON_NAMES } from '@/components/about/icons';
 
 interface Props {
 	initialData: ClubsSocietiesData;
@@ -77,7 +79,18 @@ const ClubItemsList = ({ nestIndex, control }: { nestIndex: number, control: Con
 									name={`categories.${nestIndex}.clubs.${k}.icon`}
 									render={({ field }) => (
 										<FormItem>
-											<FormControl><Input placeholder="Icon" {...field} className="bg-white" /></FormControl>
+											<Select onValueChange={field.onChange} value={field.value ?? ''}>
+												<FormControl>
+													<SelectTrigger className="bg-white">
+														<SelectValue placeholder="Select icon" />
+													</SelectTrigger>
+												</FormControl>
+												<SelectContent className="max-h-60 overflow-y-auto">
+													{SUPPORTED_ICON_NAMES.map(icon => (
+														<SelectItem key={icon} value={icon}>{icon}</SelectItem>
+													))}
+												</SelectContent>
+											</Select>
 										</FormItem>
 									)}
 								/>

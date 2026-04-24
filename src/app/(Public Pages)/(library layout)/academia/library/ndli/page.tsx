@@ -1,37 +1,24 @@
-'use client';
+import { getHero, getContent } from '@/app/(Private Pages)/actions/academia-library-ndli';
+import SimpleSubHero from '../_shared/SimpleSubHero';
+import SimpleSubContent from '../_shared/SimpleSubContent';
+import type { Metadata } from 'next';
 
-import React from 'react';
-import { motion } from 'framer-motion';
+export const metadata: Metadata = {
+	title: 'National Digital Library of India',
+	description: 'Using the National Digital Library of India (NDLI) through BPIT — millions of e-books, journals and multimedia resources.',
+	alternates: { canonical: '/academia/library/ndli' }
+};
 
-export default function NDLIPage() {
+
+
+export const revalidate = 3600;
+
+export default async function Page() {
+	const [hero, content] = await Promise.all([getHero(), getContent()]);
 	return (
-		<motion.div 
-			className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6"
-			initial={{ opacity: 0 }}
-			animate={{ opacity: 1 }}
-			transition={{ duration: 0.8 }}
-		>
-			<div className="max-w-4xl mx-auto">
-				<motion.h1 
-					className="text-4xl font-bold text-gray-900 mb-8"
-					initial={{ opacity: 0, y: 30 }}
-					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.8, delay: 0.1 }}
-				>
-					NDLI (National Digital Library of India)
-				</motion.h1>
-				
-				<motion.div 
-					className="bg-white rounded-lg shadow-lg p-8"
-					initial={{ opacity: 0, y: 30 }}
-					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.8, delay: 0.2 }}
-				>
-					<p className="text-gray-600 text-lg">
-						National Digital Library of India resources will be available here soon.
-					</p>
-				</motion.div>
-			</div>
-		</motion.div>
+		<div className='space-y-6'>
+			<SimpleSubHero data={hero} />
+			<SimpleSubContent data={content} />
+		</div>
 	);
 }

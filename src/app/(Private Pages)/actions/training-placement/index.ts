@@ -1,7 +1,9 @@
 'use server';
+import 'server-only';
 
 import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
+import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
 
 export interface TeamMember {
 	id?: string;
@@ -108,6 +110,7 @@ export async function updateTrainingPlacement(
 	data: TrainingPlacementData
 ): Promise<{ success: boolean; error?: string }> {
 	try {
+		await requireAdmin();
 		const page = await prisma.page.findUnique({
 			where: { slug: 'training-placement' },
 			include: { components: true }
@@ -119,24 +122,26 @@ export async function updateTrainingPlacement(
 
 		if (page.components.length > 0) {
 			await prisma.component.update({
-			where: { id: page.components[0].id },
-			data: {
-				data: data as any,
-				updatedAt: new Date()
-			}
-		});
-	} else {
-		await prisma.component.create({
-			data: {
-				pageId: page.id,
-				order: 0,
-				data: data as any
-			}
-		});
-	}
+				where: { id: page.components[0].id },
+				data: {
+					data: data as unknown as import('@prisma/client').Prisma.InputJsonValue,
+					updatedAt: new Date()
+				}
+			});
+		} else {
+			await prisma.component.create({
+				data: {
+					pageId: page.id,
+					order: 0,
+					data: data as unknown as import('@prisma/client').Prisma.InputJsonValue
+				}
+			});
+		}
 
-	revalidatePath('/placements/training-placement');
-	revalidatePath('/admin/placements/training-placement');		return { success: true };
+		revalidatePath('/placements/training-placement');
+		revalidatePath('/admin/placements/training-placement');
+
+		return { success: true };
 	} catch (error) {
 		console.error('Error updating training placement data:', error);
 		return { success: false, error: 'Failed to update data' };

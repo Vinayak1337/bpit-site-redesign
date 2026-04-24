@@ -15,6 +15,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Loader2, Save, Plus, Trash2 } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { SUPPORTED_ICON_NAMES } from '@/components/about/icons';
 import {
 	updateGrievanceCell,
 	type GrievanceCellData
@@ -174,7 +176,18 @@ export default function GrievanceForm({
 											name={`contactInfo.${index}.icon`}
 											render={({ field }) => (
 												<FormItem>
-													<FormControl><Input placeholder="Icon" {...field} className="bg-white" /></FormControl>
+													<Select onValueChange={field.onChange} value={field.value ?? ''}>
+														<FormControl>
+															<SelectTrigger className="bg-white">
+																<SelectValue placeholder="Select icon" />
+															</SelectTrigger>
+														</FormControl>
+														<SelectContent className="max-h-60 overflow-y-auto">
+															{SUPPORTED_ICON_NAMES.map(icon => (
+																<SelectItem key={icon} value={icon}>{icon}</SelectItem>
+															))}
+														</SelectContent>
+													</Select>
 												</FormItem>
 											)}
 										/>

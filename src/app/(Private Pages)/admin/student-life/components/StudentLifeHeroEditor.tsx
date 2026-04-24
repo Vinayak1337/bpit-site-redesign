@@ -22,7 +22,7 @@ export default function StudentLifeHeroEditor({ initialData, pageSlug }: Props) 
 	);
 
 	return (
-		<Editable label='Student Life Hero' formContent={formContent}>
+		<Editable label='Student Life Hero' presentation='dialog' formContent={formContent}>
 			<div className='border rounded-xl overflow-hidden bg-gray-50'>
 				<StudentLifeHero data={data} />
 			</div>

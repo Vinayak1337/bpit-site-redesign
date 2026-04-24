@@ -42,7 +42,7 @@ const ProcessSteps = ({
 			initial={{ opacity: 0, y: 20 }}
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.6, delay }}
-			className='bg-white rounded-xl p-8 shadow-lg border border-gray-200'>
+			className='bg-white rounded-xl p-4 sm:p-6 md:p-8 shadow-lg border border-gray-200'>
 			<div className='text-center mb-8'>
 				<div
 					className={`w-12 h-12 bg-gradient-to-r ${titleGradient} rounded-lg flex items-center justify-center mx-auto mb-4`}>
@@ -51,7 +51,7 @@ const ProcessSteps = ({
 				<h3 className='text-2xl font-bold text-gray-900 mb-6'>{title}</h3>
 			</div>
 
-			<div className='grid md:grid-cols-4 gap-6'>
+			<div className='grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6'>
 				{steps.map((step, index) => {
 					const StepIconComponent = iconMap[step.icon as keyof typeof iconMap];
 					return (

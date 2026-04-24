@@ -20,13 +20,13 @@ export default function PageTracker() {
       posthog.capture('$pageview', {
         $current_url: url,
       });
-      
+
       // Reset start time for page leave tracking
       setStartTime(Date.now());
     }
   }, [pathname, searchParams, posthog]);
 
-  // Track page leave manually if needed (PostHog handles $pageleave automatically for window unload, 
+  // Track page leave manually if needed (PostHog handles $pageleave automatically for window unload,
   // but for SPA navigation we might want a custom event or rely on PostHog's improved handling)
   useEffect(() => {
     return () => {
@@ -40,4 +40,3 @@ export default function PageTracker() {
 
   return null;
 }
-

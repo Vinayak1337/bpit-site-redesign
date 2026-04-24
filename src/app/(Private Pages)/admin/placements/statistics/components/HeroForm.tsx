@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { updatePlacementStatistics, type PlacementStatisticsData } from '@/app/(Private Pages)/actions/placement-statistics';
+import { BarChart3, TrendingUp, Award, Target, Users, Building2, Briefcase, GraduationCap, type LucideIcon } from 'lucide-react';
 
 const GRADIENT_OPTIONS = [
 	'from-blue-900 via-blue-800 to-blue-900',
@@ -27,6 +28,10 @@ const ICON_OPTIONS = [
 	'Briefcase',
 	'GraduationCap'
 ];
+
+const ICON_COMPONENT_MAP: Record<string, LucideIcon> = {
+	BarChart3, TrendingUp, Award, Target, Users, Building2, Briefcase, GraduationCap
+};
 
 interface HeroFormProps {
 	initialData: PlacementStatisticsData;
@@ -111,11 +116,17 @@ export default function HeroForm({ initialData, pageSlug, onChange }: HeroFormPr
 									</SelectTrigger>
 								</FormControl>
 								<SelectContent>
-									{ICON_OPTIONS.map(icon => (
-										<SelectItem key={icon} value={icon}>
-											{icon}
-										</SelectItem>
-									))}
+									{ICON_OPTIONS.map(icon => {
+										const IconComp = ICON_COMPONENT_MAP[icon];
+										return (
+											<SelectItem key={icon} value={icon}>
+												<span className='flex items-center gap-2'>
+													{IconComp && <IconComp className='w-4 h-4' />}
+													{icon}
+												</span>
+											</SelectItem>
+										);
+									})}
 								</SelectContent>
 							</Select>
 							<FormMessage />

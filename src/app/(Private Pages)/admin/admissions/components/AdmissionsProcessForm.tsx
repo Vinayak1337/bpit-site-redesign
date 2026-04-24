@@ -1289,7 +1289,7 @@ export default function AdmissionsProcessForm({
 				className={`space-y-6 ${
 					isImmersiveProgramEditor
 						? 'rounded-none border-0 bg-transparent p-0 shadow-none'
-						: 'max-h-[70vh] overflow-y-auto rounded-xl border border-slate-200 bg-white p-6 shadow-sm'
+						: 'rounded-xl border border-slate-200 bg-white p-6 shadow-sm'
 				}`}
 				onSubmit={form.handleSubmit(handleSubmit)}>
 				<div className='flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between'>

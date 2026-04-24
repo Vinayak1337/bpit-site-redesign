@@ -26,6 +26,7 @@ export default function AdmissionsFeesEditor({ initialData }: Props) {
 		<div className='space-y-8'>
 			<Editable
 				label='Fees Meta'
+				presentation='dialog'
 				formContent={
 					<AdmissionsFeesForm
 						initialData={initial}
@@ -41,6 +42,7 @@ export default function AdmissionsFeesEditor({ initialData }: Props) {
 
 			<Editable
 				label='Fees Programs'
+				presentation='dialog'
 				formContent={
 					<AdmissionsFeesForm
 						initialData={initial}

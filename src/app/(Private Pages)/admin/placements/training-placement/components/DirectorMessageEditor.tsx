@@ -28,7 +28,7 @@ export default function DirectorMessageEditor({ initialData, pageSlug }: Directo
 	);
 
 	return (
-		<Editable label="Director's Message" formContent={formContent}>
+		<Editable label="Director's Message" presentation="dialog" formContent={formContent}>
 			{currentData.directorMessage ? (
 			<section className='py-20 bg-white -mt-10 relative z-20'>
 			<div className='container mx-auto px-4'>

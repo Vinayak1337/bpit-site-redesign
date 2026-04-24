@@ -64,12 +64,11 @@ export default function BenefitsForm({ initialData, pageSlug, onChange }: Benefi
 	const onSubmit = async (values: any) => {
 		try {
 			setSaveStatus('saving');
-			const admin = await requireAdmin();
 
 			const result = await updateInternshipsData({
 				...initialData,
 				benefits: values.benefits
-			}, admin.id);
+			});
 
 			if (result.success) {
 				const freshData = await getInternshipsData();

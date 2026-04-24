@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { usePostHog } from 'posthog-js/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -31,6 +32,7 @@ type ContactDTO = {
 
 const EnquiryPopup = ({ contacts }: { contacts: ContactDTO[] }) => {
 	const [isOpen, setIsOpen] = useState(false);
+	const posthog = usePostHog();
 	const [formData, setFormData] = useState({
 		name: '',
 		email: '',
@@ -40,26 +42,33 @@ const EnquiryPopup = ({ contacts }: { contacts: ContactDTO[] }) => {
 	});
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [isSuccess, setIsSuccess] = useState(false);
-
 	useEffect(() => {
 		const handleOpenEnquiry = () => {
 			setIsOpen(true);
 			setIsSuccess(false);
+			posthog?.capture('enquiry_popup_opened');
 		};
 
 		window.addEventListener('openEnquiry', handleOpenEnquiry);
 		return () => window.removeEventListener('openEnquiry', handleOpenEnquiry);
-	}, []);
+	}, [posthog]);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setIsSubmitting(true);
+		posthog?.capture('enquiry_form_submitted', {
+			course: formData.course || 'unspecified',
+			has_phone: Boolean(formData.phone)
+		});
 
 		// Simulate API call
 		await new Promise(resolve => setTimeout(resolve, 1500));
 
 		setIsSubmitting(false);
 		setIsSuccess(true);
+		posthog?.capture('enquiry_form_success', {
+			course: formData.course || 'unspecified'
+		});
 
 		// Auto close after success
 		setTimeout(() => {

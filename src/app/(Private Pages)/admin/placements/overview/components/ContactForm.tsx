@@ -25,6 +25,21 @@ import { updatePlacementOverview } from '@/app/(Private Pages)/actions/placement
 import { SUPPORTED_ICON_NAMES } from '@/components/about/icons';
 import { Plus, Trash2 } from 'lucide-react';
 
+const BG_COLOR_OPTIONS = [
+	{ label: 'Blue/20', value: 'bg-blue-500/20' },
+	{ label: 'Green/20', value: 'bg-green-500/20' },
+	{ label: 'Purple/20', value: 'bg-purple-500/20' },
+	{ label: 'Orange/20', value: 'bg-orange-500/20' },
+	{ label: 'White/20', value: 'bg-white/20' },
+	{ label: 'White/10', value: 'bg-white/10' },
+	{ label: 'Indigo/20', value: 'bg-indigo-500/20' },
+];
+
+const TEXT_COLOR_OPTIONS = [
+	'text-blue-100', 'text-white', 'text-green-100',
+	'text-purple-100', 'text-orange-100', 'text-gray-100',
+];
+
 type ContactFormValue = {
 	id: string;
 	icon: string;
@@ -282,9 +297,18 @@ export default function ContactForm({ initialData, pageSlug, onChange }: Props) 
 										render={({ field: colorField }) => (
 											<FormItem>
 												<FormLabel>Icon Background Color</FormLabel>
-												<FormControl>
-													<Input placeholder="bg-white/20" {...colorField} />
-												</FormControl>
+												<Select onValueChange={colorField.onChange} value={colorField.value ?? ''}>
+													<FormControl>
+														<SelectTrigger>
+															<SelectValue placeholder='Select bg color' />
+														</SelectTrigger>
+													</FormControl>
+													<SelectContent>
+														{BG_COLOR_OPTIONS.map(opt => (
+															<SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+														))}
+													</SelectContent>
+												</Select>
 												<FormMessage />
 											</FormItem>
 										)}
@@ -295,9 +319,18 @@ export default function ContactForm({ initialData, pageSlug, onChange }: Props) 
 										render={({ field: textColorField }) => (
 											<FormItem>
 												<FormLabel>Text Color</FormLabel>
-												<FormControl>
-													<Input placeholder="text-blue-100" {...textColorField} />
-												</FormControl>
+												<Select onValueChange={textColorField.onChange} value={textColorField.value ?? ''}>
+													<FormControl>
+														<SelectTrigger>
+															<SelectValue placeholder='Select text color' />
+														</SelectTrigger>
+													</FormControl>
+													<SelectContent>
+														{TEXT_COLOR_OPTIONS.map(c => (
+															<SelectItem key={c} value={c}>{c}</SelectItem>
+														))}
+													</SelectContent>
+												</Select>
 												<FormMessage />
 											</FormItem>
 										)}

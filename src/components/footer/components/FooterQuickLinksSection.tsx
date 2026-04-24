@@ -32,7 +32,7 @@ const FooterQuickLinksSection = ({
 				<h3 className='text-xl font-bold text-white'>Quick Links</h3>
 				<button
 					onClick={() => onToggle(SECTION_ID)}
-					className='md:hidden text-white/60'
+					className='md:hidden text-white/60 p-2 -m-2'
 					aria-label='Toggle Quick Links section'>
 					<ChevronDown
 						className={`w-5 h-5 transition-transform ${

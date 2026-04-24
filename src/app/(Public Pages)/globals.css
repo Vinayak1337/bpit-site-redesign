@@ -3,6 +3,11 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Prevent horizontal scroll from transient framer-motion x-axis animations */
+html, body {
+	overflow-x: hidden;
+}
+
 .animate-accordion-down {
 	animation: accordion-down 0.2s ease-out;
 }

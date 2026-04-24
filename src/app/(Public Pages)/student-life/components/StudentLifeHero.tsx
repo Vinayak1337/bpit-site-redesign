@@ -40,9 +40,9 @@ const StudentLifeHero = ({ data }: StudentLifeHeroProps) => {
 						<span className='text-sm font-medium text-blue-100'>Student Life at BPIT</span>
 					</div>
 
-					<h1 className='text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl'>{data.title}</h1>
+					<h1 className='text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight'>{data.title}</h1>
 
-					<p className='mx-auto mt-5 max-w-3xl text-lg text-slate-200 md:text-xl'>
+					<p className='mx-auto mt-5 max-w-3xl text-base sm:text-lg md:text-xl text-slate-200'>
 						{data.subtitle}
 					</p>
 

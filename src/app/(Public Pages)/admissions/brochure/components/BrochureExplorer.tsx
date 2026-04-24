@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { usePostHog } from 'posthog-js/react';
 import { Download, ExternalLink, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getAdmissionsIcon } from '@/lib/admissions-icons';
@@ -63,6 +64,7 @@ const applyScrapeToItems = (
 
 export default function BrochureExplorer({ config, items = [] }: Props) {
 	const safeConfig = config ?? EMPTY_CONFIG;
+	const posthog = usePostHog();
 	const [brochures, setBrochures] = useState<AdmissionsBrochureItem[]>(items);
 	const [message, setMessage] = useState('');
 	const [isRefreshing, setIsRefreshing] = useState(false);
@@ -165,6 +167,10 @@ export default function BrochureExplorer({ config, items = [] }: Props) {
 									<Button
 										className='flex-1 bg-blue-700 hover:bg-blue-800'
 										onClick={() => {
+											posthog?.capture('brochure_download', {
+												brochure_id: item.id,
+												brochure_title: item.title
+											});
 											window.location.assign(brochureProxyUrl(item, 'download'));
 										}}>
 										<Download className='mr-2 h-4 w-4' />
@@ -174,6 +180,10 @@ export default function BrochureExplorer({ config, items = [] }: Props) {
 										variant='outline'
 										className='flex-1'
 										onClick={() => {
+											posthog?.capture('brochure_view', {
+												brochure_id: item.id,
+												brochure_title: item.title
+											});
 											window.open(
 												brochureProxyUrl(item, 'view'),
 												'_blank',

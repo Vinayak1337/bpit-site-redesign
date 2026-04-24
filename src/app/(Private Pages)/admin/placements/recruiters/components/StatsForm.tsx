@@ -9,7 +9,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { SUPPORTED_ICON_NAMES } from '@/components/about/icons';
 import { updateRecruitersData, type RecruitersData } from '@/app/(Private Pages)/actions/recruiters';
-import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
 
 const COLOR_OPTIONS = [
 	'from-blue-500 to-blue-700',
@@ -61,14 +60,12 @@ export default function StatsForm({ initialData, pageSlug, onChange }: StatsForm
 		setSaveStatus('saving');
 		startTransition(async () => {
 			try {
-				const admin = await requireAdmin();
-
 				const updatedData: RecruitersData = {
 					...initialData,
 					stats: values.stats
 				};
 
-				await updateRecruitersData(updatedData, admin.id);
+				await updateRecruitersData(updatedData);
 				
 				if (onChange) {
 					onChange(updatedData);

@@ -68,11 +68,11 @@ export default function PlacementOverviewSection({
 							</div>
 						</motion.div>
 
-						<h1 className='text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent'>
+						<h1 className='text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent'>
 							{data.hero.title}
 						</h1>
 						<p
-							className={`text-xl md:text-2xl ${data.hero.textColor} mb-8 leading-relaxed`}>
+							className={`text-base sm:text-lg md:text-xl lg:text-2xl ${data.hero.textColor} mb-8 leading-relaxed`}>
 							{data.hero.subtitle}
 						</p>
 						<div className='w-24 h-1 bg-gradient-to-r from-blue-400 to-blue-600 mx-auto rounded-full' />
@@ -93,7 +93,7 @@ export default function PlacementOverviewSection({
 									initial={{ opacity: 0, y: 30 }}
 									whileInView={{ opacity: 1, y: 0 }}
 									transition={{ duration: 0.6, delay: index * 0.1 }}
-									className='bg-white rounded-2xl p-8 shadow-xl border border-gray-100'>
+									className='bg-white rounded-2xl p-4 sm:p-6 md:p-8 shadow-xl border border-gray-100'>
 									<div
 										className={`w-16 h-16 ${stat.iconColor} rounded-2xl flex items-center justify-center mx-auto mb-6 text-white`}>
 										<IconComponent className='w-8 h-8' />
@@ -120,7 +120,7 @@ export default function PlacementOverviewSection({
 						whileInView={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.8 }}
 						className='text-center max-w-4xl mx-auto mb-16'>
-						<h2 className='text-4xl md:text-5xl font-bold text-gray-900 mb-6'>
+						<h2 className='text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6'>
 							{data.missionTitle}
 						</h2>
 						<p className='text-xl text-gray-600 leading-relaxed'>
@@ -191,7 +191,7 @@ export default function PlacementOverviewSection({
 						whileInView={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.8 }}
 						className='text-center mb-16'>
-						<h2 className='text-4xl md:text-5xl font-bold text-gray-900 mb-6'>
+						<h2 className='text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6'>
 							{data.servicesTitle}
 						</h2>
 						<p className='text-xl text-gray-600 max-w-3xl mx-auto'>
@@ -209,7 +209,7 @@ export default function PlacementOverviewSection({
 									initial={{ opacity: 0, y: 30 }}
 									whileInView={{ opacity: 1, y: 0 }}
 									transition={{ duration: 0.6, delay: index * 0.1 }}
-									className='bg-white rounded-2xl p-8 shadow-lg'>
+									className='bg-white rounded-2xl p-4 sm:p-6 md:p-8 shadow-lg'>
 									<div
 										className={`w-16 h-16 bg-gradient-to-r ${feature.iconColor} rounded-2xl flex items-center justify-center mb-6 text-white`}>
 										<IconComponent className='w-8 h-8' />
@@ -235,7 +235,7 @@ export default function PlacementOverviewSection({
 						whileInView={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.8 }}
 						className='text-center mb-16'>
-						<h2 className='text-4xl md:text-5xl font-bold text-gray-900 mb-6'>
+						<h2 className='text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6'>
 							{data.teamTitle}
 						</h2>
 						<p className='text-xl text-gray-600 max-w-3xl mx-auto'>
@@ -300,7 +300,7 @@ export default function PlacementOverviewSection({
 						whileInView={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.8 }}
 						className='text-center mb-16'>
-						<h2 className='text-4xl md:text-5xl font-bold text-gray-900 mb-6'>
+						<h2 className='text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6'>
 							{data.trainingTitle}
 						</h2>
 						<p className='text-xl text-gray-600 max-w-3xl mx-auto'>
@@ -318,7 +318,7 @@ export default function PlacementOverviewSection({
 									initial={{ opacity: 0, y: 30 }}
 									whileInView={{ opacity: 1, y: 0 }}
 									transition={{ duration: 0.6, delay: index * 0.1 }}
-									className='bg-white rounded-2xl p-8 shadow-lg'>
+									className='bg-white rounded-2xl p-4 sm:p-6 md:p-8 shadow-lg'>
 									<div
 										className={`w-16 h-16 bg-gradient-to-r ${area.iconColor} rounded-2xl flex items-center justify-center mx-auto mb-6 text-white`}>
 										<IconComponent className='w-8 h-8' />
@@ -351,7 +351,7 @@ export default function PlacementOverviewSection({
 						whileInView={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.8 }}
 						className='text-center mb-16'>
-						<h2 className='text-4xl md:text-5xl font-bold text-gray-900 mb-6'>
+						<h2 className='text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6'>
 							{data.achievementsTitle}
 						</h2>
 						<p className='text-xl text-gray-600 max-w-3xl mx-auto'>
@@ -408,7 +408,7 @@ export default function PlacementOverviewSection({
 						whileInView={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.8 }}
 						className='text-center mb-16'>
-						<h2 className='text-4xl md:text-5xl font-bold text-gray-900 mb-6'>
+						<h2 className='text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6'>
 							{data.highlightsTitle}
 						</h2>
 						<p className='text-xl text-gray-600 max-w-3xl mx-auto'>
@@ -459,7 +459,7 @@ export default function PlacementOverviewSection({
 						whileInView={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.8 }}
 						className='text-center text-white'>
-						<h2 className='text-4xl md:text-5xl font-bold mb-6'>
+						<h2 className='text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-6'>
 							{data.contactTitle}
 						</h2>
 						<p className='text-xl text-blue-200 mb-12 max-w-3xl mx-auto'>

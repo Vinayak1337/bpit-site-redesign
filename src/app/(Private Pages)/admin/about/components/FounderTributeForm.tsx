@@ -157,7 +157,7 @@ export default function FounderTributeForm({
 	return (
 		<Form {...form}>
 			<form
-				className='space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm max-h-[70vh] overflow-y-auto overflow-x-hidden'
+				className='space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm'
 				onSubmit={form.handleSubmit(handleSubmit)}>
 				<div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
 					<div>

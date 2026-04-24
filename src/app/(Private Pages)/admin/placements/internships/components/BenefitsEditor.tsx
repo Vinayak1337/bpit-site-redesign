@@ -28,7 +28,7 @@ export default function BenefitsEditor({ initialData, pageSlug }: BenefitsEditor
 	);
 
 	return (
-		<Editable label="Why Internships Section" formContent={formContent}>
+		<Editable label="Why Internships Section" presentation="dialog" formContent={formContent}>
 			<section className="py-20 bg-gradient-to-br from-gray-50 to-white">
 				<div className="container mx-auto px-4">
 					<motion.div

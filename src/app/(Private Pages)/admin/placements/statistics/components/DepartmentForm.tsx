@@ -104,8 +104,9 @@ export default function DepartmentForm({
 	}, [form, initialData, onChange, selectedYear]);
 
 	const onSubmit = async (values: DepartmentFormData) => {
+		setSaveStatus('saving');
 		const departmentStats = { ...(initialData.departmentStats || {}) };
-		const yearData: Record<string, any> = {};
+		const yearData: Record<string, import('@/app/(Private Pages)/actions/placement-statistics').DepartmentStat> = {};
 
 		values.departments.forEach(dept => {
 			yearData[dept.name] = {
@@ -125,18 +126,32 @@ export default function DepartmentForm({
 		});
 
 		if (result.success) {
-			alert('Department statistics updated successfully!');
+			setSaveStatus('saved');
+			setTimeout(() => setSaveStatus('idle'), 2000);
 		} else {
-			alert('Failed to update: ' + result.error);
+			setSaveStatus('error');
+			setTimeout(() => setSaveStatus('idle'), 3000);
 		}
 	};
+
+	const deptFields = form.watch('departments') || [];
+	const avgRate = deptFields.length > 0
+		? Math.round(deptFields.reduce((sum, d) => sum + (d.total > 0 ? (d.placed / d.total) * 100 : 0), 0) / deptFields.length)
+		: 0;
 
 	return (
 		<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6 p-6'>
 			<div className='flex items-center justify-between border-b pb-4'>
 				<div className='flex items-center space-x-3'>
 					<Building2 className='w-6 h-6 text-blue-600' />
-					<h3 className='text-2xl font-bold'>Department-wise Statistics</h3>
+					<div>
+						<h3 className='text-2xl font-bold'>Department-wise Statistics</h3>
+						{deptFields.length > 0 && (
+							<p className='text-sm text-gray-500 mt-0.5'>
+								{deptFields.length} departments • avg {avgRate}% placement rate
+							</p>
+						)}
+					</div>
 				</div>
 				<Select value={selectedYear} onValueChange={setSelectedYear}>
 					<SelectTrigger className='w-32'>

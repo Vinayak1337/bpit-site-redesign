@@ -20,8 +20,9 @@ import {
 	SelectTrigger,
 	SelectValue
 } from '@/components/ui/select';
-import type { MissionData } from '@/app/(Private Pages)/actions/vision-mission';
+import type { MissionData, ImpactStatColor } from '@/app/(Private Pages)/actions/vision-mission';
 import { updateMission } from '@/app/(Private Pages)/actions/vision-mission';
+import { IMPACT_STAT_COLOR_OPTIONS } from '@/app/(Private Pages)/actions/vision-mission-constants';
 import { SUPPORTED_ICON_NAMES } from '@/components/about/icons';
 
 type ObjectiveFormValue = {
@@ -97,11 +98,12 @@ const normalizeMission = (values: Partial<FormValues>): MissionData => {
 		}))
 		.filter(objective => objective.title.length > 0 && objective.description.length > 0);
 
+	const validImpactColors = new Set<string>(IMPACT_STAT_COLOR_OPTIONS);
 	const impactStats = (values.impactStats ?? [])
 		.map(stat => ({
 			number: (stat.number ?? '').trim(),
 			label: (stat.label ?? '').trim(),
-			color: (stat.color ?? '').trim() || 'text-green-600'
+			color: (validImpactColors.has(stat.color ?? '') ? stat.color : 'text-green-600') as ImpactStatColor
 		}))
 		.filter(stat => stat.number.length > 0 && stat.label.length > 0);
 
@@ -224,7 +226,7 @@ export default function MissionForm({
 	return (
 		<Form {...form}>
 			<form
-				className='space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm max-h-[70vh] overflow-y-auto overflow-x-hidden'
+				className='space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm'
 				onSubmit={form.handleSubmit(onSubmit)}>
 				
 				<div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
@@ -591,10 +593,19 @@ export default function MissionForm({
 										name={`impactStats.${index}.color`}
 										render={({ field }) => (
 											<FormItem>
-												<FormLabel>Color (Tailwind class)</FormLabel>
-												<FormControl>
-													<Input placeholder="text-green-600" {...field} />
-												</FormControl>
+												<FormLabel>Color</FormLabel>
+												<Select onValueChange={field.onChange} value={field.value}>
+													<FormControl>
+														<SelectTrigger>
+															<SelectValue placeholder='Select color' />
+														</SelectTrigger>
+													</FormControl>
+													<SelectContent>
+														{IMPACT_STAT_COLOR_OPTIONS.map(c => (
+															<SelectItem key={c} value={c}>{c}</SelectItem>
+														))}
+													</SelectContent>
+												</Select>
 												<FormMessage />
 											</FormItem>
 										)}

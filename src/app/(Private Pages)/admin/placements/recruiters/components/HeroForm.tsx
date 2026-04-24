@@ -9,7 +9,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { SUPPORTED_ICON_NAMES } from '@/components/about/icons';
 import { updateRecruitersData, type RecruitersData } from '@/app/(Private Pages)/actions/recruiters';
-import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
 
 const GRADIENT_OPTIONS = [
 	'from-blue-900 via-blue-800 to-blue-900',
@@ -61,8 +60,6 @@ export default function HeroForm({ initialData, pageSlug, onChange }: HeroFormPr
 		setSaveStatus('saving');
 		startTransition(async () => {
 			try {
-				const admin = await requireAdmin();
-
 				const updatedData: RecruitersData = {
 					...initialData,
 					hero: {
@@ -73,7 +70,7 @@ export default function HeroForm({ initialData, pageSlug, onChange }: HeroFormPr
 					}
 				};
 
-				await updateRecruitersData(updatedData, admin.id);
+				await updateRecruitersData(updatedData);
 				
 				if (onChange) {
 					onChange(updatedData);

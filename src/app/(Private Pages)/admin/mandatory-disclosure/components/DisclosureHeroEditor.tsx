@@ -22,7 +22,7 @@ export default function DisclosureHeroEditor({ initialData }: Props) {
 	);
 
 	return (
-		<Editable label='Mandatory Disclosure Hero' formContent={formContent}>
+		<Editable label='Mandatory Disclosure Hero' presentation='dialog' formContent={formContent}>
 			<DisclosureHeroSection data={previewData} />
 		</Editable>
 	);

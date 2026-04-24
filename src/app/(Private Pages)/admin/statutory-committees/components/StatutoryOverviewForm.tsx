@@ -1,16 +1,23 @@
 'use client';
 
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Trash2, Plus, Save, Loader2 } from 'lucide-react';
 import { updateStatutoryOverview, type StatutoryOverviewData } from '@/app/(Private Pages)/actions/statutory-committees';
 import { useTransition, useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
+const ICON_COLOR_OPTIONS = [
+	'text-blue-600', 'text-green-600', 'text-purple-600',
+	'text-orange-600', 'text-red-600', 'text-indigo-600',
+	'text-teal-600', 'text-pink-600', 'text-yellow-600', 'text-gray-600'
+] as const;
 
 const schema = z.object({
 	hero: z.object({
@@ -24,7 +31,7 @@ const schema = z.object({
 			icon: z.string().min(1, 'Icon is required'),
 			iconColor: z.string().min(1, 'Icon Color is required'),
 			href: z.string().min(1, 'Href is required'),
-			key: z.string().min(1, 'Key is required')
+			key: z.string()  // internal routing key — preserved via hidden input, not shown in UI
 		})
 	)
 });
@@ -120,7 +127,7 @@ export default function StatutoryOverviewForm({
 								icon: 'Shield',
 								iconColor: 'text-blue-600',
 								href: '',
-								key: ''
+								key: ''  // auto-set based on href when saved
 							})
 						}>
 						<Plus className='w-4 h-4 mr-2' />
@@ -153,17 +160,30 @@ export default function StatutoryOverviewForm({
 											<p className='text-red-500 text-sm mt-1'>{errors.committees[index]?.title?.message}</p>
 										)}
 									</div>
-									<div>
-										<Label>Key (Unique ID)</Label>
-										<Input {...register(`committees.${index}.key`)} placeholder="e.g. anti-ragging" />
-									</div>
+									{/* key is a developer-only routing field — hidden from admin UI */}
+									<input type='hidden' {...register(`committees.${index}.key`)} />
 									<div>
 										<Label>Icon Name (Lucide)</Label>
 										<Input {...register(`committees.${index}.icon`)} placeholder="e.g. UserX" />
 									</div>
 									<div>
-										<Label>Icon Color Class</Label>
-										<Input {...register(`committees.${index}.iconColor`)} placeholder="e.g. text-red-600" />
+										<Label>Icon Color</Label>
+										<Controller
+											control={control}
+											name={`committees.${index}.iconColor`}
+											render={({ field }) => (
+												<Select onValueChange={field.onChange} value={field.value}>
+													<SelectTrigger>
+														<SelectValue placeholder='Select color' />
+													</SelectTrigger>
+													<SelectContent>
+														{ICON_COLOR_OPTIONS.map(c => (
+															<SelectItem key={c} value={c}>{c}</SelectItem>
+														))}
+													</SelectContent>
+												</Select>
+											)}
+										/>
 									</div>
 									<div className='md:col-span-2'>
 										<Label>Link Href</Label>

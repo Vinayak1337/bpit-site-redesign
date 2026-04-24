@@ -71,7 +71,7 @@ export default function Editable({
 				<Sheet open={open} onOpenChange={setOpen}>
 					<SheetContent
 						side='right'
-						className={`w-full overflow-y-auto sm:max-w-md ${contentClassName ?? ''}`}>
+						className={`w-full overflow-y-auto sm:max-w-xl ${contentClassName ?? ''}`}>
 						<SheetHeader>
 							<SheetTitle>Edit: {label}</SheetTitle>
 						</SheetHeader>

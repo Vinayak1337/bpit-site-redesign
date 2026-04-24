@@ -19,10 +19,21 @@ const geistMono = Geist_Mono({
 	subsets: ['latin']
 });
 
+const SITE_URL =
+	process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bpitindia.com';
+const IS_PROD = process.env.NEXT_PUBLIC_SITE_ENV === 'production';
+
 export const metadata: Metadata = {
-	title: 'BPIT - Development Site',
+	metadataBase: new URL(SITE_URL),
+	title: {
+		default: 'BPIT — Bhagwan Parshuram Institute of Technology',
+		template: '%s | BPIT'
+	},
 	description:
-		'BPIT development site - not for public use. This is a redesign project.',
+		'Bhagwan Parshuram Institute of Technology (BPIT) — a GGSIPU-affiliated, NBA-accredited engineering college in Rohini, Delhi offering BTech programs in CSE, IT, ECE, EEE and allied branches.',
+	alternates: {
+		canonical: '/'
+	},
 	keywords: [
 		'BPIT',
 		'Bhagwan Parshuram Institute of Technology',
@@ -44,11 +55,14 @@ export const metadata: Metadata = {
 	creator: 'BPIT - Bhagwan Parshuram Institute of Technology',
 	publisher: 'BPIT',
 	robots: {
-		index: false,
-		follow: false,
+		index: IS_PROD,
+		follow: IS_PROD,
 		googleBot: {
-			index: false,
-			follow: false
+			index: IS_PROD,
+			follow: IS_PROD,
+			'max-snippet': -1,
+			'max-image-preview': 'large',
+			'max-video-preview': -1
 		}
 	},
 	formatDetection: {
@@ -69,21 +83,33 @@ export const metadata: Metadata = {
 	openGraph: {
 		type: 'website',
 		locale: 'en_US',
-		title: 'BPIT - Development Site',
-		description: 'BPIT development site - not for public use.',
-		siteName: 'BPIT Dev'
+		url: SITE_URL,
+		title: 'BPIT — Bhagwan Parshuram Institute of Technology',
+		description:
+			'GGSIPU-affiliated, NBA-accredited engineering college in Rohini, Delhi.',
+		siteName: 'BPIT',
+		images: [
+			{
+				url: '/og-default.jpg',
+				width: 1200,
+				height: 630,
+				alt: 'BPIT — Bhagwan Parshuram Institute of Technology'
+			}
+		]
 	},
 	twitter: {
 		card: 'summary_large_image',
-		title: 'BPIT - Development Site',
-		description: 'BPIT development site - not for public use.'
+		title: 'BPIT — Bhagwan Parshuram Institute of Technology',
+		description:
+			'GGSIPU-affiliated, NBA-accredited engineering college in Rohini, Delhi.',
+		images: ['/og-default.jpg']
 	},
 	appleWebApp: {
 		capable: true,
 		statusBarStyle: 'black-translucent',
 		title: 'BPIT'
 	},
-	applicationName: 'BPIT Dev'
+	applicationName: 'BPIT'
 };
 
 export const viewport: Viewport = {
@@ -95,9 +121,20 @@ export const viewport: Viewport = {
 
 const structuredData = {
 	'@context': 'https://schema.org',
-	'@type': 'WebSite',
-	name: 'BPIT Development Site',
-	description: 'Development version - not for public use'
+	'@type': 'CollegeOrUniversity',
+	name: 'Bhagwan Parshuram Institute of Technology',
+	alternateName: 'BPIT',
+	url: SITE_URL,
+	logo: `${SITE_URL}/BPIT-logo-transparent.png`,
+	description:
+		'GGSIPU-affiliated, NBA-accredited engineering college in Rohini, Delhi offering BTech programs in CSE, IT, ECE, EEE and allied branches.',
+	address: {
+		'@type': 'PostalAddress',
+		streetAddress: 'PSP-4, Sector-17, Rohini',
+		addressLocality: 'Delhi',
+		postalCode: '110089',
+		addressCountry: 'IN'
+	}
 };
 
 export default async function RootLayout({

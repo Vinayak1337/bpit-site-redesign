@@ -109,7 +109,7 @@ export default function AdmissionsFaqForm({
 			items:
 				initialData.items.length > 0
 					? initialData.items.map(item => ({
-					id: item.id,
+					id: item.id ?? createFaqItemId(),
 					question: item.question,
 					answer: item.answer,
 					category: item.category
@@ -161,7 +161,7 @@ export default function AdmissionsFaqForm({
 	return (
 		<Form {...form}>
 			<form
-				className='space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm max-h-[70vh] overflow-y-auto'
+				className='space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm'
 				onSubmit={form.handleSubmit(handleSubmit)}>
 				<div className='flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between'>
 					<div>
@@ -210,7 +210,7 @@ export default function AdmissionsFaqForm({
 										</Button>
 									</div>
 									<div className='grid gap-4 sm:grid-cols-2'>
-										<FormField control={form.control} name={`items.${index}.id`} render={({ field }) => <FormItem><FormLabel>ID</FormLabel><FormControl><Input type='number' {...field} onChange={event => field.onChange(Number(event.target.value))} /></FormControl></FormItem>} />
+										{/* id is auto-assigned — not shown to admin */}
 										<FormField control={form.control} name={`items.${index}.category`} render={({ field }) => <FormItem><FormLabel>Category</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
 										<FormField control={form.control} name={`items.${index}.question`} render={({ field }) => <FormItem className='sm:col-span-2'><FormLabel>Question</FormLabel><FormControl><Textarea rows={2} className='resize-none' {...field} /></FormControl></FormItem>} />
 										<FormField control={form.control} name={`items.${index}.answer`} render={({ field }) => <FormItem className='sm:col-span-2'><FormLabel>Answer</FormLabel><FormControl><Textarea rows={4} className='resize-none' {...field} /></FormControl></FormItem>} />

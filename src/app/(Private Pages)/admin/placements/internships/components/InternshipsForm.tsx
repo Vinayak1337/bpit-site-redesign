@@ -20,7 +20,6 @@ import {
 	SelectTrigger,
 	SelectValue
 } from '@/components/ui/select';
-import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
 import {
 	updateInternshipsData,
 	type InternshipsData,
@@ -218,8 +217,6 @@ export default function InternshipsForm({
 		setMessage('');
 		startTransition(async () => {
 			try {
-				const admin = await requireAdmin();
-
 				const dataToSubmit: InternshipsData = {
 					hero: values.hero as any,
 					stats: values.stats as any,
@@ -241,7 +238,7 @@ export default function InternshipsForm({
 					contact: values.contact as any
 				};
 
-				const result = await updateInternshipsData(dataToSubmit, admin.id);
+				const result = await updateInternshipsData(dataToSubmit);
 
 				if (result.success) {
 					setMessage('Saved');
@@ -260,7 +257,7 @@ export default function InternshipsForm({
 		<Form {...form}>
 			<form
 				onSubmit={form.handleSubmit(onSubmit)}
-				className='space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm max-h-[70vh] overflow-y-auto overflow-x-hidden'>
+				className='space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm'>
 				<div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
 					<div>
 						<h3 className='text-lg font-semibold text-slate-900'>

@@ -25,6 +25,7 @@ export default function AdmissionsOverviewEditor({ initialData, programCount }: 
 		<div className='space-y-8'>
 			<Editable
 				label='Overview Intro'
+				presentation='dialog'
 				formContent={
 					<AdmissionsOverviewForm
 						initialData={initial}
@@ -40,6 +41,7 @@ export default function AdmissionsOverviewEditor({ initialData, programCount }: 
 
 			<Editable
 				label='Overview Stats'
+				presentation='dialog'
 				formContent={
 					<AdmissionsOverviewForm
 						initialData={initial}
@@ -52,6 +54,7 @@ export default function AdmissionsOverviewEditor({ initialData, programCount }: 
 
 			<Editable
 				label='Overview Links'
+				presentation='dialog'
 				formContent={
 					<AdmissionsOverviewForm
 						initialData={initial}
@@ -64,6 +67,7 @@ export default function AdmissionsOverviewEditor({ initialData, programCount }: 
 
 			<Editable
 				label='Overview Departments'
+				presentation='dialog'
 				formContent={
 					<AdmissionsOverviewForm
 						initialData={initial}
@@ -76,6 +80,7 @@ export default function AdmissionsOverviewEditor({ initialData, programCount }: 
 
 			<Editable
 				label='Overview Notes'
+				presentation='dialog'
 				formContent={
 					<AdmissionsOverviewForm
 						initialData={initial}

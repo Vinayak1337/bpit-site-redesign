@@ -22,7 +22,7 @@ export default function AcademiaHeroEditor({ initialData, pageSlug }: Props) {
 	);
 
 	return (
-		<Editable label='Academia Hero' formContent={formContent}>
+		<Editable label='Academia Hero' presentation='dialog' formContent={formContent}>
 			<div className='border rounded-xl overflow-hidden bg-gray-50'>
 				<AcademiaHero data={data} />
 			</div>

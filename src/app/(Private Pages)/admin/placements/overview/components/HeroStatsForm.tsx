@@ -66,6 +66,19 @@ const COLOR_OPTIONS: string[] = [
 	'pink'
 ];
 
+const TEXT_COLOR_OPTIONS: string[] = [
+	'text-white',
+	'text-gray-900',
+	'text-gray-700',
+	'text-blue-600',
+	'text-blue-100',
+	'text-green-600',
+	'text-purple-600',
+	'text-orange-600',
+	'text-red-600',
+	'text-indigo-600'
+];
+
 const GRADIENT_OPTIONS: string[] = [
 	'bg-gradient-to-br from-blue-600 to-purple-600',
 	'bg-gradient-to-br from-green-600 to-blue-600',
@@ -272,9 +285,18 @@ export default function HeroStatsForm({
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>Icon Background Color</FormLabel>
-								<FormControl>
-									<Input placeholder='bg-blue-500' {...field} />
-								</FormControl>
+								<Select onValueChange={field.onChange} value={field.value}>
+									<FormControl>
+										<SelectTrigger>
+											<SelectValue placeholder='Select color' />
+										</SelectTrigger>
+									</FormControl>
+									<SelectContent>
+										{COLOR_OPTIONS.map(c => (
+											<SelectItem key={c} value={c}>{c}</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
 								<FormMessage />
 							</FormItem>
 						)}
@@ -286,9 +308,18 @@ export default function HeroStatsForm({
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>Text Color</FormLabel>
-								<FormControl>
-									<Input placeholder='text-white' {...field} />
-								</FormControl>
+								<Select onValueChange={field.onChange} value={field.value}>
+									<FormControl>
+										<SelectTrigger>
+											<SelectValue placeholder='Select text color' />
+										</SelectTrigger>
+									</FormControl>
+									<SelectContent>
+										{TEXT_COLOR_OPTIONS.map(c => (
+											<SelectItem key={c} value={c}>{c}</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
 								<FormMessage />
 							</FormItem>
 						)}
@@ -389,9 +420,18 @@ export default function HeroStatsForm({
 										render={({ field: colorField }) => (
 											<FormItem>
 												<FormLabel>Icon Color</FormLabel>
-												<FormControl>
-													<Input placeholder='bg-blue-500' {...colorField} />
-												</FormControl>
+												<Select onValueChange={colorField.onChange} value={colorField.value}>
+													<FormControl>
+														<SelectTrigger>
+															<SelectValue placeholder='Select color' />
+														</SelectTrigger>
+													</FormControl>
+													<SelectContent>
+														{COLOR_OPTIONS.map(c => (
+															<SelectItem key={c} value={c}>{c}</SelectItem>
+														))}
+													</SelectContent>
+												</Select>
 												<FormMessage />
 											</FormItem>
 										)}

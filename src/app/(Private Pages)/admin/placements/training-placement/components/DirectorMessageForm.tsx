@@ -16,6 +16,14 @@ const GRADIENT_OPTIONS = [
 	'from-green-500 to-green-700'
 ];
 
+const computeInitials = (name: string) =>
+	name
+		.split(/\s+/)
+		.filter(w => w.length > 1 && !/^(Prof\.|Dr\.|Mr\.|Ms\.|Mrs\.|Er\.)$/i.test(w))
+		.map(w => w[0].toUpperCase())
+		.slice(0, 2)
+		.join('') || name.slice(0, 2).toUpperCase();
+
 interface DirectorMessageFormProps {
 	initialData: TrainingPlacementData;
 	pageSlug: string;
@@ -30,7 +38,6 @@ export default function DirectorMessageForm({ initialData, pageSlug, onChange }:
 		defaultValues: {
 			name: initialData.directorMessage?.name || '',
 			position: initialData.directorMessage?.position || '',
-			initials: initialData.directorMessage?.initials || '',
 			gradientColor: initialData.directorMessage?.gradientColor || GRADIENT_OPTIONS[0],
 			message1: initialData.directorMessage?.message1 || '',
 			message2: initialData.directorMessage?.message2 || '',
@@ -47,7 +54,7 @@ export default function DirectorMessageForm({ initialData, pageSlug, onChange }:
 					directorMessage: {
 						name: values.name || '',
 						position: values.position || '',
-						initials: values.initials || '',
+						initials: computeInitials(values.name || ''),
 						gradientColor: values.gradientColor || GRADIENT_OPTIONS[0],
 						message1: values.message1 || '',
 						message2: values.message2 || '',
@@ -69,7 +76,7 @@ export default function DirectorMessageForm({ initialData, pageSlug, onChange }:
 					directorMessage: {
 						name: values.name,
 						position: values.position,
-						initials: values.initials,
+						initials: computeInitials(values.name),
 						gradientColor: values.gradientColor,
 						message1: values.message1,
 						message2: values.message2,
@@ -118,20 +125,6 @@ export default function DirectorMessageForm({ initialData, pageSlug, onChange }:
 								<FormLabel>Position</FormLabel>
 								<FormControl>
 									<Input {...field} placeholder='Director T&P' />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-
-					<FormField
-						control={form.control}
-						name='initials'
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Initials</FormLabel>
-								<FormControl>
-									<Input {...field} placeholder='AK' />
 								</FormControl>
 								<FormMessage />
 							</FormItem>

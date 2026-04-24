@@ -34,7 +34,7 @@ export default function ObjectivesEditor({ initialData, pageSlug }: ObjectivesEd
 	const getIcon = (iconName: string) => iconMap[iconName] || CheckCircle;
 
 	return (
-		<Editable label="T&P Cell Objectives" formContent={formContent}>
+		<Editable label="T&P Cell Objectives" presentation="dialog" formContent={formContent}>
 			{currentData.objectives && currentData.objectives.length > 0 ? (
 			<section className='py-20 bg-white'>
 				<div className='container mx-auto px-4'>

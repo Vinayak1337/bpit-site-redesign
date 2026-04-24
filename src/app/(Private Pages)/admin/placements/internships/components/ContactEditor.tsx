@@ -28,7 +28,7 @@ export default function ContactEditor({ initialData, pageSlug }: ContactEditorPr
 	);
 
 	return (
-		<Editable label="Need Guidance Section" formContent={formContent}>
+		<Editable label="Need Guidance Section" presentation="dialog" formContent={formContent}>
 			<section className={`py-20 bg-gradient-to-r ${currentData.contact.gradient} text-white`}>
 				<div className="container mx-auto px-4">
 					<motion.div

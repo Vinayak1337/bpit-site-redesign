@@ -1,8 +1,10 @@
 'use server';
+import 'server-only';
 
 import { revalidatePath } from 'next/cache';
 import prisma from '@/lib/prisma';
 import { createAuditLog } from '@/lib/audit';
+import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
 
 // TypeScript Interfaces
 export interface RecruiterHero {
@@ -83,10 +85,10 @@ export async function getRecruitersData(): Promise<RecruitersData | null> {
  * Update recruiters data in the database
  */
 export async function updateRecruitersData(
-	data: RecruitersData,
-	actorId: string
+	data: RecruitersData
 ): Promise<{ success: boolean; message?: string }> {
 	try {
+		const admin = await requireAdmin();
 		// Find the page
 		const page = await prisma.page.findUnique({
 			where: { slug: 'recruiters' },
@@ -106,14 +108,14 @@ export async function updateRecruitersData(
 			const component = page.components[0];
 			await prisma.component.update({
 				where: { id: component.id },
-				data: { data: data as any }
+				data: { data: data as unknown as import('@prisma/client').Prisma.InputJsonValue }
 			});
 		} else {
 			await prisma.component.create({
 				data: {
 					pageId: page.id,
 					key: 'recruiters-data',
-					data: data as any,
+					data: data as unknown as import('@prisma/client').Prisma.InputJsonValue,
 					order: 0
 				}
 			});
@@ -121,7 +123,7 @@ export async function updateRecruitersData(
 
 		// Create audit log
 		await createAuditLog({
-			actorId,
+			actorId: admin.id,
 			action: 'UPDATE',
 			resourceType: 'COMPONENT',
 			summary: `Updated recruiters data with ${data.recruiters.length} companies`
@@ -131,8 +133,7 @@ export async function updateRecruitersData(
 		revalidatePath('/placements/recruiters');
 
 		return { success: true };
-	} catch (error) {
-		console.error('Error updating recruiters data:', error);
+	} catch {
 		return { success: false, message: 'Failed to update recruiters data' };
 	}
 }

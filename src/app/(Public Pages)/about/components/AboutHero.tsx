@@ -32,8 +32,8 @@ const AboutHero = ({ data }: AboutHeroProps) => {
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.8 }}
 					className='text-center'>
-					<h1 className='text-4xl md:text-5xl font-bold mb-4'>{data.title}</h1>
-					<p className='text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto'>
+					<h1 className='text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4'>{data.title}</h1>
+					<p className='text-base sm:text-lg md:text-xl lg:text-2xl text-blue-100 max-w-3xl mx-auto'>
 						{data.subtitle}
 					</p>
 

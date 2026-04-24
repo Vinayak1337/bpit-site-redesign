@@ -26,6 +26,26 @@ import { SUPPORTED_ICON_NAMES } from '@/components/about/icons';
 import UploadButton from '@/components/cloudinary/upload-button';
 import { Plus, Trash2 } from 'lucide-react';
 
+const GRADIENT_OPTIONS = [
+	{ label: 'Blue', value: 'from-blue-500 to-blue-700' },
+	{ label: 'Green', value: 'from-green-500 to-green-700' },
+	{ label: 'Purple', value: 'from-purple-500 to-purple-700' },
+	{ label: 'Orange', value: 'from-orange-500 to-orange-700' },
+	{ label: 'Red', value: 'from-red-500 to-red-700' },
+	{ label: 'Indigo', value: 'from-indigo-500 to-indigo-700' },
+	{ label: 'Teal', value: 'from-teal-500 to-teal-700' },
+	{ label: 'Pink', value: 'from-pink-500 to-pink-700' },
+];
+
+const TEXT_COLOR_OPTIONS = [
+	{ label: 'White', value: 'text-white' },
+	{ label: 'Dark', value: 'text-gray-900' },
+	{ label: 'Blue', value: 'text-blue-600' },
+	{ label: 'Light Blue', value: 'text-blue-100' },
+	{ label: 'Green', value: 'text-green-600' },
+	{ label: 'Purple', value: 'text-purple-600' },
+];
+
 type FeatureFormValue = {
 	id: string;
 	icon: string;
@@ -364,12 +384,18 @@ export default function ServicesTeamForm({
 										render={({ field: colorField }) => (
 											<FormItem>
 												<FormLabel>Icon Color</FormLabel>
-												<FormControl>
-													<Input
-														placeholder='from-blue-500 to-blue-700'
-														{...colorField}
-													/>
-												</FormControl>
+												<Select onValueChange={colorField.onChange} value={colorField.value ?? ''}>
+													<FormControl>
+														<SelectTrigger>
+															<SelectValue placeholder='Select gradient' />
+														</SelectTrigger>
+													</FormControl>
+													<SelectContent>
+														{GRADIENT_OPTIONS.map(opt => (
+															<SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+														))}
+													</SelectContent>
+												</Select>
 												<FormMessage />
 											</FormItem>
 										)}
@@ -576,12 +602,18 @@ export default function ServicesTeamForm({
 										render={({ field: textColorField }) => (
 											<FormItem>
 												<FormLabel>Initials Text Color</FormLabel>
-												<FormControl>
-													<Input
-														placeholder='e.g. text-white'
-														{...textColorField}
-													/>
-												</FormControl>
+												<Select onValueChange={textColorField.onChange} value={textColorField.value}>
+													<FormControl>
+														<SelectTrigger>
+															<SelectValue placeholder='Select text color' />
+														</SelectTrigger>
+													</FormControl>
+													<SelectContent>
+														{TEXT_COLOR_OPTIONS.map(opt => (
+															<SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+														))}
+													</SelectContent>
+												</Select>
 												<FormMessage />
 											</FormItem>
 										)}

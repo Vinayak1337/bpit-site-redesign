@@ -20,7 +20,7 @@ const aboutHeroSchema = z.object({
 	backgroundImage: z.string().url().optional().or(z.literal('')).or(z.null())
 });
 
-const STAT_COLOR_VALUES = ['green', 'purple', 'blue'] as const;
+const STAT_COLOR_VALUES = ['green', 'purple', 'blue', 'orange', 'red', 'indigo'] as const;
 const iconStringSchema = z.string().min(1);
 
 const aboutStatSchema = z.object({

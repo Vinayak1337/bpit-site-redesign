@@ -90,7 +90,7 @@ export default function StudentsEditor({ initialData, pageSlug }: StudentsEditor
 	);
 
 	return (
-		<Editable label="Top Placed Students Section" formContent={formContent}>
+		<Editable label="Top Placed Students Section" presentation="dialog" formContent={formContent}>
 			<section className='py-16 bg-white -mt-10 relative z-20'>
 				<div className='container mx-auto px-4'>
 					<motion.div

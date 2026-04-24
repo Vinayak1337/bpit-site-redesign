@@ -37,11 +37,11 @@ const VisionMissionHero = () => {
 						<Compass className='w-10 h-10 text-white' />
 					</motion.div>
 
-					<h1 className='mb-6 bg-gradient-to-r from-white to-blue-100 bg-clip-text text-5xl font-bold text-transparent md:text-6xl'>
+					<h1 className='mb-6 bg-gradient-to-r from-white to-blue-100 bg-clip-text text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-transparent'>
 						{title}
 					</h1>
 
-					<p className='mb-8 text-xl leading-relaxed text-slate-200 md:text-2xl'>
+					<p className='mb-8 text-base sm:text-lg md:text-xl lg:text-2xl leading-relaxed text-slate-200'>
 						{subtitle}
 					</p>
 

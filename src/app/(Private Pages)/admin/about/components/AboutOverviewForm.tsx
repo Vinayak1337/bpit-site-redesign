@@ -52,7 +52,10 @@ type Props = {
 const COLOR_OPTIONS: AboutOverviewData['stats'][number]['color'][] = [
 	'blue',
 	'green',
-	'purple'
+	'purple',
+	'orange',
+	'red',
+	'indigo'
 ];
 
 const FALLBACK_ICON = 'GraduationCap';
@@ -71,13 +74,14 @@ const normalizeOverview = (values: Partial<FormValues>): AboutOverviewData => {
 			icon: stat.icon?.trim().length ? stat.icon.trim() : FALLBACK_ICON,
 			value: (stat.value ?? '').trim(),
 			label: (stat.label ?? '').trim(),
-			color: COLOR_OPTIONS.includes(stat.color ?? 'blue')
-				? stat.color ?? 'blue'
-				: 'blue'
+			color: (COLOR_OPTIONS as string[]).includes(stat.color ?? 'blue')
+				? (stat.color ?? 'blue') as typeof COLOR_OPTIONS[number]
+				: 'blue' as const
 		}))
 		.filter(stat => stat.value.length > 0 && stat.label.length > 0);
 
 	const headerImageValue = (values.headerImage ?? '').trim();
+
 
 	return {
 		header: {
@@ -163,7 +167,7 @@ export default function AboutOverviewForm({
 	return (
 		<Form {...form}>
 			<form
-				className='space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm max-h-[70vh] overflow-y-auto overflow-x-hidden'
+				className='space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm'
 				onSubmit={form.handleSubmit(handleSubmit)}>
 				<div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
 					<div>

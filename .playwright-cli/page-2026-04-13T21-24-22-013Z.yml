@@ -1,0 +1,350 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - link "011-2757 1080" [ref=e6] [cursor=pointer]:
+        - /url: tel:01127571080
+        - img [ref=e7]
+        - generic [ref=e9]: 011-2757 1080
+      - link "bpitindia@yahoo.com" [ref=e10] [cursor=pointer]:
+        - /url: mailto:bpitindia@yahoo.com
+        - img [ref=e11]
+        - generic [ref=e14]: bpitindia@yahoo.com
+      - link "PSP-4, Sector-17, Rohini, New Delhi" [ref=e15] [cursor=pointer]:
+        - /url: https://www.google.com/maps/search/?api=1&query=PSP-4%2C%20Sector-17%2C%20Rohini%2C%20New%20Delhi
+        - img [ref=e16]
+        - generic [ref=e19]: PSP-4, Sector-17, Rohini, New Delhi
+    - generic [ref=e20]: NBA Accredited B.Tech Programs
+  - generic [ref=e22]:
+    - generic [ref=e24]:
+      - img [ref=e25]
+      - generic [ref=e28]: "Important Announcements:"
+    - generic [ref=e30]:
+      - link "Admission 2024-25 Session Open - Apply Now" [ref=e31] [cursor=pointer]:
+        - /url: /admissions/apply
+      - link "Placement Drive 2024 - Register Today" [ref=e32] [cursor=pointer]:
+        - /url: /placements/register
+      - link "Annual Tech Fest \"INNOVATE 2024\" - March 15-17" [ref=e33] [cursor=pointer]:
+        - /url: /events/tech-fest
+      - link "Library New Books Collection Available" [ref=e34] [cursor=pointer]:
+        - /url: /academia/library
+      - link "Scholarship Applications Open - Merit & Need Based" [ref=e35] [cursor=pointer]:
+        - /url: /admissions/scholarship
+      - link [ref=e36] [cursor=pointer]:
+        - /url: /admissions/apply
+        - text: Admission 2024-25 Session Open - Apply Now
+      - link [ref=e37] [cursor=pointer]:
+        - /url: /placements/register
+        - text: Placement Drive 2024 - Register Today
+      - link [ref=e38] [cursor=pointer]:
+        - /url: /events/tech-fest
+        - text: Annual Tech Fest "INNOVATE 2024" - March 15-17
+      - link [ref=e39] [cursor=pointer]:
+        - /url: /academia/library
+        - text: Library New Books Collection Available
+      - link [ref=e40] [cursor=pointer]:
+        - /url: /admissions/scholarship
+        - text: Scholarship Applications Open - Merit & Need Based
+  - banner [ref=e41]:
+    - generic [ref=e43]:
+      - link "BPIT Logo" [ref=e44] [cursor=pointer]:
+        - /url: /
+        - img "BPIT Logo" [ref=e46]
+      - generic [ref=e47]:
+        - navigation "Main" [ref=e48]:
+          - list [ref=e50]:
+            - listitem [ref=e51]:
+              - button "About BPIT" [ref=e52] [cursor=pointer]:
+                - text: About BPIT
+                - img [ref=e53]
+            - listitem [ref=e55]:
+              - button "Admissions" [ref=e56] [cursor=pointer]:
+                - text: Admissions
+                - img [ref=e57]
+            - listitem [ref=e59]:
+              - button "Academics" [ref=e60] [cursor=pointer]:
+                - text: Academics
+                - img [ref=e61]
+            - listitem [ref=e63]:
+              - button "Departments" [ref=e64] [cursor=pointer]:
+                - text: Departments
+                - img [ref=e65]
+        - navigation "Main" [ref=e67]:
+          - list [ref=e69]:
+            - listitem [ref=e70]:
+              - button "Placements" [ref=e71] [cursor=pointer]:
+                - text: Placements
+                - img [ref=e72]
+            - listitem [ref=e74]:
+              - button "Student Life" [ref=e75] [cursor=pointer]:
+                - text: Student Life
+                - img [ref=e76]
+            - listitem [ref=e78]:
+              - button "Student Portal" [ref=e79] [cursor=pointer]:
+                - text: Student Portal
+                - img [ref=e80]
+        - button "Enquire Now" [ref=e82] [cursor=pointer]:
+          - generic [ref=e83]: Enquire Now
+  - main [ref=e84]:
+    - generic [ref=e87]:
+      - heading "Academia" [level=1] [ref=e88]
+      - paragraph [ref=e89]: Explore our academic resources, syllabi, notices, and calendar for comprehensive educational support
+    - generic [ref=e91]:
+      - generic [ref=e94]:
+        - link "Notices & Circulars" [ref=e96] [cursor=pointer]:
+          - /url: /academia/notices-circulars
+          - generic [ref=e97]:
+            - img [ref=e99]
+            - generic [ref=e102]: Notices & Circulars
+            - img [ref=e103]
+        - link "Syllabus & Ordinance" [ref=e106] [cursor=pointer]:
+          - /url: /academia/syllabus-ordinance
+          - generic [ref=e107]:
+            - img [ref=e109]
+            - generic [ref=e112]: Syllabus & Ordinance
+            - img [ref=e113]
+        - link "Academic Calendar" [ref=e116] [cursor=pointer]:
+          - /url: /academia/academic-calendar
+          - generic [ref=e117]:
+            - img [ref=e119]
+            - generic [ref=e124]: Academic Calendar
+            - img [ref=e125]
+      - generic [ref=e130]:
+        - generic [ref=e131]:
+          - heading "Academic Excellence at BPIT" [level=1] [ref=e132]
+          - paragraph [ref=e133]: Discover our comprehensive academic resources, programs, and support systems designed to foster innovation and excellence in engineering education.
+        - generic [ref=e134]:
+          - generic [ref=e135]:
+            - img [ref=e137]
+            - generic [ref=e140]: "8"
+            - generic [ref=e141]: Academic Departments
+          - generic [ref=e142]:
+            - img [ref=e144]
+            - generic [ref=e149]: 2000+
+            - generic [ref=e150]: Students Enrolled
+          - generic [ref=e151]:
+            - img [ref=e153]
+            - generic [ref=e156]: 100+
+            - generic [ref=e157]: Faculty Members
+          - generic [ref=e158]:
+            - img [ref=e160]
+            - generic [ref=e166]: "12"
+            - generic [ref=e167]: B.Tech Programs
+        - generic [ref=e168]:
+          - heading "Our Academic Mission" [level=2] [ref=e169]
+          - paragraph [ref=e170]: BPIT is committed to providing quality technical education that prepares students for successful careers in engineering and technology. Our academic programs are designed to combine theoretical knowledge with practical application, ensuring graduates are industry-ready and capable of contributing to technological advancement.
+        - generic [ref=e171]:
+          - link "Notices & Circulars Stay updated with the latest academic notices and circulars" [ref=e172] [cursor=pointer]:
+            - /url: /academia/notices-circulars
+            - generic [ref=e173]:
+              - img [ref=e175]
+              - generic [ref=e178]:
+                - heading "Notices & Circulars" [level=3] [ref=e179]
+                - paragraph [ref=e180]: Stay updated with the latest academic notices and circulars
+          - link "Syllabus & Ordinance Access detailed syllabi and academic ordinances" [ref=e181] [cursor=pointer]:
+            - /url: /academia/syllabus-ordinance
+            - generic [ref=e182]:
+              - img [ref=e184]
+              - generic [ref=e187]:
+                - heading "Syllabus & Ordinance" [level=3] [ref=e188]
+                - paragraph [ref=e189]: Access detailed syllabi and academic ordinances
+          - link "Academic Calendar View important academic dates and schedules" [ref=e190] [cursor=pointer]:
+            - /url: /academia/academic-calendar
+            - generic [ref=e191]:
+              - img [ref=e193]
+              - generic [ref=e198]:
+                - heading "Academic Calendar" [level=3] [ref=e199]
+                - paragraph [ref=e200]: View important academic dates and schedules
+        - generic [ref=e201]:
+          - heading "Academic Departments" [level=2] [ref=e202]
+          - generic [ref=e203]:
+            - generic [ref=e207]: Computer Science & Engineering
+            - generic [ref=e211]: Electronics & Communication
+            - generic [ref=e215]: Mechanical Engineering
+            - generic [ref=e219]: Civil Engineering
+            - generic [ref=e223]: Electrical Engineering
+            - generic [ref=e227]: Information Technology
+            - generic [ref=e231]: Applied Mathematics
+            - generic [ref=e235]: Physics & Chemistry
+        - generic [ref=e236]:
+          - heading "Important Academic Information" [level=3] [ref=e237]
+          - list [ref=e238]:
+            - listitem [ref=e239]:
+              - generic [ref=e240]: •
+              - generic [ref=e241]: All academic notices and updates are published in the Notices & Circulars section
+            - listitem [ref=e242]:
+              - generic [ref=e243]: •
+              - generic [ref=e244]: Semester syllabi and examination schedules are available in Syllabus & Ordinance
+            - listitem [ref=e245]:
+              - generic [ref=e246]: •
+              - generic [ref=e247]: Academic calendar contains all important dates for the academic year
+            - listitem [ref=e248]:
+              - generic [ref=e249]: •
+              - generic [ref=e250]: Students are advised to regularly check these sections for updates
+  - contentinfo [ref=e251]:
+    - generic [ref=e257]:
+      - generic [ref=e258]:
+        - generic [ref=e259]:
+          - img [ref=e261]
+          - generic [ref=e269]:
+            - heading "Bhagwan Parshuram Institute of Technology" [level=2] [ref=e270]
+            - paragraph [ref=e271]: Excellence in Engineering Education
+        - generic [ref=e272]:
+          - generic [ref=e273]:
+            - img [ref=e275]
+            - generic [ref=e280]: "2007"
+            - generic [ref=e281]: Established
+          - generic [ref=e282]:
+            - img [ref=e284]
+            - generic [ref=e289]: 1000+
+            - generic [ref=e290]: Students
+          - generic [ref=e291]:
+            - img [ref=e293]
+            - generic [ref=e296]: NBA
+            - generic [ref=e297]: Accredited
+          - generic [ref=e298]:
+            - img [ref=e300]
+            - generic [ref=e307]: 95%+
+            - generic [ref=e308]: Placement
+      - generic [ref=e309]:
+        - generic [ref=e310]:
+          - heading "Quick Links" [level=3] [ref=e311]
+          - generic [ref=e312]:
+            - link "About BPIT" [ref=e314] [cursor=pointer]:
+              - /url: /about
+              - img [ref=e316]
+              - generic [ref=e324]: About BPIT
+              - img [ref=e325]
+            - link "Admissions" [ref=e328] [cursor=pointer]:
+              - /url: /admissions/process
+              - img [ref=e330]
+              - generic [ref=e334]: Admissions
+              - img [ref=e335]
+            - link "Academics" [ref=e338] [cursor=pointer]:
+              - /url: /academia/academic-calendar
+              - img [ref=e340]
+              - generic [ref=e343]: Academics
+              - img [ref=e344]
+            - link "Placements" [ref=e347] [cursor=pointer]:
+              - /url: /placements/overview
+              - img [ref=e349]
+              - generic [ref=e356]: Placements
+              - img [ref=e357]
+            - link "Student Life" [ref=e360] [cursor=pointer]:
+              - /url: /student-life/campus-facilities
+              - img [ref=e362]
+              - generic [ref=e367]: Student Life
+              - img [ref=e368]
+            - link "Statutory Committees" [ref=e371] [cursor=pointer]:
+              - /url: /statutory-committees
+              - img [ref=e373]
+              - generic [ref=e375]: Statutory Committees
+              - img [ref=e376]
+        - generic [ref=e378]:
+          - heading "Departments" [level=3] [ref=e379]
+          - generic [ref=e380]:
+            - link "CSE Computer Science & Engineering Programs" [ref=e382] [cursor=pointer]:
+              - /url: https://cse.bpitindia.ac.in
+              - generic [ref=e384]:
+                - generic [ref=e385]: CSE
+                - generic [ref=e386]:
+                  - generic [ref=e387]: Computer Science & Engineering
+                  - generic [ref=e388]: Programs
+            - link "IT Information Technology Programs" [ref=e390] [cursor=pointer]:
+              - /url: https://it.bpitindia.ac.in
+              - generic [ref=e392]:
+                - generic [ref=e393]: IT
+                - generic [ref=e394]:
+                  - generic [ref=e395]: Information Technology
+                  - generic [ref=e396]: Programs
+            - link "ECE Electronics & Communication Programs" [ref=e398] [cursor=pointer]:
+              - /url: https://ece.bpitindia.ac.in
+              - generic [ref=e400]:
+                - generic [ref=e401]: ECE
+                - generic [ref=e402]:
+                  - generic [ref=e403]: Electronics & Communication
+                  - generic [ref=e404]: Programs
+            - link "EEE Electrical & Electronics Programs" [ref=e406] [cursor=pointer]:
+              - /url: https://eee.bpitindia.ac.in
+              - generic [ref=e408]:
+                - generic [ref=e409]: EEE
+                - generic [ref=e410]:
+                  - generic [ref=e411]: Electrical & Electronics
+                  - generic [ref=e412]: Programs
+            - link "AS Applied Sciences Programs" [ref=e414] [cursor=pointer]:
+              - /url: https://applied-sciences.bpitindia.ac.in
+              - generic [ref=e416]:
+                - generic [ref=e417]: AS
+                - generic [ref=e418]:
+                  - generic [ref=e419]: Applied Sciences
+                  - generic [ref=e420]: Programs
+            - link "MBA Management Programs Programs" [ref=e422] [cursor=pointer]:
+              - /url: https://sba.bpitindia.ac.in
+              - generic [ref=e424]:
+                - generic [ref=e425]: MBA
+                - generic [ref=e426]:
+                  - generic [ref=e427]: Management Programs
+                  - generic [ref=e428]: Programs
+        - generic [ref=e429]:
+          - heading "Contact Info" [level=3] [ref=e430]
+          - generic [ref=e431]:
+            - link "Campus Address PSP-4, Sector-17, Rohini, New Delhi" [ref=e433] [cursor=pointer]:
+              - /url: https://www.google.com/maps/search/?api=1&query=PSP-4%2C%20Sector-17%2C%20Rohini%2C%20New%20Delhi
+              - generic [ref=e435]:
+                - img [ref=e437]
+                - generic [ref=e440]:
+                  - generic [ref=e441]: Campus Address
+                  - generic [ref=e442]: PSP-4, Sector-17, Rohini, New Delhi
+            - link "Phone Numbers 011-2757 1080, 011-2757 2900" [ref=e444] [cursor=pointer]:
+              - /url: tel:01127571080
+              - generic [ref=e446]:
+                - img [ref=e448]
+                - generic [ref=e450]:
+                  - generic [ref=e451]: Phone Numbers
+                  - generic [ref=e452]: 011-2757 1080, 011-2757 2900
+            - link "Email Address bpitindia@yahoo.com" [ref=e454] [cursor=pointer]:
+              - /url: mailto:bpitindia@yahoo.com
+              - generic [ref=e456]:
+                - img [ref=e458]
+                - generic [ref=e461]:
+                  - generic [ref=e462]: Email Address
+                  - generic [ref=e463]: bpitindia@yahoo.com
+        - generic [ref=e464]:
+          - heading "Stay Connected" [level=3] [ref=e465]
+          - generic [ref=e466]:
+            - generic [ref=e467]:
+              - heading "Get Updates" [level=4] [ref=e468]
+              - generic [ref=e469]:
+                - textbox "Email address" [ref=e470]:
+                  - /placeholder: Enter your email
+                - button "Subscribe" [ref=e471] [cursor=pointer]:
+                  - img
+                  - text: Subscribe
+            - generic [ref=e472]:
+              - heading "Follow Us" [level=4] [ref=e473]
+              - generic [ref=e474]:
+                - link "Visit BPIT on Instagram" [ref=e475] [cursor=pointer]:
+                  - /url: https://www.instagram.com/bpitindia/
+                  - img [ref=e476]
+                - link "Visit BPIT on LinkedIn" [ref=e480] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/in/bhagwan-parshuram-institute-of-technology-bpit-50358a178/
+                  - img [ref=e481]
+                - link "Visit BPIT on X (Twitter)" [ref=e485] [cursor=pointer]:
+                  - /url: https://x.com/BpitIndia
+                  - img [ref=e486]
+                - link "Visit BPIT on YouTube" [ref=e488] [cursor=pointer]:
+                  - /url: https://www.youtube.com/@bpitcampus
+                  - img [ref=e489]
+                - link "Visit BPIT on Facebook" [ref=e492] [cursor=pointer]:
+                  - /url: https://www.facebook.com/bpitindia
+                  - img [ref=e493]
+      - generic [ref=e496]:
+        - generic [ref=e497]:
+          - paragraph [ref=e498]: © 2026 Bhagwan Parshuram Institute of Technology. All rights reserved.
+          - paragraph [ref=e499]: Affiliated to GGSIPU | NBA Accredited | NAAC Certified
+        - generic [ref=e500]:
+          - link "Privacy Policy" [ref=e501] [cursor=pointer]:
+            - /url: /privacy-policy
+          - link "Terms of Service" [ref=e502] [cursor=pointer]:
+            - /url: /terms-of-service
+          - link "Sitemap" [ref=e503] [cursor=pointer]:
+            - /url: /sitemap.xml

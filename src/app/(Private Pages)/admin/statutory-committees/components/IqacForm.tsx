@@ -1,16 +1,23 @@
 'use client';
 
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Trash2, Plus, Save, Loader2 } from 'lucide-react';
 import { updateIqac, type IqacData } from '@/app/(Private Pages)/actions/statutory-committees';
 import { useTransition, useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
+const ICON_COLOR_OPTIONS = [
+	'text-blue-600', 'text-green-600', 'text-purple-600',
+	'text-orange-600', 'text-red-600', 'text-indigo-600',
+	'text-teal-600', 'text-pink-600', 'text-yellow-600', 'text-gray-600'
+] as const;
 
 const schema = z.object({
 	// Hero removed as it inherits from parent layout
@@ -185,7 +192,21 @@ export default function IqacForm({
 								<div><Label>Title</Label><Input {...register(`objectives.${index}.title`)} /></div>
 								<div className="grid grid-cols-2 gap-2">
 									<div><Label>Icon</Label><Input {...register(`objectives.${index}.icon`)} /></div>
-									<div><Label>Color</Label><Input {...register(`objectives.${index}.iconColor`)} /></div>
+									<div>
+									<Label>Color</Label>
+									<Controller
+										control={control}
+										name={`objectives.${index}.iconColor`}
+										render={({ field }) => (
+											<Select onValueChange={field.onChange} value={field.value}>
+												<SelectTrigger><SelectValue placeholder='Select color' /></SelectTrigger>
+												<SelectContent>
+													{ICON_COLOR_OPTIONS.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+												</SelectContent>
+											</Select>
+										)}
+									/>
+								</div>
 								</div>
 								<div><Label>Description</Label><Textarea {...register(`objectives.${index}.description`)} rows={2} /></div>
 							</CardContent>
@@ -270,7 +291,21 @@ export default function IqacForm({
 								<div><Label>Title</Label><Input {...register(`initiatives.${index}.title`)} /></div>
 								<div className="grid grid-cols-2 gap-2">
 									<div><Label>Icon</Label><Input {...register(`initiatives.${index}.icon`)} /></div>
-									<div><Label>Color</Label><Input {...register(`initiatives.${index}.iconColor`)} /></div>
+									<div>
+									<Label>Color</Label>
+									<Controller
+										control={control}
+										name={`initiatives.${index}.iconColor`}
+										render={({ field }) => (
+											<Select onValueChange={field.onChange} value={field.value}>
+												<SelectTrigger><SelectValue placeholder='Select color' /></SelectTrigger>
+												<SelectContent>
+													{ICON_COLOR_OPTIONS.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+												</SelectContent>
+											</Select>
+										)}
+									/>
+								</div>
 								</div>
 								<div><Label>Description</Label><Textarea {...register(`initiatives.${index}.description`)} rows={2} /></div>
 							</CardContent>

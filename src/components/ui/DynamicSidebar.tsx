@@ -4,7 +4,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { ChevronRight, ChevronLeft } from 'lucide-react';
+import { ChevronRight, ChevronLeft, ChevronUp, ChevronDown } from 'lucide-react';
 import * as Icons from 'lucide-react';
 
 interface NavItem {
@@ -31,8 +31,11 @@ interface DynamicSidebarProps {
 const DynamicSidebar = ({ navItems, theme }: DynamicSidebarProps) => {
 	const pathname = usePathname();
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
+	const desktopScrollRef = useRef<HTMLDivElement>(null);
 	const [showLeftArrow, setShowLeftArrow] = useState(false);
 	const [showRightArrow, setShowRightArrow] = useState(false);
+	const [showUpArrow, setShowUpArrow] = useState(false);
+	const [showDownArrow, setShowDownArrow] = useState(false);
 
 	const isActive = (href: string) => {
 		const basePath = navItems[0]?.href || '';
@@ -83,6 +86,38 @@ const DynamicSidebar = ({ navItems, theme }: DynamicSidebarProps) => {
 		return () => clearTimeout(timer);
 	}, [navItems]);
 
+	// Desktop vertical scroll tracking
+	useEffect(() => {
+		const checkVerticalScroll = () => {
+			if (!desktopScrollRef.current) return;
+			const { scrollTop, scrollHeight, clientHeight } = desktopScrollRef.current;
+			setShowUpArrow(scrollTop > 0);
+			setShowDownArrow(scrollTop < scrollHeight - clientHeight - 1);
+		};
+
+		const container = desktopScrollRef.current;
+		if (container) {
+			checkVerticalScroll();
+			container.addEventListener('scroll', checkVerticalScroll);
+			const resizeObserver = new ResizeObserver(checkVerticalScroll);
+			resizeObserver.observe(container);
+			return () => {
+				container.removeEventListener('scroll', checkVerticalScroll);
+				resizeObserver.disconnect();
+			};
+		}
+	}, [navItems]);
+
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			if (desktopScrollRef.current) {
+				const { scrollHeight, clientHeight } = desktopScrollRef.current;
+				setShowDownArrow(scrollHeight > clientHeight);
+			}
+		}, 100);
+		return () => clearTimeout(timer);
+	}, [navItems]);
+
 	// Scroll functions
 	const scrollLeft = () => {
 		if (scrollContainerRef.current) {
@@ -93,6 +128,18 @@ const DynamicSidebar = ({ navItems, theme }: DynamicSidebarProps) => {
 	const scrollRight = () => {
 		if (scrollContainerRef.current) {
 			scrollContainerRef.current.scrollBy({ left: 200, behavior: 'smooth' });
+		}
+	};
+
+	const scrollUp = () => {
+		if (desktopScrollRef.current) {
+			desktopScrollRef.current.scrollBy({ top: -160, behavior: 'smooth' });
+		}
+	};
+
+	const scrollDown = () => {
+		if (desktopScrollRef.current) {
+			desktopScrollRef.current.scrollBy({ top: 160, behavior: 'smooth' });
 		}
 	};
 
@@ -190,8 +237,34 @@ const DynamicSidebar = ({ navItems, theme }: DynamicSidebarProps) => {
 				animate={{ opacity: 1, x: 0 }}
 				transition={{ duration: 0.6 }}
 				className='hidden lg:block lg:w-80 flex-shrink-0'>
-				<div className='bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden sticky top-25'>
-					<div className='p-2 overflow-y-auto max-h-[50vh] blue-scrollbar'>
+				<div className='bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden sticky top-25 relative'>
+					{/* Up Arrow */}
+					{showUpArrow && (
+						<motion.button
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
+							exit={{ opacity: 0 }}
+							onClick={scrollUp}
+							className='absolute top-2 left-1/2 -translate-x-1/2 z-20 w-10 h-10 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full shadow-xl border-2 border-blue-300 flex items-center justify-center text-white hover:from-blue-600 hover:to-blue-700 hover:scale-110 transition-all duration-300 active:scale-95'
+							aria-label='Scroll up'>
+							<ChevronUp className='w-5 h-5' />
+						</motion.button>
+					)}
+
+					{/* Down Arrow */}
+					{showDownArrow && (
+						<motion.button
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
+							exit={{ opacity: 0 }}
+							onClick={scrollDown}
+							className='absolute bottom-2 left-1/2 -translate-x-1/2 z-20 w-10 h-10 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full shadow-xl border-2 border-blue-300 flex items-center justify-center text-white hover:from-blue-600 hover:to-blue-700 hover:scale-110 transition-all duration-300 active:scale-95'
+							aria-label='Scroll down'>
+							<ChevronDown className='w-5 h-5' />
+						</motion.button>
+					)}
+
+					<div ref={desktopScrollRef} className='p-2 overflow-y-auto max-h-[50vh] blue-scrollbar'>
 						{navItems.map((item, index) => (
 							<motion.div
 								key={item.id}

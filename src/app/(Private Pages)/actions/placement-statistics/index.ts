@@ -1,7 +1,9 @@
 'use server';
+import 'server-only';
 
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
+import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
 
 export interface YearStats {
 	placementRate: number;
@@ -94,6 +96,7 @@ export async function updatePlacementStatistics(
 	data: PlacementStatisticsData
 ): Promise<{ success: boolean; error?: string }> {
 	try {
+		await requireAdmin();
 		const page = await prisma.page.findUnique({
 			where: { slug: 'placement-statistics' },
 			include: {

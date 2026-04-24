@@ -137,7 +137,7 @@ export default function MetricsForm({ initialData, pageSlug, onChange }: Metrics
 	};
 
 	const addYearStats = () => {
-		const newYear = `20${24 - yearFields.length}`;
+		const newYear = String(new Date().getFullYear() - yearFields.length);
 		appendYear({
 			year: newYear,
 			placementRate: 0,

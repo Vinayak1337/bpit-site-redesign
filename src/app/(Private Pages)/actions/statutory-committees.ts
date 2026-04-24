@@ -1,4 +1,5 @@
 'use server';
+import 'server-only';
 
 import { z } from 'zod';
 import { revalidatePath, unstable_cache } from 'next/cache';
@@ -22,7 +23,8 @@ const committeeSchema = z.object({
 	icon: z.string().min(1),
 	iconColor: z.string().min(1),
 	href: z.string().min(1),
-	key: z.string().min(1)
+	// key is an internal routing constant — preserved from stored data, not editable by admins
+	key: z.string().optional().default('')
 });
 
 const memberSchema = z.object({
@@ -184,8 +186,8 @@ export async function updateStatutoryOverview(data: StatutoryOverviewData, slug 
 
 		await prisma.component.upsert({
 			where: { pageId_order: { pageId: page.id, order: 1 } },
-			update: { data: data as any, key: 'STATUTORY_OVERVIEW_DATA' },
-			create: { pageId: page.id, data: data as any, order: 1, key: 'STATUTORY_OVERVIEW_DATA' }
+			update: { data: data as unknown as import('@prisma/client').Prisma.InputJsonValue, key: 'STATUTORY_OVERVIEW_DATA' },
+			create: { pageId: page.id, data: data as unknown as import('@prisma/client').Prisma.InputJsonValue, order: 1, key: 'STATUTORY_OVERVIEW_DATA' }
 		});
 
 		revalidatePath('/statutory-committees');

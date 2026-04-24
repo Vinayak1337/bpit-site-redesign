@@ -41,7 +41,7 @@ export function AntiRaggingHeroEditor({ initialData, pageSlug }: EditorProps) {
 	);
 
 	return (
-		<Editable label='Hero Section' formContent={formContent}>
+		<Editable label='Hero Section' presentation='dialog' formContent={formContent}>
 			<AntiRaggingHeroSection data={previewData.hero} />
 		</Editable>
 	);
@@ -66,7 +66,7 @@ export function AntiRaggingDefinitionEditor({
 	);
 
 	return (
-		<Editable label='Definition & Scope' formContent={formContent}>
+		<Editable label='Definition & Scope' presentation='dialog' formContent={formContent}>
 			<AntiRaggingDefinitionSection
 				data={previewData.definition}
 				heroIcon={previewData.hero.icon}
@@ -94,7 +94,7 @@ export function AntiRaggingMembersEditor({
 	);
 
 	return (
-		<Editable label='Committee Members' formContent={formContent}>
+		<Editable label='Committee Members' presentation='dialog' formContent={formContent}>
 			<AntiRaggingMembersSection data={previewData.committeeMembers} />
 		</Editable>
 	);
@@ -119,7 +119,7 @@ export function AntiRaggingMeasuresEditor({
 	);
 
 	return (
-		<Editable label='Preventive Measures' formContent={formContent}>
+		<Editable label='Preventive Measures' presentation='dialog' formContent={formContent}>
 			<AntiRaggingMeasuresSection data={previewData.preventiveMeasures} />
 		</Editable>
 	);
@@ -144,7 +144,7 @@ export function AntiRaggingPunishmentsEditor({
 	);
 
 	return (
-		<Editable label='Punishments' formContent={formContent}>
+		<Editable label='Punishments' presentation='dialog' formContent={formContent}>
 			<AntiRaggingPunishmentsSection data={previewData.punishments} />
 		</Editable>
 	);
@@ -169,7 +169,7 @@ export function AntiRaggingContactsEditor({
 	);
 
 	return (
-		<Editable label='Emergency Contacts' formContent={formContent}>
+		<Editable label='Emergency Contacts' presentation='dialog' formContent={formContent}>
 			<AntiRaggingContactsSection data={previewData.emergencyContacts} />
 		</Editable>
 	);
