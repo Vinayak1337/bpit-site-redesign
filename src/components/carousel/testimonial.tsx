@@ -257,7 +257,7 @@ export default function Testimonial({ data }: TestimonialProps) {
 				))}
 			</div>
 
-			<div className='relative z-10 container mx-auto px-4 py-20'>
+			<div className='relative z-10 container mx-auto px-4 py-10 md:py-20'>
 				{/* Header Section */}
 				<motion.div
 					initial={{ opacity: 0, y: 30 }}

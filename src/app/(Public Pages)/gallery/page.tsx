@@ -1,7 +1,18 @@
 import { getGallery } from '@/app/(Private Pages)/actions/gallery';
 import GalleryCollage from '@/components/gallery/GalleryCollage';
+import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+	title: 'Gallery',
+	description: 'Photo gallery of BPIT — campus life, events, festivals, labs, workshops, cultural and academic moments from the institute.',
+	alternates: { canonical: '/gallery' }
+};
+
+
 
 export default async function GalleryPage() {
+	return notFound();
 	const galleryData = await getGallery();
 
 	return (

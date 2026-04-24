@@ -1,6 +1,15 @@
 import React from 'react';
 import { getInternshipsData } from '@/app/(Private Pages)/actions/internships';
 import InternshipsClient from './InternshipsClient';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+	title: 'Internships',
+	description: 'Internship opportunities and programmes for BPIT students — industry, research and summer internships.',
+	alternates: { canonical: '/placements/internships' }
+};
+
+
 
 export const revalidate = 3600; // Revalidate every hour
 

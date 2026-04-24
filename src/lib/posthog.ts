@@ -7,7 +7,7 @@ export const initPostHog = () => {
       loaded: (ph) => {
         if (process.env.NODE_ENV === 'development') ph.debug();
       },
-      capture_pageview: false, // We will handle this manually for Next.js App Router
+      capture_pageview: true, // We will handle this manually for Next.js App Router
       capture_pageleave: true // Enable page leave capture
     });
   }
@@ -20,4 +20,3 @@ export const trackEvent = (eventName: string, properties?: Record<string, any>) 
 };
 
 export default posthog;
-

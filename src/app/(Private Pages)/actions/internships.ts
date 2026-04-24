@@ -177,8 +177,8 @@ export async function updateInternshipsData(
 		if (page.components[0]) {
 			await prisma.component.update({
 				where: { id: page.components[0].id },
-				data: { 
-					data: data as any,
+				data: {
+					data: data as unknown as import('@prisma/client').Prisma.InputJsonValue,
 					updatedAt: new Date()
 				}
 			});
@@ -187,7 +187,7 @@ export async function updateInternshipsData(
 				data: {
 					pageId: page.id,
 					key: 'internships-data',
-					data: data as any,
+					data: data as unknown as import('@prisma/client').Prisma.InputJsonValue,
 					order: 0
 				}
 			});

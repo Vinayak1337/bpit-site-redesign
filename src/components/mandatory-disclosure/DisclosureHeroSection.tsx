@@ -24,7 +24,7 @@ export default function DisclosureHeroSection({
 				<div className='absolute bottom-20 right-10 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl'></div>
 			</div>
 
-			<div className='relative z-10 container mx-auto px-4 py-24'>
+			<div className='relative z-10 container mx-auto px-4 py-12 sm:py-16 md:py-24'>
 				<motion.div
 					initial={{ opacity: 0, y: 30 }}
 					animate={{ opacity: 1, y: 0 }}
@@ -38,11 +38,11 @@ export default function DisclosureHeroSection({
 						<FileText className='w-10 h-10 text-white' />
 					</motion.div>
 
-					<h1 className='text-5xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-green-100'>
+					<h1 className='text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-green-100'>
 						{data.hero.title}
 					</h1>
 
-					<p className='text-xl md:text-2xl text-green-100 mb-8 leading-relaxed'>
+					<p className='text-base sm:text-lg md:text-xl lg:text-2xl text-green-100 mb-8 leading-relaxed'>
 						{data.hero.description}
 					</p>
 

@@ -1,6 +1,15 @@
 import React from 'react';
 import { getRecruitersData } from '@/app/(Private Pages)/actions/recruiters';
 import RecruitersClient from './RecruitersClient';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+	title: 'Recruiters',
+	description: 'Companies that have recruited from BPIT — a diverse list of top tech, core engineering and consulting recruiters.',
+	alternates: { canonical: '/placements/recruiters' }
+};
+
+
 
 export default async function RecruitersPage() {
 	const data = await getRecruitersData();

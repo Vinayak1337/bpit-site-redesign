@@ -104,8 +104,9 @@ export default function DepartmentForm({
 	}, [form, initialData, onChange, selectedYear]);
 
 	const onSubmit = async (values: DepartmentFormData) => {
+		setSaveStatus('saving');
 		const departmentStats = { ...(initialData.departmentStats || {}) };
-		const yearData: Record<string, any> = {};
+		const yearData: Record<string, import('@/app/(Private Pages)/actions/placement-statistics').DepartmentStat> = {};
 
 		values.departments.forEach(dept => {
 			yearData[dept.name] = {
@@ -125,9 +126,11 @@ export default function DepartmentForm({
 		});
 
 		if (result.success) {
-			alert('Department statistics updated successfully!');
+			setSaveStatus('saved');
+			setTimeout(() => setSaveStatus('idle'), 2000);
 		} else {
-			alert('Failed to update: ' + result.error);
+			setSaveStatus('error');
+			setTimeout(() => setSaveStatus('idle'), 3000);
 		}
 	};
 

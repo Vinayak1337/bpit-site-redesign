@@ -466,6 +466,36 @@ export const adminAcademiaSidebarData = {
 			title: 'Academia Overview',
 			icon: 'BookOpen',
 			href: '/admin/academia'
+		},
+		{
+			id: 'examination',
+			title: 'Examination',
+			icon: 'FileCheck',
+			href: '/admin/academia/examination'
+		},
+		{
+			id: 'academic-calendar',
+			title: 'Academic Calendar',
+			icon: 'Calendar',
+			href: '/admin/academia/academic-calendar'
+		},
+		{
+			id: 'notices-circulars',
+			title: 'Notices & Circulars',
+			icon: 'Bell',
+			href: '/admin/academia/notices-circulars'
+		},
+		{
+			id: 'syllabus-ordinance',
+			title: 'Syllabus & Ordinance',
+			icon: 'FileText',
+			href: '/admin/academia/syllabus-ordinance'
+		},
+		{
+			id: 'library',
+			title: 'Library',
+			icon: 'Library',
+			href: '/admin/academia/library'
 		}
 	],
 	theme: {

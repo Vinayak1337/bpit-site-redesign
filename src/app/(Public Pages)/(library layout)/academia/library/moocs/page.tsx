@@ -1,37 +1,24 @@
-'use client';
+import { getHero, getContent } from '@/app/(Private Pages)/actions/academia-library-moocs';
+import SimpleSubHero from '../_shared/SimpleSubHero';
+import SimpleSubContent from '../_shared/SimpleSubContent';
+import type { Metadata } from 'next';
 
-import React from 'react';
-import { motion } from 'framer-motion';
+export const metadata: Metadata = {
+	title: 'MOOCs',
+	description: 'Massive Open Online Courses (MOOCs) curated by the BPIT library — SWAYAM, NPTEL and other platforms for skill development.',
+	alternates: { canonical: '/academia/library/moocs' }
+};
 
-export default function MOOCsPage() {
+
+
+export const revalidate = 3600;
+
+export default async function Page() {
+	const [hero, content] = await Promise.all([getHero(), getContent()]);
 	return (
-		<motion.div 
-			className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6"
-			initial={{ opacity: 0 }}
-			animate={{ opacity: 1 }}
-			transition={{ duration: 0.8 }}
-		>
-			<div className="max-w-4xl mx-auto">
-				<motion.h1 
-					className="text-4xl font-bold text-gray-900 mb-8"
-					initial={{ opacity: 0, y: 30 }}
-					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.8, delay: 0.1 }}
-				>
-					MOOCs (Massive Open Online Courses)
-				</motion.h1>
-				
-				<motion.div 
-					className="bg-white rounded-lg shadow-lg p-8"
-					initial={{ opacity: 0, y: 30 }}
-					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.8, delay: 0.2 }}
-				>
-					<p className="text-gray-600 text-lg">
-						MOOCs and online learning resources will be available here soon.
-					</p>
-				</motion.div>
-			</div>
-		</motion.div>
+		<div className='space-y-6'>
+			<SimpleSubHero data={hero} />
+			<SimpleSubContent data={content} />
+		</div>
 	);
 }

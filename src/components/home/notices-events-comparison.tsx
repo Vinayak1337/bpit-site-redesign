@@ -19,7 +19,7 @@ export default function NoticesEventsComparison({
 	const events = sortByDateAsc(dedupeByIdAndTitle(eventsData.events));
 
 	return (
-		<section className='relative overflow-hidden bg-gradient-to-b from-slate-50 via-white to-slate-100 py-16 md:py-20'>
+		<section className='relative overflow-hidden bg-gradient-to-b from-slate-50 via-white to-slate-100 py-8 md:py-20'>
 			<div className='pointer-events-none absolute inset-0'>
 				<div className='absolute -left-20 top-20 h-64 w-64 rounded-full bg-blue-200/25 blur-3xl' />
 				<div className='absolute right-0 top-10 h-72 w-72 rounded-full bg-cyan-200/25 blur-3xl' />

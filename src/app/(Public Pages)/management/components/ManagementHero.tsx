@@ -39,11 +39,11 @@ const ManagementHero = ({ data }: ManagementHeroProps) => {
 						<Users className='w-10 h-10 text-white' />
 					</motion.div>
 
-					<h1 className='text-5xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-100'>
+					<h1 className='text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-100'>
 						{data.title}
 					</h1>
 
-					<p className='text-xl md:text-2xl text-blue-100 mb-8 leading-relaxed'>
+					<p className='text-base sm:text-lg md:text-xl lg:text-2xl text-blue-100 mb-8 leading-relaxed'>
 						{data.subtitle}
 					</p>
 

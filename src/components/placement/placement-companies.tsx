@@ -202,7 +202,7 @@ const PlacementCompanies = ({ data }: PlacementCompaniesProps) => {
 	};
 
 	return (
-		<section className='py-12 lg:py-16 bg-gray-50 overflow-hidden'>
+		<section className='py-8 md:py-12 lg:py-16 bg-gray-50 overflow-hidden'>
 			<div className='container mx-auto px-4'>
 				{/* Section Header */}
 				<div className='text-center mb-8 lg:mb-12'>

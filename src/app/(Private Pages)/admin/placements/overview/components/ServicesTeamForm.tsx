@@ -37,6 +37,15 @@ const GRADIENT_OPTIONS = [
 	{ label: 'Pink', value: 'from-pink-500 to-pink-700' },
 ];
 
+const TEXT_COLOR_OPTIONS = [
+	{ label: 'White', value: 'text-white' },
+	{ label: 'Dark', value: 'text-gray-900' },
+	{ label: 'Blue', value: 'text-blue-600' },
+	{ label: 'Light Blue', value: 'text-blue-100' },
+	{ label: 'Green', value: 'text-green-600' },
+	{ label: 'Purple', value: 'text-purple-600' },
+];
+
 type FeatureFormValue = {
 	id: string;
 	icon: string;
@@ -593,12 +602,18 @@ export default function ServicesTeamForm({
 										render={({ field: textColorField }) => (
 											<FormItem>
 												<FormLabel>Initials Text Color</FormLabel>
-												<FormControl>
-													<Input
-														placeholder='e.g. text-white'
-														{...textColorField}
-													/>
-												</FormControl>
+												<Select onValueChange={textColorField.onChange} value={textColorField.value}>
+													<FormControl>
+														<SelectTrigger>
+															<SelectValue placeholder='Select text color' />
+														</SelectTrigger>
+													</FormControl>
+													<SelectContent>
+														{TEXT_COLOR_OPTIONS.map(opt => (
+															<SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+														))}
+													</SelectContent>
+												</Select>
 												<FormMessage />
 											</FormItem>
 										)}

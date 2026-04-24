@@ -47,6 +47,22 @@ export default function MetricsEditor({ initialData, pageSlug }: MetricsEditorPr
 	const [animatedStats, setAnimatedStats] = useState(false);
 	const currentStats = currentData.overallStats?.[selectedYear];
 
+	type StatField = 'placementRate' | 'studentsPlaced' | 'companiesVisited' | 'highestPackage' | 'averagePackage' | 'medianPackage' | 'totalStudents';
+
+	// Compute YoY trend for a given stat field
+	const computeTrend = (field: StatField): { direction: 'up' | 'down'; pct: string } => {
+		const years = currentData.years ?? [];
+		const idx = years.indexOf(selectedYear);
+		const prevYear = idx >= 0 && idx < years.length - 1 ? years[idx + 1] : null;
+		const prevStats = prevYear ? currentData.overallStats?.[prevYear] : null;
+		if (!currentStats || !prevStats) return { direction: 'up', pct: '—' };
+		const curr = currentStats[field] as number;
+		const prev = prevStats[field] as number;
+		if (!prev) return { direction: 'up', pct: '—' };
+		const change = ((curr - prev) / prev) * 100;
+		return { direction: change >= 0 ? 'up' : 'down', pct: `${change >= 0 ? '+' : ''}${change.toFixed(1)}%` };
+	};
+
 	useEffect(() => {
 		const timer = setTimeout(() => {
 			setAnimatedStats(true);
@@ -134,40 +150,16 @@ export default function MetricsEditor({ initialData, pageSlug }: MetricsEditorPr
 						<>
 							{/* Main Metrics Cards */}
 							<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12'>
-								{[
-									{
-										icon: Target,
-										label: 'Placement Rate',
-										value: currentStats.placementRate,
-										suffix: '%',
-										color: 'from-green-500 to-emerald-600',
-										trend: 'up'
-									},
-									{
-										icon: Users,
-										label: 'Students Placed',
-										value: currentStats.studentsPlaced,
-										suffix: '',
-										color: 'from-blue-500 to-cyan-600',
-										trend: 'up'
-									},
-									{
-										icon: Building2,
-										label: 'Companies Visited',
-										value: currentStats.companiesVisited,
-										suffix: '',
-										color: 'from-purple-500 to-violet-600',
-										trend: 'up'
-									},
-									{
-										icon: DollarSign,
-										label: 'Highest Package',
-										value: currentStats.highestPackage,
-										suffix: ' LPA',
-										color: 'from-orange-500 to-red-600',
-										trend: 'up'
-									}
-								].map((metric, index) => (
+								{(
+									[
+										{ icon: Target, label: 'Placement Rate', value: currentStats.placementRate, suffix: '%', color: 'from-green-500 to-emerald-600', field: 'placementRate' as const },
+										{ icon: Users, label: 'Students Placed', value: currentStats.studentsPlaced, suffix: '', color: 'from-blue-500 to-cyan-600', field: 'studentsPlaced' as const },
+										{ icon: Building2, label: 'Companies Visited', value: currentStats.companiesVisited, suffix: '', color: 'from-purple-500 to-violet-600', field: 'companiesVisited' as const },
+										{ icon: DollarSign, label: 'Highest Package', value: currentStats.highestPackage, suffix: ' LPA', color: 'from-orange-500 to-red-600', field: 'highestPackage' as const }
+									] as const
+								).map((metric, index) => {
+									const trend = computeTrend(metric.field);
+									return (
 									<motion.div
 										key={index}
 										initial={{ opacity: 0, y: 30 }}
@@ -180,13 +172,13 @@ export default function MetricsEditor({ initialData, pageSlug }: MetricsEditorPr
 												<metric.icon className='w-8 h-8' />
 											</div>
 											<div
-												className={`flex items-center space-x-1 ${metric.trend === 'up' ? 'text-green-500' : 'text-red-500'}`}>
-												{metric.trend === 'up' ? (
+												className={`flex items-center space-x-1 ${trend.direction === 'up' ? 'text-green-500' : 'text-red-500'}`}>
+												{trend.direction === 'up' ? (
 													<ArrowUp className='w-4 h-4' />
 												) : (
 													<ArrowDown className='w-4 h-4' />
 												)}
-												<span className='text-sm font-medium'>+5.2%</span>
+												<span className='text-sm font-medium'>{trend.pct}</span>
 											</div>
 										</div>
 										<h3 className='text-3xl font-bold text-gray-900 mb-2'>
@@ -194,7 +186,8 @@ export default function MetricsEditor({ initialData, pageSlug }: MetricsEditorPr
 										</h3>
 										<p className='text-gray-600 font-medium'>{metric.label}</p>
 									</motion.div>
-								))}
+								);
+								})}
 							</div>
 
 							{/* Package Statistics */}

@@ -6,7 +6,6 @@ import Testimonial from '@/components/carousel/testimonial';
 import TopPlacedStudents from '@/components/placement/top-placed-students';
 import NoticesEventsComparison from '@/components/home/notices-events-comparison';
 
-import { homeHero2Data } from '@/data/home';
 import {
 	getHeroSlides,
 	type HeroSlide
@@ -23,6 +22,15 @@ import {
 	toEventsSectionComponentData,
 	toTestimonialComponentData
 } from '@/lib/carousel-adapters';
+
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+	title: 'Home',
+	description: 'Bhagwan Parshuram Institute of Technology — GGSIPU-affiliated, NBA-accredited engineering college in Rohini, Delhi offering BTech programs in CSE, IT, ECE, EEE and allied branches.',
+	alternates: { canonical: '/' }
+};
+
 
 type HeroCarouselData = ComponentProps<typeof Hero2>['data'];
 type HeroCarouselSlide = HeroCarouselData['slides'][number];
@@ -72,8 +80,7 @@ export default async function Home() {
 		getTestimonials(pageSlug)
 	]);
 
-	const heroData: HeroCarouselData =
-		heroSlides.length > 0 ? mapHeroSlidesToHeroData(heroSlides) : homeHero2Data;
+	const heroData: HeroCarouselData = mapHeroSlidesToHeroData(heroSlides);
 
 	return (
 		<>

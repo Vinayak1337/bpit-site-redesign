@@ -28,8 +28,9 @@ export default function SectorSection({ data }: SectorSectionProps) {
 
 				<div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
 					<motion.div
-						initial={{ opacity: 0, x: -30 }}
-						whileInView={{ opacity: 1, x: 0 }}
+						initial={{ opacity: 0, y: 30 }}
+						whileInView={{ opacity: 1, y: 0 }}
+						viewport={{ once: true }}
 						transition={{ duration: 0.8 }}
 						className='space-y-5' role='list'>
 						{(data.sectorWiseData || []).map((sector, index) => (
@@ -64,8 +65,9 @@ export default function SectorSection({ data }: SectorSectionProps) {
 					</motion.div>
 
 					<motion.div
-						initial={{ opacity: 0, x: 30 }}
-						whileInView={{ opacity: 1, x: 0 }}
+						initial={{ opacity: 0, y: 30 }}
+						whileInView={{ opacity: 1, y: 0 }}
+						viewport={{ once: true }}
 						transition={{ duration: 0.8 }}
 						className='bg-white rounded-2xl p-6 shadow-lg'>
 						<h3 className='text-xl font-bold text-gray-900 mb-6'>Yearly Trends</h3>

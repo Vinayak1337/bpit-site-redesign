@@ -28,23 +28,23 @@ const HeaderContactUs = ({ contacts }: { contacts: ContactDTO[] }) => {
 
 	return (
 		<motion.div
-			className='bg-gradient-to-r from-blue-800 to-blue-900 text-white py-2 sm:py-3 px-4 sm:px-6 lg:px-8 text-xs sm:text-sm'
+			className='bg-gradient-to-r from-blue-800 to-blue-900 text-white py-1 sm:py-3 px-4 sm:px-6 lg:px-8 text-xs sm:text-sm'
 			initial={{ y: -20, opacity: 0 }}
 			animate={{ y: 0, opacity: 1 }}
 			transition={{ duration: 0.5 }}>
 			<div className='container mx-auto'>
 				{/* Mobile Layout - Stacked */}
-				<div className='md:hidden space-y-2'>
+				<div className='md:hidden space-y-1'>
 					<div className='flex items-center justify-between'>
 						<a
 							href={`tel:${phoneTel}`}
-							className='flex items-center space-x-2 hover:text-yellow-300 transition-colors duration-200'>
+							className='flex items-center space-x-2 hover:text-yellow-300 transition-colors duration-200 py-1'>
 							<Phone className='w-3 h-3 sm:w-4 sm:h-4' />
 							<span>{phoneDisplay}</span>
 						</a>
 						<a
 							href={`mailto:${emailValue}`}
-							className='flex items-center space-x-2 hover:text-yellow-300 transition-colors duration-200'>
+							className='flex items-center space-x-2 hover:text-yellow-300 transition-colors duration-200 py-1'>
 							<Mail className='w-3 h-3 sm:w-4 sm:h-4' />
 							<span className='sm:inline'>{emailValue}</span>
 						</a>
@@ -54,7 +54,7 @@ const HeaderContactUs = ({ contacts }: { contacts: ContactDTO[] }) => {
 							href={mapUrl}
 							target='_blank'
 							rel='noopener noreferrer'
-							className='flex items-center space-x-2 hover:text-yellow-300 transition-colors duration-200'>
+							className='flex items-center space-x-2 hover:text-yellow-300 transition-colors duration-200 py-1'>
 							<MapPin className='w-3 h-3 sm:w-4 sm:h-4' />
 							<span className='hidden sm:inline'>{addressText}</span>
 							<span className='sm:hidden'>Location</span>

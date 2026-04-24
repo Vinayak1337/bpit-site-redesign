@@ -14,6 +14,15 @@ import {
 import { ADMISSIONS_SLUGS } from '@/lib/admissions-cms';
 import AdmissionsPageShell from '@/app/(Public Pages)/admissions/components/AdmissionsPageShell';
 
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+	title: 'Why BPIT',
+	description: 'Reasons to choose BPIT — accreditation, placements, faculty, infrastructure, campus life and industry partnerships.',
+	alternates: { canonical: '/admissions/why-bpit' }
+};
+
+
 const pageSlug = ADMISSIONS_SLUGS.whyBpit;
 
 const WhyBPITPage = async () => {

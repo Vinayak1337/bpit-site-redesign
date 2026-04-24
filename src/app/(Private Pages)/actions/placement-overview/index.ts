@@ -207,13 +207,13 @@ export async function updatePlacementOverview(pageSlug: string, data: PlacementO
 				}
 			},
 			update: {
-				data: data as any,
+				data: data as unknown as import('@prisma/client').Prisma.InputJsonValue,
 				key: 'PLACEMENT_OVERVIEW'
 			},
 			create: {
 				pageId: page.id,
 				key: 'PLACEMENT_OVERVIEW',
-				data: data as any,
+				data: data as unknown as import('@prisma/client').Prisma.InputJsonValue,
 				order: 0
 			}
 		});

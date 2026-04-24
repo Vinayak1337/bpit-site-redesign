@@ -39,7 +39,7 @@ const FooterBottomBar = ({
 						<Link
 							key={link.href}
 							href={link.href}
-							className='hover:text-white transition-colors'>
+							className='hover:text-white transition-colors py-2 inline-block'>
 							{link.label}
 						</Link>
 					))}

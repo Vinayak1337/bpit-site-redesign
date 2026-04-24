@@ -1,0 +1,19 @@
+[    2650ms] [INFO] Download the React DevTools for a better development experience: https://react.dev/link/react-devtools @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:25022
+[    2877ms] [WARNING] Image with src "/logo.png" was detected as the Largest Contentful Paint (LCP). Please add the "priority" property if this image is above the fold.
+Read more: https://nextjs.org/docs/api-reference/next/image#priority @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/shared/lib/utils/warn-once.js:15
+[    2924ms] [LOG] You're now in debug mode. All calls to PostHog will be logged in your console.
+You can disable this with `posthog.debug(false)`. @ webpack-internal:///(app-pages-browser)/./node_modules/posthog-js/dist/module.js:19
+[    2924ms] [LOG] [PostHog.js] set_config JSHandle@object @ webpack-internal:///(app-pages-browser)/./node_modules/posthog-js/dist/module.js:19
+[    2984ms] [WARNING] Image with src "/logo.png" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio. @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/shared/lib/utils/warn-once.js:15
+[    3001ms] [LOG] [PostHog.js] [RemoteConfig] __preview_remote_config is disabled. Logging config instead JSHandle@object @ webpack-internal:///(app-pages-browser)/./node_modules/posthog-js/dist/module.js:19
+[    3748ms] [LOG] [PostHog.js] Persistence loaded sessionStorage JSHandle@object @ webpack-internal:///(app-pages-browser)/./node_modules/posthog-js/dist/module.js:19
+[    3749ms] [LOG] [PostHog.js] set_config JSHandle@object @ webpack-internal:///(app-pages-browser)/./node_modules/posthog-js/dist/module.js:19
+[    3749ms] [LOG] [PostHog.js] [Surveys] flags response received, isSurveysEnabled: false @ webpack-internal:///(app-pages-browser)/./node_modules/posthog-js/dist/module.js:19
+[    3750ms] [LOG] [PostHog.js] [WebExperiments] Refusing to render web experiment since the viewer is a likely bot Array @ webpack-internal:///(app-pages-browser)/./node_modules/posthog-js/dist/module.js:19
+[    3780ms] [LOG] [PostHog.js] [Surveys] Surveys loaded successfully @ webpack-internal:///(app-pages-browser)/./node_modules/posthog-js/dist/module.js:19
+[   12466ms] [WARNING] [JavaScript Warning: "The resource at “http://127.0.0.1:3001/_next/static/media/4cf2300e9c8272f7-s.p.woff2” preloaded with link preload was not used within a few seconds. Make sure all attributes of the preload tag are set correctly." {file: "http://127.0.0.1:3001/academia" line: 0}] @ http://127.0.0.1:3001/academia:0
+[   12467ms] [WARNING] [JavaScript Warning: "The resource at “http://127.0.0.1:3001/_next/static/media/93f479601ee12b01-s.p.woff2” preloaded with link preload was not used within a few seconds. Make sure all attributes of the preload tag are set correctly." {file: "http://127.0.0.1:3001/academia" line: 0}] @ http://127.0.0.1:3001/academia:0
+[  236660ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:196
+[  237979ms] [LOG] [Fast Refresh] done in 1323ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/utils/report-hmr-latency.js:13
+[  250932ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:196
+[  251470ms] [LOG] [Fast Refresh] done in 540ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/utils/report-hmr-latency.js:13

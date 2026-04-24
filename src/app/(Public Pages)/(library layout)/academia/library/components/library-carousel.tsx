@@ -6,25 +6,25 @@ import { Button } from "@/components/ui/button"
 
 const libraryImages = [
   {
-    src: "/placeholder.svg?height=600&width=1920",
+    src: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=1920&q=80",
     alt: "Main Library Hall",
     title: "BPIT Library",
     description: "Discover knowledge, explore resources, and enhance your learning journey",
   },
   {
-    src: "/placeholder.svg?height=600&width=1920",
+    src: "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1920&q=80",
     alt: "Digital Library Section",
     title: "Digital Resources",
     description: "Access thousands of e-books, journals, and online databases",
   },
   {
-    src: "/placeholder.svg?height=600&width=1920",
+    src: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1920&q=80",
     alt: "Reading Area",
     title: "Study Spaces",
     description: "Quiet and comfortable spaces for focused learning",
   },
   {
-    src: "/placeholder.svg?height=600&width=1920",
+    src: "https://images.unsplash.com/photo-1568667256549-094345857637?auto=format&fit=crop&w=1920&q=80",
     alt: "Book Collection",
     title: "Extensive Collection",
     description: "Over 50,000 books across various disciplines",
@@ -60,8 +60,8 @@ export function LibraryCarousel() {
           <div className="absolute inset-0 bg-gradient-to-r from-blue-900/70 to-blue-600/50" />
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center text-white max-w-4xl px-4">
-              <h1 className="text-5xl md:text-7xl font-bold mb-6">{image.title}</h1>
-              <p className="text-xl md:text-2xl font-light">{image.description}</p>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold mb-4 md:mb-6">{image.title}</h1>
+              <p className="text-base sm:text-lg md:text-xl lg:text-2xl font-light">{image.description}</p>
             </div>
           </div>
         </div>
@@ -90,11 +90,16 @@ export function LibraryCarousel() {
         {libraryImages.map((_, index) => (
           <button
             key={index}
-            className={`w-3 h-3 rounded-full transition-all duration-300 ${
-              index === currentSlide ? "bg-white scale-125" : "bg-white/50"
-            }`}
+            aria-label={`Go to slide ${index + 1}`}
+            className="p-3 flex items-center justify-center"
             onClick={() => setCurrentSlide(index)}
-          />
+          >
+            <span
+              className={`block w-3 h-3 rounded-full transition-all duration-300 ${
+                index === currentSlide ? "bg-white scale-125" : "bg-white/50"
+              }`}
+            />
+          </button>
         ))}
       </div>
     </div>

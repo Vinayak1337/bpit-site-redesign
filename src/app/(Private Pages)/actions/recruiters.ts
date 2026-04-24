@@ -108,14 +108,14 @@ export async function updateRecruitersData(
 			const component = page.components[0];
 			await prisma.component.update({
 				where: { id: component.id },
-				data: { data: data as any }
+				data: { data: data as unknown as import('@prisma/client').Prisma.InputJsonValue }
 			});
 		} else {
 			await prisma.component.create({
 				data: {
 					pageId: page.id,
 					key: 'recruiters-data',
-					data: data as any,
+					data: data as unknown as import('@prisma/client').Prisma.InputJsonValue,
 					order: 0
 				}
 			});

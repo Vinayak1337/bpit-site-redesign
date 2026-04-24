@@ -27,11 +27,11 @@ const StatutoryCommitteesHero = () => {
 						<Shield className='w-10 h-10 text-white' />
 					</motion.div>
 
-					<h1 className='text-5xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-green-100'>
+					<h1 className='text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-green-100'>
 						Statutory Committees
 					</h1>
 
-					<p className='text-xl md:text-2xl text-green-100 mb-8 leading-relaxed'>
+					<p className='text-base sm:text-lg md:text-xl lg:text-2xl text-green-100 mb-8 leading-relaxed'>
 						Ensuring Quality, Safety, and Compliance in Educational Excellence
 					</p>
 

@@ -56,20 +56,14 @@ const objectiveSchema = z.object({
 	color: z.enum(['blue', 'green', 'purple', 'orange', 'red', 'indigo'])
 });
 
-const IMPACT_STAT_COLORS = [
-	'text-blue-600', 'text-green-600', 'text-purple-600',
-	'text-orange-600', 'text-red-600', 'text-indigo-600',
-	'text-teal-600', 'text-yellow-600'
-] as const;
+import { IMPACT_STAT_COLORS } from './vision-mission-constants';
+export type { ImpactStatColor } from './vision-mission-constants';
 
 const impactStatSchema = z.object({
 	number: z.string().min(1),
 	label: z.string().min(1),
 	color: z.enum(IMPACT_STAT_COLORS).default('text-green-600')
 });
-
-export type ImpactStatColor = (typeof IMPACT_STAT_COLORS)[number];
-export const IMPACT_STAT_COLOR_OPTIONS = IMPACT_STAT_COLORS;
 
 const impactSchema = z.object({
 	title: z.string().min(1),

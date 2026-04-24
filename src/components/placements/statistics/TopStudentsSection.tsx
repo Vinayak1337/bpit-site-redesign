@@ -262,7 +262,7 @@ export default function TopStudentsSection({ data }: TopStudentsSectionProps) {
 													</div>
 												)}
 
-												<div className='flex items-center justify-between gap-4'>
+												<div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
 													<div className='flex items-center gap-4'>
 														<div className='relative w-16 h-16 flex-shrink-0'>
 															<Image
@@ -274,15 +274,15 @@ export default function TopStudentsSection({ data }: TopStudentsSectionProps) {
 															/>
 														</div>
 														<div>
-															<h4 className='text-lg font-bold text-gray-900 mb-1'>{student.name}</h4>
+															<h4 className='text-lg font-bold text-gray-900 mb-1 break-words'>{student.name}</h4>
 															<div className='space-y-1'>
-																<div className='flex items-center gap-2 text-sm text-gray-600'>
+																<div className='flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-gray-600'>
 																	<GraduationCap className='w-4 h-4 flex-shrink-0' />
 																	<span className='font-medium'>{student.department}</span>
 																	<span className='text-gray-400'>•</span>
 																	<span>Batch {student.batch}</span>
 																</div>
-																<div className='flex items-center gap-2 text-sm text-gray-600'>
+																<div className='flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-gray-600'>
 																	<Building2 className='w-4 h-4 flex-shrink-0' />
 																	<span className='font-medium'>{student.company}</span>
 																	<span className='text-gray-400'>•</span>

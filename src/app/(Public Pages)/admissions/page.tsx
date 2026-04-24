@@ -13,6 +13,15 @@ import {
 	AdmissionsOverviewStatsSection
 } from '@/app/(Public Pages)/admissions/components/AdmissionsOverviewSections';
 
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+	title: 'Admissions',
+	description: 'Admissions at BPIT — BTech programmes, eligibility, process, fees, scholarships and brochures for the upcoming intake.',
+	alternates: { canonical: '/admissions' }
+};
+
+
 export default async function AdmissionsOverviewPage() {
 	const [pageHero, overview, programs] = await Promise.all([
 		getAdmissionsHero(ADMISSIONS_SLUGS.overview),

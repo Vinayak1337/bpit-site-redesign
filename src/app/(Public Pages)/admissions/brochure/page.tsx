@@ -7,6 +7,15 @@ import AdmissionsPageShell from '@/app/(Public Pages)/admissions/components/Admi
 import BrochureExplorer from '@/app/(Public Pages)/admissions/brochure/components/BrochureExplorer';
 import { ADMISSIONS_SLUGS } from '@/lib/admissions-cms';
 
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+	title: 'Brochure',
+	description: 'Download the official BPIT admissions brochure with programme details, fees and campus information.',
+	alternates: { canonical: '/admissions/brochure' }
+};
+
+
 export default async function BrochurePage() {
 	const [pageHero, config, items] = await Promise.all([
 		getAdmissionsHero(ADMISSIONS_SLUGS.brochure),

@@ -226,12 +226,17 @@ export function LibraryQuotes() {
 								whileHover={{ scale: 1.2 }}
 								whileTap={{ scale: 0.8 }}
 								onClick={() => goToQuote(index)}
-								className={`w-2 h-2 rounded-full transition-all duration-300 ${
-									index === currentIndex
-										? 'bg-blue-600 w-6'
-										: 'bg-blue-300 hover:bg-blue-400'
-								}`}
-							/>
+								aria-label={`Go to quote ${index + 1}`}
+								className="p-3 flex items-center justify-center"
+							>
+								<span
+									className={`block h-2 rounded-full transition-all duration-300 ${
+										index === currentIndex
+											? 'bg-blue-600 w-6'
+											: 'bg-blue-300 hover:bg-blue-400 w-2'
+									}`}
+								/>
+							</motion.button>
 						))}
 					</div>
 				</div>

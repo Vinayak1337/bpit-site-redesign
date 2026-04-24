@@ -35,6 +35,7 @@ interface TopPlacedStudentsProps {
 const TopPlacedStudents = ({ data }: TopPlacedStudentsProps) => {
 	const [scope, animate] = useAnimate();
 	const [isHovered, setIsHovered] = useState(false);
+	const [isMobile, setIsMobile] = useState(false);
 	const containerRef = useRef<HTMLDivElement>(null);
 	const animationRef = useRef<ReturnType<typeof animate> | null>(null);
 	const currentPositionRef = useRef(0);
@@ -71,14 +72,16 @@ const TopPlacedStudents = ({ data }: TopPlacedStudentsProps) => {
 		const handleResize = () => {
 			setCardWidth(getCardWidth());
 			setCardGap(getCardGap());
+			setIsMobile(window.innerWidth < 640);
 		};
 
+		handleResize();
 		window.addEventListener('resize', handleResize);
 		return () => window.removeEventListener('resize', handleResize);
 	}, []);
 
 	useEffect(() => {
-		if (!scope.current || !containerRef.current || !hasStudents) return;
+		if (!scope.current || !containerRef.current || !hasStudents || isMobile) return;
 
 		const containerWidth = containerRef.current.offsetWidth;
 
@@ -129,10 +132,10 @@ const TopPlacedStudents = ({ data }: TopPlacedStudentsProps) => {
 				animationRef.current.stop();
 			}
 		};
-	}, [scope, animate, studentsToRender.length, totalCardsWidth, cardWidth, cardGap, hasStudents]);
+	}, [scope, animate, studentsToRender.length, totalCardsWidth, cardWidth, cardGap, hasStudents, isMobile]);
 
 	useEffect(() => {
-		if (!isHovered && scope.current && containerRef.current && hasStudents) {
+		if (!isHovered && scope.current && containerRef.current && hasStudents && !isMobile) {
 			const containerWidth = containerRef.current.offsetWidth;
 
 			const continueAnimation = () => {
@@ -170,7 +173,7 @@ const TopPlacedStudents = ({ data }: TopPlacedStudentsProps) => {
 
 			setTimeout(continueAnimation, 50);
 		}
-	}, [isHovered, scope, animate, totalCardsWidth, cardWidth, cardGap, hasStudents]);
+	}, [isHovered, scope, animate, totalCardsWidth, cardWidth, cardGap, hasStudents, isMobile]);
 
 	useEffect(() => {
 		if (isHovered) {
@@ -180,12 +183,22 @@ const TopPlacedStudents = ({ data }: TopPlacedStudentsProps) => {
 		}
 	}, [isHovered]);
 
+	useEffect(() => {
+		if (!isMobile || !scope.current) return;
+		animate(scope.current, { x: 0 }, { duration: 0 });
+		currentPositionRef.current = 0;
+		if (animationRef.current) {
+			animationRef.current.stop();
+			animationRef.current = null;
+		}
+	}, [animate, isMobile, scope]);
+
 	const handleCardHover = (hovered: boolean) => {
 		setIsHovered(hovered);
 	};
 
 	return (
-		<section className='py-12 lg:py-16 bg-gray-50 overflow-hidden'>
+		<section className='py-8 md:py-12 lg:py-16 bg-gray-50 overflow-hidden'>
 			<div className='container mx-auto px-4'>
 				{/* Section Header */}
 				<div className='text-center mb-8 lg:mb-12'>
@@ -209,17 +222,19 @@ const TopPlacedStudents = ({ data }: TopPlacedStudentsProps) => {
 
 				{/* Infinite Scrolling Students */}
 				<div ref={containerRef} className='relative'>
-					<div className='overflow-hidden'>
+					<div className={isMobile ? 'overflow-x-auto scrollbar-hide -mx-4 px-4 pb-2' : 'overflow-hidden'}>
 						{/* Gradient Fade Effect - hidden on mobile */}
 						<div className='absolute top-0 left-0 w-0 sm:w-16 lg:w-20 h-full bg-gradient-to-r from-gray-50 to-transparent pointer-events-none z-10'></div>
 						<div className='absolute top-0 right-0 w-0 sm:w-16 lg:w-20 h-full bg-gradient-to-l from-gray-50 to-transparent pointer-events-none z-10'></div>
 
-						<div ref={scope} className='flex gap-4 sm:gap-6 lg:gap-8 w-max'>
+						<div
+							ref={scope}
+							className={`flex gap-4 sm:gap-6 lg:gap-8 ${isMobile ? 'w-max snap-x snap-mandatory' : 'w-max'}`}>
 							{studentsToRender.map((student, index) => (
 								<motion.div
 									key={`${student.name}-${index}`}
-									className='flex-shrink-0 w-60 sm:w-64 lg:w-72 bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group mb-5'
-									whileHover={{ scale: 1.02 }}
+									className='group mb-5 w-[calc(100vw-6rem)] max-w-[280px] snap-center overflow-hidden rounded-xl bg-white shadow-lg transition-all duration-300 hover:shadow-xl sm:w-64 lg:w-72'
+									whileHover={isMobile ? undefined : { scale: 1.02 }}
 									onMouseEnter={() => handleCardHover(true)}
 									onMouseLeave={() => handleCardHover(false)}>
 									{/* Student Image */}

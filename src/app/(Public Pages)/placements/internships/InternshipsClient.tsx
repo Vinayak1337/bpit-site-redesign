@@ -56,10 +56,10 @@ export default function InternshipsClient({ data }: InternshipsClientProps) {
               </div>
             </motion.div>
             
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
               {data.hero.title}
             </h1>
-            <p className="text-xl md:text-2xl text-blue-200 mb-8 leading-relaxed">
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-blue-200 mb-8 leading-relaxed">
               {data.hero.subtitle}
             </p>
             <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-blue-600 mx-auto rounded-full" />
@@ -79,7 +79,7 @@ export default function InternshipsClient({ data }: InternshipsClientProps) {
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className="bg-white rounded-2xl p-8 shadow-xl border border-gray-100"
+                  className="bg-white rounded-2xl p-4 sm:p-6 md:p-8 shadow-xl border border-gray-100"
                 >
                   <div className={`w-16 h-16 bg-gradient-to-r ${stat.color} rounded-2xl flex items-center justify-center mx-auto mb-6 text-white`}>
                     <StatIcon className="w-8 h-8" />
@@ -102,7 +102,7 @@ export default function InternshipsClient({ data }: InternshipsClientProps) {
             transition={{ duration: 0.8 }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
               Why Pursue Internships?
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -110,7 +110,7 @@ export default function InternshipsClient({ data }: InternshipsClientProps) {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
             {data.benefits.map((benefit, index) => {
               const BenefitIcon = (Icons as any)[benefit.icon] || Icons.Award;
               return (
@@ -119,7 +119,7 @@ export default function InternshipsClient({ data }: InternshipsClientProps) {
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-8 shadow-lg border border-gray-100"
+                  className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-4 sm:p-6 md:p-8 shadow-lg border border-gray-100"
                 >
                   <div className={`w-16 h-16 bg-gradient-to-r ${
                     benefit.color === 'blue' ? 'from-blue-500 to-cyan-600' :
@@ -194,7 +194,7 @@ export default function InternshipsClient({ data }: InternshipsClientProps) {
             transition={{ duration: 0.8 }}
             className="text-center mb-12"
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
               Industry Partners
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -209,7 +209,7 @@ export default function InternshipsClient({ data }: InternshipsClientProps) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5 }}
-              className="grid grid-cols-1 lg:grid-cols-2 gap-8"
+              className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8"
             >
               {filteredInternships.map((internship, index) => (
                 <motion.div
@@ -217,7 +217,7 @@ export default function InternshipsClient({ data }: InternshipsClientProps) {
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100"
+                  className="bg-white rounded-2xl p-4 sm:p-6 md:p-8 shadow-lg border border-gray-100"
                 >
                   {/* Header */}
                   <div className="flex items-start justify-between mb-6">
@@ -299,7 +299,7 @@ export default function InternshipsClient({ data }: InternshipsClientProps) {
             transition={{ duration: 0.8 }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
               How Internships Work
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -307,7 +307,7 @@ export default function InternshipsClient({ data }: InternshipsClientProps) {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8">
             {data.process.map((step, index) => {
               const StepIcon = (Icons as any)[step.icon] || Icons.Users;
               return (
@@ -316,7 +316,7 @@ export default function InternshipsClient({ data }: InternshipsClientProps) {
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-8 shadow-lg text-center"
+                  className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-4 sm:p-6 md:p-8 shadow-lg text-center"
                 >
                   <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-700 rounded-full flex items-center justify-center mx-auto mb-6 text-white">
                     <StepIcon className="w-8 h-8" />
@@ -339,14 +339,14 @@ export default function InternshipsClient({ data }: InternshipsClientProps) {
             transition={{ duration: 0.8 }}
             className="text-center text-white max-w-4xl mx-auto"
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
               {data.contact.title}
             </h2>
             <p className="text-xl text-blue-200 mb-12 leading-relaxed">
               {data.contact.subtitle}
             </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 mb-12">
               <div className="flex flex-col items-center">
                 <div className="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-4">
                   <PhoneIcon className="w-8 h-8" />

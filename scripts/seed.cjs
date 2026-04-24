@@ -22,6 +22,32 @@ const SCRIPTS = {
 	'student-life': 'seed-student-life.cjs',
 	admissions: 'seed-admissions.cjs',
 	academia: 'seed-academia.cjs',
+	'academia-academic-calendar': 'seed-academia-academic-calendar.cjs',
+	'academia-examination': 'seed-academia-examination.cjs',
+	'academia-notices-circulars': 'seed-academia-notices-circulars.cjs',
+	'academia-syllabus-ordinance': 'seed-academia-syllabus-ordinance.cjs',
+	'academia-library': 'seed-academia-library.cjs',
+	'academia-library-rules': 'seed-academia-library-rules.cjs',
+	'academia-library-timings': 'seed-academia-library-timings.cjs',
+	'academia-library-moocs': 'seed-academia-library-moocs.cjs',
+	'academia-library-delnet': 'seed-academia-library-delnet.cjs',
+	'academia-library-ndli': 'seed-academia-library-ndli.cjs',
+	'academia-library-newspapers': 'seed-academia-library-newspapers.cjs',
+	'academia-library-photocopy-service': 'seed-academia-library-photocopy-service.cjs',
+	'academia-library-information': 'seed-academia-library-information.cjs',
+	'academia-library-weeding-out': 'seed-academia-library-weeding-out.cjs',
+	'academia-library-self-learning': 'seed-academia-library-self-learning.cjs',
+	'academia-library-digital-library': 'seed-academia-library-digital-library.cjs',
+	'academia-library-book-acquisition': 'seed-academia-library-book-acquisition.cjs',
+	'academia-library-book-bank': 'seed-academia-library-book-bank.cjs',
+	'academia-library-e-resources': 'seed-academia-library-e-resources.cjs',
+	'academia-library-services': 'seed-academia-library-services.cjs',
+	'academia-library-collection': 'seed-academia-library-collection.cjs',
+	'academia-library-staff': 'seed-academia-library-staff.cjs',
+	'academia-library-advisory-committee': 'seed-academia-library-advisory-committee.cjs',
+	'academia-library-downloads': 'seed-academia-library-downloads.cjs',
+	'academia-library-useful-links': 'seed-academia-library-useful-links.cjs',
+	'academia-library-contact': 'seed-academia-library-contact.cjs',
 
 	// Statutory Committees & Aliases
 	statutory: 'seed-statutory-committees.cjs',
@@ -33,7 +59,14 @@ const SCRIPTS = {
 	grievance: 'seed-statutory-committees.cjs', // Placeholder if added to script
 
 	gallery: 'seed-gallery.cjs',
-	'mandatory-disclosure': 'seed-mandatory-disclosure.cjs'
+	'mandatory-disclosure': 'seed-mandatory-disclosure.cjs',
+
+	// Public pages migrated from hardcoded to DB
+	'academia-overview': 'seed-academia-overview.cjs',
+	accreditation: 'seed-accreditation.cjs',
+	departments: 'seed-departments.cjs',
+	'privacy-policy': 'seed-privacy-policy.cjs',
+	'terms-of-service': 'seed-terms-of-service.cjs'
 };
 
 const args = process.argv.slice(2);

@@ -1,0 +1,988 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - link "011-2757 1080" [ref=e6] [cursor=pointer]:
+        - /url: tel:01127571080
+        - img [ref=e7]
+        - generic [ref=e9]: 011-2757 1080
+      - link "bpitindia@yahoo.com" [ref=e10] [cursor=pointer]:
+        - /url: mailto:bpitindia@yahoo.com
+        - img [ref=e11]
+        - generic [ref=e14]: bpitindia@yahoo.com
+      - link "PSP-4, Sector-17, Rohini, New Delhi" [ref=e15] [cursor=pointer]:
+        - /url: https://www.google.com/maps/search/?api=1&query=PSP-4%2C%20Sector-17%2C%20Rohini%2C%20New%20Delhi
+        - img [ref=e16]
+        - generic [ref=e19]: PSP-4, Sector-17, Rohini, New Delhi
+    - generic [ref=e20]: NBA Accredited B.Tech Programs
+  - generic [ref=e22]:
+    - generic [ref=e24]:
+      - img [ref=e25]
+      - generic [ref=e28]: "Important Announcements:"
+    - generic [ref=e30]:
+      - link "Admission 2024-25 Session Open - Apply Now" [ref=e31] [cursor=pointer]:
+        - /url: /admissions/apply
+      - link "Placement Drive 2024 - Register Today" [ref=e32] [cursor=pointer]:
+        - /url: /placements/register
+      - link "Annual Tech Fest \"INNOVATE 2024\" - March 15-17" [ref=e33] [cursor=pointer]:
+        - /url: /events/tech-fest
+      - link "Library New Books Collection Available" [ref=e34] [cursor=pointer]:
+        - /url: /academia/library
+      - link "Scholarship Applications Open - Merit & Need Based" [ref=e35] [cursor=pointer]:
+        - /url: /admissions/scholarship
+      - link [ref=e36] [cursor=pointer]:
+        - /url: /admissions/apply
+        - text: Admission 2024-25 Session Open - Apply Now
+      - link [ref=e37] [cursor=pointer]:
+        - /url: /placements/register
+        - text: Placement Drive 2024 - Register Today
+      - link [ref=e38] [cursor=pointer]:
+        - /url: /events/tech-fest
+        - text: Annual Tech Fest "INNOVATE 2024" - March 15-17
+      - link [ref=e39] [cursor=pointer]:
+        - /url: /academia/library
+        - text: Library New Books Collection Available
+      - link [ref=e40] [cursor=pointer]:
+        - /url: /admissions/scholarship
+        - text: Scholarship Applications Open - Merit & Need Based
+  - banner [ref=e41]:
+    - generic [ref=e43]:
+      - link "BPIT Logo" [ref=e44] [cursor=pointer]:
+        - /url: /
+        - img "BPIT Logo" [ref=e46]
+      - generic [ref=e47]:
+        - navigation "Main" [ref=e48]:
+          - list [ref=e50]:
+            - listitem [ref=e51]:
+              - button "About BPIT" [ref=e52] [cursor=pointer]:
+                - text: About BPIT
+                - img [ref=e53]
+            - listitem [ref=e55]:
+              - button "Admissions" [ref=e56] [cursor=pointer]:
+                - text: Admissions
+                - img [ref=e57]
+            - listitem [ref=e59]:
+              - button "Academics" [ref=e60] [cursor=pointer]:
+                - text: Academics
+                - img [ref=e61]
+            - listitem [ref=e63]:
+              - button "Departments" [ref=e64] [cursor=pointer]:
+                - text: Departments
+                - img [ref=e65]
+        - navigation "Main" [ref=e67]:
+          - list [ref=e69]:
+            - listitem [ref=e70]:
+              - button "Placements" [ref=e71] [cursor=pointer]:
+                - text: Placements
+                - img [ref=e72]
+            - listitem [ref=e74]:
+              - button "Student Life" [ref=e75] [cursor=pointer]:
+                - text: Student Life
+                - img [ref=e76]
+            - listitem [ref=e78]:
+              - button "Student Portal" [ref=e79] [cursor=pointer]:
+                - text: Student Portal
+                - img [ref=e80]
+        - button "Enquire Now" [ref=e82] [cursor=pointer]:
+          - generic [ref=e83]: Enquire Now
+  - generic [ref=e84]:
+    - generic [ref=e91]:
+      - heading "Computer Science & Engineering" [level=1] [ref=e92]
+      - paragraph [ref=e93]: Innovating Tomorrow's Technology Today
+      - generic [ref=e94]:
+        - generic [ref=e95]:
+          - img [ref=e96]
+          - generic [ref=e98]: AI & Machine Learning
+        - generic [ref=e99]:
+          - img [ref=e100]
+          - generic [ref=e102]: Data Science
+        - generic [ref=e103]:
+          - img [ref=e104]
+          - generic [ref=e106]: Cybersecurity
+    - generic [ref=e108]:
+      - generic [ref=e110]:
+        - heading "Navigation" [level=3] [ref=e112]
+        - generic [ref=e113]:
+          - generic [ref=e115]:
+            - button "Home" [ref=e116] [cursor=pointer]:
+              - generic [ref=e117]:
+                - img [ref=e119]
+                - generic [ref=e122]: Home
+            - button [ref=e123] [cursor=pointer]:
+              - img [ref=e124]
+          - button "Faculty" [ref=e128] [cursor=pointer]:
+            - generic [ref=e129]:
+              - img [ref=e131]
+              - generic [ref=e136]: Faculty
+              - img [ref=e137]
+          - generic [ref=e140]:
+            - button "Pedagogical Initiatives" [ref=e141] [cursor=pointer]:
+              - generic [ref=e142]:
+                - img [ref=e144]
+                - generic [ref=e147]: Pedagogical Initiatives
+            - button [ref=e148] [cursor=pointer]:
+              - img [ref=e149]
+          - generic [ref=e152]:
+            - button "Facilities" [ref=e153] [cursor=pointer]:
+              - generic [ref=e154]:
+                - img [ref=e156]
+                - generic [ref=e164]: Facilities
+            - button [ref=e165] [cursor=pointer]:
+              - img [ref=e166]
+          - generic [ref=e169]:
+            - button "Student Corner" [ref=e170] [cursor=pointer]:
+              - generic [ref=e171]:
+                - img [ref=e173]
+                - generic [ref=e177]: Student Corner
+            - button [ref=e178] [cursor=pointer]:
+              - img [ref=e179]
+          - generic [ref=e182]:
+            - button "Publications" [ref=e183] [cursor=pointer]:
+              - generic [ref=e184]:
+                - img [ref=e186]
+                - generic [ref=e192]: Publications
+            - button [ref=e193] [cursor=pointer]:
+              - img [ref=e194]
+          - button "Patents" [ref=e198] [cursor=pointer]:
+            - generic [ref=e199]:
+              - img [ref=e201]
+              - generic [ref=e203]: Patents
+              - img [ref=e204]
+          - button "Magazine" [ref=e208] [cursor=pointer]:
+            - generic [ref=e209]:
+              - img [ref=e211]
+              - generic [ref=e214]: Magazine
+              - img [ref=e215]
+          - button "News‑Letter" [ref=e219] [cursor=pointer]:
+            - generic [ref=e220]:
+              - img [ref=e222]
+              - generic [ref=e227]: News‑Letter
+              - img [ref=e228]
+          - button "Result" [ref=e232] [cursor=pointer]:
+            - generic [ref=e233]:
+              - img [ref=e235]
+              - generic [ref=e239]: Result
+              - img [ref=e240]
+          - button "Placement" [ref=e244] [cursor=pointer]:
+            - generic [ref=e245]:
+              - img [ref=e247]
+              - generic [ref=e250]: Placement
+              - img [ref=e251]
+      - generic [ref=e256]:
+        - generic [ref=e262]:
+          - generic [ref=e264]:
+            - heading "Computer Science & Engineering" [level=1] [ref=e265]
+            - paragraph [ref=e266]: Shaping the Future of Technology
+          - generic [ref=e267]:
+            - generic [ref=e268]:
+              - img [ref=e270]
+              - generic [ref=e275]: 800+
+              - generic [ref=e276]: Students
+            - generic [ref=e277]:
+              - img [ref=e279]
+              - generic [ref=e283]: 30+
+              - generic [ref=e284]: Faculty
+            - generic [ref=e285]:
+              - img [ref=e287]
+              - generic [ref=e291]: 15+
+              - generic [ref=e292]: Labs
+            - generic [ref=e293]:
+              - img [ref=e295]
+              - generic [ref=e298]: 95%
+              - generic [ref=e299]: Placements
+        - generic [ref=e301]:
+          - generic [ref=e302]:
+            - img [ref=e304]
+            - heading "About Department" [level=2] [ref=e307]
+          - generic [ref=e308]:
+            - paragraph [ref=e309]: The Department of Computer Science & Engineering is committed towards excellence in education and research in the field of Computer Science and Engineering. The department offers a 4-year undergraduate program in Computer Science and Engineering leading to the degree of Bachelor of Technology.
+            - paragraph [ref=e310]: The Department has well-equipped laboratories, including Programming Language Lab, Data Structure Lab, Database Lab, Computer Networks Lab, Software Engineering Lab, and many more. The department also has a dedicated Research & Development center that focuses on cutting-edge research in various domains of computer science.
+            - paragraph [ref=e311]: Our faculty members are highly qualified and experienced in their respective fields. They are actively involved in research and have published numerous papers in international journals and conferences. The department also regularly organizes workshops, seminars, and industrial visits to keep students updated with the latest technological trends.
+        - generic [ref=e313]:
+          - generic [ref=e314]:
+            - img [ref=e316]
+            - heading "Message from HOD" [level=2] [ref=e319]
+          - generic [ref=e321]:
+            - generic [ref=e323]:
+              - img [ref=e325]
+              - generic [ref=e328]:
+                - heading "Dr. [HOD Name]" [level=3] [ref=e329]
+                - paragraph [ref=e330]: Head of Department
+                - paragraph [ref=e331]: Ph.D. Computer Science
+            - generic [ref=e333]:
+              - paragraph [ref=e334]: "\"Welcome to the Department of Computer Science & Engineering. Our department is committed to providing quality education and fostering innovation in the field of computer science and engineering.\""
+              - paragraph [ref=e335]: "\"We strive to create an environment where students can develop their technical skills, critical thinking abilities, and professional competencies to become successful engineers and leaders in the technology industry.\""
+              - paragraph [ref=e336]: "\"I invite you to explore our programs, research opportunities, and the vibrant academic community that makes our department a great place to learn and grow.\""
+        - generic [ref=e338]:
+          - generic [ref=e339]:
+            - img [ref=e341]
+            - heading "Events & News" [level=2] [ref=e346]
+          - generic [ref=e347]:
+            - generic [ref=e348]:
+              - generic [ref=e349]:
+                - img [ref=e350]
+                - heading "Upcoming Events" [level=3] [ref=e355]
+              - generic [ref=e357]:
+                - generic [ref=e358]:
+                  - generic [ref=e359] [cursor=pointer]:
+                    - generic [ref=e361]:
+                      - img [ref=e363]
+                      - generic [ref=e368]:
+                        - heading "Annual Tech Symposium 2025" [level=4] [ref=e369]
+                        - paragraph [ref=e370]: March 15-16, 2025
+                    - paragraph [ref=e371]: Two-day technical symposium featuring latest trends in AI, ML, and emerging technologies.
+                    - generic [ref=e373]:
+                      - img [ref=e374]
+                      - text: 500+ Expected
+                  - generic [ref=e379] [cursor=pointer]:
+                    - generic [ref=e381]:
+                      - img [ref=e383]
+                      - generic [ref=e388]:
+                        - heading "Industry Expert Lecture Series" [level=4] [ref=e389]
+                        - paragraph [ref=e390]: February 28, 2025
+                    - paragraph [ref=e391]: Distinguished industry professionals sharing insights on current market trends.
+                    - generic [ref=e393]:
+                      - img [ref=e394]
+                      - text: 200+ Students
+                  - generic [ref=e399] [cursor=pointer]:
+                    - generic [ref=e401]:
+                      - img [ref=e403]
+                      - generic [ref=e408]:
+                        - heading "Coding Competition - CodeFest" [level=4] [ref=e409]
+                        - paragraph [ref=e410]: March 5, 2025
+                    - paragraph [ref=e411]: Inter-college coding competition with exciting prizes and internship opportunities.
+                    - generic [ref=e413]:
+                      - img [ref=e414]
+                      - text: 300+ Participants
+                  - generic [ref=e419] [cursor=pointer]:
+                    - generic [ref=e421]:
+                      - img [ref=e423]
+                      - generic [ref=e428]:
+                        - heading "Workshop on Machine Learning" [level=4] [ref=e429]
+                        - paragraph [ref=e430]: February 20, 2025
+                    - paragraph [ref=e431]: Hands-on workshop covering advanced machine learning techniques and applications.
+                    - generic [ref=e433]:
+                      - img [ref=e434]
+                      - text: 150+ Students
+                  - generic [ref=e439] [cursor=pointer]:
+                    - generic [ref=e441]:
+                      - img [ref=e443]
+                      - generic [ref=e448]:
+                        - heading "Hackathon 2025" [level=4] [ref=e449]
+                        - paragraph [ref=e450]: March 25-26, 2025
+                    - paragraph [ref=e451]: 48-hour hackathon challenging students to develop innovative solutions to real-world problems.
+                    - generic [ref=e453]:
+                      - img [ref=e454]
+                      - text: 400+ Participants
+                  - generic [ref=e459] [cursor=pointer]:
+                    - generic [ref=e461]:
+                      - img [ref=e463]
+                      - generic [ref=e468]:
+                        - heading "Alumni Meet & Greet" [level=4] [ref=e469]
+                        - paragraph [ref=e470]: April 10, 2025
+                    - paragraph [ref=e471]: Connect with successful alumni working in top tech companies and startups.
+                    - generic [ref=e473]:
+                      - img [ref=e474]
+                      - text: 250+ Alumni
+                - generic [ref=e479]:
+                  - generic [ref=e480] [cursor=pointer]:
+                    - generic [ref=e482]:
+                      - img [ref=e484]
+                      - generic [ref=e489]:
+                        - heading "Annual Tech Symposium 2025" [level=4] [ref=e490]
+                        - paragraph [ref=e491]: March 15-16, 2025
+                    - paragraph [ref=e492]: Two-day technical symposium featuring latest trends in AI, ML, and emerging technologies.
+                    - generic [ref=e494]:
+                      - img [ref=e495]
+                      - text: 500+ Expected
+                  - generic [ref=e500] [cursor=pointer]:
+                    - generic [ref=e502]:
+                      - img [ref=e504]
+                      - generic [ref=e509]:
+                        - heading "Industry Expert Lecture Series" [level=4] [ref=e510]
+                        - paragraph [ref=e511]: February 28, 2025
+                    - paragraph [ref=e512]: Distinguished industry professionals sharing insights on current market trends.
+                    - generic [ref=e514]:
+                      - img [ref=e515]
+                      - text: 200+ Students
+                  - generic [ref=e520] [cursor=pointer]:
+                    - generic [ref=e522]:
+                      - img [ref=e524]
+                      - generic [ref=e529]:
+                        - heading "Coding Competition - CodeFest" [level=4] [ref=e530]
+                        - paragraph [ref=e531]: March 5, 2025
+                    - paragraph [ref=e532]: Inter-college coding competition with exciting prizes and internship opportunities.
+                    - generic [ref=e534]:
+                      - img [ref=e535]
+                      - text: 300+ Participants
+                  - generic [ref=e540] [cursor=pointer]:
+                    - generic [ref=e542]:
+                      - img [ref=e544]
+                      - generic [ref=e549]:
+                        - heading "Workshop on Machine Learning" [level=4] [ref=e550]
+                        - paragraph [ref=e551]: February 20, 2025
+                    - paragraph [ref=e552]: Hands-on workshop covering advanced machine learning techniques and applications.
+                    - generic [ref=e554]:
+                      - img [ref=e555]
+                      - text: 150+ Students
+                  - generic [ref=e560] [cursor=pointer]:
+                    - generic [ref=e562]:
+                      - img [ref=e564]
+                      - generic [ref=e569]:
+                        - heading "Hackathon 2025" [level=4] [ref=e570]
+                        - paragraph [ref=e571]: March 25-26, 2025
+                    - paragraph [ref=e572]: 48-hour hackathon challenging students to develop innovative solutions to real-world problems.
+                    - generic [ref=e574]:
+                      - img [ref=e575]
+                      - text: 400+ Participants
+                  - generic [ref=e580] [cursor=pointer]:
+                    - generic [ref=e582]:
+                      - img [ref=e584]
+                      - generic [ref=e589]:
+                        - heading "Alumni Meet & Greet" [level=4] [ref=e590]
+                        - paragraph [ref=e591]: April 10, 2025
+                    - paragraph [ref=e592]: Connect with successful alumni working in top tech companies and startups.
+                    - generic [ref=e594]:
+                      - img [ref=e595]
+                      - text: 250+ Alumni
+                - generic [ref=e600]:
+                  - generic [ref=e601] [cursor=pointer]:
+                    - generic [ref=e603]:
+                      - img [ref=e605]
+                      - generic [ref=e610]:
+                        - heading "Annual Tech Symposium 2025" [level=4] [ref=e611]
+                        - paragraph [ref=e612]: March 15-16, 2025
+                    - paragraph [ref=e613]: Two-day technical symposium featuring latest trends in AI, ML, and emerging technologies.
+                    - generic [ref=e615]:
+                      - img [ref=e616]
+                      - text: 500+ Expected
+                  - generic [ref=e621] [cursor=pointer]:
+                    - generic [ref=e623]:
+                      - img [ref=e625]
+                      - generic [ref=e630]:
+                        - heading "Industry Expert Lecture Series" [level=4] [ref=e631]
+                        - paragraph [ref=e632]: February 28, 2025
+                    - paragraph [ref=e633]: Distinguished industry professionals sharing insights on current market trends.
+                    - generic [ref=e635]:
+                      - img [ref=e636]
+                      - text: 200+ Students
+                  - generic [ref=e641] [cursor=pointer]:
+                    - generic [ref=e643]:
+                      - img [ref=e645]
+                      - generic [ref=e650]:
+                        - heading "Coding Competition - CodeFest" [level=4] [ref=e651]
+                        - paragraph [ref=e652]: March 5, 2025
+                    - paragraph [ref=e653]: Inter-college coding competition with exciting prizes and internship opportunities.
+                    - generic [ref=e655]:
+                      - img [ref=e656]
+                      - text: 300+ Participants
+                  - generic [ref=e661] [cursor=pointer]:
+                    - generic [ref=e663]:
+                      - img [ref=e665]
+                      - generic [ref=e670]:
+                        - heading "Workshop on Machine Learning" [level=4] [ref=e671]
+                        - paragraph [ref=e672]: February 20, 2025
+                    - paragraph [ref=e673]: Hands-on workshop covering advanced machine learning techniques and applications.
+                    - generic [ref=e675]:
+                      - img [ref=e676]
+                      - text: 150+ Students
+                  - generic [ref=e681] [cursor=pointer]:
+                    - generic [ref=e683]:
+                      - img [ref=e685]
+                      - generic [ref=e690]:
+                        - heading "Hackathon 2025" [level=4] [ref=e691]
+                        - paragraph [ref=e692]: March 25-26, 2025
+                    - paragraph [ref=e693]: 48-hour hackathon challenging students to develop innovative solutions to real-world problems.
+                    - generic [ref=e695]:
+                      - img [ref=e696]
+                      - text: 400+ Participants
+                  - generic [ref=e701] [cursor=pointer]:
+                    - generic [ref=e703]:
+                      - img [ref=e705]
+                      - generic [ref=e710]:
+                        - heading "Alumni Meet & Greet" [level=4] [ref=e711]
+                        - paragraph [ref=e712]: April 10, 2025
+                    - paragraph [ref=e713]: Connect with successful alumni working in top tech companies and startups.
+                    - generic [ref=e715]:
+                      - img [ref=e716]
+                      - text: 250+ Alumni
+                - generic [ref=e721]:
+                  - generic [ref=e722] [cursor=pointer]:
+                    - generic [ref=e724]:
+                      - img [ref=e726]
+                      - generic [ref=e731]:
+                        - heading "Annual Tech Symposium 2025" [level=4] [ref=e732]
+                        - paragraph [ref=e733]: March 15-16, 2025
+                    - paragraph [ref=e734]: Two-day technical symposium featuring latest trends in AI, ML, and emerging technologies.
+                    - generic [ref=e736]:
+                      - img [ref=e737]
+                      - text: 500+ Expected
+                  - generic [ref=e742] [cursor=pointer]:
+                    - generic [ref=e744]:
+                      - img [ref=e746]
+                      - generic [ref=e751]:
+                        - heading "Industry Expert Lecture Series" [level=4] [ref=e752]
+                        - paragraph [ref=e753]: February 28, 2025
+                    - paragraph [ref=e754]: Distinguished industry professionals sharing insights on current market trends.
+                    - generic [ref=e756]:
+                      - img [ref=e757]
+                      - text: 200+ Students
+                  - generic [ref=e762] [cursor=pointer]:
+                    - generic [ref=e764]:
+                      - img [ref=e766]
+                      - generic [ref=e771]:
+                        - heading "Coding Competition - CodeFest" [level=4] [ref=e772]
+                        - paragraph [ref=e773]: March 5, 2025
+                    - paragraph [ref=e774]: Inter-college coding competition with exciting prizes and internship opportunities.
+                    - generic [ref=e776]:
+                      - img [ref=e777]
+                      - text: 300+ Participants
+                  - generic [ref=e782] [cursor=pointer]:
+                    - generic [ref=e784]:
+                      - img [ref=e786]
+                      - generic [ref=e791]:
+                        - heading "Workshop on Machine Learning" [level=4] [ref=e792]
+                        - paragraph [ref=e793]: February 20, 2025
+                    - paragraph [ref=e794]: Hands-on workshop covering advanced machine learning techniques and applications.
+                    - generic [ref=e796]:
+                      - img [ref=e797]
+                      - text: 150+ Students
+                  - generic [ref=e802] [cursor=pointer]:
+                    - generic [ref=e804]:
+                      - img [ref=e806]
+                      - generic [ref=e811]:
+                        - heading "Hackathon 2025" [level=4] [ref=e812]
+                        - paragraph [ref=e813]: March 25-26, 2025
+                    - paragraph [ref=e814]: 48-hour hackathon challenging students to develop innovative solutions to real-world problems.
+                    - generic [ref=e816]:
+                      - img [ref=e817]
+                      - text: 400+ Participants
+                  - generic [ref=e822] [cursor=pointer]:
+                    - generic [ref=e824]:
+                      - img [ref=e826]
+                      - generic [ref=e831]:
+                        - heading "Alumni Meet & Greet" [level=4] [ref=e832]
+                        - paragraph [ref=e833]: April 10, 2025
+                    - paragraph [ref=e834]: Connect with successful alumni working in top tech companies and startups.
+                    - generic [ref=e836]:
+                      - img [ref=e837]
+                      - text: 250+ Alumni
+            - generic [ref=e842]:
+              - generic [ref=e843]:
+                - img [ref=e844]
+                - heading "Latest News" [level=3] [ref=e849]
+              - generic [ref=e851]:
+                - generic [ref=e852]:
+                  - generic [ref=e853] [cursor=pointer]:
+                    - generic [ref=e855]:
+                      - img [ref=e857]
+                      - generic [ref=e862]:
+                        - heading "CSE Department Achieves NBA Accreditation" [level=4] [ref=e863]
+                        - paragraph [ref=e864]: January 20, 2025
+                    - paragraph [ref=e867]: Our department has been granted NBA accreditation for the next 5 years, recognizing our commitment to quality education.
+                  - generic [ref=e868] [cursor=pointer]:
+                    - generic [ref=e870]:
+                      - img [ref=e872]
+                      - generic [ref=e877]:
+                        - heading "New Research Lab Inaugurated" [level=4] [ref=e878]
+                        - paragraph [ref=e879]: January 15, 2025
+                    - paragraph [ref=e880]: State-of-the-art AI & ML research laboratory inaugurated with latest equipment and software.
+                  - generic [ref=e881] [cursor=pointer]:
+                    - generic [ref=e883]:
+                      - img [ref=e885]
+                      - generic [ref=e890]:
+                        - heading "Outstanding Placement Results 2024" [level=4] [ref=e891]
+                        - paragraph [ref=e892]: January 10, 2025
+                    - paragraph [ref=e895]: 95% placement rate achieved with top companies like Google, Microsoft, and Amazon recruiting our students.
+                  - generic [ref=e896] [cursor=pointer]:
+                    - generic [ref=e898]:
+                      - img [ref=e900]
+                      - generic [ref=e905]:
+                        - heading "Faculty Research Paper Published" [level=4] [ref=e906]
+                        - paragraph [ref=e907]: January 5, 2025
+                    - paragraph [ref=e908]: Dr. [Faculty Name] published research paper on "Advanced Machine Learning Algorithms" in IEEE journal.
+                  - generic [ref=e909] [cursor=pointer]:
+                    - generic [ref=e911]:
+                      - img [ref=e913]
+                      - generic [ref=e918]:
+                        - heading "Student Wins National Coding Competition" [level=4] [ref=e919]
+                        - paragraph [ref=e920]: December 28, 2024
+                    - paragraph [ref=e923]: CSE student secures first place in national level coding competition organized by IIT Delhi.
+                  - generic [ref=e924] [cursor=pointer]:
+                    - generic [ref=e926]:
+                      - img [ref=e928]
+                      - generic [ref=e933]:
+                        - heading "New Partnership with Tech Giants" [level=4] [ref=e934]
+                        - paragraph [ref=e935]: December 20, 2024
+                    - paragraph [ref=e936]: Department establishes collaboration with leading technology companies for internships and placements.
+                - generic [ref=e937]:
+                  - generic [ref=e938] [cursor=pointer]:
+                    - generic [ref=e940]:
+                      - img [ref=e942]
+                      - generic [ref=e947]:
+                        - heading "CSE Department Achieves NBA Accreditation" [level=4] [ref=e948]
+                        - paragraph [ref=e949]: January 20, 2025
+                    - paragraph [ref=e952]: Our department has been granted NBA accreditation for the next 5 years, recognizing our commitment to quality education.
+                  - generic [ref=e953] [cursor=pointer]:
+                    - generic [ref=e955]:
+                      - img [ref=e957]
+                      - generic [ref=e962]:
+                        - heading "New Research Lab Inaugurated" [level=4] [ref=e963]
+                        - paragraph [ref=e964]: January 15, 2025
+                    - paragraph [ref=e965]: State-of-the-art AI & ML research laboratory inaugurated with latest equipment and software.
+                  - generic [ref=e966] [cursor=pointer]:
+                    - generic [ref=e968]:
+                      - img [ref=e970]
+                      - generic [ref=e975]:
+                        - heading "Outstanding Placement Results 2024" [level=4] [ref=e976]
+                        - paragraph [ref=e977]: January 10, 2025
+                    - paragraph [ref=e980]: 95% placement rate achieved with top companies like Google, Microsoft, and Amazon recruiting our students.
+                  - generic [ref=e981] [cursor=pointer]:
+                    - generic [ref=e983]:
+                      - img [ref=e985]
+                      - generic [ref=e990]:
+                        - heading "Faculty Research Paper Published" [level=4] [ref=e991]
+                        - paragraph [ref=e992]: January 5, 2025
+                    - paragraph [ref=e993]: Dr. [Faculty Name] published research paper on "Advanced Machine Learning Algorithms" in IEEE journal.
+                  - generic [ref=e994] [cursor=pointer]:
+                    - generic [ref=e996]:
+                      - img [ref=e998]
+                      - generic [ref=e1003]:
+                        - heading "Student Wins National Coding Competition" [level=4] [ref=e1004]
+                        - paragraph [ref=e1005]: December 28, 2024
+                    - paragraph [ref=e1008]: CSE student secures first place in national level coding competition organized by IIT Delhi.
+                  - generic [ref=e1009] [cursor=pointer]:
+                    - generic [ref=e1011]:
+                      - img [ref=e1013]
+                      - generic [ref=e1018]:
+                        - heading "New Partnership with Tech Giants" [level=4] [ref=e1019]
+                        - paragraph [ref=e1020]: December 20, 2024
+                    - paragraph [ref=e1021]: Department establishes collaboration with leading technology companies for internships and placements.
+                - generic [ref=e1022]:
+                  - generic [ref=e1023] [cursor=pointer]:
+                    - generic [ref=e1025]:
+                      - img [ref=e1027]
+                      - generic [ref=e1032]:
+                        - heading "CSE Department Achieves NBA Accreditation" [level=4] [ref=e1033]
+                        - paragraph [ref=e1034]: January 20, 2025
+                    - paragraph [ref=e1037]: Our department has been granted NBA accreditation for the next 5 years, recognizing our commitment to quality education.
+                  - generic [ref=e1038] [cursor=pointer]:
+                    - generic [ref=e1040]:
+                      - img [ref=e1042]
+                      - generic [ref=e1047]:
+                        - heading "New Research Lab Inaugurated" [level=4] [ref=e1048]
+                        - paragraph [ref=e1049]: January 15, 2025
+                    - paragraph [ref=e1050]: State-of-the-art AI & ML research laboratory inaugurated with latest equipment and software.
+                  - generic [ref=e1051] [cursor=pointer]:
+                    - generic [ref=e1053]:
+                      - img [ref=e1055]
+                      - generic [ref=e1060]:
+                        - heading "Outstanding Placement Results 2024" [level=4] [ref=e1061]
+                        - paragraph [ref=e1062]: January 10, 2025
+                    - paragraph [ref=e1065]: 95% placement rate achieved with top companies like Google, Microsoft, and Amazon recruiting our students.
+                  - generic [ref=e1066] [cursor=pointer]:
+                    - generic [ref=e1068]:
+                      - img [ref=e1070]
+                      - generic [ref=e1075]:
+                        - heading "Faculty Research Paper Published" [level=4] [ref=e1076]
+                        - paragraph [ref=e1077]: January 5, 2025
+                    - paragraph [ref=e1078]: Dr. [Faculty Name] published research paper on "Advanced Machine Learning Algorithms" in IEEE journal.
+                  - generic [ref=e1079] [cursor=pointer]:
+                    - generic [ref=e1081]:
+                      - img [ref=e1083]
+                      - generic [ref=e1088]:
+                        - heading "Student Wins National Coding Competition" [level=4] [ref=e1089]
+                        - paragraph [ref=e1090]: December 28, 2024
+                    - paragraph [ref=e1093]: CSE student secures first place in national level coding competition organized by IIT Delhi.
+                  - generic [ref=e1094] [cursor=pointer]:
+                    - generic [ref=e1096]:
+                      - img [ref=e1098]
+                      - generic [ref=e1103]:
+                        - heading "New Partnership with Tech Giants" [level=4] [ref=e1104]
+                        - paragraph [ref=e1105]: December 20, 2024
+                    - paragraph [ref=e1106]: Department establishes collaboration with leading technology companies for internships and placements.
+                - generic [ref=e1107]:
+                  - generic [ref=e1108] [cursor=pointer]:
+                    - generic [ref=e1110]:
+                      - img [ref=e1112]
+                      - generic [ref=e1117]:
+                        - heading "CSE Department Achieves NBA Accreditation" [level=4] [ref=e1118]
+                        - paragraph [ref=e1119]: January 20, 2025
+                    - paragraph [ref=e1122]: Our department has been granted NBA accreditation for the next 5 years, recognizing our commitment to quality education.
+                  - generic [ref=e1123] [cursor=pointer]:
+                    - generic [ref=e1125]:
+                      - img [ref=e1127]
+                      - generic [ref=e1132]:
+                        - heading "New Research Lab Inaugurated" [level=4] [ref=e1133]
+                        - paragraph [ref=e1134]: January 15, 2025
+                    - paragraph [ref=e1135]: State-of-the-art AI & ML research laboratory inaugurated with latest equipment and software.
+                  - generic [ref=e1136] [cursor=pointer]:
+                    - generic [ref=e1138]:
+                      - img [ref=e1140]
+                      - generic [ref=e1145]:
+                        - heading "Outstanding Placement Results 2024" [level=4] [ref=e1146]
+                        - paragraph [ref=e1147]: January 10, 2025
+                    - paragraph [ref=e1150]: 95% placement rate achieved with top companies like Google, Microsoft, and Amazon recruiting our students.
+                  - generic [ref=e1151] [cursor=pointer]:
+                    - generic [ref=e1153]:
+                      - img [ref=e1155]
+                      - generic [ref=e1160]:
+                        - heading "Faculty Research Paper Published" [level=4] [ref=e1161]
+                        - paragraph [ref=e1162]: January 5, 2025
+                    - paragraph [ref=e1163]: Dr. [Faculty Name] published research paper on "Advanced Machine Learning Algorithms" in IEEE journal.
+                  - generic [ref=e1164] [cursor=pointer]:
+                    - generic [ref=e1166]:
+                      - img [ref=e1168]
+                      - generic [ref=e1173]:
+                        - heading "Student Wins National Coding Competition" [level=4] [ref=e1174]
+                        - paragraph [ref=e1175]: December 28, 2024
+                    - paragraph [ref=e1178]: CSE student secures first place in national level coding competition organized by IIT Delhi.
+                  - generic [ref=e1179] [cursor=pointer]:
+                    - generic [ref=e1181]:
+                      - img [ref=e1183]
+                      - generic [ref=e1188]:
+                        - heading "New Partnership with Tech Giants" [level=4] [ref=e1189]
+                        - paragraph [ref=e1190]: December 20, 2024
+                    - paragraph [ref=e1191]: Department establishes collaboration with leading technology companies for internships and placements.
+        - generic [ref=e1193]:
+          - generic [ref=e1194]:
+            - img [ref=e1196]
+            - heading "Department Highlights" [level=2] [ref=e1203]
+          - generic [ref=e1207]:
+            - generic [ref=e1208]:
+              - img "Hackathon Winners 2024" [ref=e1210]
+              - generic [ref=e1211]:
+                - heading "Hackathon Winners 2024" [level=3] [ref=e1212]
+                - paragraph [ref=e1213]: Our students secured 1st place in National Hackathon with innovative AI solution for healthcare.
+            - generic [ref=e1214]:
+              - img "Research Excellence Award" [ref=e1216]
+              - generic [ref=e1217]:
+                - heading "Research Excellence Award" [level=3] [ref=e1218]
+                - paragraph [ref=e1219]: Department recognized for outstanding research contribution in Machine Learning and Data Science.
+            - generic [ref=e1220]:
+              - img "Tech Symposium 2024" [ref=e1222]
+              - generic [ref=e1223]:
+                - heading "Tech Symposium 2024" [level=3] [ref=e1224]
+                - paragraph [ref=e1225]: Annual technical symposium with 500+ participants and industry experts from top tech companies.
+            - generic [ref=e1226]:
+              - img "Industry Partnership Program" [ref=e1228]
+              - generic [ref=e1229]:
+                - heading "Industry Partnership Program" [level=3] [ref=e1230]
+                - paragraph [ref=e1231]: Strategic collaboration with leading tech companies for student internships and placements.
+            - generic [ref=e1232]:
+              - img "Coding Competition Victory" [ref=e1234]
+              - generic [ref=e1235]:
+                - heading "Coding Competition Victory" [level=3] [ref=e1236]
+                - paragraph [ref=e1237]: Team CodeMasters won inter-college programming contest with innovative problem-solving approach.
+            - generic [ref=e1238]:
+              - img "Innovation Lab Launch" [ref=e1240]
+              - generic [ref=e1241]:
+                - heading "Innovation Lab Launch" [level=3] [ref=e1242]
+                - paragraph [ref=e1243]: New AI/ML innovation lab inaugurated with state-of-the-art equipment and software tools.
+            - generic [ref=e1244]:
+              - img "Open Source Contribution Drive" [ref=e1246]
+              - generic [ref=e1247]:
+                - heading "Open Source Contribution Drive" [level=3] [ref=e1248]
+                - paragraph [ref=e1249]: Students contributed to major open source projects and gained recognition from global developers.
+            - generic [ref=e1250]:
+              - img "AI Workshop Series" [ref=e1252]
+              - generic [ref=e1253]:
+                - heading "AI Workshop Series" [level=3] [ref=e1254]
+                - paragraph [ref=e1255]: Comprehensive workshop series on Artificial Intelligence and Machine Learning for beginners.
+            - generic [ref=e1256]:
+              - img "Startup Incubation Program" [ref=e1258]
+              - generic [ref=e1259]:
+                - heading "Startup Incubation Program" [level=3] [ref=e1260]
+                - paragraph [ref=e1261]: Department launches startup incubation program to foster entrepreneurship among students.
+            - generic [ref=e1262]:
+              - img "International Conference Participation" [ref=e1264]
+              - generic [ref=e1265]:
+                - heading "International Conference Participation" [level=3] [ref=e1266]
+                - paragraph [ref=e1267]: Faculty and students presented research papers at international technology conferences.
+            - generic [ref=e1268]:
+              - img "Hackathon Winners 2024" [ref=e1270]
+              - generic [ref=e1271]:
+                - heading "Hackathon Winners 2024" [level=3] [ref=e1272]
+                - paragraph [ref=e1273]: Our students secured 1st place in National Hackathon with innovative AI solution for healthcare.
+            - generic [ref=e1274]:
+              - img "Research Excellence Award" [ref=e1276]
+              - generic [ref=e1277]:
+                - heading "Research Excellence Award" [level=3] [ref=e1278]
+                - paragraph [ref=e1279]: Department recognized for outstanding research contribution in Machine Learning and Data Science.
+            - generic [ref=e1280]:
+              - img "Tech Symposium 2024" [ref=e1282]
+              - generic [ref=e1283]:
+                - heading "Tech Symposium 2024" [level=3] [ref=e1284]
+                - paragraph [ref=e1285]: Annual technical symposium with 500+ participants and industry experts from top tech companies.
+            - generic [ref=e1286]:
+              - img "Industry Partnership Program" [ref=e1288]
+              - generic [ref=e1289]:
+                - heading "Industry Partnership Program" [level=3] [ref=e1290]
+                - paragraph [ref=e1291]: Strategic collaboration with leading tech companies for student internships and placements.
+            - generic [ref=e1292]:
+              - img "Coding Competition Victory" [ref=e1294]
+              - generic [ref=e1295]:
+                - heading "Coding Competition Victory" [level=3] [ref=e1296]
+                - paragraph [ref=e1297]: Team CodeMasters won inter-college programming contest with innovative problem-solving approach.
+            - generic [ref=e1298]:
+              - img "Innovation Lab Launch" [ref=e1300]
+              - generic [ref=e1301]:
+                - heading "Innovation Lab Launch" [level=3] [ref=e1302]
+                - paragraph [ref=e1303]: New AI/ML innovation lab inaugurated with state-of-the-art equipment and software tools.
+            - generic [ref=e1304]:
+              - img "Open Source Contribution Drive" [ref=e1306]
+              - generic [ref=e1307]:
+                - heading "Open Source Contribution Drive" [level=3] [ref=e1308]
+                - paragraph [ref=e1309]: Students contributed to major open source projects and gained recognition from global developers.
+            - generic [ref=e1310]:
+              - img "AI Workshop Series" [ref=e1312]
+              - generic [ref=e1313]:
+                - heading "AI Workshop Series" [level=3] [ref=e1314]
+                - paragraph [ref=e1315]: Comprehensive workshop series on Artificial Intelligence and Machine Learning for beginners.
+            - generic [ref=e1316]:
+              - img "Startup Incubation Program" [ref=e1318]
+              - generic [ref=e1319]:
+                - heading "Startup Incubation Program" [level=3] [ref=e1320]
+                - paragraph [ref=e1321]: Department launches startup incubation program to foster entrepreneurship among students.
+            - generic [ref=e1322]:
+              - img "International Conference Participation" [ref=e1324]
+              - generic [ref=e1325]:
+                - heading "International Conference Participation" [level=3] [ref=e1326]
+                - paragraph [ref=e1327]: Faculty and students presented research papers at international technology conferences.
+        - generic [ref=e1329]:
+          - generic [ref=e1330]:
+            - img [ref=e1332]
+            - heading "Our Shining Stars" [level=2] [ref=e1334]
+          - generic [ref=e1335]:
+            - generic [ref=e1337]:
+              - generic [ref=e1339]:
+                - img "Arjun Sharma" [ref=e1341]
+                - heading "Arjun Sharma" [level=3] [ref=e1342]
+                - paragraph [ref=e1343]: Google Software Engineer
+                - paragraph [ref=e1344]: 2023 Graduate
+                - generic [ref=e1345]:
+                  - img [ref=e1346]
+                  - generic [ref=e1354]: Google
+                - generic [ref=e1355]:
+                  - img [ref=e1356]
+                  - generic [ref=e1359]: ₹45 LPA
+                - generic [ref=e1360]:
+                  - img [ref=e1361]
+                  - generic [ref=e1364]: Bangalore
+              - generic [ref=e1365]:
+                - generic [ref=e1366]:
+                  - heading "Achievement Story" [level=4] [ref=e1367]
+                  - paragraph [ref=e1368]: Secured position as Software Engineer at Google after excelling in competitive programming and contributing to open-source projects.
+                - generic [ref=e1369]:
+                  - heading "Core Skills" [level=4] [ref=e1370]
+                  - generic [ref=e1371]:
+                    - generic [ref=e1372]: Python
+                    - generic [ref=e1373]: Java
+                    - generic [ref=e1374]: Machine Learning
+                    - generic [ref=e1375]: System Design
+                - generic [ref=e1376]:
+                  - heading "Notable Projects" [level=4] [ref=e1377]
+                  - generic [ref=e1378]:
+                    - generic [ref=e1380]:
+                      - img [ref=e1381]
+                      - generic [ref=e1383]: AI-powered Healthcare App
+                    - generic [ref=e1385]:
+                      - img [ref=e1386]
+                      - generic [ref=e1388]: Distributed Computing System
+                - generic [ref=e1389]:
+                  - heading "Awards & Recognition" [level=4] [ref=e1390]
+                  - generic [ref=e1391]:
+                    - generic [ref=e1393]:
+                      - img [ref=e1394]
+                      - generic [ref=e1397]: Best Final Year Project
+                    - generic [ref=e1399]:
+                      - img [ref=e1400]
+                      - generic [ref=e1403]: Google Code-in Winner
+            - generic [ref=e1404]:
+              - button "Arjun Sharma" [ref=e1405] [cursor=pointer]:
+                - img "Arjun Sharma" [ref=e1407]
+              - button "Priya Patel" [ref=e1409] [cursor=pointer]:
+                - img "Priya Patel" [ref=e1411]
+              - button "Rahul Kumar" [ref=e1412] [cursor=pointer]:
+                - img "Rahul Kumar" [ref=e1414]
+              - button "Sneha Gupta" [ref=e1415] [cursor=pointer]:
+                - img "Sneha Gupta" [ref=e1417]
+              - button "Vikash Singh" [ref=e1418] [cursor=pointer]:
+                - img "Vikash Singh" [ref=e1420]
+              - button "Ananya Gupta" [ref=e1421] [cursor=pointer]:
+                - img "Ananya Gupta" [ref=e1423]
+              - button "Karan Mehta" [ref=e1424] [cursor=pointer]:
+                - img "Karan Mehta" [ref=e1426]
+              - button "Ritika Sharma" [ref=e1427] [cursor=pointer]:
+                - img "Ritika Sharma" [ref=e1429]
+              - button "Aditya Raj" [ref=e1430] [cursor=pointer]:
+                - img "Aditya Raj" [ref=e1432]
+              - button "Pooja Verma" [ref=e1433] [cursor=pointer]:
+                - img "Pooja Verma" [ref=e1435]
+  - contentinfo [ref=e1436]:
+    - generic [ref=e1442]:
+      - generic [ref=e1443]:
+        - generic [ref=e1444]:
+          - img [ref=e1446]
+          - generic [ref=e1454]:
+            - heading "Bhagwan Parshuram Institute of Technology" [level=2] [ref=e1455]
+            - paragraph [ref=e1456]: Excellence in Engineering Education
+        - generic [ref=e1457]:
+          - generic [ref=e1458]:
+            - img [ref=e1460]
+            - generic [ref=e1465]: "2007"
+            - generic [ref=e1466]: Established
+          - generic [ref=e1467]:
+            - img [ref=e1469]
+            - generic [ref=e1474]: 1000+
+            - generic [ref=e1475]: Students
+          - generic [ref=e1476]:
+            - img [ref=e1478]
+            - generic [ref=e1481]: NBA
+            - generic [ref=e1482]: Accredited
+          - generic [ref=e1483]:
+            - img [ref=e1485]
+            - generic [ref=e1492]: 95%+
+            - generic [ref=e1493]: Placement
+      - generic [ref=e1494]:
+        - generic [ref=e1495]:
+          - heading "Quick Links" [level=3] [ref=e1496]
+          - generic [ref=e1497]:
+            - link "About BPIT" [ref=e1499] [cursor=pointer]:
+              - /url: /about
+              - img [ref=e1501]
+              - generic [ref=e1509]: About BPIT
+              - img [ref=e1510]
+            - link "Admissions" [ref=e1513] [cursor=pointer]:
+              - /url: /admissions/process
+              - img [ref=e1515]
+              - generic [ref=e1519]: Admissions
+              - img [ref=e1520]
+            - link "Academics" [ref=e1523] [cursor=pointer]:
+              - /url: /academia/academic-calendar
+              - img [ref=e1525]
+              - generic [ref=e1528]: Academics
+              - img [ref=e1529]
+            - link "Placements" [ref=e1532] [cursor=pointer]:
+              - /url: /placements/overview
+              - img [ref=e1534]
+              - generic [ref=e1541]: Placements
+              - img [ref=e1542]
+            - link "Student Life" [ref=e1545] [cursor=pointer]:
+              - /url: /student-life/campus-facilities
+              - img [ref=e1547]
+              - generic [ref=e1552]: Student Life
+              - img [ref=e1553]
+            - link "Statutory Committees" [ref=e1556] [cursor=pointer]:
+              - /url: /statutory-committees
+              - img [ref=e1558]
+              - generic [ref=e1560]: Statutory Committees
+              - img [ref=e1561]
+        - generic [ref=e1563]:
+          - heading "Departments" [level=3] [ref=e1564]
+          - generic [ref=e1565]:
+            - link "CSE Computer Science & Engineering Programs" [ref=e1567] [cursor=pointer]:
+              - /url: https://cse.bpitindia.ac.in
+              - generic [ref=e1569]:
+                - generic [ref=e1570]: CSE
+                - generic [ref=e1571]:
+                  - generic [ref=e1572]: Computer Science & Engineering
+                  - generic [ref=e1573]: Programs
+            - link "IT Information Technology Programs" [ref=e1575] [cursor=pointer]:
+              - /url: https://it.bpitindia.ac.in
+              - generic [ref=e1577]:
+                - generic [ref=e1578]: IT
+                - generic [ref=e1579]:
+                  - generic [ref=e1580]: Information Technology
+                  - generic [ref=e1581]: Programs
+            - link "ECE Electronics & Communication Programs" [ref=e1583] [cursor=pointer]:
+              - /url: https://ece.bpitindia.ac.in
+              - generic [ref=e1585]:
+                - generic [ref=e1586]: ECE
+                - generic [ref=e1587]:
+                  - generic [ref=e1588]: Electronics & Communication
+                  - generic [ref=e1589]: Programs
+            - link "EEE Electrical & Electronics Programs" [ref=e1591] [cursor=pointer]:
+              - /url: https://eee.bpitindia.ac.in
+              - generic [ref=e1593]:
+                - generic [ref=e1594]: EEE
+                - generic [ref=e1595]:
+                  - generic [ref=e1596]: Electrical & Electronics
+                  - generic [ref=e1597]: Programs
+            - link "AS Applied Sciences Programs" [ref=e1599] [cursor=pointer]:
+              - /url: https://applied-sciences.bpitindia.ac.in
+              - generic [ref=e1601]:
+                - generic [ref=e1602]: AS
+                - generic [ref=e1603]:
+                  - generic [ref=e1604]: Applied Sciences
+                  - generic [ref=e1605]: Programs
+            - link "MBA Management Programs Programs" [ref=e1607] [cursor=pointer]:
+              - /url: https://sba.bpitindia.ac.in
+              - generic [ref=e1609]:
+                - generic [ref=e1610]: MBA
+                - generic [ref=e1611]:
+                  - generic [ref=e1612]: Management Programs
+                  - generic [ref=e1613]: Programs
+        - generic [ref=e1614]:
+          - heading "Contact Info" [level=3] [ref=e1615]
+          - generic [ref=e1616]:
+            - link "Campus Address PSP-4, Sector-17, Rohini, New Delhi" [ref=e1618] [cursor=pointer]:
+              - /url: https://www.google.com/maps/search/?api=1&query=PSP-4%2C%20Sector-17%2C%20Rohini%2C%20New%20Delhi
+              - generic [ref=e1620]:
+                - img [ref=e1622]
+                - generic [ref=e1625]:
+                  - generic [ref=e1626]: Campus Address
+                  - generic [ref=e1627]: PSP-4, Sector-17, Rohini, New Delhi
+            - link "Phone Numbers 011-2757 1080, 011-2757 2900" [ref=e1629] [cursor=pointer]:
+              - /url: tel:01127571080
+              - generic [ref=e1631]:
+                - img [ref=e1633]
+                - generic [ref=e1635]:
+                  - generic [ref=e1636]: Phone Numbers
+                  - generic [ref=e1637]: 011-2757 1080, 011-2757 2900
+            - link "Email Address bpitindia@yahoo.com" [ref=e1639] [cursor=pointer]:
+              - /url: mailto:bpitindia@yahoo.com
+              - generic [ref=e1641]:
+                - img [ref=e1643]
+                - generic [ref=e1646]:
+                  - generic [ref=e1647]: Email Address
+                  - generic [ref=e1648]: bpitindia@yahoo.com
+        - generic [ref=e1649]:
+          - heading "Stay Connected" [level=3] [ref=e1650]
+          - generic [ref=e1651]:
+            - generic [ref=e1652]:
+              - heading "Get Updates" [level=4] [ref=e1653]
+              - generic [ref=e1654]:
+                - textbox "Email address" [ref=e1655]:
+                  - /placeholder: Enter your email
+                - button "Subscribe" [ref=e1656] [cursor=pointer]:
+                  - img
+                  - text: Subscribe
+            - generic [ref=e1657]:
+              - heading "Follow Us" [level=4] [ref=e1658]
+              - generic [ref=e1659]:
+                - link "Visit BPIT on Instagram" [ref=e1660] [cursor=pointer]:
+                  - /url: https://www.instagram.com/bpitindia/
+                  - img [ref=e1661]
+                - link "Visit BPIT on LinkedIn" [ref=e1665] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/in/bhagwan-parshuram-institute-of-technology-bpit-50358a178/
+                  - img [ref=e1666]
+                - link "Visit BPIT on X (Twitter)" [ref=e1670] [cursor=pointer]:
+                  - /url: https://x.com/BpitIndia
+                  - img [ref=e1671]
+                - link "Visit BPIT on YouTube" [ref=e1673] [cursor=pointer]:
+                  - /url: https://www.youtube.com/@bpitcampus
+                  - img [ref=e1674]
+                - link "Visit BPIT on Facebook" [ref=e1677] [cursor=pointer]:
+                  - /url: https://www.facebook.com/bpitindia
+                  - img [ref=e1678]
+      - generic [ref=e1681]:
+        - generic [ref=e1682]:
+          - paragraph [ref=e1683]: © 2026 Bhagwan Parshuram Institute of Technology. All rights reserved.
+          - paragraph [ref=e1684]: Affiliated to GGSIPU | NBA Accredited | NAAC Certified
+        - generic [ref=e1685]:
+          - link "Privacy Policy" [ref=e1686] [cursor=pointer]:
+            - /url: /privacy-policy
+          - link "Terms of Service" [ref=e1687] [cursor=pointer]:
+            - /url: /terms-of-service
+          - link "Sitemap" [ref=e1688] [cursor=pointer]:
+            - /url: /sitemap.xml

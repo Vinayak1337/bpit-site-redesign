@@ -168,7 +168,7 @@ const ImportantAnnouncement = ({
 
 			{/* Mobile Announcements Bar */}
 			<motion.div
-				className='bg-gradient-to-r from-blue-600 to-blue-700 text-white py-2 sm:py-3 overflow-hidden relative md:hidden'
+				className='bg-gradient-to-r from-blue-600 to-blue-700 text-white py-1.5 sm:py-3 overflow-hidden relative md:hidden'
 				initial={{ y: -20, opacity: 0 }}
 				animate={{ y: 0, opacity: 1 }}
 				transition={{ duration: 0.5, delay: 0.2 }}
@@ -201,7 +201,7 @@ const ImportantAnnouncement = ({
 								<Link
 									key={index}
 									href={announcement.href}
-									className='text-xs sm:text-sm hover:text-yellow-300 transition-colors duration-200 mx-4 sm:mx-6 flex-shrink-0 py-1'>
+									className='text-xs sm:text-sm hover:text-yellow-300 transition-colors duration-200 mx-4 sm:mx-6 flex-shrink-0 py-2 sm:py-3'>
 									{announcement.title}
 								</Link>
 							))}
@@ -210,7 +210,7 @@ const ImportantAnnouncement = ({
 									key={`mobile-clone-${index}`}
 									href={announcement.href}
 									aria-hidden='true'
-									className='text-xs sm:text-sm hover:text-yellow-300 transition-colors duration-200 mx-4 sm:mx-6 flex-shrink-0 py-1'>
+									className='text-xs sm:text-sm hover:text-yellow-300 transition-colors duration-200 mx-4 sm:mx-6 flex-shrink-0 py-2 sm:py-3'>
 									{announcement.title}
 								</Link>
 							))}

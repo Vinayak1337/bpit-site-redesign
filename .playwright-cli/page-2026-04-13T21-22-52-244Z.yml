@@ -1,0 +1,552 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - link "011-2757 1080" [ref=e6] [cursor=pointer]:
+        - /url: tel:01127571080
+        - img [ref=e7]
+        - generic [ref=e9]: 011-2757 1080
+      - link "bpitindia@yahoo.com" [ref=e10] [cursor=pointer]:
+        - /url: mailto:bpitindia@yahoo.com
+        - img [ref=e11]
+        - generic [ref=e14]: bpitindia@yahoo.com
+      - link "PSP-4, Sector-17, Rohini, New Delhi" [ref=e15] [cursor=pointer]:
+        - /url: https://www.google.com/maps/search/?api=1&query=PSP-4%2C%20Sector-17%2C%20Rohini%2C%20New%20Delhi
+        - img [ref=e16]
+        - generic [ref=e19]: PSP-4, Sector-17, Rohini, New Delhi
+    - generic [ref=e20]: NBA Accredited B.Tech Programs
+  - generic [ref=e22]:
+    - generic [ref=e24]:
+      - img [ref=e25]
+      - generic [ref=e28]: "Important Announcements:"
+    - generic [ref=e30]:
+      - link "Admission 2024-25 Session Open - Apply Now" [ref=e31] [cursor=pointer]:
+        - /url: /admissions/apply
+      - link "Placement Drive 2024 - Register Today" [ref=e32] [cursor=pointer]:
+        - /url: /placements/register
+      - link "Annual Tech Fest \"INNOVATE 2024\" - March 15-17" [ref=e33] [cursor=pointer]:
+        - /url: /events/tech-fest
+      - link "Library New Books Collection Available" [ref=e34] [cursor=pointer]:
+        - /url: /academia/library
+      - link "Scholarship Applications Open - Merit & Need Based" [ref=e35] [cursor=pointer]:
+        - /url: /admissions/scholarship
+      - link [ref=e36] [cursor=pointer]:
+        - /url: /admissions/apply
+        - text: Admission 2024-25 Session Open - Apply Now
+      - link [ref=e37] [cursor=pointer]:
+        - /url: /placements/register
+        - text: Placement Drive 2024 - Register Today
+      - link [ref=e38] [cursor=pointer]:
+        - /url: /events/tech-fest
+        - text: Annual Tech Fest "INNOVATE 2024" - March 15-17
+      - link [ref=e39] [cursor=pointer]:
+        - /url: /academia/library
+        - text: Library New Books Collection Available
+      - link [ref=e40] [cursor=pointer]:
+        - /url: /admissions/scholarship
+        - text: Scholarship Applications Open - Merit & Need Based
+  - banner [ref=e41]:
+    - generic [ref=e43]:
+      - link "BPIT Logo" [ref=e44] [cursor=pointer]:
+        - /url: /
+        - img "BPIT Logo" [ref=e46]
+      - generic [ref=e47]:
+        - navigation "Main" [ref=e48]:
+          - list [ref=e50]:
+            - listitem [ref=e51]:
+              - button "About BPIT" [ref=e52] [cursor=pointer]:
+                - text: About BPIT
+                - img [ref=e53]
+            - listitem [ref=e55]:
+              - button "Admissions" [ref=e56] [cursor=pointer]:
+                - text: Admissions
+                - img [ref=e57]
+            - listitem [ref=e59]:
+              - button "Academics" [ref=e60] [cursor=pointer]:
+                - text: Academics
+                - img [ref=e61]
+            - listitem [ref=e63]:
+              - button "Departments" [ref=e64] [cursor=pointer]:
+                - text: Departments
+                - img [ref=e65]
+        - navigation "Main" [ref=e67]:
+          - list [ref=e69]:
+            - listitem [ref=e70]:
+              - button "Placements" [ref=e71] [cursor=pointer]:
+                - text: Placements
+                - img [ref=e72]
+            - listitem [ref=e74]:
+              - button "Student Life" [ref=e75] [cursor=pointer]:
+                - text: Student Life
+                - img [ref=e76]
+            - listitem [ref=e78]:
+              - button "Student Portal" [ref=e79] [cursor=pointer]:
+                - text: Student Portal
+                - img [ref=e80]
+        - button "Enquire Now" [ref=e82] [cursor=pointer]:
+          - generic [ref=e83]: Enquire Now
+  - generic [ref=e84]:
+    - generic [ref=e92]:
+      - generic [ref=e93]: NBA Accredited Institution
+      - heading "Welcome to BPIT Delhi" [level=2] [ref=e94]
+      - paragraph [ref=e95]: Shaping Tomorrow's Innovators
+      - paragraph [ref=e96]: A Unit of Bhartiya Brahmin Charitable Trust (Regd.). (Approved by AICTE, Ministry of Education (MoE)) Affiliated to Guru Gobind Singh Indraprastha University, Delhi
+      - generic [ref=e97]:
+        - button "Apply Now" [ref=e98] [cursor=pointer]:
+          - text: Apply Now
+          - img
+        - button "Explore Programs" [ref=e99] [cursor=pointer]
+    - button "Previous slide" [ref=e100] [cursor=pointer]:
+      - img
+    - button "Next slide" [ref=e101] [cursor=pointer]:
+      - img
+    - generic [ref=e102]:
+      - button "Go to slide 1" [ref=e103] [cursor=pointer]
+      - button "Go to slide 2" [ref=e104] [cursor=pointer]
+      - button "Go to slide 3" [ref=e105] [cursor=pointer]
+      - button "Go to slide 4" [ref=e106] [cursor=pointer]
+      - button "Go to slide 5" [ref=e107] [cursor=pointer]
+  - generic [ref=e112]:
+    - generic [ref=e113]:
+      - article [ref=e114]:
+        - generic [ref=e115]:
+          - generic [ref=e116]:
+            - img [ref=e117]
+            - generic [ref=e122]: Official News & Notices
+          - generic [ref=e123]: "3"
+        - generic [ref=e125]:
+          - link "Academic 28 Dec 2024 Mid-semester examination schedule released The mid-semester examination schedule has been released. Students are advised to check their individual exam accordingly Read update" [ref=e127] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e128]:
+              - generic [ref=e129]: Academic
+              - generic [ref=e130]: 28 Dec 2024
+            - heading "Mid-semester examination schedule released" [level=3] [ref=e131]
+            - paragraph [ref=e132]: The mid-semester examination schedule has been released. Students are advised to check their individual exam accordingly
+            - generic [ref=e133]:
+              - generic [ref=e134]: Read update
+              - img [ref=e135]
+          - link "Financial Aid 25 Dec 2024 Education loans available through PM Vidya Laxmi scheme Students can now apply for education loans through the PM Vidya Laxmi scheme. Eligible students can receive financial assistance for their studies. Read update" [ref=e139] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e140]:
+              - generic [ref=e141]: Financial Aid
+              - generic [ref=e142]: 25 Dec 2024
+            - heading "Education loans available through PM Vidya Laxmi scheme" [level=3] [ref=e143]
+            - paragraph [ref=e144]: Students can now apply for education loans through the PM Vidya Laxmi scheme. Eligible students can receive financial assistance for their studies.
+            - generic [ref=e145]:
+              - generic [ref=e146]: Read update
+              - img [ref=e147]
+          - link "Admission 24 Dec 2024 Last date for semester registration extended The deadline for semester registration has been extended by one week. Students who have not yet registered are advised to complete the process immediately. Read update" [ref=e151] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e152]:
+              - generic [ref=e153]: Admission
+              - generic [ref=e154]: 24 Dec 2024
+            - heading "Last date for semester registration extended" [level=3] [ref=e155]
+            - paragraph [ref=e156]: The deadline for semester registration has been extended by one week. Students who have not yet registered are advised to complete the process immediately.
+            - generic [ref=e157]:
+              - generic [ref=e158]: Read update
+              - img [ref=e159]
+      - article [ref=e162]:
+        - generic [ref=e163]:
+          - generic [ref=e164]:
+            - img [ref=e165]
+            - generic [ref=e168]: Announcements
+          - generic [ref=e169]: "3"
+        - generic [ref=e171]:
+          - link "Innovation 24 Dec 2024 Institute Innovation Council (IIC) Meeting Monthly meeting of the Institute Innovation Council to discuss ongoing projects and future initiatives. Read update" [ref=e173] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e174]:
+              - generic [ref=e175]: Innovation
+              - generic [ref=e176]: 24 Dec 2024
+            - heading "Institute Innovation Council (IIC) Meeting" [level=3] [ref=e177]
+            - paragraph [ref=e178]: Monthly meeting of the Institute Innovation Council to discuss ongoing projects and future initiatives.
+            - generic [ref=e179]:
+              - generic [ref=e180]: Read update
+              - img [ref=e181]
+          - link "Admission 24 Dec 2024 Last date for semester registration extended The deadline for semester registration has been extended by one week. Students who have not yet registered are advised to complete the process immediately. Read update" [ref=e185] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e186]:
+              - generic [ref=e187]: Admission
+              - generic [ref=e188]: 24 Dec 2024
+            - heading "Last date for semester registration extended" [level=3] [ref=e189]
+            - paragraph [ref=e190]: The deadline for semester registration has been extended by one week. Students who have not yet registered are advised to complete the process immediately.
+            - generic [ref=e191]:
+              - generic [ref=e192]: Read update
+              - img [ref=e193]
+          - link "Sports 23 Dec 2024 Inter-college basketball tournament registration Registration is now open for the inter-college basketball tournament. Teams must register before the deadline. Read update" [ref=e197] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e198]:
+              - generic [ref=e199]: Sports
+              - generic [ref=e200]: 23 Dec 2024
+            - heading "Inter-college basketball tournament registration" [level=3] [ref=e201]
+            - paragraph [ref=e202]: Registration is now open for the inter-college basketball tournament. Teams must register before the deadline.
+            - generic [ref=e203]:
+              - generic [ref=e204]: Read update
+              - img [ref=e205]
+    - article [ref=e209]:
+      - generic [ref=e210]:
+        - img [ref=e211]
+        - generic [ref=e222]: Events Spotlight
+      - paragraph [ref=e223]: No events available right now.
+  - generic [ref=e225]:
+    - generic [ref=e226]:
+      - heading "Our Placement Partners" [level=2] [ref=e227]
+      - paragraph [ref=e228]: Leading companies trust BPIT graduates for their innovation, technical expertise, and professional excellence
+    - generic [ref=e231]:
+      - img "Microsoft logo" [ref=e233]
+      - img "Google logo" [ref=e235]
+      - img "Amazon logo" [ref=e237]
+      - img "IBM logo" [ref=e239]
+      - img "TCS logo" [ref=e241]
+      - img "Infosys logo" [ref=e243]
+      - img "Wipro logo" [ref=e245]
+      - img "Accenture logo" [ref=e247]
+      - img "Dell logo" [ref=e249]
+      - img "Oracle logo" [ref=e251]
+      - img "Adobe logo" [ref=e253]
+      - img "Cisco logo" [ref=e255]
+    - generic [ref=e256]:
+      - generic [ref=e257]:
+        - generic [ref=e258]: 100+
+        - generic [ref=e259]: Partner Companies
+      - generic [ref=e260]:
+        - generic [ref=e261]: 95%
+        - generic [ref=e262]: Placement Rate
+      - generic [ref=e263]:
+        - generic [ref=e264]: 12 LPA
+        - generic [ref=e265]: Highest Package
+      - generic [ref=e266]:
+        - generic [ref=e267]: 6.5 LPA
+        - generic [ref=e268]: Average Package
+  - generic [ref=e270]:
+    - generic [ref=e271]:
+      - heading "Our Top Placed Students" [level=2] [ref=e272]
+      - paragraph [ref=e273]: Meet the bright minds from BPIT who secured exceptional packages at top-tier companies worldwide
+    - generic [ref=e276]:
+      - generic [ref=e277]:
+        - generic [ref=e278]:
+          - img "Priya Sharma" [ref=e279]
+          - img "Google" [ref=e281]
+          - generic [ref=e283]: 2024 Graduate
+        - generic [ref=e284]:
+          - heading "Priya Sharma" [level=3] [ref=e285]
+          - paragraph [ref=e286]: Computer Science
+          - generic [ref=e287]:
+            - generic [ref=e288]:
+              - generic [ref=e289]:
+                - img [ref=e290]
+                - text: 45 LPA
+              - generic [ref=e293]: Package
+            - generic [ref=e294]:
+              - generic [ref=e295]: Google
+              - generic [ref=e296]: Placed at
+      - generic [ref=e297]:
+        - generic [ref=e298]:
+          - img "Arjun Gupta" [ref=e299]
+          - img "Microsoft" [ref=e301]
+          - generic [ref=e303]: 2024 Graduate
+        - generic [ref=e304]:
+          - heading "Arjun Gupta" [level=3] [ref=e305]
+          - paragraph [ref=e306]: Information Technology
+          - generic [ref=e307]:
+            - generic [ref=e308]:
+              - generic [ref=e309]:
+                - img [ref=e310]
+                - text: 42 LPA
+              - generic [ref=e313]: Package
+            - generic [ref=e314]:
+              - generic [ref=e315]: Microsoft
+              - generic [ref=e316]: Placed at
+      - generic [ref=e317]:
+        - generic [ref=e318]:
+          - img "Sneha Patel" [ref=e319]
+          - img "Amazon" [ref=e321]
+          - generic [ref=e323]: 2024 Graduate
+        - generic [ref=e324]:
+          - heading "Sneha Patel" [level=3] [ref=e325]
+          - paragraph [ref=e326]: Computer Science
+          - generic [ref=e327]:
+            - generic [ref=e328]:
+              - generic [ref=e329]:
+                - img [ref=e330]
+                - text: 38 LPA
+              - generic [ref=e333]: Package
+            - generic [ref=e334]:
+              - generic [ref=e335]: Amazon
+              - generic [ref=e336]: Placed at
+      - generic [ref=e337]:
+        - generic [ref=e338]:
+          - img "Rohit Kumar" [ref=e339]
+          - img "Adobe" [ref=e341]
+          - generic [ref=e343]: 2024 Graduate
+        - generic [ref=e344]:
+          - heading "Rohit Kumar" [level=3] [ref=e345]
+          - paragraph [ref=e346]: Electronics & Communication
+          - generic [ref=e347]:
+            - generic [ref=e348]:
+              - generic [ref=e349]:
+                - img [ref=e350]
+                - text: 35 LPA
+              - generic [ref=e353]: Package
+            - generic [ref=e354]:
+              - generic [ref=e355]: Adobe
+              - generic [ref=e356]: Placed at
+      - generic [ref=e357]:
+        - generic [ref=e358]:
+          - img "Ananya Singh" [ref=e359]
+          - img "Oracle" [ref=e361]
+          - generic [ref=e363]: 2024 Graduate
+        - generic [ref=e364]:
+          - heading "Ananya Singh" [level=3] [ref=e365]
+          - paragraph [ref=e366]: Information Technology
+          - generic [ref=e367]:
+            - generic [ref=e368]:
+              - generic [ref=e369]:
+                - img [ref=e370]
+                - text: 32 LPA
+              - generic [ref=e373]: Package
+            - generic [ref=e374]:
+              - generic [ref=e375]: Oracle
+              - generic [ref=e376]: Placed at
+      - generic [ref=e377]:
+        - generic [ref=e378]:
+          - img "Karan Mehta" [ref=e379]
+          - img "IBM" [ref=e381]
+          - generic [ref=e383]: 2024 Graduate
+        - generic [ref=e384]:
+          - heading "Karan Mehta" [level=3] [ref=e385]
+          - paragraph [ref=e386]: Computer Science
+          - generic [ref=e387]:
+            - generic [ref=e388]:
+              - generic [ref=e389]:
+                - img [ref=e390]
+                - text: 28 LPA
+              - generic [ref=e393]: Package
+            - generic [ref=e394]:
+              - generic [ref=e395]: IBM
+              - generic [ref=e396]: Placed at
+    - generic [ref=e397]:
+      - generic [ref=e398]:
+        - generic [ref=e399]: 45 LPA
+        - generic [ref=e400]: Highest Package
+      - generic [ref=e401]:
+        - generic [ref=e402]: 15+
+        - generic [ref=e403]: Dream Offers
+      - generic [ref=e404]:
+        - generic [ref=e405]: 50+
+        - generic [ref=e406]: Top Companies
+      - generic [ref=e407]:
+        - generic [ref=e408]: 98%
+        - generic [ref=e409]: Success Rate
+  - generic [ref=e415]:
+    - generic [ref=e416]:
+      - generic:
+        - generic: Student Success Stories
+      - heading "Voices of Excellence" [level=2] [ref=e417]
+      - paragraph [ref=e418]: Hear from our students and alumni about their transformative journey at BPIT and how it shaped their successful careers.
+    - generic [ref=e419]:
+      - generic [ref=e422]:
+        - generic [ref=e423]:
+          - img "Arjun Sharma" [ref=e424]
+          - button [ref=e425] [cursor=pointer]:
+            - img [ref=e426]
+          - generic [ref=e428]: Microsoft
+          - generic [ref=e429]:
+            - img [ref=e430]
+            - text: Success Story
+        - generic [ref=e434]:
+          - img [ref=e436]
+          - blockquote [ref=e439]: “BPIT transformed my career. The faculty's guidance and modern infrastructure helped me secure my dream job at Microsoft. The coding culture here is exceptional.”
+          - generic [ref=e440]:
+            - heading "Arjun Sharma" [level=3] [ref=e441]
+            - paragraph [ref=e442]: Software Engineer
+            - paragraph [ref=e443]: B.Tech CSE 2024 • Placed at Microsoft with 18 LPA package
+          - generic [ref=e444]:
+            - generic [ref=e445]: Coding
+            - generic [ref=e446]: Placements
+            - generic [ref=e447]: Faculty
+          - button "Watch Full Story" [ref=e448] [cursor=pointer]:
+            - img
+            - generic [ref=e449]: Watch Full Story
+            - img
+      - button "Previous testimonial" [ref=e450] [cursor=pointer]:
+        - img
+      - button "Next testimonial" [ref=e451] [cursor=pointer]:
+        - img
+    - generic [ref=e452]:
+      - button "Arjun Sharma" [ref=e453] [cursor=pointer]:
+        - img "Arjun Sharma" [ref=e454]
+      - button "Priya Patel" [ref=e456] [cursor=pointer]:
+        - img "Priya Patel" [ref=e457]
+      - button "Rajesh Kumar" [ref=e459] [cursor=pointer]:
+        - img "Rajesh Kumar" [ref=e460]
+    - generic [ref=e462]:
+      - button [ref=e463] [cursor=pointer]
+      - button [ref=e465] [cursor=pointer]
+      - button [ref=e466] [cursor=pointer]
+  - contentinfo [ref=e467]:
+    - generic [ref=e473]:
+      - generic [ref=e474]:
+        - generic [ref=e475]:
+          - img [ref=e477]
+          - generic [ref=e485]:
+            - heading "Bhagwan Parshuram Institute of Technology" [level=2] [ref=e486]
+            - paragraph [ref=e487]: Excellence in Engineering Education
+        - generic [ref=e488]:
+          - generic [ref=e489]:
+            - img [ref=e491]
+            - generic [ref=e496]: "2007"
+            - generic [ref=e497]: Established
+          - generic [ref=e498]:
+            - img [ref=e500]
+            - generic [ref=e505]: 1000+
+            - generic [ref=e506]: Students
+          - generic [ref=e507]:
+            - img [ref=e509]
+            - generic [ref=e512]: NBA
+            - generic [ref=e513]: Accredited
+          - generic [ref=e514]:
+            - img [ref=e516]
+            - generic [ref=e523]: 95%+
+            - generic [ref=e524]: Placement
+      - generic [ref=e525]:
+        - generic [ref=e526]:
+          - heading "Quick Links" [level=3] [ref=e527]
+          - generic [ref=e528]:
+            - link "About BPIT" [ref=e530] [cursor=pointer]:
+              - /url: /about
+              - img [ref=e532]
+              - generic [ref=e540]: About BPIT
+              - img [ref=e541]
+            - link "Admissions" [ref=e544] [cursor=pointer]:
+              - /url: /admissions/process
+              - img [ref=e546]
+              - generic [ref=e550]: Admissions
+              - img [ref=e551]
+            - link "Academics" [ref=e554] [cursor=pointer]:
+              - /url: /academia/academic-calendar
+              - img [ref=e556]
+              - generic [ref=e559]: Academics
+              - img [ref=e560]
+            - link "Placements" [ref=e563] [cursor=pointer]:
+              - /url: /placements/overview
+              - img [ref=e565]
+              - generic [ref=e572]: Placements
+              - img [ref=e573]
+            - link "Student Life" [ref=e576] [cursor=pointer]:
+              - /url: /student-life/campus-facilities
+              - img [ref=e578]
+              - generic [ref=e583]: Student Life
+              - img [ref=e584]
+            - link "Statutory Committees" [ref=e587] [cursor=pointer]:
+              - /url: /statutory-committees
+              - img [ref=e589]
+              - generic [ref=e591]: Statutory Committees
+              - img [ref=e592]
+        - generic [ref=e594]:
+          - heading "Departments" [level=3] [ref=e595]
+          - generic [ref=e596]:
+            - link "CSE Computer Science & Engineering Programs" [ref=e598] [cursor=pointer]:
+              - /url: https://cse.bpitindia.ac.in
+              - generic [ref=e600]:
+                - generic [ref=e601]: CSE
+                - generic [ref=e602]:
+                  - generic [ref=e603]: Computer Science & Engineering
+                  - generic [ref=e604]: Programs
+            - link "IT Information Technology Programs" [ref=e606] [cursor=pointer]:
+              - /url: https://it.bpitindia.ac.in
+              - generic [ref=e608]:
+                - generic [ref=e609]: IT
+                - generic [ref=e610]:
+                  - generic [ref=e611]: Information Technology
+                  - generic [ref=e612]: Programs
+            - link "ECE Electronics & Communication Programs" [ref=e614] [cursor=pointer]:
+              - /url: https://ece.bpitindia.ac.in
+              - generic [ref=e616]:
+                - generic [ref=e617]: ECE
+                - generic [ref=e618]:
+                  - generic [ref=e619]: Electronics & Communication
+                  - generic [ref=e620]: Programs
+            - link "EEE Electrical & Electronics Programs" [ref=e622] [cursor=pointer]:
+              - /url: https://eee.bpitindia.ac.in
+              - generic [ref=e624]:
+                - generic [ref=e625]: EEE
+                - generic [ref=e626]:
+                  - generic [ref=e627]: Electrical & Electronics
+                  - generic [ref=e628]: Programs
+            - link "AS Applied Sciences Programs" [ref=e630] [cursor=pointer]:
+              - /url: https://applied-sciences.bpitindia.ac.in
+              - generic [ref=e632]:
+                - generic [ref=e633]: AS
+                - generic [ref=e634]:
+                  - generic [ref=e635]: Applied Sciences
+                  - generic [ref=e636]: Programs
+            - link "MBA Management Programs Programs" [ref=e638] [cursor=pointer]:
+              - /url: https://sba.bpitindia.ac.in
+              - generic [ref=e640]:
+                - generic [ref=e641]: MBA
+                - generic [ref=e642]:
+                  - generic [ref=e643]: Management Programs
+                  - generic [ref=e644]: Programs
+        - generic [ref=e645]:
+          - heading "Contact Info" [level=3] [ref=e646]
+          - generic [ref=e647]:
+            - link "Campus Address PSP-4, Sector-17, Rohini, New Delhi" [ref=e649] [cursor=pointer]:
+              - /url: https://www.google.com/maps/search/?api=1&query=PSP-4%2C%20Sector-17%2C%20Rohini%2C%20New%20Delhi
+              - generic [ref=e651]:
+                - img [ref=e653]
+                - generic [ref=e656]:
+                  - generic [ref=e657]: Campus Address
+                  - generic [ref=e658]: PSP-4, Sector-17, Rohini, New Delhi
+            - link "Phone Numbers 011-2757 1080, 011-2757 2900" [ref=e660] [cursor=pointer]:
+              - /url: tel:01127571080
+              - generic [ref=e662]:
+                - img [ref=e664]
+                - generic [ref=e666]:
+                  - generic [ref=e667]: Phone Numbers
+                  - generic [ref=e668]: 011-2757 1080, 011-2757 2900
+            - link "Email Address bpitindia@yahoo.com" [ref=e670] [cursor=pointer]:
+              - /url: mailto:bpitindia@yahoo.com
+              - generic [ref=e672]:
+                - img [ref=e674]
+                - generic [ref=e677]:
+                  - generic [ref=e678]: Email Address
+                  - generic [ref=e679]: bpitindia@yahoo.com
+        - generic [ref=e680]:
+          - heading "Stay Connected" [level=3] [ref=e681]
+          - generic [ref=e682]:
+            - generic [ref=e683]:
+              - heading "Get Updates" [level=4] [ref=e684]
+              - generic [ref=e685]:
+                - textbox "Email address" [ref=e686]:
+                  - /placeholder: Enter your email
+                - button "Subscribe" [ref=e687] [cursor=pointer]:
+                  - img
+                  - text: Subscribe
+            - generic [ref=e688]:
+              - heading "Follow Us" [level=4] [ref=e689]
+              - generic [ref=e690]:
+                - link "Visit BPIT on Instagram" [ref=e691] [cursor=pointer]:
+                  - /url: https://www.instagram.com/bpitindia/
+                  - img [ref=e692]
+                - link "Visit BPIT on LinkedIn" [ref=e696] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/in/bhagwan-parshuram-institute-of-technology-bpit-50358a178/
+                  - img [ref=e697]
+                - link "Visit BPIT on X (Twitter)" [ref=e701] [cursor=pointer]:
+                  - /url: https://x.com/BpitIndia
+                  - img [ref=e702]
+                - link "Visit BPIT on YouTube" [ref=e704] [cursor=pointer]:
+                  - /url: https://www.youtube.com/@bpitcampus
+                  - img [ref=e705]
+                - link "Visit BPIT on Facebook" [ref=e708] [cursor=pointer]:
+                  - /url: https://www.facebook.com/bpitindia
+                  - img [ref=e709]
+      - generic [ref=e712]:
+        - generic [ref=e713]:
+          - paragraph [ref=e714]: © 2026 Bhagwan Parshuram Institute of Technology. All rights reserved.
+          - paragraph [ref=e715]: Affiliated to GGSIPU | NBA Accredited | NAAC Certified
+        - generic [ref=e716]:
+          - link "Privacy Policy" [ref=e717] [cursor=pointer]:
+            - /url: /privacy-policy
+          - link "Terms of Service" [ref=e718] [cursor=pointer]:
+            - /url: /terms-of-service
+          - link "Sitemap" [ref=e719] [cursor=pointer]:
+            - /url: /sitemap.xml

@@ -21,7 +21,8 @@ import {
 	SelectValue
 } from '@/components/ui/select';
 import type { MissionData, ImpactStatColor } from '@/app/(Private Pages)/actions/vision-mission';
-import { updateMission, IMPACT_STAT_COLOR_OPTIONS } from '@/app/(Private Pages)/actions/vision-mission';
+import { updateMission } from '@/app/(Private Pages)/actions/vision-mission';
+import { IMPACT_STAT_COLOR_OPTIONS } from '@/app/(Private Pages)/actions/vision-mission-constants';
 import { SUPPORTED_ICON_NAMES } from '@/components/about/icons';
 
 type ObjectiveFormValue = {
