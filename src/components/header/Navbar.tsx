@@ -103,7 +103,7 @@ const Navbar = () => {
 				animate={{ y: 0 }}
 				transition={{ duration: 0.6, ease: 'easeOut' }}>
 				<div className='container mx-auto px-4 sm:px-6 lg:px-8'>
-					<div className='flex items-center lg:justify-center justify-between gap-2 sm:gap-4 h-16 sm:h-18 lg:h-20'>
+					<div className='flex items-center xl:justify-center justify-between gap-2 sm:gap-4 h-16 sm:h-18 xl:h-20'>
 						{/* Logo */}
 						<Link href='/'>
 							<motion.div
@@ -115,13 +115,13 @@ const Navbar = () => {
 									alt='BPIT Logo'
 									width={60}
 									height={60}
-									className='rounded-lg sm:scale-125 lg:scale-150'
+									className='rounded-lg sm:scale-125 xl:scale-150'
 								/>
 							</motion.div>
 						</Link>
 
 						{/* Desktop Navigation */}
-						<div className='hidden lg:flex items-center space-x-3 xl:space-x-5'>
+						<div className='hidden xl:flex items-center space-x-5'>
 							{/* First Navigation Menu - Left Side */}
 							<NavigationMenu>
 								<NavigationMenuList>
@@ -307,7 +307,7 @@ const Navbar = () => {
 
 						{/* Mobile Menu Button */}
 						<button
-							className='lg:hidden p-2 sm:p-3 rounded-md hover:bg-gray-100 transition-colors z-50 relative'
+							className='xl:hidden p-2 sm:p-3 rounded-md hover:bg-gray-100 transition-colors z-50 relative'
 							onClick={() => {
 								setIsMobileMenuOpen(!isMobileMenuOpen);
 								setActiveMobileSection(null);
@@ -326,7 +326,7 @@ const Navbar = () => {
 			{isMounted && (
 				<AnimatePresence>
 					<motion.button
-						className='lg:hidden fixed bottom-4 left-4 sm:bottom-6 sm:left-6 z-50 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-3 sm:px-5 sm:py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 group flex items-center gap-2 text-sm sm:text-base'
+						className='xl:hidden fixed bottom-4 left-4 sm:bottom-6 sm:left-6 z-50 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-3 sm:px-5 sm:py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 group flex items-center gap-2 text-sm sm:text-base'
 						initial={{ opacity: 0, scale: 0.8 }}
 						animate={{ opacity: 1, scale: 1 }}
 						exit={{ opacity: 0, scale: 0.8 }}
@@ -352,7 +352,7 @@ const Navbar = () => {
 				{isMobileMenuOpen && (
 					<motion.div
 						className={cn(
-							'lg:hidden fixed inset-0 z-40 bg-white border-t shadow-lg mobile-menu-container',
+							'xl:hidden fixed inset-0 z-40 bg-white border-t shadow-lg mobile-menu-container',
 							isScrolled ? 'top-16 sm:top-18' : 'top-[110px] sm:top-[120px]'
 						)}
 						initial={{ opacity: 0, x: '100%' }}
