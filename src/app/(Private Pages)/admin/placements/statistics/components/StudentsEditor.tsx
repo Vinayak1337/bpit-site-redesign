@@ -113,8 +113,8 @@ export default function StudentsEditor({ initialData, pageSlug }: StudentsEditor
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.6 }}
 						className='max-w-6xl mx-auto mb-16'>
-						<div className='bg-white rounded-2xl p-8 shadow-lg border border-gray-200'>
-							<div className='flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8'>
+							<div className='bg-white rounded-2xl p-5 sm:p-8 shadow-lg border border-gray-200'>
+								<div className='flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between mb-8'>
 								<div className='flex items-center space-x-3 mb-4 lg:mb-0'>
 									<div className='p-2 bg-blue-100 rounded-lg'>
 										<Sliders className='w-5 h-5 text-blue-600' />
@@ -126,7 +126,7 @@ export default function StudentsEditor({ initialData, pageSlug }: StudentsEditor
 										<p className='text-gray-600 text-sm'>Refine your search</p>
 									</div>
 								</div>
-								<div className='flex items-center space-x-2 bg-blue-50 px-4 py-2 rounded-lg border border-blue-200'>
+									<div className='flex w-fit items-center space-x-2 bg-blue-50 px-4 py-2 rounded-lg border border-blue-200'>
 									<Trophy className='w-4 h-4 text-blue-600' />
 									<span className='text-lg font-bold text-blue-700'>
 										{filteredStudents.length}
@@ -273,7 +273,7 @@ export default function StudentsEditor({ initialData, pageSlug }: StudentsEditor
 						initial={{ opacity: 0, y: 20 }}
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.6 }}>
-						<div className='flex items-center justify-between mb-8'>
+							<div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8'>
 							<div>
 								<h3 className='text-3xl font-bold text-gray-900 mb-2'>
 									Student Placements
@@ -285,7 +285,7 @@ export default function StudentsEditor({ initialData, pageSlug }: StudentsEditor
 									• Sorted by package (highest first)
 								</p>
 							</div>
-							<div className='text-right'>
+								<div className='text-left sm:text-right'>
 								<div className='text-sm text-gray-600 bg-gradient-to-r from-gray-100 to-gray-200 px-6 py-3 rounded-2xl border'>
 									<div className='font-semibold text-gray-800'>
 										{startIndex + 1}-
@@ -327,7 +327,7 @@ export default function StudentsEditor({ initialData, pageSlug }: StudentsEditor
 													animate={{ opacity: 1, y: 0 }}
 													exit={{ opacity: 0, y: -30 }}
 													transition={{ duration: 0.4, delay: index * 0.05 }}
-													className={`relative bg-white rounded-3xl p-8 shadow-xl border-2 hover:shadow-2xl transition-all duration-300 ${
+														className={`relative bg-white rounded-3xl p-5 sm:p-8 shadow-xl border-2 hover:shadow-2xl transition-all duration-300 ${
 														isTopThree && currentPage === 1
 															? globalIndex === 0
 																? 'border-yellow-300 bg-gradient-to-br from-yellow-50 to-yellow-100'
@@ -342,47 +342,47 @@ export default function StudentsEditor({ initialData, pageSlug }: StudentsEditor
 														</div>
 													)}
 
-													<div className='flex items-center justify-between'>
-														<div className='flex items-center space-x-6'>
-															{student.image ? (
-																<img
-																	src={student.image}
-																	alt={student.name}
-																	className='w-20 h-20 rounded-2xl object-cover shadow-lg border-2 border-blue-100'
-																/>
-															) : (
-																<div className='w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white text-2xl font-bold shadow-lg border-2 border-blue-100'>
-																	{student.name.split(' ').map(n => n[0]).join('')}
-																</div>
-															)}
-															<div>
-																<h4 className='text-xl font-bold text-gray-900 mb-2'>
-																	{student.name}
-																</h4>
-																<div className='space-y-2'>
-																	<div className='flex items-center space-x-3 text-gray-600'>
-																		<GraduationCap className='w-5 h-5' />
-																		<span className='font-semibold'>
-																			{student.department}
-																		</span>
-																		<span className='text-gray-400'>•</span>
-																		<span>Batch {student.batch}</span>
+														<div className='flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between'>
+															<div className='flex min-w-0 items-start gap-4 sm:items-center sm:gap-6'>
+																{student.image ? (
+																	<img
+																		src={student.image}
+																		alt={student.name}
+																		className='h-16 w-16 flex-shrink-0 rounded-2xl object-cover shadow-lg border-2 border-blue-100 sm:h-20 sm:w-20'
+																	/>
+																) : (
+																	<div className='flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 text-white text-xl font-bold shadow-lg border-2 border-blue-100 sm:h-20 sm:w-20 sm:text-2xl'>
+																		{student.name.split(' ').map(n => n[0]).join('')}
 																	</div>
-																	<div className='flex items-center space-x-3 text-gray-600'>
-																		<Building2 className='w-5 h-5' />
-																		<span className='font-semibold'>
-																			{student.company}
-																		</span>
-																		<span className='text-gray-400'>•</span>
-																		<span>{student.role}</span>
+																)}
+																<div className='min-w-0'>
+																	<h4 className='text-lg font-bold text-gray-900 mb-2 break-words sm:text-xl'>
+																		{student.name}
+																	</h4>
+																	<div className='space-y-2'>
+																		<div className='flex flex-wrap items-center gap-x-3 gap-y-1 text-gray-600'>
+																			<GraduationCap className='h-5 w-5 flex-shrink-0' />
+																			<span className='font-semibold'>
+																				{student.department}
+																			</span>
+																			<span className='text-gray-400'>•</span>
+																			<span>Batch {student.batch}</span>
+																		</div>
+																		<div className='flex flex-wrap items-center gap-x-3 gap-y-1 text-gray-600'>
+																			<Building2 className='h-5 w-5 flex-shrink-0' />
+																			<span className='font-semibold'>
+																				{student.company}
+																			</span>
+																			<span className='text-gray-400'>•</span>
+																			<span className='break-words'>{student.role}</span>
+																		</div>
 																	</div>
 																</div>
 															</div>
-														</div>
-														<div className='text-right'>
-															<div className='text-3xl font-bold text-green-600 mb-1'>
-																₹{student.package}
-															</div>
+															<div className='flex-shrink-0 text-left sm:text-right'>
+																<div className='text-2xl font-bold text-green-600 mb-1 sm:text-3xl'>
+																	₹{student.package}
+																</div>
 															<div className='text-sm text-gray-500 font-semibold'>
 																LPA
 															</div>
@@ -396,19 +396,19 @@ export default function StudentsEditor({ initialData, pageSlug }: StudentsEditor
 
 								{/* Pagination */}
 								{totalPages > 1 && (
-									<div className='flex items-center justify-center space-x-3'>
+										<div className='flex flex-wrap items-center justify-center gap-3'>
 										<Button
 											onClick={() =>
 												setCurrentPage(prev => Math.max(prev - 1, 1))
 											}
 											disabled={currentPage === 1}
 											variant='outline'
-											className='px-8 py-4 font-semibold rounded-2xl border-2 disabled:opacity-50'>
+												className='px-4 py-3 sm:px-8 sm:py-4 font-semibold rounded-2xl border-2 disabled:opacity-50'>
 											<ChevronLeft className='w-5 h-5 mr-2' />
 											Previous
 										</Button>
 
-										<div className='flex space-x-2'>
+											<div className='flex gap-2'>
 											{Array.from(
 												{ length: Math.min(totalPages, 5) },
 												(_, i) => {
@@ -430,7 +430,7 @@ export default function StudentsEditor({ initialData, pageSlug }: StudentsEditor
 															variant={
 																currentPage === pageNum ? 'default' : 'outline'
 															}
-															className={`w-14 h-14 p-0 font-bold text-lg rounded-2xl border-2 transition-all duration-200 ${
+																className={`h-11 w-11 p-0 font-bold text-base rounded-2xl border-2 transition-all duration-200 sm:h-14 sm:w-14 sm:text-lg ${
 																currentPage === pageNum
 																	? 'bg-blue-600 text-white shadow-lg scale-110'
 																	: 'text-gray-600 hover:bg-blue-50 hover:border-blue-300'
@@ -448,7 +448,7 @@ export default function StudentsEditor({ initialData, pageSlug }: StudentsEditor
 											}
 											disabled={currentPage === totalPages}
 											variant='outline'
-											className='px-8 py-4 font-semibold rounded-2xl border-2 disabled:opacity-50'>
+												className='px-4 py-3 sm:px-8 sm:py-4 font-semibold rounded-2xl border-2 disabled:opacity-50'>
 											Next
 											<ChevronRight className='w-5 h-5 ml-2' />
 										</Button>

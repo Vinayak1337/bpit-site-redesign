@@ -51,8 +51,8 @@ export default function MissionEditor({ initialData, pageSlug }: MissionEditorPr
 
 					<div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 						<motion.div
-							initial={{ opacity: 0, x: -50 }}
-							whileInView={{ opacity: 1, x: 0 }}
+							initial={{ opacity: 0, y: 24 }}
+							whileInView={{ opacity: 1, y: 0 }}
 							transition={{ duration: 0.8 }}
 							className="space-y-6"
 						>
@@ -76,8 +76,8 @@ export default function MissionEditor({ initialData, pageSlug }: MissionEditorPr
 						</motion.div>
 
 						<motion.div
-							initial={{ opacity: 0, x: 50 }}
-							whileInView={{ opacity: 1, x: 0 }}
+							initial={{ opacity: 0, y: 24 }}
+							whileInView={{ opacity: 1, y: 0 }}
 							transition={{ duration: 0.8 }}
 							className="relative"
 						>
@@ -88,8 +88,8 @@ export default function MissionEditor({ initialData, pageSlug }: MissionEditorPr
 										{currentData.missionContent.objectives.map((objective, index) => (
 											<motion.li
 												key={index}
-												initial={{ opacity: 0, x: 20 }}
-												whileInView={{ opacity: 1, x: 0 }}
+												initial={{ opacity: 0, y: 12 }}
+												whileInView={{ opacity: 1, y: 0 }}
 												transition={{ delay: index * 0.1 }}
 												className="flex items-center space-x-3"
 											>

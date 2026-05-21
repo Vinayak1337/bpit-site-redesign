@@ -50,7 +50,7 @@ export default function HeroEditor({ initialData, pageSlug }: HeroEditorProps) {
 							</div>
 						</motion.div>
 						
-						<h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
+							<h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent break-words">
 							{currentData.hero.title}
 						</h1>
 						<p className="text-xl md:text-2xl text-blue-200 mb-8 leading-relaxed">

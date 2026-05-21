@@ -146,8 +146,8 @@ const DynamicSidebar = ({ navItems, theme }: DynamicSidebarProps) => {
 						{navItems.map((item, index) => (
 							<motion.div
 								key={item.id}
-								initial={{ opacity: 0, x: 20 }}
-								animate={{ opacity: 1, x: 0 }}
+								initial={{ opacity: 0, y: 16 }}
+								animate={{ opacity: 1, y: 0 }}
 								transition={{ duration: 0.3, delay: index * 0.1 }}
 								className='flex-shrink-0'>
 								<Link
@@ -186,8 +186,8 @@ const DynamicSidebar = ({ navItems, theme }: DynamicSidebarProps) => {
 
 			{/* Desktop Sidebar */}
 			<motion.div
-				initial={{ opacity: 0, x: -50 }}
-				animate={{ opacity: 1, x: 0 }}
+				initial={{ opacity: 0, y: 24 }}
+				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.6 }}
 				className='hidden lg:block lg:w-80 flex-shrink-0'>
 				<div className='bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden sticky top-25'>
@@ -195,8 +195,8 @@ const DynamicSidebar = ({ navItems, theme }: DynamicSidebarProps) => {
 						{navItems.map((item, index) => (
 							<motion.div
 								key={item.id}
-								initial={{ opacity: 0, x: -20 }}
-								animate={{ opacity: 1, x: 0 }}
+								initial={{ opacity: 0, y: 12 }}
+								animate={{ opacity: 1, y: 0 }}
 								transition={{ duration: 0.3, delay: index * 0.1 }}>
 								<Link
 									href={item.href}

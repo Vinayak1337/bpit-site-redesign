@@ -14,14 +14,14 @@ export default async function AdminDashboardPage() {
 		orderBy: { createdAt: 'desc' }
 	});
 	return (
-		<div className='min-h-screen p-8 bg-gradient-to-br from-blue-50 to-white'>
-			<div className='max-w-5xl mx-auto bg-white rounded-2xl shadow-md border border-blue-100 p-6'>
-				<div className='flex items-center justify-between'>
-					<div>
-						<h1 className='text-2xl font-semibold text-blue-900'>
+		<div className='min-h-screen bg-gradient-to-br from-blue-50 to-white p-4 sm:p-6 lg:p-8'>
+			<div className='max-w-5xl mx-auto bg-white rounded-xl sm:rounded-2xl shadow-md border border-blue-100 p-4 sm:p-6'>
+				<div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
+					<div className='min-w-0'>
+						<h1 className='text-xl sm:text-2xl font-semibold text-blue-900'>
 							Admin Dashboard
 						</h1>
-						<p className='text-sm text-blue-600'>
+						<p className='text-sm text-blue-600 break-words'>
 							Signed in as {admin.email} ({admin.role})
 						</p>
 					</div>
@@ -34,7 +34,7 @@ export default async function AdminDashboardPage() {
 					</form>
 				</div>
 
-				<div className='mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8'>
+				<div className='mt-6 sm:mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8'>
 					{admin.role === 'ADMIN' ? (
 						<div>
 							<h2 className='text-lg font-semibold text-blue-900 mb-3'>
@@ -109,7 +109,7 @@ export default async function AdminDashboardPage() {
 					<div>
 						<h2 className='text-lg font-semibold text-blue-900 mb-3'>Users</h2>
 						<div className='overflow-x-auto border border-blue-100 rounded-md'>
-							<table className='min-w-full text-sm'>
+							<table className='min-w-[34rem] text-xs sm:text-sm'>
 								<thead className='bg-blue-50 text-blue-900'>
 									<tr>
 										<th className='text-left px-3 py-2'>Email</th>
@@ -155,7 +155,7 @@ export default async function AdminDashboardPage() {
 				<div className='mt-6 text-blue-800'>
 					<p className='mb-4'>Welcome! Use the quick links below to manage your website content:</p>
 					
-					<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'>
+					<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'>
 						<Link
 							href='/admin/about'
 							className='block p-4 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition-colors'>

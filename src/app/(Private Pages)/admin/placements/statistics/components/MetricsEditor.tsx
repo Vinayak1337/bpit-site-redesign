@@ -112,14 +112,16 @@ export default function MetricsEditor({ initialData, pageSlug }: MetricsEditorPr
 					</motion.div>
 
 					{/* Year Selector */}
-					<div className='flex justify-center mb-12'>
-						<div className='bg-white rounded-xl shadow-lg p-6 border border-gray-200 inline-flex items-center space-x-4'>
-							<Calendar className='w-5 h-5 text-blue-600' />
-							<span className='font-semibold text-gray-700'>Academic Year:</span>
-							<Select value={selectedYear} onValueChange={setSelectedYear}>
-								<SelectTrigger className='w-32 border-gray-300 focus:border-blue-500'>
-									<SelectValue />
-								</SelectTrigger>
+						<div className='flex justify-center mb-12'>
+							<div className='flex w-full flex-col gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-lg sm:w-auto sm:flex-row sm:items-center sm:p-6'>
+								<div className='flex items-center gap-3'>
+									<Calendar className='w-5 h-5 text-blue-600' />
+									<span className='font-semibold text-gray-700'>Academic Year:</span>
+								</div>
+								<Select value={selectedYear} onValueChange={setSelectedYear}>
+									<SelectTrigger className='w-full border-gray-300 focus:border-blue-500 sm:w-32'>
+										<SelectValue />
+									</SelectTrigger>
 								<SelectContent>
 									{(currentData.years || []).map(year => (
 										<SelectItem key={year} value={year}>
@@ -128,7 +130,7 @@ export default function MetricsEditor({ initialData, pageSlug }: MetricsEditorPr
 									))}
 								</SelectContent>
 							</Select>
-							<Button className='bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl shadow-lg transition-all duration-300'>
+								<Button className='w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl shadow-lg transition-all duration-300 sm:w-auto'>
 								<Download className='w-4 h-4 mr-2' />
 								Download Report
 							</Button>
@@ -205,8 +207,8 @@ export default function MetricsEditor({ initialData, pageSlug }: MetricsEditorPr
 							{/* Package Statistics */}
 							<div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
 								<motion.div
-									initial={{ opacity: 0, x: -30 }}
-									animate={{ opacity: 1, x: 0 }}
+									initial={{ opacity: 0, y: 24 }}
+									animate={{ opacity: 1, y: 0 }}
 									transition={{ duration: 0.8 }}
 									className='bg-white rounded-2xl p-8 shadow-lg border border-gray-100'>
 									<h3 className='text-2xl font-bold text-gray-900 mb-6'>

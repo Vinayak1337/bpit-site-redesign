@@ -85,26 +85,26 @@ export default function PartnersEditor({ initialData, pageSlug }: PartnersEditor
 					</div>
 
 					{/* Opportunities Grid */}
-					<div className="grid md:grid-cols-2 gap-6">
-						{filteredOpportunities.map((opportunity, index) => (
-							<motion.div
-								key={index}
-								initial={{ opacity: 0, y: 30 }}
-								whileInView={{ opacity: 1, y: 0 }}
-								transition={{ duration: 0.6, delay: index * 0.05 }}
-								className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
-								{/* Header */}
-								<div className="flex items-start justify-between mb-6">
-									<div className="flex items-center space-x-4">
-										<div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-700 rounded-xl flex items-center justify-center text-white text-xl font-bold">
-											{opportunity.company.split(' ').map(word => word[0]).join('').substring(0, 2)}
+						<div className="grid min-w-0 grid-cols-1 gap-6 md:grid-cols-2">
+							{filteredOpportunities.map((opportunity, index) => (
+								<motion.div
+									key={index}
+									initial={{ opacity: 0, y: 30 }}
+									whileInView={{ opacity: 1, y: 0 }}
+									transition={{ duration: 0.6, delay: index * 0.05 }}
+									className="min-w-0 w-full bg-white rounded-2xl p-5 sm:p-8 shadow-lg border border-gray-100">
+									{/* Header */}
+									<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-6">
+										<div className="flex min-w-0 items-center gap-4">
+											<div className="w-14 h-14 sm:w-16 sm:h-16 flex-shrink-0 bg-gradient-to-r from-blue-500 to-blue-700 rounded-xl flex items-center justify-center text-white text-lg sm:text-xl font-bold">
+												{opportunity.company.split(' ').map(word => word[0]).join('').substring(0, 2)}
+											</div>
+											<div className="min-w-0">
+												<h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-1 break-words">{opportunity.company}</h3>
+												<p className="text-blue-600 font-semibold break-words">{opportunity.title}</p>
+											</div>
 										</div>
-										<div>
-											<h3 className="text-xl font-bold text-gray-900 mb-1">{opportunity.company}</h3>
-											<p className="text-blue-600 font-semibold">{opportunity.title}</p>
-										</div>
-									</div>
-									<span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
+										<span className="w-fit px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
 										{opportunity.category}
 									</span>
 								</div>

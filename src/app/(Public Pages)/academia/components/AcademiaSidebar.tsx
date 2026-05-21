@@ -51,8 +51,8 @@ const AcademiaSidebar = () => {
 
 	return (
 		<motion.div
-			initial={{ opacity: 0, x: -50 }}
-			animate={{ opacity: 1, x: 0 }}
+			initial={{ opacity: 0, y: 24 }}
+			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.6 }}
 			className='lg:w-80 flex-shrink-0'>
 			<div className='bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden sticky top-6 max-h-[calc(100vh-8rem)]'>
@@ -60,8 +60,8 @@ const AcademiaSidebar = () => {
 					{navItems.map((item, index) => (
 						<motion.div
 							key={item.id}
-							initial={{ opacity: 0, x: -20 }}
-							animate={{ opacity: 1, x: 0 }}
+							initial={{ opacity: 0, y: 12 }}
+							animate={{ opacity: 1, y: 0 }}
 							transition={{ duration: 0.3, delay: index * 0.1 }}>
 							<Link
 								href={item.href}
