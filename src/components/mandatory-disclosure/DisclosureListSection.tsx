@@ -76,14 +76,14 @@ export default function DisclosureListSection({
 	});
 
 	return (
-		<div className='container mx-auto px-4 py-12'>
-			<div className='max-w-6xl mx-auto space-y-12'>
+		<div className='container mx-auto px-4 sm:px-6 lg:px-8 py-12'>
+			<div className='max-w-6xl mx-auto min-w-0 space-y-8 sm:space-y-12'>
 				{/* Introduction Card - Like "Quality Recognition" */}
 				<motion.div
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.6 }}
-					className='bg-white rounded-2xl p-8 shadow-lg border border-gray-200'>
+					className='bg-white rounded-2xl p-4 sm:p-6 lg:p-8 shadow-lg border border-gray-200'>
 					<div className='text-center mb-8'>
 						<div className='w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4'>
 							<Shield className='w-8 h-8 text-green-600' />
@@ -100,7 +100,7 @@ export default function DisclosureListSection({
 				</motion.div>
 
 				{/* Document Category Cards - Like NAAC/NBA/ISO Cards */}
-				<div className='grid md:grid-cols-3 gap-8'>
+				<div className='grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 lg:gap-8'>
 					{categories.map((category, index) => {
 						const variant = COLOR_VARIANTS[index % COLOR_VARIANTS.length];
 						const IconComponent = ICONS[index % ICONS.length];
@@ -112,13 +112,13 @@ export default function DisclosureListSection({
 								initial={{ opacity: 0, y: 20 }}
 								animate={{ opacity: 1, y: 0 }}
 								transition={{ duration: 0.6, delay: 0.1 * (index + 1) }}
-								className='bg-white rounded-xl p-6 shadow-lg border border-gray-200 hover:shadow-xl transition-shadow'>
+								className='min-w-0 bg-white rounded-xl p-4 sm:p-6 shadow-lg border border-gray-200 hover:shadow-xl transition-shadow'>
 								<div className='text-center mb-6'>
 									<div
 										className={`w-16 h-16 ${variant.bg} rounded-full flex items-center justify-center mx-auto mb-4`}>
 										<IconComponent className={`w-8 h-8 ${variant.text}`} />
 									</div>
-									<h3 className='text-2xl font-bold text-gray-900 mb-2'>
+									<h3 className='text-xl sm:text-2xl font-bold text-gray-900 mb-2 break-words'>
 										{category}
 									</h3>
 									<p className={`${variant.text} font-medium`}>
@@ -129,7 +129,7 @@ export default function DisclosureListSection({
 
 								<div className='space-y-4'>
 									{/* Info Box - Like the Grade/Programs box */}
-									<div className={`${variant.infoBg} rounded-lg p-4`}>
+									<div className={`${variant.infoBg} rounded-lg p-4 min-w-0`}>
 										<div className='flex items-center gap-2 mb-2'>
 											<CheckCircle className={`w-5 h-5 ${variant.text}`} />
 											<span className={`font-semibold ${variant.infoTitle}`}>
@@ -144,7 +144,7 @@ export default function DisclosureListSection({
 													target={
 														item.url.startsWith('http') ? '_blank' : undefined
 													}
-													className={`flex items-center gap-2 text-sm ${variant.infoText} hover:underline`}>
+													className={`flex min-w-0 items-center gap-2 text-sm ${variant.infoText} hover:underline`}>
 													{item.url.endsWith('.pdf') ? (
 														<Download className='w-3 h-3 flex-shrink-0' />
 													) : (
@@ -184,12 +184,12 @@ export default function DisclosureListSection({
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.6, delay: 0.4 }}
-					className='bg-white rounded-2xl p-8 shadow-lg border border-gray-200'>
+					className='bg-white rounded-2xl p-4 sm:p-6 lg:p-8 shadow-lg border border-gray-200'>
 					<h3 className='text-2xl font-bold text-gray-900 text-center mb-8'>
 						Why Mandatory Disclosure?
 					</h3>
 
-					<div className='grid md:grid-cols-2 lg:grid-cols-4 gap-6'>
+					<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6'>
 						<div className='text-center'>
 							<div className='w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4'>
 								<TrendingUp className='w-6 h-6 text-blue-600' />
@@ -244,7 +244,7 @@ export default function DisclosureListSection({
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.6, delay: 0.5 }}
-					className='bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl p-8 border border-gray-200'>
+					className='bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl p-4 sm:p-6 lg:p-8 border border-gray-200'>
 					<div className='text-center mb-8'>
 						<h3 className='text-2xl font-bold text-gray-900 mb-4'>
 							Regulatory Bodies
@@ -255,8 +255,8 @@ export default function DisclosureListSection({
 						</p>
 					</div>
 
-					<div className='grid md:grid-cols-2 gap-8'>
-						<div className='bg-white rounded-xl p-6 shadow-sm'>
+					<div className='grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8'>
+						<div className='min-w-0 bg-white rounded-xl p-4 sm:p-6 shadow-sm'>
 							<h4 className='text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2'>
 								<FileText className='w-5 h-5 text-blue-600' />
 								AICTE Requirements
@@ -281,7 +281,7 @@ export default function DisclosureListSection({
 							</ul>
 						</div>
 
-						<div className='bg-white rounded-xl p-6 shadow-sm'>
+						<div className='min-w-0 bg-white rounded-xl p-4 sm:p-6 shadow-sm'>
 							<h4 className='text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2'>
 								<Shield className='w-5 h-5 text-purple-600' />
 								University Guidelines
@@ -313,7 +313,7 @@ export default function DisclosureListSection({
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.6, delay: 0.6 }}
-					className='bg-white rounded-2xl p-8 shadow-lg border border-gray-200'>
+					className='bg-white rounded-2xl p-4 sm:p-6 lg:p-8 shadow-lg border border-gray-200'>
 					<div className='text-center mb-8'>
 						<div className='w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6'>
 							<FileText className='w-8 h-8 text-white' />
@@ -327,13 +327,13 @@ export default function DisclosureListSection({
 						</p>
 					</div>
 
-					<div className='grid md:grid-cols-2 lg:grid-cols-3 gap-4'>
+					<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
 						{data.items.map((item, index) => (
 							<Link
 								key={item.id}
 								href={item.url}
 								target={item.url.startsWith('http') ? '_blank' : undefined}
-								className='group flex items-center gap-3 p-4 rounded-lg bg-gray-50 hover:bg-blue-50 border border-gray-100 hover:border-blue-200 transition-all duration-200'>
+								className='group flex min-w-0 items-center gap-3 p-4 rounded-lg bg-gray-50 hover:bg-blue-50 border border-gray-100 hover:border-blue-200 transition-all duration-200'>
 								<div className='w-10 h-10 bg-white rounded-lg flex items-center justify-center border border-gray-100 group-hover:border-blue-200 flex-shrink-0'>
 									{item.url.endsWith('.pdf') ? (
 										<Download className='w-5 h-5 text-gray-400 group-hover:text-blue-600' />
@@ -341,7 +341,7 @@ export default function DisclosureListSection({
 										<ExternalLink className='w-5 h-5 text-gray-400 group-hover:text-blue-600' />
 									)}
 								</div>
-								<div className='overflow-hidden'>
+								<div className='min-w-0 overflow-hidden'>
 									<p className='font-medium text-gray-700 group-hover:text-blue-700 truncate text-sm'>
 										{item.title}
 									</p>
