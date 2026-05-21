@@ -979,8 +979,8 @@ const CSEDepartmentPage = () => {
 				<div className='flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8'>
 					{/* Advanced Sidebar Navigation */}
 					<motion.div
-						initial={{ opacity: 0, x: -50 }}
-						animate={{ opacity: 1, x: 0 }}
+						initial={{ opacity: 0, y: 24 }}
+						animate={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.6 }}
 						className='lg:w-80 flex-shrink-0'>
 						<div className='bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden sticky top-8'>
@@ -1006,8 +1006,8 @@ const CSEDepartmentPage = () => {
 											}`}
 											whileHover={{ scale: 1.02 }}
 											whileTap={{ scale: 0.98 }}
-											initial={{ opacity: 0, x: -20 }}
-											animate={{ opacity: 1, x: 0 }}
+											initial={{ opacity: 0, y: 12 }}
+											animate={{ opacity: 1, y: 0 }}
 											transition={{ duration: 0.3, delay: index * 0.05 }}>
 											<div className='flex items-center gap-3 relative z-10'>
 												<div
@@ -1068,8 +1068,8 @@ const CSEDepartmentPage = () => {
 																		? 'bg-blue-100 text-blue-700 border-l-2 border-blue-500'
 																		: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-l-2 border-transparent'
 																}`}
-																initial={{ opacity: 0, x: -10 }}
-																animate={{ opacity: 1, x: 0 }}
+																initial={{ opacity: 0, y: 8 }}
+																animate={{ opacity: 1, y: 0 }}
 																transition={{
 																	duration: 0.2,
 																	delay: subIndex * 0.05
@@ -1101,8 +1101,8 @@ const CSEDepartmentPage = () => {
 
 					{/* Content Area */}
 					<motion.div
-						initial={{ opacity: 0, x: 50 }}
-						animate={{ opacity: 1, x: 0 }}
+						initial={{ opacity: 0, y: 24 }}
+						animate={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.6 }}
 						className='flex-1'>
 						<div className='bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden'>
@@ -1113,7 +1113,7 @@ const CSEDepartmentPage = () => {
 									animate={{ opacity: 1, y: 0 }}
 									exit={{ opacity: 0, y: -20 }}
 									transition={{ duration: 0.4 }}
-									className='p-8'>
+									className='p-4 sm:p-6 lg:p-8'>
 									{getCurrentContent()}
 								</motion.div>
 							</AnimatePresence>

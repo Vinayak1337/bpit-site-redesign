@@ -65,9 +65,9 @@ Required viewport set: `375`, `430`, `768`, `1024`, `1440`
 | Scholarships | `/admissions/scholarship` | `/admin/admissions/scholarship` | Verified | `375`, `430`, `768`, `1024`, `1440` | No actionable responsive issues found after the shared Admissions wrapper fix. | - | - | No code changes to push | Verified public and admin Scholarships routes with no page-level horizontal overflow at all required widths. |
 | Admissions brochure | `/admissions/brochure` | `/admin/admissions/brochure` | Verified | `375`, `430`, `768`, `1024`, `1440` | No actionable responsive issues found after the shared Admissions wrapper fix. | - | - | No code changes to push | Verified public and admin Admissions Brochure routes with no page-level horizontal overflow at all required widths. |
 | Admissions FAQs | `/admissions/faqs` | `/admin/admissions/faqs` | Verified | `375`, `430`, `768`, `1024`, `1440` | No actionable responsive issues found after the shared Admissions wrapper fix. | - | - | No code changes to push | Verified public and admin Admissions FAQs routes with no page-level horizontal overflow at all required widths. |
-| CSE shortcut | `/cse` | - | Not checked | - | - | - | - | - | No admin page found. |
-| Departments | `/departments` | - | Not checked | - | - | - | - | - | No admin page found. |
-| Department CSE | `/departments/cse` | - | Not checked | - | - | - | - | - | No admin page found. |
+| CSE shortcut | `/cse` | - | Verified | `375`, `430`, `768`, `1024`, `1440` | Public CSE shortcut had 38px mobile and 34px tablet horizontal overflow from local x-axis entrance animations in its sidebar/content layout. | `src/app/(Public Pages)/cse/page.tsx` | pending | Pending push | Replaced horizontal entrance motion with vertical motion and made content-card padding responsive. Verified `/cse` with no page-level horizontal overflow at all required widths. `npx tsc --noEmit` passed. No admin page found. |
+| Departments | `/departments` | - | Verified | `375`, `430`, `768`, `1024`, `1440` | No actionable responsive issues found. | - | - | No code changes to push | Verified public Departments route with no page-level horizontal overflow at all required widths. No admin page found. |
+| Department CSE | `/departments/cse` | - | Verified | `375`, `430`, `768`, `1024`, `1440` | No actionable responsive issues found. | - | - | No code changes to push | Verified public Department CSE route with no page-level horizontal overflow at all required widths. No admin page found. |
 | Placement overview | `/placements/overview` | `/admin/placements/overview` | Not checked | - | - | - | - | - | - |
 | Training placement | `/placements/training-placement` | `/admin/placements/training-placement` | Not checked | - | - | - | - | - | - |
 | Recruiters | `/placements/recruiters` | `/admin/placements/recruiters` | Not checked | - | - | - | - | - | - |
@@ -79,5 +79,5 @@ Required viewport set: `375`, `430`, `768`, `1024`, `1440`
 | Events festivals | `/student-life/events-and-festivals` | `/admin/student-life/events` | Not checked | - | - | - | - | - | - |
 | Student grievance cell | `/student-life/student-grievance-cell` | `/admin/student-life/grievance` | Not checked | - | - | - | - | - | - |
 | Code of conduct | `/student-life/code-of-conduct` | `/admin/student-life/conduct` | Not checked | - | - | - | - | - | - |
-| Privacy policy | `/privacy-policy` | - | Not checked | - | - | - | - | - | No admin page found. |
-| Terms of service | `/terms-of-service` | - | Not checked | - | - | - | - | - | No admin page found. |
+| Privacy policy | `/privacy-policy` | - | Verified | `375`, `430`, `768`, `1024`, `1440` | No actionable responsive issues found. | - | - | No code changes to push | Verified public Privacy Policy route with no page-level horizontal overflow at all required widths. No admin page found. |
+| Terms of service | `/terms-of-service` | - | Verified | `375`, `430`, `768`, `1024`, `1440` | No actionable responsive issues found. | - | - | No code changes to push | Verified public Terms of Service route with no page-level horizontal overflow at all required widths. No admin page found. |
