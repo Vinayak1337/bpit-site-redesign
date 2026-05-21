@@ -201,8 +201,8 @@ export default function PlacementStatisticsSection({
 						whileInView={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.6 }}
 						className='max-w-6xl mx-auto mb-16'>
-						<div className='bg-white rounded-2xl p-8 shadow-lg border border-gray-200'>
-							<div className='flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8'>
+							<div className='bg-white rounded-2xl p-5 sm:p-8 shadow-lg border border-gray-200'>
+								<div className='flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between mb-8'>
 								<div className='flex items-center space-x-3 mb-4 lg:mb-0'>
 									<div className='p-2 bg-blue-100 rounded-lg'>
 										<Sliders className='w-5 h-5 text-blue-600' />
@@ -214,7 +214,7 @@ export default function PlacementStatisticsSection({
 										<p className='text-gray-600 text-sm'>Refine your search</p>
 									</div>
 								</div>
-								<div className='flex items-center space-x-2 bg-blue-50 px-4 py-2 rounded-lg border border-blue-200'>
+									<div className='flex w-fit items-center space-x-2 bg-blue-50 px-4 py-2 rounded-lg border border-blue-200'>
 									<Trophy className='w-4 h-4 text-blue-600' />
 									<span className='text-lg font-bold text-blue-700'>
 										{filteredStudents.length}
@@ -361,7 +361,7 @@ export default function PlacementStatisticsSection({
 						initial={{ opacity: 0, y: 20 }}
 						whileInView={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.6 }}>
-						<div className='flex items-center justify-between mb-8'>
+							<div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8'>
 							<div>
 								<h3 className='text-3xl font-bold text-gray-900 mb-2'>
 									Student Placements
@@ -373,7 +373,7 @@ export default function PlacementStatisticsSection({
 									• Sorted by package (highest first)
 								</p>
 							</div>
-							<div className='text-right'>
+								<div className='text-left sm:text-right'>
 								<div className='text-sm text-gray-600 bg-gradient-to-r from-gray-100 to-gray-200 px-6 py-3 rounded-2xl border'>
 									<div className='font-semibold text-gray-800'>
 										{startIndex + 1}-
@@ -415,7 +415,7 @@ export default function PlacementStatisticsSection({
 													animate={{ opacity: 1, y: 0 }}
 													exit={{ opacity: 0, y: -30 }}
 													transition={{ duration: 0.4, delay: index * 0.05 }}
-													className={`relative bg-white rounded-3xl p-8 shadow-xl border-2 hover:shadow-2xl transition-all duration-300 ${
+														className={`relative bg-white rounded-3xl p-5 sm:p-8 shadow-xl border-2 hover:shadow-2xl transition-all duration-300 ${
 														isTopThree && currentPage === 1
 															? globalIndex === 0
 																? 'border-yellow-300 bg-gradient-to-br from-yellow-50 to-yellow-100'
@@ -430,49 +430,49 @@ export default function PlacementStatisticsSection({
 														</div>
 													)}
 
-													<div className='flex items-center justify-between'>
-														<div className='flex items-center space-x-6'>
-															{student.image ? (
-																<img
-																	src={student.image}
-																	alt={student.name}
-																	className='w-20 h-20 rounded-2xl object-cover shadow-lg border-2 border-blue-100'
-																/>
-															) : (
-																<img
-																	src='/avatar-default.svg'
-																	alt={student.name}
-																	className='w-20 h-20 rounded-2xl object-cover shadow-lg border-2 border-blue-100 bg-blue-500'
-																/>
-															)}
-															<div>
-																<h4 className='text-xl font-bold text-gray-900 mb-2'>
-																	{student.name}
-																</h4>
-																<div className='space-y-2'>
-																	<div className='flex items-center space-x-3 text-gray-600'>
-																		<GraduationCap className='w-5 h-5' />
-																		<span className='font-semibold'>
-																			{student.department}
-																		</span>
-																		<span className='text-gray-400'>•</span>
-																		<span>Batch {student.batch}</span>
-																	</div>
-																	<div className='flex items-center space-x-3 text-gray-600'>
-																		<Building2 className='w-5 h-5' />
-																		<span className='font-semibold'>
-																			{student.company}
-																		</span>
-																		<span className='text-gray-400'>•</span>
-																		<span>{student.role}</span>
+														<div className='flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between'>
+															<div className='flex min-w-0 items-start gap-4 sm:items-center sm:gap-6'>
+																{student.image ? (
+																	<img
+																		src={student.image}
+																		alt={student.name}
+																		className='h-16 w-16 flex-shrink-0 rounded-2xl object-cover shadow-lg border-2 border-blue-100 sm:h-20 sm:w-20'
+																	/>
+																) : (
+																	<img
+																		src='/avatar-default.svg'
+																		alt={student.name}
+																		className='h-16 w-16 flex-shrink-0 rounded-2xl object-cover shadow-lg border-2 border-blue-100 bg-blue-500 sm:h-20 sm:w-20'
+																	/>
+																)}
+																<div className='min-w-0'>
+																	<h4 className='text-lg font-bold text-gray-900 mb-2 break-words sm:text-xl'>
+																		{student.name}
+																	</h4>
+																	<div className='space-y-2'>
+																		<div className='flex flex-wrap items-center gap-x-3 gap-y-1 text-gray-600'>
+																			<GraduationCap className='h-5 w-5 flex-shrink-0' />
+																			<span className='font-semibold'>
+																				{student.department}
+																			</span>
+																			<span className='text-gray-400'>•</span>
+																			<span>Batch {student.batch}</span>
+																		</div>
+																		<div className='flex flex-wrap items-center gap-x-3 gap-y-1 text-gray-600'>
+																			<Building2 className='h-5 w-5 flex-shrink-0' />
+																			<span className='font-semibold'>
+																				{student.company}
+																			</span>
+																			<span className='text-gray-400'>•</span>
+																			<span className='break-words'>{student.role}</span>
+																		</div>
 																	</div>
 																</div>
 															</div>
-														</div>
-														<div className='text-right'>
-															<div className='text-3xl font-bold text-green-600 mb-1'>
-																₹{student.package}
-															</div>
+															<div className='flex-shrink-0 text-left sm:text-right'>
+																<div className='text-2xl font-bold text-green-600 mb-1 sm:text-3xl'>
+																	₹{student.package}
+																</div>
 															<div className='text-sm text-gray-500 font-semibold'>
 																LPA
 															</div>
@@ -486,19 +486,19 @@ export default function PlacementStatisticsSection({
 
 								{/* Pagination */}
 								{totalPages > 1 && (
-									<div className='flex items-center justify-center space-x-3'>
-										<Button
+										<div className='flex flex-wrap items-center justify-center gap-3'>
+											<Button
 											onClick={() =>
 												setCurrentPage(prev => Math.max(prev - 1, 1))
 											}
 											disabled={currentPage === 1}
 											variant='outline'
-											className='px-8 py-4 font-semibold rounded-2xl border-2 disabled:opacity-50'>
+												className='px-4 py-3 sm:px-8 sm:py-4 font-semibold rounded-2xl border-2 disabled:opacity-50'>
 											<ChevronLeft className='w-5 h-5 mr-2' />
 											Previous
 										</Button>
 
-										<div className='flex space-x-2'>
+											<div className='flex gap-2'>
 											{Array.from(
 												{ length: Math.min(totalPages, 5) },
 												(_, i) => {
@@ -520,7 +520,7 @@ export default function PlacementStatisticsSection({
 															variant={
 																currentPage === pageNum ? 'default' : 'outline'
 															}
-															className={`w-14 h-14 p-0 font-bold text-lg rounded-2xl border-2 transition-all duration-200 ${
+																className={`h-11 w-11 p-0 font-bold text-base rounded-2xl border-2 transition-all duration-200 sm:h-14 sm:w-14 sm:text-lg ${
 																currentPage === pageNum
 																	? 'bg-blue-600 text-white shadow-lg scale-110'
 																	: 'text-gray-600 hover:bg-blue-50 hover:border-blue-300'
@@ -538,7 +538,7 @@ export default function PlacementStatisticsSection({
 											}
 											disabled={currentPage === totalPages}
 											variant='outline'
-											className='px-8 py-4 font-semibold rounded-2xl border-2 disabled:opacity-50'>
+												className='px-4 py-3 sm:px-8 sm:py-4 font-semibold rounded-2xl border-2 disabled:opacity-50'>
 											Next
 											<ChevronRight className='w-5 h-5 ml-2' />
 										</Button>
@@ -558,17 +558,17 @@ export default function PlacementStatisticsSection({
 						whileInView={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.6 }}
 						className='max-w-4xl mx-auto'>
-						<div className='bg-white rounded-2xl p-8 shadow-lg border border-gray-200'>
-							<div className='flex flex-col lg:flex-row gap-6 items-center justify-between'>
-								<div className='flex flex-col sm:flex-row gap-4'>
-									<div className='space-y-2'>
+							<div className='bg-white rounded-2xl p-5 sm:p-8 shadow-lg border border-gray-200'>
+								<div className='flex flex-col lg:flex-row gap-6 items-center justify-between'>
+									<div className='flex w-full flex-col gap-4 sm:flex-row lg:w-auto'>
+										<div className='min-w-0 flex-1 space-y-2'>
 										<label className='text-sm font-semibold text-gray-700'>
 											Academic Year
 										</label>
 										<Select
 											value={selectedYear}
 											onValueChange={setSelectedYear}>
-											<SelectTrigger className='w-40'>
+												<SelectTrigger className='w-full sm:w-40'>
 												<SelectValue />
 											</SelectTrigger>
 											<SelectContent>
@@ -580,14 +580,14 @@ export default function PlacementStatisticsSection({
 											</SelectContent>
 										</Select>
 									</div>
-									<div className='space-y-2'>
+										<div className='min-w-0 flex-1 space-y-2'>
 										<label className='text-sm font-semibold text-gray-700'>
 											Department
 										</label>
 										<Select
 											value={selectedDepartment}
 											onValueChange={setSelectedDepartment}>
-											<SelectTrigger className='w-48'>
+												<SelectTrigger className='w-full sm:w-48'>
 												<SelectValue />
 											</SelectTrigger>
 											<SelectContent>
@@ -601,7 +601,7 @@ export default function PlacementStatisticsSection({
 									</div>
 								</div>
 
-								<Button className='bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl shadow-lg transition-all duration-300'>
+									<Button className='w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl shadow-lg transition-all duration-300 sm:w-auto'>
 									<Download className='w-4 h-4 mr-2' />
 									Download Report
 								</Button>
@@ -694,9 +694,9 @@ export default function PlacementStatisticsSection({
 
 						{/* Package Statistics */}
 						<div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
-							<motion.div
-								initial={{ opacity: 0, x: -30 }}
-								whileInView={{ opacity: 1, x: 0 }}
+								<motion.div
+									initial={{ opacity: 0, y: 24 }}
+									whileInView={{ opacity: 1, y: 0 }}
 								transition={{ duration: 0.8 }}
 								className='bg-white rounded-2xl p-8 shadow-lg border border-gray-100'>
 								<h3 className='text-2xl font-bold text-gray-900 mb-6'>
@@ -867,9 +867,9 @@ export default function PlacementStatisticsSection({
 					</motion.div>
 
 					<div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
-						<motion.div
-							initial={{ opacity: 0, x: -30 }}
-							whileInView={{ opacity: 1, x: 0 }}
+							<motion.div
+								initial={{ opacity: 0, y: 24 }}
+								whileInView={{ opacity: 1, y: 0 }}
 							transition={{ duration: 0.8 }}
 							className='space-y-6'>
 							{(data.sectorWiseData || []).map((sector, index) => (
@@ -905,9 +905,9 @@ export default function PlacementStatisticsSection({
 							))}
 						</motion.div>
 
-						<motion.div
-							initial={{ opacity: 0, x: 30 }}
-							whileInView={{ opacity: 1, x: 0 }}
+							<motion.div
+								initial={{ opacity: 0, y: 24 }}
+								whileInView={{ opacity: 1, y: 0 }}
 							transition={{ duration: 0.8 }}
 							className='bg-white rounded-2xl p-8 shadow-lg'>
 							<h3 className='text-2xl font-bold text-gray-900 mb-6'>

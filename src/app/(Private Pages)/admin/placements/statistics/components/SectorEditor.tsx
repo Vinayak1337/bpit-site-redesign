@@ -45,10 +45,10 @@ export default function SectorEditor({ initialData, pageSlug }: SectorEditorProp
 
 					<div className='space-y-6'>
 						{(currentData.sectorWiseData || []).map((sector, index) => (
-							<motion.div
-								key={index}
-								initial={{ opacity: 0, x: -30 }}
-								whileInView={{ opacity: 1, x: 0 }}
+								<motion.div
+									key={index}
+									initial={{ opacity: 0, y: 24 }}
+									whileInView={{ opacity: 1, y: 0 }}
 								transition={{ duration: 0.8, delay: index * 0.1 }}
 								className='bg-white rounded-xl p-6 shadow-lg'>
 								<div className='flex items-center justify-between mb-4'>

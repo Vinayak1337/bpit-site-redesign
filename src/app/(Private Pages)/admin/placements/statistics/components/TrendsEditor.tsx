@@ -44,8 +44,8 @@ export default function TrendsEditor({ initialData, pageSlug }: TrendsEditorProp
 					</motion.div>
 
 					<motion.div
-						initial={{ opacity: 0, x: 30 }}
-						whileInView={{ opacity: 1, x: 0 }}
+						initial={{ opacity: 0, y: 24 }}
+						whileInView={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.8 }}
 						className='max-w-4xl mx-auto bg-white rounded-2xl p-8 shadow-lg border border-gray-100'>
 						<div className='space-y-6'>
