@@ -1,14 +1,26 @@
 'use client';
 
-import React, { useState, useTransition, useEffect } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
-import { Plus, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import UploadButton from '@/components/cloudinary/upload-button';
-import { updateTrainingPlacement, type TrainingPlacementData } from '@/app/(Private Pages)/actions/training-placement';
+import {
+	updateTrainingPlacement,
+	type TrainingPlacementData
+} from '@/app/(Private Pages)/actions/training-placement';
+import {
+	AddRowButton,
+	AdminEmptyState,
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	AdminItemCard,
+	AdminItemList,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 interface TeamFormProps {
 	initialData: TrainingPlacementData;
@@ -16,9 +28,9 @@ interface TeamFormProps {
 	onChange?: (data: TrainingPlacementData) => void;
 }
 
-export default function TeamForm({ initialData, pageSlug, onChange }: TeamFormProps) {
+export default function TeamForm({ initialData, onChange }: TeamFormProps) {
 	const [isPending, startTransition] = useTransition();
-	const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 
 	const form = useForm({
 		defaultValues: {
@@ -28,29 +40,36 @@ export default function TeamForm({ initialData, pageSlug, onChange }: TeamFormPr
 		}
 	});
 
-	const { fields, append, remove } = useFieldArray({
+	const { fields, append, remove, move } = useFieldArray({
 		control: form.control,
 		name: 'teamMembers'
 	});
 
-	// Watch for changes and update preview in real-time
 	useEffect(() => {
-		const subscription = form.watch((values) => {
+		const sub = form.watch(values => {
 			if (onChange) {
-				const updatedData: TrainingPlacementData = {
+				onChange({
 					...initialData,
 					teamTitle: values.teamTitle || '',
 					teamDescription: values.teamDescription || '',
-					teamMembers: (values.teamMembers || []).filter(Boolean) as any
-				};
-				onChange(updatedData);
+					teamMembers: (values.teamMembers || []).filter(
+						Boolean
+					) as TrainingPlacementData['teamMembers']
+				});
+				setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 			}
 		});
-		return () => subscription.unsubscribe();
+		return () => sub.unsubscribe();
 	}, [form, onChange, initialData]);
 
-	const onSubmit = async (values: any) => {
-		setSaveStatus('saving');
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
+	const onSubmit = form.handleSubmit(values => {
+		setStatus({ kind: 'saving' });
 		startTransition(async () => {
 			try {
 				const updatedData: TrainingPlacementData = {
@@ -59,183 +78,133 @@ export default function TeamForm({ initialData, pageSlug, onChange }: TeamFormPr
 					teamDescription: values.teamDescription,
 					teamMembers: values.teamMembers
 				};
-
 				await updateTrainingPlacement(updatedData);
-				
-				if (onChange) {
-					onChange(updatedData);
-				}
-
-				setSaveStatus('saved');
-				setTimeout(() => setSaveStatus('idle'), 2000);
+				onChange?.(updatedData);
+				setStatus({ kind: 'success', message: 'Saved' });
 			} catch (error) {
 				console.error('Failed to save:', error);
-				setSaveStatus('error');
+				setStatus({ kind: 'error', message: 'Save failed' });
 			}
 		});
-	};
+	});
 
 	return (
-		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
-				<div className='grid grid-cols-1 gap-4'>
-					<FormField
-						control={form.control}
-						name='teamTitle'
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Section Title</FormLabel>
-								<FormControl>
-									<Input {...field} placeholder='Our Dedicated Team' />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
+		<AdminForm onSubmit={onSubmit}>
+			<AdminFormSection
+				title='Section heading'
+				description='Copy shown above the team grid.'>
+				<AdminField label='Section title' htmlFor='tm-title'>
+					<Input
+						id='tm-title'
+						placeholder='Our Dedicated Team'
+						{...form.register('teamTitle')}
 					/>
-
-					<FormField
-						control={form.control}
-						name='teamDescription'
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Section Description</FormLabel>
-								<FormControl>
-									<Textarea {...field} rows={3} placeholder='Meet our team...' />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
+				</AdminField>
+				<AdminField label='Section description' htmlFor='tm-desc'>
+					<Textarea
+						id='tm-desc'
+						rows={3}
+						placeholder='Meet our team…'
+						{...form.register('teamDescription')}
 					/>
-				</div>
+				</AdminField>
+			</AdminFormSection>
 
-				<div className='space-y-4'>
-					<div className='flex items-center justify-between'>
-						<h3 className='text-lg font-semibold'>Team Members</h3>
-						<Button
-							type='button'
-							onClick={() => append({ id: Date.now().toString(), name: '', position: '', qualifications: '', specialization: '', image: '' })}
-							size='sm'>
-							<Plus className='w-4 h-4 mr-2' />
-							Add Member
-						</Button>
-					</div>
-
-					{fields.map((field, index) => (
-						<div key={field.id} className='p-4 border rounded-lg space-y-4'>
-							<div className='flex items-center justify-between mb-2'>
-								<h4 className='font-semibold'>Member {index + 1}</h4>
-								<Button
-									type='button'
-									variant='destructive'
-									size='sm'
-									onClick={() => remove(index)}>
-									<Trash2 className='w-4 h-4' />
-								</Button>
-							</div>
-
-							<div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-								<FormField
-									control={form.control}
-									name={`teamMembers.${index}.name`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Name</FormLabel>
-											<FormControl>
-												<Input {...field} placeholder='Dr. John Doe' />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
+			<AdminFormSection title='Team members'>
+				<AdminItemList>
+					{fields.map((field, index) => {
+						const image = form.watch(`teamMembers.${index}.image`);
+						return (
+							<AdminItemCard
+								key={field.id}
+								index={index}
+								total={fields.length}
+								title={
+									form.watch(`teamMembers.${index}.name`) ||
+									`Member ${index + 1}`
+								}
+								subtitle={
+									form.watch(`teamMembers.${index}.position`) || undefined
+								}
+								onMove={d => move(index, index + d)}
+								onRemove={() => remove(index)}>
+								<AdminFieldGrid>
+									<AdminField label='Name'>
+										<Input
+											placeholder='Dr. John Doe'
+											{...form.register(`teamMembers.${index}.name` as const)}
+										/>
+									</AdminField>
+									<AdminField label='Position'>
+										<Input
+											placeholder='Training Coordinator'
+											{...form.register(`teamMembers.${index}.position` as const)}
+										/>
+									</AdminField>
+									<AdminField label='Qualifications'>
+										<Input
+											placeholder='Ph.D., M.Tech'
+											{...form.register(
+												`teamMembers.${index}.qualifications` as const
+											)}
+										/>
+									</AdminField>
+									<AdminField label='Specialization'>
+										<Input
+											placeholder='Career Development'
+											{...form.register(
+												`teamMembers.${index}.specialization` as const
+											)}
+										/>
+									</AdminField>
+								</AdminFieldGrid>
+								<AdminField label='Profile image'>
+									<Input
+										placeholder='Image URL'
+										{...form.register(`teamMembers.${index}.image` as const)}
+									/>
+									<div className='mt-2'>
+										<UploadButton
+											onUpload={url =>
+												form.setValue(`teamMembers.${index}.image`, url, {
+													shouldDirty: true
+												})
+											}
+											buttonText='Upload image'
+										/>
+									</div>
+									{image && (
+										<div className='mt-3'>
+											{/* eslint-disable-next-line @next/next/no-img-element */}
+											<img
+												src={image}
+												alt='Preview'
+												className='h-20 w-20 rounded-full border border-slate-200 object-cover'
+											/>
+										</div>
 									)}
-								/>
+								</AdminField>
+							</AdminItemCard>
+						);
+					})}
+				</AdminItemList>
+				{fields.length === 0 && <AdminEmptyState title='No team members yet' />}
+				<AddRowButton
+					onClick={() =>
+						append({
+							id: Date.now().toString(),
+							name: '',
+							position: '',
+							qualifications: '',
+							specialization: '',
+							image: ''
+						})
+					}>
+					Add member
+				</AddRowButton>
+			</AdminFormSection>
 
-								<FormField
-									control={form.control}
-									name={`teamMembers.${index}.position`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Position</FormLabel>
-											<FormControl>
-												<Input {...field} placeholder='Training Coordinator' />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`teamMembers.${index}.qualifications`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Qualifications</FormLabel>
-											<FormControl>
-												<Input {...field} placeholder='Ph.D., M.Tech' />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`teamMembers.${index}.specialization`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Specialization</FormLabel>
-											<FormControl>
-												<Input {...field} placeholder='Career Development' />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`teamMembers.${index}.image`}
-									render={({ field }) => (
-										<FormItem className='md:col-span-2'>
-											<FormLabel>Profile Image</FormLabel>
-											<FormControl>
-												<div className='space-y-2'>
-													<Input {...field} placeholder='Image URL (optional)' />
-													<UploadButton
-														onUpload={(url) => field.onChange(url)}
-														buttonText='Upload Image'
-														className='w-full'
-													/>
-													{field.value && (
-														<div className='mt-2'>
-															<img
-																src={field.value}
-																alt='Preview'
-																className='w-20 h-20 rounded-full object-cover border-2 border-blue-200'
-															/>
-														</div>
-													)}
-												</div>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							</div>
-						</div>
-					))}
-				</div>
-
-				<div className='flex items-center gap-3'>
-					<Button type='submit' disabled={isPending}>
-						{isPending ? 'Saving...' : 'Save Changes'}
-					</Button>
-					{saveStatus === 'saved' && (
-						<span className='text-sm text-green-600'>✓ Saved successfully</span>
-					)}
-					{saveStatus === 'error' && (
-						<span className='text-sm text-red-600'>Failed to save</span>
-					)}
-				</div>
-			</form>
-		</Form>
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }

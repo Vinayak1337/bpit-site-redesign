@@ -5,6 +5,7 @@ import Editable from '@/components/ui/Editable';
 import Footer from '@/components/footer/BPITFooter';
 import FooterContactsForm from '@/app/(Private Pages)/admin/components/FooterContactsForm';
 import { ContactType } from '@prisma/client';
+import { defaultSiteChromeConfig } from '@/data/site-chrome';
 
 type FooterContactsEditorProps = {
 	initialContacts: {
@@ -33,6 +34,16 @@ export default function FooterContactsEditor({
 		[initialContacts]
 	);
 	const [previewContacts, setPreviewContacts] = useState(normalized);
+	const previewConfig = useMemo<SiteChromeConfig>(
+		() => ({
+			...defaultSiteChromeConfig,
+			footer: {
+				...defaultSiteChromeConfig.footer,
+				bottomText: bottomLeftContent
+			}
+		}),
+		[bottomLeftContent]
+	);
 
 	const handleChange = useCallback((contacts: typeof previewContacts) => {
 		setPreviewContacts(sanitizeContacts(contacts));
@@ -47,10 +58,7 @@ export default function FooterContactsEditor({
 					onChange={handleChange}
 				/>
 			}>
-			<Footer
-				contacts={previewContacts}
-				bottomLeftContent={bottomLeftContent}
-			/>
+			<Footer contacts={previewContacts} siteChromeConfig={previewConfig} />
 		</Editable>
 	);
 }

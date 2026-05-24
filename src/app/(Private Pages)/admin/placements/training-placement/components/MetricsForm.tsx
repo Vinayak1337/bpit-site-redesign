@@ -1,13 +1,25 @@
 'use client';
 
-import React, { useState, useTransition, useEffect } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
-import { Plus, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { updateTrainingPlacement, type TrainingPlacementData } from '@/app/(Private Pages)/actions/training-placement';
+import {
+	updateTrainingPlacement,
+	type TrainingPlacementData
+} from '@/app/(Private Pages)/actions/training-placement';
+import {
+	AddRowButton,
+	AdminEmptyState,
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	AdminItemCard,
+	AdminItemList,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 interface MetricsFormProps {
 	initialData: TrainingPlacementData;
@@ -15,9 +27,9 @@ interface MetricsFormProps {
 	onChange?: (data: TrainingPlacementData) => void;
 }
 
-export default function MetricsForm({ initialData, pageSlug, onChange }: MetricsFormProps) {
+export default function MetricsForm({ initialData, onChange }: MetricsFormProps) {
 	const [isPending, startTransition] = useTransition();
-	const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 
 	const form = useForm({
 		defaultValues: {
@@ -27,29 +39,36 @@ export default function MetricsForm({ initialData, pageSlug, onChange }: Metrics
 		}
 	});
 
-	const { fields, append, remove } = useFieldArray({
+	const { fields, append, remove, move } = useFieldArray({
 		control: form.control,
 		name: 'statistics'
 	});
 
-	// Watch for changes and update preview in real-time
 	useEffect(() => {
-		const subscription = form.watch((values) => {
+		const sub = form.watch(values => {
 			if (onChange) {
-				const updatedData: TrainingPlacementData = {
+				onChange({
 					...initialData,
 					statisticsTitle: values.statisticsTitle || '',
 					statisticsDescription: values.statisticsDescription || '',
-					statistics: (values.statistics || []).filter(Boolean) as any
-				};
-				onChange(updatedData);
+					statistics: (values.statistics || []).filter(
+						Boolean
+					) as TrainingPlacementData['statistics']
+				});
+				setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 			}
 		});
-		return () => subscription.unsubscribe();
+		return () => sub.unsubscribe();
 	}, [form, onChange, initialData]);
 
-	const onSubmit = async (values: any) => {
-		setSaveStatus('saving');
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
+	const onSubmit = form.handleSubmit(values => {
+		setStatus({ kind: 'saving' });
 		startTransition(async () => {
 			try {
 				const updatedData: TrainingPlacementData = {
@@ -58,139 +77,90 @@ export default function MetricsForm({ initialData, pageSlug, onChange }: Metrics
 					statisticsDescription: values.statisticsDescription,
 					statistics: values.statistics
 				};
-
 				await updateTrainingPlacement(updatedData);
-				
-				if (onChange) {
-					onChange(updatedData);
-				}
-
-				setSaveStatus('saved');
-				setTimeout(() => setSaveStatus('idle'), 2000);
+				onChange?.(updatedData);
+				setStatus({ kind: 'success', message: 'Saved' });
 			} catch (error) {
 				console.error('Failed to save:', error);
-				setSaveStatus('error');
+				setStatus({ kind: 'error', message: 'Save failed' });
 			}
 		});
-	};
+	});
 
 	return (
-		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
-				<div className='grid grid-cols-1 gap-4'>
-					<FormField
-						control={form.control}
-						name='statisticsTitle'
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Section Title</FormLabel>
-								<FormControl>
-									<Input {...field} placeholder='Our Impact in Numbers' />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
+		<AdminForm onSubmit={onSubmit}>
+			<AdminFormSection
+				title='Section heading'
+				description='Copy shown above the statistics grid.'>
+				<AdminField label='Section title' htmlFor='tp-stats-title'>
+					<Input
+						id='tp-stats-title'
+						placeholder='Our Impact in Numbers'
+						{...form.register('statisticsTitle')}
 					/>
-
-					<FormField
-						control={form.control}
-						name='statisticsDescription'
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Section Description</FormLabel>
-								<FormControl>
-									<Textarea {...field} rows={3} placeholder='Description...' />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
+				</AdminField>
+				<AdminField label='Section description' htmlFor='tp-stats-desc'>
+					<Textarea
+						id='tp-stats-desc'
+						rows={3}
+						placeholder='Description…'
+						{...form.register('statisticsDescription')}
 					/>
-				</div>
+				</AdminField>
+			</AdminFormSection>
 
-				<div className='space-y-4'>
-					<div className='flex items-center justify-between'>
-						<h3 className='text-lg font-semibold'>Statistics</h3>
-						<Button
-							type='button'
-							onClick={() => append({ id: Date.now().toString(), number: '', label: '', sublabel: '' })}
-							size='sm'>
-							<Plus className='w-4 h-4 mr-2' />
-							Add Statistic
-						</Button>
-					</div>
-
+			<AdminFormSection title='Statistics'>
+				<AdminItemList>
 					{fields.map((field, index) => (
-						<div key={field.id} className='p-4 border rounded-lg space-y-4'>
-							<div className='flex items-center justify-between mb-2'>
-								<h4 className='font-semibold'>Statistic {index + 1}</h4>
-								<Button
-									type='button'
-									variant='destructive'
-									size='sm'
-									onClick={() => remove(index)}>
-									<Trash2 className='w-4 h-4' />
-								</Button>
-							</div>
-
-							<div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-								<FormField
-									control={form.control}
-									name={`statistics.${index}.number`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Number</FormLabel>
-											<FormControl>
-												<Input {...field} placeholder='95%' />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`statistics.${index}.label`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Label</FormLabel>
-											<FormControl>
-												<Input {...field} placeholder='Placement Rate' />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`statistics.${index}.sublabel`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Sublabel</FormLabel>
-											<FormControl>
-												<Input {...field} placeholder='Academic Year 2024' />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							</div>
-						</div>
+						<AdminItemCard
+							key={field.id}
+							index={index}
+							total={fields.length}
+							title={
+								form.watch(`statistics.${index}.label`) ||
+								`Statistic ${index + 1}`
+							}
+							subtitle={form.watch(`statistics.${index}.number`) || undefined}
+							onMove={d => move(index, index + d)}
+							onRemove={() => remove(index)}>
+							<AdminFieldGrid cols={3}>
+								<AdminField label='Number'>
+									<Input
+										placeholder='95%'
+										{...form.register(`statistics.${index}.number` as const)}
+									/>
+								</AdminField>
+								<AdminField label='Label'>
+									<Input
+										placeholder='Placement Rate'
+										{...form.register(`statistics.${index}.label` as const)}
+									/>
+								</AdminField>
+								<AdminField label='Sublabel'>
+									<Input
+										placeholder='Academic Year 2024'
+										{...form.register(`statistics.${index}.sublabel` as const)}
+									/>
+								</AdminField>
+							</AdminFieldGrid>
+						</AdminItemCard>
 					))}
-				</div>
+				</AdminItemList>
+				{fields.length === 0 && <AdminEmptyState title='No statistics yet' />}
+				<AddRowButton
+					onClick={() =>
+						append({
+							id: Date.now().toString(),
+							number: '',
+							label: '',
+							sublabel: ''
+						})
+					}>
+					Add statistic
+				</AddRowButton>
+			</AdminFormSection>
 
-				<div className='flex items-center gap-3'>
-					<Button type='submit' disabled={isPending}>
-						{isPending ? 'Saving...' : 'Save Changes'}
-					</Button>
-					{saveStatus === 'saved' && (
-						<span className='text-sm text-green-600'>✓ Saved successfully</span>
-					)}
-					{saveStatus === 'error' && (
-						<span className='text-sm text-red-600'>Failed to save</span>
-					)}
-				</div>
-			</form>
-		</Form>
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }

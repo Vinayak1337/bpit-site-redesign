@@ -1,10 +1,8 @@
 import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
 import TestimonialsEditor from '@/app/(Private Pages)/admin/components/TestimonialsEditor';
-import FooterContactsEditor from '@/app/(Private Pages)/admin/components/FooterContactsEditor';
+import SiteChromeEditor from '@/app/(Private Pages)/admin/components/SiteChromeEditor';
 
-import { footerBottomLeftContent } from '@/data/header';
 import { getContacts } from '@/app/(Public Pages)/actions/contacts';
-import HeaderAnnouncementsEditor from '@/app/(Private Pages)/admin/home/components/HeaderAnnouncementsEditor';
 import HeroSlidesEditor from '@/app/(Private Pages)/admin/components/HeroSlidesEditor';
 import NoticesSectionEditor from '@/app/(Private Pages)/admin/components/NoticesSectionEditor';
 import EventsSectionEditor from '@/app/(Private Pages)/admin/components/EventsSectionEditor';
@@ -19,6 +17,7 @@ import {
 	getTopPlacedStudents
 } from '@/app/(Private Pages)/actions/placement';
 import { getTestimonials } from '@/app/(Private Pages)/actions/testimonials';
+import { getSiteChromeConfig } from '@/app/(Private Pages)/actions/site-chrome';
 
 export default async function AdminHomePage() {
 	await requireAdmin();
@@ -31,7 +30,8 @@ export default async function AdminHomePage() {
 		eventsSection,
 		placementCompanies,
 		topPlacedStudents,
-		testimonials
+		testimonials,
+		siteChromeConfig
 	] = await Promise.all([
 		getContacts(),
 		getHeaderAnnouncements(pageSlug),
@@ -40,7 +40,8 @@ export default async function AdminHomePage() {
 		getEventsSection(pageSlug),
 		getPlacementCompanies(pageSlug),
 		getTopPlacedStudents(pageSlug),
-		getTestimonials(pageSlug)
+		getTestimonials(pageSlug),
+		getSiteChromeConfig()
 	]);
 
 	const announcementsData: HeaderAnnouncementsData = {
@@ -49,15 +50,15 @@ export default async function AdminHomePage() {
 	};
 
 	return (
-		<div className='space-y-0'>
+		<div className='-mx-4 -my-4 md:-mx-6 md:-my-6 space-y-0'>
 			<div className='bg-blue-50 border-b border-blue-200 text-blue-900 p-3 text-center text-sm'>
 				Select any section to start editing
 			</div>
-			<HeaderAnnouncementsEditor
-				initialItems={initialAnnouncementItems}
+			<SiteChromeEditor
+				variant='header'
+				initialConfig={siteChromeConfig}
+				initialContacts={contacts}
 				announcementsData={announcementsData}
-				contacts={contacts}
-				pageSlug={pageSlug}
 			/>
 			<main>
 				<HeroSlidesEditor initialSlides={heroSlides} pageSlug={pageSlug} />
@@ -76,9 +77,11 @@ export default async function AdminHomePage() {
 				/>
 				<TestimonialsEditor initialData={testimonials} pageSlug={pageSlug} />
 			</main>
-			<FooterContactsEditor
+			<SiteChromeEditor
+				variant='footer'
+				initialConfig={siteChromeConfig}
 				initialContacts={contacts}
-				bottomLeftContent={footerBottomLeftContent}
+				announcementsData={announcementsData}
 			/>
 		</div>
 	);

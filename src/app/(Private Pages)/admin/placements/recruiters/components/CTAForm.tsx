@@ -1,24 +1,36 @@
 'use client';
 
-import React, { useState, useTransition, useEffect } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
-import { Plus, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue
+} from '@/components/ui/select';
 import { SUPPORTED_ICON_NAMES } from '@/components/about/icons';
-import { updateRecruitersData, type RecruitersData } from '@/app/(Private Pages)/actions/recruiters';
+import {
+	updateRecruitersData,
+	type RecruitersData
+} from '@/app/(Private Pages)/actions/recruiters';
 import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
+import {
+	AddRowButton,
+	AdminEmptyState,
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	AdminItemCard,
+	AdminItemList,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
-const GRADIENT_OPTIONS = [
-	'from-blue-900 via-blue-800 to-blue-900',
-	'from-purple-900 via-purple-800 to-purple-900',
-	'from-green-900 via-green-800 to-green-900',
-	'from-red-900 via-red-800 to-red-900',
-	'from-indigo-900 via-indigo-800 to-indigo-900'
-];
+const DEFAULT_GRADIENT = 'from-blue-900 via-blue-800 to-blue-900';
 
 interface CTAFormProps {
 	initialData: RecruitersData;
@@ -26,49 +38,55 @@ interface CTAFormProps {
 	onChange?: (data: RecruitersData) => void;
 }
 
-export default function CTAForm({ initialData, pageSlug, onChange }: CTAFormProps) {
+export default function CTAForm({ initialData, onChange }: CTAFormProps) {
 	const [isPending, startTransition] = useTransition();
-	const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 
 	const form = useForm({
 		defaultValues: {
 			title: initialData.cta?.title || '',
 			subtitle: initialData.cta?.subtitle || '',
-			gradient: initialData.cta?.gradient || GRADIENT_OPTIONS[0],
+			gradient: initialData.cta?.gradient || DEFAULT_GRADIENT,
 			buttons: initialData.cta?.buttons || []
 		}
 	});
 
-	const { fields, append, remove } = useFieldArray({
+	const { fields, append, remove, move } = useFieldArray({
 		control: form.control,
 		name: 'buttons'
 	});
 
-	// Watch for changes and update preview in real-time
 	useEffect(() => {
-		const subscription = form.watch((values) => {
+		const sub = form.watch(values => {
 			if (onChange) {
-				const updatedData: RecruitersData = {
+				onChange({
 					...initialData,
 					cta: {
 						title: values.title || '',
 						subtitle: values.subtitle || '',
-						gradient: values.gradient || GRADIENT_OPTIONS[0],
-						buttons: (values.buttons || []).filter(Boolean) as any
+						gradient: values.gradient || DEFAULT_GRADIENT,
+						buttons: (values.buttons || []).filter(
+							Boolean
+						) as RecruitersData['cta']['buttons']
 					}
-				};
-				onChange(updatedData);
+				});
+				setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 			}
 		});
-		return () => subscription.unsubscribe();
+		return () => sub.unsubscribe();
 	}, [form, onChange, initialData]);
 
-	const onSubmit = async (values: any) => {
-		setSaveStatus('saving');
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
+	const onSubmit = form.handleSubmit(values => {
+		setStatus({ kind: 'saving' });
 		startTransition(async () => {
 			try {
 				const admin = await requireAdmin();
-
 				const updatedData: RecruitersData = {
 					...initialData,
 					cta: {
@@ -78,184 +96,118 @@ export default function CTAForm({ initialData, pageSlug, onChange }: CTAFormProp
 						buttons: values.buttons
 					}
 				};
-
 				await updateRecruitersData(updatedData, admin.id);
-				
-				if (onChange) {
-					onChange(updatedData);
-				}
-
-				setSaveStatus('saved');
-				setTimeout(() => setSaveStatus('idle'), 2000);
+				onChange?.(updatedData);
+				setStatus({ kind: 'success', message: 'Saved' });
 			} catch (error) {
 				console.error('Failed to save:', error);
-				setSaveStatus('error');
+				setStatus({ kind: 'error', message: 'Save failed' });
 			}
 		});
-	};
+	});
 
 	return (
-		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
-				<FormField
-					control={form.control}
-					name='title'
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Title</FormLabel>
-							<FormControl>
-								<Input {...field} placeholder='Want to Partner with BPIT?' />
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+		<AdminForm onSubmit={onSubmit}>
+			<AdminFormSection
+				title='CTA block'
+				description='Headline copy and button list at the bottom of the recruiters page.'>
+				<AdminField label='Title' htmlFor='cta-title'>
+					<Input
+						id='cta-title'
+						placeholder='Want to Partner with BPIT?'
+						{...form.register('title')}
+					/>
+				</AdminField>
+				<AdminField label='Subtitle' htmlFor='cta-sub'>
+					<Textarea
+						id='cta-sub'
+						rows={3}
+						placeholder='Join our network of industry leaders'
+						{...form.register('subtitle')}
+					/>
+				</AdminField>
+				<AdminField
+					label='Gradient (Tailwind classes)'
+					htmlFor='cta-gradient'>
+					<Input
+						id='cta-gradient'
+						{...form.register('gradient')}
+					/>
+				</AdminField>
+			</AdminFormSection>
 
-				<FormField
-					control={form.control}
-					name='subtitle'
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Subtitle</FormLabel>
-							<FormControl>
-								<Textarea {...field} placeholder='Join our network of industry leaders' rows={3} />
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-
-				<FormField
-					control={form.control}
-					name='gradient'
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Gradient Color</FormLabel>
-							<Select onValueChange={field.onChange} value={field.value}>
-								<FormControl>
-									<SelectTrigger>
-										<SelectValue />
-									</SelectTrigger>
-								</FormControl>
-								<SelectContent>
-									{GRADIENT_OPTIONS.map(gradient => (
-										<SelectItem key={gradient} value={gradient}>
-											{gradient}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-
-				<div className='space-y-4'>
-					<h4 className='font-semibold'>CTA Buttons</h4>
+			<AdminFormSection title='CTA buttons'>
+				<AdminItemList>
 					{fields.map((field, index) => (
-						<div key={field.id} className='p-4 border rounded-lg space-y-4'>
-							<div className='flex items-center justify-between'>
-								<h5 className='font-medium'>Button {index + 1}</h5>
-								<Button
-									type='button'
-									variant='ghost'
-									size='sm'
-									onClick={() => remove(index)}
-								>
-									<Trash2 className='h-4 w-4' />
-								</Button>
-							</div>
-
-							<FormField
-								control={form.control}
-								name={`buttons.${index}.text`}
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Button Text</FormLabel>
-										<FormControl>
-											<Input {...field} placeholder='Contact Us' />
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-
-							<div className='grid grid-cols-2 gap-4'>
-								<FormField
-									control={form.control}
-									name={`buttons.${index}.icon`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Icon</FormLabel>
-											<Select onValueChange={field.onChange} value={field.value}>
-												<FormControl>
-													<SelectTrigger>
-														<SelectValue />
-													</SelectTrigger>
-												</FormControl>
-												<SelectContent>
-													{SUPPORTED_ICON_NAMES.map(icon => (
-														<SelectItem key={icon} value={icon}>
-															{icon}
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-											<FormMessage />
-										</FormItem>
-									)}
+						<AdminItemCard
+							key={field.id}
+							index={index}
+							total={fields.length}
+							title={
+								form.watch(`buttons.${index}.text`) || `Button ${index + 1}`
+							}
+							onMove={d => move(index, index + d)}
+							onRemove={() => remove(index)}>
+							<AdminField label='Button text'>
+								<Input
+									placeholder='Contact Us'
+									{...form.register(`buttons.${index}.text` as const)}
 								/>
-
-								<FormField
-									control={form.control}
-									name={`buttons.${index}.variant`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Variant</FormLabel>
-											<Select onValueChange={field.onChange} value={field.value}>
-												<FormControl>
-													<SelectTrigger>
-														<SelectValue />
-													</SelectTrigger>
-												</FormControl>
-												<SelectContent>
-													<SelectItem value='primary'>Primary</SelectItem>
-													<SelectItem value='secondary'>Secondary</SelectItem>
-												</SelectContent>
-											</Select>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							</div>
-						</div>
+							</AdminField>
+							<AdminFieldGrid>
+								<AdminField label='Icon'>
+									<Select
+										value={form.watch(`buttons.${index}.icon`) || 'Mail'}
+										onValueChange={v =>
+											form.setValue(`buttons.${index}.icon`, v, {
+												shouldDirty: true
+											})
+										}>
+										<SelectTrigger>
+											<SelectValue />
+										</SelectTrigger>
+										<SelectContent>
+											{SUPPORTED_ICON_NAMES.map(icon => (
+												<SelectItem key={icon} value={icon}>
+													{icon}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								</AdminField>
+								<AdminField label='Variant'>
+									<Select
+										value={form.watch(`buttons.${index}.variant`) || 'primary'}
+										onValueChange={v =>
+											form.setValue(
+												`buttons.${index}.variant`,
+												v as 'primary' | 'secondary',
+												{ shouldDirty: true }
+											)
+										}>
+										<SelectTrigger>
+											<SelectValue />
+										</SelectTrigger>
+										<SelectContent>
+											<SelectItem value='primary'>Primary</SelectItem>
+											<SelectItem value='secondary'>Secondary</SelectItem>
+										</SelectContent>
+									</Select>
+								</AdminField>
+							</AdminFieldGrid>
+						</AdminItemCard>
 					))}
-				</div>
-
-				<Button
-					type='button'
-					variant='outline'
+				</AdminItemList>
+				{fields.length === 0 && <AdminEmptyState title='No CTA buttons yet' />}
+				<AddRowButton
 					onClick={() =>
-						append({
-							text: '',
-							icon: 'Mail',
-							variant: 'primary'
-						})
-					}
-				>
-					<Plus className='h-4 w-4 mr-2' />
-					Add Button
-				</Button>
+						append({ text: '', icon: 'Mail', variant: 'primary' })
+					}>
+					Add button
+				</AddRowButton>
+			</AdminFormSection>
 
-				<div className='flex items-center space-x-2'>
-					<Button type='submit' disabled={isPending}>
-						{isPending ? 'Saving...' : saveStatus === 'saved' ? 'Saved!' : 'Save Changes'}
-					</Button>
-					{saveStatus === 'error' && (
-						<span className='text-sm text-red-600'>Failed to save</span>
-					)}
-				</div>
-			</form>
-		</Form>
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }

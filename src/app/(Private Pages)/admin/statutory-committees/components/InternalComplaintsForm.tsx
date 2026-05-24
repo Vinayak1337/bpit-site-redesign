@@ -3,17 +3,27 @@
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Trash2, Plus, Save, Loader2 } from 'lucide-react';
-import { updateInternalComplaints, type InternalComplaintsData } from '@/app/(Private Pages)/actions/statutory-committees';
-import { useTransition, useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+	updateInternalComplaints,
+	type InternalComplaintsData
+} from '@/app/(Private Pages)/actions/statutory-committees';
+import { useEffect, useState, useTransition } from 'react';
+import {
+	AddRowButton,
+	AdminEmptyState,
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	AdminItemCard,
+	AdminItemList,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 const schema = z.object({
-	// Hero removed
 	definition: z.object({
 		title: z.string().min(1),
 		content: z.string().min(1),
@@ -79,10 +89,8 @@ export default function InternalComplaintsForm({
 	visibleSections
 }: Props) {
 	const [isPending, startTransition] = useTransition();
-	const [statusMessage, setStatusMessage] = useState<{
-		type: 'success' | 'error';
-		text: string;
-	} | null>(null);
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
+
 	const restData = { ...initialData };
 	delete (restData as Partial<InternalComplaintsData>).hero;
 
@@ -91,264 +99,384 @@ export default function InternalComplaintsForm({
 		defaultValues: restData as FormData
 	});
 
-	const includesFields = useFieldArray({ control, name: 'definition.includes' as any });
-	const membersFields = useFieldArray({ control, name: 'committeeMembers' });
-	const proceduresFields = useFieldArray({ control, name: 'procedures' });
-	const supportServicesFields = useFieldArray({ control, name: 'supportServices' });
-	const rightsFields = useFieldArray({ control, name: 'rightsAndResponsibilities.rights' as any });
-	const responsibilitiesFields = useFieldArray({ control, name: 'rightsAndResponsibilities.responsibilities' as any });
-	const contactInfoFields = useFieldArray({ control, name: 'contactInfo' });
+	const includesList = useFieldArray({
+		control,
+		name: 'definition.includes' as never
+	});
+	const members = useFieldArray({ control, name: 'committeeMembers' });
+	const procedures = useFieldArray({ control, name: 'procedures' });
+	const supportServices = useFieldArray({ control, name: 'supportServices' });
+	const rights = useFieldArray({
+		control,
+		name: 'rightsAndResponsibilities.rights' as never
+	});
+	const responsibilities = useFieldArray({
+		control,
+		name: 'rightsAndResponsibilities.responsibilities' as never
+	});
+	const contactInfo = useFieldArray({ control, name: 'contactInfo' });
 
 	const watchedData = watch();
 	useEffect(() => {
-		if (onChange) {
-			onChange({ ...initialData, ...watchedData } as InternalComplaintsData);
-		}
+		onChange?.({ ...initialData, ...watchedData } as InternalComplaintsData);
+		setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 	}, [watchedData, onChange, initialData]);
 
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
 	const showSection = (
-		section: 'hero' | 'definition' | 'members' | 'procedures' | 'support' | 'rights' | 'contacts'
+		section:
+			| 'hero'
+			| 'definition'
+			| 'members'
+			| 'procedures'
+			| 'support'
+			| 'rights'
+			| 'contacts'
 	) => !visibleSections || visibleSections.includes(section);
 
-	const onSubmit = (data: FormData) => {
-		setStatusMessage(null);
+	const onSubmit = handleSubmit(data => {
+		setStatus({ kind: 'saving' });
 		startTransition(async () => {
 			try {
-				await updateInternalComplaints({ ...initialData, ...data }, pageSlug);
-				setStatusMessage({ type: 'success', text: 'Saved successfully.' });
+				await updateInternalComplaints(
+					{ ...initialData, ...data },
+					pageSlug
+				);
+				setStatus({ kind: 'success', message: 'Saved' });
 			} catch (error) {
 				console.error(error);
-				setStatusMessage({ type: 'error', text: 'Failed to save.' });
+				setStatus({ kind: 'error', message: 'Save failed' });
 			}
 		});
-	};
+	});
 
 	return (
-		<form onSubmit={handleSubmit(onSubmit)} className='space-y-8 max-w-5xl mx-auto pb-24'>
-			
-			{showSection('hero') ? (
-				<div className='rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800'>
-					Hero content is edited from the internal complaints hero section.
-				</div>
-			) : null}
+		<AdminForm onSubmit={onSubmit}>
+			{showSection('hero') && (
+				<AdminFormSection title='Hero'>
+					<p className='text-sm text-slate-500'>
+						Hero content is edited from the internal complaints hero section.
+					</p>
+				</AdminFormSection>
+			)}
 
-			{/* Definition */}
 			{showSection('definition') && (
-			<Card>
-				<CardHeader>
-					<CardTitle>Definition & Scope</CardTitle>
-				</CardHeader>
-				<CardContent className='space-y-6'>
-					<div><Label>Title</Label><Input {...register('definition.title')} /></div>
-					<div><Label>Content</Label><Textarea {...register('definition.content')} rows={4} /></div>
-					
-					<div className='space-y-2'>
-						<div className='flex justify-between items-center'>
-							<Label>Includes Points</Label>
-							<Button type='button' size='sm' variant='outline' onClick={() => includesFields.append('')}>
-								<Plus className='w-4 h-4 mr-2' /> Add Point
-							</Button>
-						</div>
-						{includesFields.fields.map((field, index) => (
-							<div key={field.id} className='flex gap-2'>
-								<Input {...register(`definition.includes.${index}` as const)} />
-								<Button type='button' size='icon' variant='ghost' className="text-red-500" onClick={() => includesFields.remove(index)}>
-									<Trash2 className='w-4 h-4' />
-								</Button>
-							</div>
-						))}
+				<AdminFormSection
+					title='Definition & scope'
+					description='Headline copy and the list of behaviors that fall under the committee.'>
+					<AdminField label='Title'>
+						<Input {...register('definition.title')} />
+					</AdminField>
+					<AdminField label='Content'>
+						<Textarea rows={4} {...register('definition.content')} />
+					</AdminField>
+					<div className='flex flex-col gap-3'>
+						<p className='text-sm font-medium text-slate-700'>Includes points</p>
+						<AdminItemList>
+							{includesList.fields.map((field, index) => (
+								<AdminItemCard
+									key={field.id}
+									index={index}
+									total={includesList.fields.length}
+									title={`Point ${index + 1}`}
+									onMove={d => includesList.move(index, index + d)}
+									onRemove={() => includesList.remove(index)}>
+									<AdminField label={`Point ${index + 1}`} className='[&_label]:sr-only'>
+										<Input
+											{...register(`definition.includes.${index}` as const)}
+										/>
+									</AdminField>
+								</AdminItemCard>
+							))}
+						</AdminItemList>
+						{includesList.fields.length === 0 && (
+							<AdminEmptyState title='No points yet' />
+						)}
+						<AddRowButton onClick={() => includesList.append('' as never)}>
+							Add point
+						</AddRowButton>
 					</div>
-				</CardContent>
-			</Card>
+				</AdminFormSection>
 			)}
 
-			{/* Committee Members */}
 			{showSection('members') && (
-			<div className='space-y-4'>
-				<div className='flex justify-between items-center'>
-					<h3 className='text-xl font-semibold'>Committee Members</h3>
-					<Button type='button' size='sm' variant='outline' onClick={() => membersFields.append({ name: '', designation: '', department: '' })}>
-						<Plus className='w-4 h-4 mr-2' /> Add Member
-					</Button>
-				</div>
-				<div className='grid md:grid-cols-2 gap-4'>
-					{membersFields.fields.map((field, index) => (
-						<Card key={field.id} className='relative'>
-							<div className='absolute top-2 right-2'>
-								<Button type='button' size='icon' variant='ghost' className="h-8 w-8 text-red-500 hover:bg-red-50" onClick={() => membersFields.remove(index)}>
-									<Trash2 className='w-4 h-4' />
-								</Button>
-							</div>
-							<CardContent className='pt-6 space-y-3'>
-								<div><Label>Name</Label><Input {...register(`committeeMembers.${index}.name`)} /></div>
-								<div><Label>Designation</Label><Input {...register(`committeeMembers.${index}.designation`)} /></div>
-								<div><Label>Department</Label><Input {...register(`committeeMembers.${index}.department`)} /></div>
-								<div className='grid grid-cols-2 gap-2'>
-									<div><Label>Phone</Label><Input {...register(`committeeMembers.${index}.phone`)} /></div>
-									<div><Label>Email</Label><Input {...register(`committeeMembers.${index}.email`)} /></div>
-								</div>
-							</CardContent>
-						</Card>
-					))}
-				</div>
-			</div>
-			)}
-
-			{/* Procedures */}
-			{showSection('procedures') && (
-			<div className='space-y-4'>
-				<div className='flex justify-between items-center'>
-					<h3 className='text-xl font-semibold'>Procedures</h3>
-					<Button type='button' size='sm' variant='outline' onClick={() => proceduresFields.append({ step: '', title: '', description: '', icon: 'FileText', iconColor: 'text-blue-600' })}>
-						<Plus className='w-4 h-4 mr-2' /> Add Step
-					</Button>
-				</div>
-				<div className='grid md:grid-cols-2 gap-4'>
-					{proceduresFields.fields.map((field, index) => (
-						<Card key={field.id} className='relative'>
-							<div className='absolute top-2 right-2'>
-								<Button type='button' size='icon' variant='ghost' className="h-8 w-8 text-red-500 hover:bg-red-50" onClick={() => proceduresFields.remove(index)}>
-									<Trash2 className='w-4 h-4' />
-								</Button>
-							</div>
-							<CardContent className='pt-6 space-y-3'>
-								<div className='grid grid-cols-3 gap-2'>
-									<div><Label>Step #</Label><Input {...register(`procedures.${index}.step`)} /></div>
-									<div className='col-span-2'><Label>Title</Label><Input {...register(`procedures.${index}.title`)} /></div>
-								</div>
-								<div><Label>Description</Label><Textarea {...register(`procedures.${index}.description`)} rows={2} /></div>
-							</CardContent>
-						</Card>
-					))}
-				</div>
-			</div>
-			)}
-
-			{/* Support Services */}
-			{showSection('support') && (
-			<div className='space-y-4'>
-				<div className='flex justify-between items-center'>
-					<h3 className='text-xl font-semibold'>Support Services</h3>
-					<Button type='button' size='sm' variant='outline' onClick={() => supportServicesFields.append({ title: '', description: '', icon: 'Heart', iconColor: 'text-pink-600' })}>
-						<Plus className='w-4 h-4 mr-2' /> Add Service
-					</Button>
-				</div>
-				<div className='grid md:grid-cols-2 gap-4'>
-					{supportServicesFields.fields.map((field, index) => (
-						<Card key={field.id} className='relative'>
-							<div className='absolute top-2 right-2'>
-								<Button type='button' size='icon' variant='ghost' className="h-8 w-8 text-red-500 hover:bg-red-50" onClick={() => supportServicesFields.remove(index)}>
-									<Trash2 className='w-4 h-4' />
-								</Button>
-							</div>
-							<CardContent className='pt-6 space-y-3'>
-								<div><Label>Title</Label><Input {...register(`supportServices.${index}.title`)} /></div>
-								<div><Label>Description</Label><Textarea {...register(`supportServices.${index}.description`)} rows={2} /></div>
-							</CardContent>
-						</Card>
-					))}
-				</div>
-			</div>
-			)}
-
-			{/* Rights & Responsibilities */}
-			{showSection('rights') && (
-			<div className='grid md:grid-cols-2 gap-8'>
-				<Card>
-					<CardHeader>
-						<div className='flex justify-between items-center'>
-							<CardTitle>Rights</CardTitle>
-							<Button type='button' size='sm' variant='outline' onClick={() => rightsFields.append('')}>
-								<Plus className='w-4 h-4' />
-							</Button>
-						</div>
-					</CardHeader>
-					<CardContent className='space-y-2'>
-						{rightsFields.fields.map((field, index) => (
-							<div key={field.id} className='flex gap-2'>
-								<Input {...register(`rightsAndResponsibilities.rights.${index}` as const)} />
-								<Button type='button' size='icon' variant='ghost' className="text-red-500" onClick={() => rightsFields.remove(index)}>
-									<Trash2 className='w-4 h-4' />
-								</Button>
-							</div>
+				<AdminFormSection title='Committee members'>
+					<AdminItemList>
+						{members.fields.map((field, index) => (
+							<AdminItemCard
+								key={field.id}
+								index={index}
+								total={members.fields.length}
+								title={
+									watch(`committeeMembers.${index}.name`) ||
+									`Member ${index + 1}`
+								}
+								onMove={d => members.move(index, index + d)}
+								onRemove={() => members.remove(index)}>
+								<AdminFieldGrid>
+									<AdminField label='Name'>
+										<Input
+											{...register(`committeeMembers.${index}.name` as const)}
+										/>
+									</AdminField>
+									<AdminField label='Designation'>
+										<Input
+											{...register(
+												`committeeMembers.${index}.designation` as const
+											)}
+										/>
+									</AdminField>
+									<AdminField label='Department'>
+										<Input
+											{...register(
+												`committeeMembers.${index}.department` as const
+											)}
+										/>
+									</AdminField>
+								</AdminFieldGrid>
+								<AdminFieldGrid>
+									<AdminField label='Phone'>
+										<Input
+											{...register(`committeeMembers.${index}.phone` as const)}
+										/>
+									</AdminField>
+									<AdminField label='Email'>
+										<Input
+											{...register(`committeeMembers.${index}.email` as const)}
+										/>
+									</AdminField>
+								</AdminFieldGrid>
+							</AdminItemCard>
 						))}
-					</CardContent>
-				</Card>
-
-				<Card>
-					<CardHeader>
-						<div className='flex justify-between items-center'>
-							<CardTitle>Responsibilities</CardTitle>
-							<Button type='button' size='sm' variant='outline' onClick={() => responsibilitiesFields.append('')}>
-								<Plus className='w-4 h-4' />
-							</Button>
-						</div>
-					</CardHeader>
-					<CardContent className='space-y-2'>
-						{responsibilitiesFields.fields.map((field, index) => (
-							<div key={field.id} className='flex gap-2'>
-								<Input {...register(`rightsAndResponsibilities.responsibilities.${index}` as const)} />
-								<Button type='button' size='icon' variant='ghost' className="text-red-500" onClick={() => responsibilitiesFields.remove(index)}>
-									<Trash2 className='w-4 h-4' />
-								</Button>
-							</div>
-						))}
-					</CardContent>
-				</Card>
-			</div>
-			)}
-
-			{/* Contact Info */}
-			{showSection('contacts') && (
-			<div className='space-y-4'>
-				<div className='flex justify-between items-center'>
-					<h3 className='text-xl font-semibold'>Contact Info</h3>
-					<Button type='button' size='sm' variant='outline' onClick={() => contactInfoFields.append({ title: '', contact: '', description: '', icon: 'Phone', iconColor: 'text-purple-600', bgColor: 'bg-purple-100' })}>
-						<Plus className='w-4 h-4 mr-2' /> Add Contact
-					</Button>
-				</div>
-				<div className='grid md:grid-cols-3 gap-4'>
-					{contactInfoFields.fields.map((field, index) => (
-						<Card key={field.id} className='relative'>
-							<div className='absolute top-2 right-2'>
-								<Button type='button' size='icon' variant='ghost' className="h-8 w-8 text-red-500 hover:bg-red-50" onClick={() => contactInfoFields.remove(index)}>
-									<Trash2 className='w-4 h-4' />
-								</Button>
-							</div>
-							<CardContent className='pt-6 space-y-3'>
-								<div><Label>Title</Label><Input {...register(`contactInfo.${index}.title`)} /></div>
-								<div><Label>Contact</Label><Input {...register(`contactInfo.${index}.contact`)} /></div>
-								<div><Label>Description</Label><Input {...register(`contactInfo.${index}.description`)} /></div>
-							</CardContent>
-						</Card>
-					))}
-				</div>
-			</div>
-			)}
-
-			<div className="sticky bottom-4 bg-white p-4 border rounded-xl shadow-lg flex justify-end z-50">
-				{statusMessage ? (
-					<div
-						className={`mr-3 self-center text-sm font-medium ${
-							statusMessage.type === 'error' ? 'text-red-600' : 'text-emerald-600'
-						}`}>
-						{statusMessage.text}
-					</div>
-				) : null}
-				<Button type='submit' disabled={isPending} className='w-full md:w-auto min-w-[150px]'>
-					{isPending ? (
-						<>
-							<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-							Saving...
-						</>
-					) : (
-						<>
-							<Save className="mr-2 h-4 w-4" />
-							Save Changes
-						</>
+					</AdminItemList>
+					{members.fields.length === 0 && (
+						<AdminEmptyState title='No members yet' />
 					)}
-				</Button>
-			</div>
-		</form>
+					<AddRowButton
+						onClick={() =>
+							members.append({ name: '', designation: '', department: '' })
+						}>
+						Add member
+					</AddRowButton>
+				</AdminFormSection>
+			)}
+
+			{showSection('procedures') && (
+				<AdminFormSection title='Procedures'>
+					<AdminItemList>
+						{procedures.fields.map((field, index) => (
+							<AdminItemCard
+								key={field.id}
+								index={index}
+								total={procedures.fields.length}
+								title={
+									watch(`procedures.${index}.title`) || `Step ${index + 1}`
+								}
+								subtitle={watch(`procedures.${index}.step`) || undefined}
+								onMove={d => procedures.move(index, index + d)}
+								onRemove={() => procedures.remove(index)}>
+								<AdminFieldGrid cols={3}>
+									<AdminField label='Step #'>
+										<Input {...register(`procedures.${index}.step` as const)} />
+									</AdminField>
+									<AdminField label='Title' className='md:col-span-2'>
+										<Input {...register(`procedures.${index}.title` as const)} />
+									</AdminField>
+								</AdminFieldGrid>
+								<AdminField label='Description'>
+									<Textarea
+										rows={2}
+										{...register(`procedures.${index}.description` as const)}
+									/>
+								</AdminField>
+							</AdminItemCard>
+						))}
+					</AdminItemList>
+					{procedures.fields.length === 0 && (
+						<AdminEmptyState title='No procedures yet' />
+					)}
+					<AddRowButton
+						onClick={() =>
+							procedures.append({
+								step: '',
+								title: '',
+								description: '',
+								icon: 'FileText',
+								iconColor: 'text-blue-600'
+							})
+						}>
+						Add step
+					</AddRowButton>
+				</AdminFormSection>
+			)}
+
+			{showSection('support') && (
+				<AdminFormSection title='Support services'>
+					<AdminItemList>
+						{supportServices.fields.map((field, index) => (
+							<AdminItemCard
+								key={field.id}
+								index={index}
+								total={supportServices.fields.length}
+								title={
+									watch(`supportServices.${index}.title`) ||
+									`Service ${index + 1}`
+								}
+								onMove={d => supportServices.move(index, index + d)}
+								onRemove={() => supportServices.remove(index)}>
+								<AdminField label='Title'>
+									<Input
+										{...register(`supportServices.${index}.title` as const)}
+									/>
+								</AdminField>
+								<AdminField label='Description'>
+									<Textarea
+										rows={2}
+										{...register(
+											`supportServices.${index}.description` as const
+										)}
+									/>
+								</AdminField>
+							</AdminItemCard>
+						))}
+					</AdminItemList>
+					{supportServices.fields.length === 0 && (
+						<AdminEmptyState title='No services yet' />
+					)}
+					<AddRowButton
+						onClick={() =>
+							supportServices.append({
+								title: '',
+								description: '',
+								icon: 'Heart',
+								iconColor: 'text-pink-600'
+							})
+						}>
+						Add service
+					</AddRowButton>
+				</AdminFormSection>
+			)}
+
+			{showSection('rights') && (
+				<>
+					<AdminFormSection title='Rights'>
+						<AdminItemList>
+							{rights.fields.map((field, index) => (
+								<AdminItemCard
+									key={field.id}
+									index={index}
+									total={rights.fields.length}
+									title={`Right ${index + 1}`}
+									onMove={d => rights.move(index, index + d)}
+									onRemove={() => rights.remove(index)}>
+									<AdminField label={`Right ${index + 1}`} className='[&_label]:sr-only'>
+										<Input
+											{...register(
+												`rightsAndResponsibilities.rights.${index}` as const
+											)}
+										/>
+									</AdminField>
+								</AdminItemCard>
+							))}
+						</AdminItemList>
+						{rights.fields.length === 0 && (
+							<AdminEmptyState title='No rights yet' />
+						)}
+						<AddRowButton onClick={() => rights.append('' as never)}>
+							Add right
+						</AddRowButton>
+					</AdminFormSection>
+
+					<AdminFormSection title='Responsibilities'>
+						<AdminItemList>
+							{responsibilities.fields.map((field, index) => (
+								<AdminItemCard
+									key={field.id}
+									index={index}
+									total={responsibilities.fields.length}
+									title={`Responsibility ${index + 1}`}
+									onMove={d => responsibilities.move(index, index + d)}
+									onRemove={() => responsibilities.remove(index)}>
+									<AdminField
+										label={`Responsibility ${index + 1}`}
+										className='[&_label]:sr-only'>
+										<Input
+											{...register(
+												`rightsAndResponsibilities.responsibilities.${index}` as const
+											)}
+										/>
+									</AdminField>
+								</AdminItemCard>
+							))}
+						</AdminItemList>
+						{responsibilities.fields.length === 0 && (
+							<AdminEmptyState title='No responsibilities yet' />
+						)}
+						<AddRowButton
+							onClick={() => responsibilities.append('' as never)}>
+							Add responsibility
+						</AddRowButton>
+					</AdminFormSection>
+				</>
+			)}
+
+			{showSection('contacts') && (
+				<AdminFormSection title='Contact info'>
+					<AdminItemList>
+						{contactInfo.fields.map((field, index) => (
+							<AdminItemCard
+								key={field.id}
+								index={index}
+								total={contactInfo.fields.length}
+								title={
+									watch(`contactInfo.${index}.title`) || `Contact ${index + 1}`
+								}
+								subtitle={watch(`contactInfo.${index}.contact`) || undefined}
+								onMove={d => contactInfo.move(index, index + d)}
+								onRemove={() => contactInfo.remove(index)}>
+								<AdminField label='Title'>
+									<Input
+										{...register(`contactInfo.${index}.title` as const)}
+									/>
+								</AdminField>
+								<AdminField label='Contact'>
+									<Input
+										{...register(`contactInfo.${index}.contact` as const)}
+									/>
+								</AdminField>
+								<AdminField label='Description'>
+									<Input
+										{...register(`contactInfo.${index}.description` as const)}
+									/>
+								</AdminField>
+							</AdminItemCard>
+						))}
+					</AdminItemList>
+					{contactInfo.fields.length === 0 && (
+						<AdminEmptyState title='No contacts yet' />
+					)}
+					<AddRowButton
+						onClick={() =>
+							contactInfo.append({
+								title: '',
+								contact: '',
+								description: '',
+								icon: 'Phone',
+								iconColor: 'text-purple-600',
+								bgColor: 'bg-purple-100'
+							})
+						}>
+						Add contact
+					</AddRowButton>
+				</AdminFormSection>
+			)}
+
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }

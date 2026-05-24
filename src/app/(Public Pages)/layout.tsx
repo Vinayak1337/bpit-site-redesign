@@ -3,8 +3,8 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import Header from '@/components/header/header';
 import { getHeaderData } from '@/app/(Public Pages)/actions/header';
-import { getFooterData } from '@/app/(Public Pages)/actions/footer';
 import { getContacts } from '@/app/(Public Pages)/actions/contacts';
+import { getSiteChromeConfig } from '@/app/(Private Pages)/actions/site-chrome';
 import Footer from '@/components/footer/BPITFooter';
 import EnquiryPopup from '@/components/pop-up/enquiry-popup';
 import { PostHogProvider, PageTracker } from '@/components/providers';
@@ -105,8 +105,11 @@ export default async function RootLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const [{ announcementsData }, { bottomLeftContent }, contacts] =
-		await Promise.all([getHeaderData('main'), getFooterData(), getContacts()]);
+	const [{ announcementsData }, contacts, siteChromeConfig] = await Promise.all([
+		getHeaderData('main'),
+		getContacts(),
+		getSiteChromeConfig()
+	]);
 
 	return (
 		<html lang='en'>
@@ -122,9 +125,13 @@ export default async function RootLayout({
 				className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}>
 				<PostHogProvider>
 					<PageTracker />
-					<Header contacts={contacts} announcementsData={announcementsData} />
+					<Header
+						contacts={contacts}
+						announcementsData={announcementsData}
+						siteChromeConfig={siteChromeConfig}
+					/>
 					{children}
-					<Footer contacts={contacts} bottomLeftContent={bottomLeftContent} />
+					<Footer contacts={contacts} siteChromeConfig={siteChromeConfig} />
 					<EnquiryPopup contacts={contacts} />
 				</PostHogProvider>
 			</body>

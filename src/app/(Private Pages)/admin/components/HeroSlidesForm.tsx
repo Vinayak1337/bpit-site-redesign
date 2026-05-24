@@ -4,15 +4,6 @@ import React, { useEffect, useState, useTransition } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import {
-	Form,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormControl,
-	FormMessage
-} from '@/components/ui/form';
 import {
 	Select,
 	SelectContent,
@@ -20,12 +11,23 @@ import {
 	SelectTrigger,
 	SelectValue
 } from '@/components/ui/select';
-import { Plus, Save, Trash2 } from 'lucide-react';
 import CloudinaryUploadButton from '@/components/cloudinary/upload-button';
 import {
 	updateHeroSlides,
 	type HeroSlide
 } from '@/app/(Private Pages)/actions/hero';
+import {
+	AddRowButton,
+	AdminEmptyState,
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	AdminItemCard,
+	AdminItemList,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 export type HeroSlideFormValue = {
 	title: string;
@@ -60,7 +62,7 @@ export default function HeroSlidesForm({
 	onChange
 }: Props) {
 	const [isPending, startTransition] = useTransition();
-	const [message, setMessage] = useState<string | null>(null);
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 
 	const form = useForm<FormValues>({
 		defaultValues: {
@@ -69,371 +71,235 @@ export default function HeroSlidesForm({
 		}
 	});
 
-	const { fields, append, remove } = useFieldArray({
+	const { fields, append, remove, move } = useFieldArray({
 		control: form.control,
 		name: 'slides'
 	});
 
 	useEffect(() => {
 		onChange?.(normalizeSlides(form.getValues('slides')));
-		const subscription = form.watch(value => {
-			const nextSlides = (value as Partial<FormValues>)?.slides ?? [];
-			onChange?.(normalizeSlides(nextSlides));
+		const sub = form.watch(value => {
+			const next = (value as Partial<FormValues>)?.slides ?? [];
+			onChange?.(normalizeSlides(next));
+			setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 		});
-		return () => subscription.unsubscribe();
+		return () => sub.unsubscribe();
 	}, [form, onChange]);
 
-	function onSubmit(values: FormValues): void {
-		setMessage(null);
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
+	const handleSubmit = form.handleSubmit(values => {
+		setStatus({ kind: 'saving' });
 		startTransition(async () => {
-			const payload = values.slides.map(formSlideToHeroSlide).filter(slide => {
-				const hasBaseContent =
-					slide.title.length > 0 ||
-					slide.subtitle.length > 0 ||
-					slide.description.length > 0 ||
-					slide.image.length > 0 ||
-					slide.stats.length > 0;
-				const hasCta = Boolean(slide.cta) || Boolean(slide.secondary_cta);
-				return hasBaseContent || hasCta;
-			});
+			const payload = values.slides
+				.map(formSlideToHeroSlide)
+				.filter(slide => {
+					const hasBaseContent =
+						slide.title.length > 0 ||
+						slide.subtitle.length > 0 ||
+						slide.description.length > 0 ||
+						slide.image.length > 0 ||
+						slide.stats.length > 0;
+					const hasCta = Boolean(slide.cta) || Boolean(slide.secondary_cta);
+					return hasBaseContent || hasCta;
+				});
 			const result = await updateHeroSlides(pageSlug, payload);
-			if (!result.ok) {
-				setMessage('Save failed');
-				return;
-			}
-			setMessage('Saved');
+			setStatus(
+				result.ok
+					? { kind: 'success', message: 'Saved' }
+					: { kind: 'error', message: 'Save failed' }
+			);
 		});
-	}
+	});
 
 	return (
-		<Form {...form}>
-			<form
-				className='space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm max-h-[70vh] overflow-y-auto overflow-x-hidden'
-				onSubmit={form.handleSubmit(onSubmit)}>
-				<div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
-					<div>
-						<h3 className='text-lg font-semibold text-slate-900'>
-							Hero Slides
-						</h3>
-						<p className='text-sm text-slate-500'>
-							Edit the carousel content that appears at the top of the homepage.
-						</p>
-					</div>
-					{message && (
-						<span className='rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700'>
-							{message}
-						</span>
-					)}
-				</div>
-
-				<div className='grid gap-5 pr-1'>
+		<AdminForm onSubmit={handleSubmit}>
+			<AdminFormSection
+				title='Hero slides'
+				description='Carousel content that appears at the top of the homepage. Images must be publicly accessible URLs; CTA links accept absolute URLs or internal paths beginning with /. Set the type to "enquiry modal" to trigger the popup instead.'>
+				<AdminItemList>
 					{fields.map((field, idx) => (
-						<div
+						<AdminItemCard
 							key={field.id}
-							className='rounded-lg border border-slate-200 bg-white/95 p-5 shadow-sm transition hover:border-slate-300 hover:shadow'>
-							<div className='flex items-start justify-between gap-4'>
-								<h4 className='text-sm font-semibold text-slate-700'>
-									Slide {idx + 1}
-								</h4>
-								<Button
-									type='button'
-									variant='ghost'
-									size='sm'
-									className='rounded-full border border-slate-200 text-slate-500 hover:border-rose-200 hover:bg-rose-100 hover:text-rose-600'
-									onClick={() => remove(idx)}
-									disabled={fields.length === 1}>
-									<Trash2 className='h-4 w-4' />
-								</Button>
-							</div>
+							index={idx}
+							total={fields.length}
+							title={form.watch(`slides.${idx}.title`) || `Slide ${idx + 1}`}
+							subtitle={form.watch(`slides.${idx}.subtitle`) || undefined}
+							onMove={d => move(idx, idx + d)}
+							onRemove={fields.length > 1 ? () => remove(idx) : undefined}>
+							<AdminFieldGrid>
+								<AdminField
+									label='Title'
+									error={
+										form.formState.errors.slides?.[idx]?.title?.message
+									}>
+									<Input
+										placeholder='Engineering Excellence'
+										{...form.register(`slides.${idx}.title` as const, {
+											required: 'Title is required'
+										})}
+									/>
+								</AdminField>
+								<AdminField
+									label='Subtitle'
+									error={
+										form.formState.errors.slides?.[idx]?.subtitle?.message
+									}>
+									<Input
+										placeholder="Shaping Tomorrow's Innovators"
+										{...form.register(`slides.${idx}.subtitle` as const, {
+											required: 'Subtitle is required'
+										})}
+									/>
+								</AdminField>
+								<AdminField
+									label='Stats badge'
+									error={form.formState.errors.slides?.[idx]?.stats?.message}>
+									<Input
+										placeholder='NBA Accredited Institution'
+										{...form.register(`slides.${idx}.stats` as const, {
+											required: 'Stats badge is required'
+										})}
+									/>
+								</AdminField>
+								<AdminField label='Icon'>
+									<Select
+										value={form.watch(`slides.${idx}.icon`) || 'BookOpen'}
+										onValueChange={v =>
+											form.setValue(`slides.${idx}.icon`, v, {
+												shouldDirty: true
+											})
+										}>
+										<SelectTrigger>
+											<SelectValue placeholder='Select icon' />
+										</SelectTrigger>
+										<SelectContent>
+											{ICON_OPTIONS.map(option => (
+												<SelectItem key={option} value={option}>
+													{option}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								</AdminField>
+							</AdminFieldGrid>
 
-							<div className='grid gap-4 md:grid-cols-2'>
-								<FormField
-									control={form.control}
-									name={`slides.${idx}.title`}
-									rules={{ required: 'Title is required' }}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Title</FormLabel>
-											<FormControl>
-												<Input
-													placeholder='Engineering Excellence'
-													{...field}
-												/>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
+							<AdminField
+								label='Background image URL'
+								error={form.formState.errors.slides?.[idx]?.image?.message}>
+								<div className='flex flex-col gap-2 sm:flex-row'>
+									<Input
+										placeholder='https://res.cloudinary.com/…'
+										{...form.register(`slides.${idx}.image` as const, {
+											required: 'Background image URL is required'
+										})}
+									/>
+									<CloudinaryUploadButton
+										onUpload={(url: string) =>
+											form.setValue(`slides.${idx}.image`, url, {
+												shouldDirty: true
+											})
+										}
+										buttonText='Upload image'
+										className='sm:w-auto'
+									/>
+								</div>
+							</AdminField>
 
-								<FormField
-									control={form.control}
-									name={`slides.${idx}.subtitle`}
-									rules={{ required: 'Subtitle is required' }}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Subtitle</FormLabel>
-											<FormControl>
-												<Input
-													placeholder="Shaping Tomorrow's Innovators"
-													{...field}
-												/>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
+							<AdminField
+								label='Description'
+								error={
+									form.formState.errors.slides?.[idx]?.description?.message
+								}>
+								<Textarea
+									rows={4}
+									placeholder='Short paragraph describing the slide highlight.'
+									className='resize-none'
+									{...form.register(`slides.${idx}.description` as const, {
+										required: 'Description is required'
+									})}
 								/>
+							</AdminField>
 
-								<FormField
-									control={form.control}
-									name={`slides.${idx}.stats`}
-									rules={{ required: 'Stats badge is required' }}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Stats badge</FormLabel>
-											<FormControl>
-												<Input
-													placeholder='NBA Accredited Institution'
-													{...field}
-												/>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`slides.${idx}.icon`}
-									rules={{ required: 'Icon is required' }}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Icon</FormLabel>
-											<FormControl>
-												<Select
-													value={field.value}
-													onValueChange={field.onChange}>
-													<SelectTrigger
-														size='sm'
-														className='w-full justify-between'>
-														<SelectValue placeholder='Select icon' />
-													</SelectTrigger>
-													<SelectContent>
-														{ICON_OPTIONS.map(option => (
-															<SelectItem key={option} value={option}>
-																{option}
-															</SelectItem>
-														))}
-													</SelectContent>
-												</Select>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`slides.${idx}.image`}
-									rules={{ required: 'Background image URL is required' }}
-									render={({ field }) => (
-										<FormItem className='md:col-span-2'>
-											<FormLabel>Background image URL</FormLabel>
-											<FormControl>
-												<div className='flex flex-col gap-2 sm:flex-row'>
-													<Input
-														placeholder='https://res.cloudinary.com/...'
-														{...field}
-													/>
-													<CloudinaryUploadButton
-														onUpload={(url: string) =>
-															form.setValue(`slides.${idx}.image`, url, {
-																shouldDirty: true
-															})
-														}
-														buttonText='Upload image'
-														className='sm:w-auto'
-													/>
-												</div>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`slides.${idx}.description`}
-									rules={{ required: 'Description is required' }}
-									render={({ field }) => (
-										<FormItem className='md:col-span-2'>
-											<FormLabel>Description</FormLabel>
-											<FormControl>
-												<Textarea
-													rows={4}
-													placeholder='Short paragraph describing the slide highlight.'
-													className='resize-none'
-													{...field}
-												/>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							</div>
-
-							<div className='grid gap-4 md:grid-cols-2'>
-								<FormField
-									control={form.control}
-									name={`slides.${idx}.ctaType`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Primary CTA</FormLabel>
-											<FormControl>
-												<Select
-													value={field.value}
-													onValueChange={field.onChange}>
-													<SelectTrigger
-														size='sm'
-														className='w-full justify-between'>
-														<SelectValue placeholder='Type' />
-													</SelectTrigger>
-													<SelectContent>
-														<SelectItem value='link'>Open link</SelectItem>
-														<SelectItem value='enquiry'>
-															Open enquiry modal
-														</SelectItem>
-													</SelectContent>
-												</Select>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`slides.${idx}.ctaLabel`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Primary CTA label</FormLabel>
-											<FormControl>
-												<Input placeholder='Apply Now' {...field} />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`slides.${idx}.ctaLink`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Primary CTA link</FormLabel>
-											<FormControl>
-												<Input
-													placeholder='https://example.com/apply'
-													{...field}
-												/>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`slides.${idx}.secondaryType`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Secondary CTA</FormLabel>
-											<FormControl>
-												<Select
-													value={field.value}
-													onValueChange={field.onChange}>
-													<SelectTrigger
-														size='sm'
-														className='w-full justify-between'>
-														<SelectValue placeholder='Type' />
-													</SelectTrigger>
-													<SelectContent>
-														<SelectItem value='link'>Open link</SelectItem>
-														<SelectItem value='enquiry'>
-															Open enquiry modal
-														</SelectItem>
-													</SelectContent>
-												</Select>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`slides.${idx}.secondaryLabel`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Secondary CTA label</FormLabel>
-											<FormControl>
-												<Input placeholder='Explore Programs' {...field} />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`slides.${idx}.secondaryLink`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Secondary CTA link</FormLabel>
-											<FormControl>
-												<Input
-													placeholder='https://example.com/programs'
-													{...field}
-												/>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							</div>
-						</div>
+							<AdminFieldGrid>
+								<AdminField label='Primary CTA type'>
+									<Select
+										value={form.watch(`slides.${idx}.ctaType`) || 'link'}
+										onValueChange={v =>
+											form.setValue(
+												`slides.${idx}.ctaType`,
+												v as 'link' | 'enquiry',
+												{ shouldDirty: true }
+											)
+										}>
+										<SelectTrigger>
+											<SelectValue placeholder='Type' />
+										</SelectTrigger>
+										<SelectContent>
+											<SelectItem value='link'>Open link</SelectItem>
+											<SelectItem value='enquiry'>Open enquiry modal</SelectItem>
+										</SelectContent>
+									</Select>
+								</AdminField>
+								<AdminField label='Primary CTA label'>
+									<Input
+										placeholder='Apply Now'
+										{...form.register(`slides.${idx}.ctaLabel` as const)}
+									/>
+								</AdminField>
+								<AdminField label='Primary CTA link'>
+									<Input
+										placeholder='https://example.com/apply'
+										{...form.register(`slides.${idx}.ctaLink` as const)}
+									/>
+								</AdminField>
+								<AdminField label='Secondary CTA type'>
+									<Select
+										value={form.watch(`slides.${idx}.secondaryType`) || 'link'}
+										onValueChange={v =>
+											form.setValue(
+												`slides.${idx}.secondaryType`,
+												v as 'link' | 'enquiry',
+												{ shouldDirty: true }
+											)
+										}>
+										<SelectTrigger>
+											<SelectValue placeholder='Type' />
+										</SelectTrigger>
+										<SelectContent>
+											<SelectItem value='link'>Open link</SelectItem>
+											<SelectItem value='enquiry'>Open enquiry modal</SelectItem>
+										</SelectContent>
+									</Select>
+								</AdminField>
+								<AdminField label='Secondary CTA label'>
+									<Input
+										placeholder='Explore Programs'
+										{...form.register(`slides.${idx}.secondaryLabel` as const)}
+									/>
+								</AdminField>
+								<AdminField label='Secondary CTA link'>
+									<Input
+										placeholder='https://example.com/programs'
+										{...form.register(`slides.${idx}.secondaryLink` as const)}
+									/>
+								</AdminField>
+							</AdminFieldGrid>
+						</AdminItemCard>
 					))}
-				</div>
+				</AdminItemList>
+				{fields.length === 0 && <AdminEmptyState title='No slides yet' />}
+				<AddRowButton onClick={() => append(createEmptyHeroSlide())}>
+					Add slide
+				</AddRowButton>
+			</AdminFormSection>
 
-				<div className='flex flex-col gap-3'>
-					<div className='flex flex-wrap gap-2'>
-						<Button
-							type='button'
-							variant='outline'
-							onClick={() => append(createEmptyHeroSlide())}
-							className='border-slate-200 bg-white text-slate-700 hover:bg-slate-50'>
-							<Plus className='mr-2 h-4 w-4' /> Add slide
-						</Button>
-						<Button
-							type='submit'
-							disabled={isPending}
-							className='bg-gradient-to-r from-sky-500 via-blue-500 to-indigo-500 text-white shadow-lg hover:from-sky-400 hover:via-blue-400 hover:to-indigo-400'>
-							{isPending ? (
-								<span className='flex items-center gap-2'>Saving...</span>
-							) : (
-								<span className='flex items-center gap-2'>
-									<Save className='h-4 w-4' /> Save changes
-								</span>
-							)}
-						</Button>
-					</div>
-					<p className='text-xs text-slate-500'>
-						Images should be publicly accessible URLs. CTA links support
-						absolute URLs or internal paths (starting with /). Choose 'Open
-						enquiry modal' to trigger the enquiry popup.
-					</p>
-				</div>
-			</form>
-		</Form>
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }
 
@@ -518,8 +384,8 @@ function formSlideToHeroSlide(slide: HeroSlideFormValue): HeroSlide {
 			...(slide.ctaType === 'enquiry'
 				? { isEnquiry: true }
 				: primaryLink.length > 0
-				? { href: primaryLink }
-				: {})
+					? { href: primaryLink }
+					: {})
 		};
 	}
 
@@ -529,8 +395,8 @@ function formSlideToHeroSlide(slide: HeroSlideFormValue): HeroSlide {
 			...(slide.secondaryType === 'enquiry'
 				? { isEnquiry: true }
 				: secondaryLink.length > 0
-				? { href: secondaryLink }
-				: {})
+					? { href: secondaryLink }
+					: {})
 		};
 	}
 

@@ -6,21 +6,9 @@ import type {
 	PlacementStatisticsData,
 	YearStats,
 	DepartmentStat,
-	PackageDistribution,
-	SectorWiseData,
-	YearlyTrend,
-	StudentPlacement
+	SectorWiseData
 } from '@/app/(Private Pages)/actions/placement-statistics';
 import { updatePlacementStatistics } from '@/app/(Private Pages)/actions/placement-statistics';
-import { Button } from '@/components/ui/button';
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage
-} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -31,8 +19,19 @@ import {
 	SelectValue
 } from '@/components/ui/select';
 import { SUPPORTED_ICON_NAMES } from '@/components/about/icons';
-import { Plus, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import UploadButton from '@/components/cloudinary/upload-button';
+import {
+	AddRowButton,
+	AdminEmptyState,
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	AdminItemCard,
+	AdminItemList,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 interface PlacementStatisticsFormProps {
 	initialData: PlacementStatisticsData;
@@ -40,14 +39,12 @@ interface PlacementStatisticsFormProps {
 	onChange?: (data: PlacementStatisticsData) => void;
 }
 
-// Form value types
 interface HeroFormValue {
 	icon: string;
 	title: string;
 	subtitle: string;
 	gradient: string;
 }
-
 interface YearStatsFormValue {
 	year: string;
 	placementRate: number;
@@ -58,7 +55,6 @@ interface YearStatsFormValue {
 	averagePackage: number;
 	medianPackage: number;
 }
-
 interface DepartmentStatFormValue {
 	department: string;
 	year: string;
@@ -68,27 +64,23 @@ interface DepartmentStatFormValue {
 	highest: number;
 	companies: number;
 }
-
 interface PackageDistFormValue {
 	range: string;
 	count: number;
 	percentage: number;
 }
-
 interface SectorFormValue {
 	sector: string;
 	percentage: number;
 	companies: string;
 	color: string;
 }
-
 interface TrendFormValue {
 	year: string;
 	rate: number;
 	avg: number;
 	companies: number;
 }
-
 interface StudentFormValue {
 	name: string;
 	department: string;
@@ -111,15 +103,6 @@ interface FormValues {
 	studentPlacements: StudentFormValue[];
 }
 
-const GRADIENT_OPTIONS = [
-	'from-blue-900 via-blue-800 to-blue-900',
-	'from-purple-900 via-purple-800 to-purple-900',
-	'from-green-900 via-green-800 to-green-900',
-	'from-red-900 via-red-800 to-red-900',
-	'from-indigo-900 via-indigo-800 to-indigo-900',
-	'from-cyan-900 via-cyan-800 to-cyan-900'
-];
-
 const COLOR_OPTIONS = [
 	'from-blue-500 to-cyan-600',
 	'from-green-500 to-emerald-600',
@@ -137,22 +120,13 @@ function createUpdatedData(
 	currentData: PlacementStatisticsData,
 	formValues: Partial<FormValues>
 ): PlacementStatisticsData {
-	// Parse years and departments from comma-separated strings
 	const years = formValues.years
-		? formValues.years
-				.split(',')
-				.map(y => y.trim())
-				.filter(Boolean)
+		? formValues.years.split(',').map(y => y.trim()).filter(Boolean)
 		: currentData.years;
-
 	const departments = formValues.departments
-		? formValues.departments
-				.split(',')
-				.map(d => d.trim())
-				.filter(Boolean)
+		? formValues.departments.split(',').map(d => d.trim()).filter(Boolean)
 		: currentData.departments;
 
-	// Convert overall stats array to Record
 	const overallStats: Record<string, YearStats> = {};
 	(formValues.overallStats || []).forEach(stat => {
 		if (stat.year) {
@@ -168,13 +142,10 @@ function createUpdatedData(
 		}
 	});
 
-	// Convert department stats array to nested Record
 	const departmentStats: Record<string, Record<string, DepartmentStat>> = {};
 	(formValues.departmentStats || []).forEach(stat => {
 		if (stat.year && stat.department) {
-			if (!departmentStats[stat.year]) {
-				departmentStats[stat.year] = {};
-			}
+			if (!departmentStats[stat.year]) departmentStats[stat.year] = {};
 			departmentStats[stat.year][stat.department] = {
 				placed: stat.placed,
 				total: stat.total,
@@ -185,15 +156,14 @@ function createUpdatedData(
 		}
 	});
 
-	// Convert sector form values
-	const sectorWiseData: SectorWiseData[] = (
-		formValues.sectorWiseData || []
-	).map(sector => ({
-		sector: sector.sector,
-		percentage: sector.percentage,
-		companies: sector.companies.split(',').map(c => c.trim()),
-		color: sector.color
-	}));
+	const sectorWiseData: SectorWiseData[] = (formValues.sectorWiseData || []).map(
+		s => ({
+			sector: s.sector,
+			percentage: s.percentage,
+			companies: s.companies.split(',').map(c => c.trim()),
+			color: s.color
+		})
+	);
 
 	return {
 		hero: formValues.hero || currentData.hero,
@@ -219,38 +189,17 @@ function createUpdatedData(
 
 export default function PlacementStatisticsForm({
 	initialData,
-	pageSlug,
 	onChange
 }: PlacementStatisticsFormProps) {
 	const [isPending, startTransition] = useTransition();
-	const [message, setMessage] = useState<string>('');
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 	const [currentData, setCurrentData] =
 		useState<PlacementStatisticsData>(initialData);
-	
-	// Collapsible sections state
-	const [expandedSections, setExpandedSections] = useState({
-		hero: true,
-		config: true,
-		overallStats: false,
-		departmentStats: false,
-		packageDist: false,
-		sectors: false,
-		trends: false,
-		students: false
-	});
 
-	const toggleSection = (section: keyof typeof expandedSections) => {
-		setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
-	};
-
-	// Convert initial data to form format
 	const overallStatsArray: YearStatsFormValue[] = [];
 	if (initialData.overallStats) {
 		Object.entries(initialData.overallStats).forEach(([year, stats]) => {
-			overallStatsArray.push({
-				year,
-				...stats
-			});
+			overallStatsArray.push({ year, ...stats });
 		});
 	}
 
@@ -258,21 +207,14 @@ export default function PlacementStatisticsForm({
 	if (initialData.departmentStats) {
 		Object.entries(initialData.departmentStats).forEach(([year, depts]) => {
 			Object.entries(depts).forEach(([dept, stats]) => {
-				departmentStatsArray.push({
-					year,
-					department: dept,
-					...stats
-				});
+				departmentStatsArray.push({ year, department: dept, ...stats });
 			});
 		});
 	}
 
 	const sectorFormArray: SectorFormValue[] = (
 		initialData.sectorWiseData || []
-	).map(sector => ({
-		...sector,
-		companies: sector.companies.join(', ')
-	}));
+	).map(s => ({ ...s, companies: s.companies.join(', ') }));
 
 	const form = useForm<FormValues>({
 		defaultValues: {
@@ -296,1203 +238,640 @@ export default function PlacementStatisticsForm({
 		}
 	});
 
-	const overallStatsFields = useFieldArray({
-		control: form.control,
-		name: 'overallStats'
-	});
-
-	const departmentStatsFields = useFieldArray({
+	const overallArr = useFieldArray({ control: form.control, name: 'overallStats' });
+	const deptArr = useFieldArray({
 		control: form.control,
 		name: 'departmentStats'
 	});
-
-	const packageDistFields = useFieldArray({
+	const pkgArr = useFieldArray({
 		control: form.control,
 		name: 'packageDistribution'
 	});
-
-	const sectorFields = useFieldArray({
+	const sectorArr = useFieldArray({
 		control: form.control,
 		name: 'sectorWiseData'
 	});
-
-	const trendsFields = useFieldArray({
+	const trendArr = useFieldArray({
 		control: form.control,
 		name: 'yearlyTrends'
 	});
-
-	const studentsFields = useFieldArray({
+	const studentArr = useFieldArray({
 		control: form.control,
 		name: 'studentPlacements'
 	});
 
 	useEffect(() => {
-		const updatedData = createUpdatedData(currentData, form.getValues());
-		onChange?.(updatedData);
-		const subscription = form.watch(values => {
-			const formValues = {
-				...values,
-				overallStats: values.overallStats?.filter(Boolean),
-				departmentStats: values.departmentStats?.filter(Boolean),
-				packageDistribution: values.packageDistribution?.filter(Boolean),
-				sectorWiseData: values.sectorWiseData?.filter(Boolean),
-				yearlyTrends: values.yearlyTrends?.filter(Boolean),
-				studentPlacements: values.studentPlacements?.filter(Boolean)
-			} as Partial<FormValues>;
-			const updatedData = createUpdatedData(currentData, formValues);
-			onChange?.(updatedData);
+		const sub = form.watch(values => {
+			const updated = createUpdatedData(
+				currentData,
+				values as Partial<FormValues>
+			);
+			onChange?.(updated);
+			setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 		});
-		return () => subscription.unsubscribe();
+		return () => sub.unsubscribe();
 	}, [form, onChange, currentData]);
 
-	const handleSubmit = (values: FormValues) => {
-		setMessage('');
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
+	const onSubmit = form.handleSubmit(values => {
+		setStatus({ kind: 'saving' });
 		const payload = createUpdatedData(currentData, values);
 		startTransition(async () => {
 			try {
 				await updatePlacementStatistics(payload);
 				setCurrentData(payload);
-				setMessage('Saved');
+				setStatus({ kind: 'success', message: 'Saved' });
 			} catch (error) {
 				console.error('Save error:', error);
-				setMessage('Save failed');
+				setStatus({ kind: 'error', message: 'Save failed' });
 			}
 		});
-	};
+	});
 
 	return (
-		<Form {...form}>
-			<form
-				className='space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm max-h-[70vh] overflow-y-auto overflow-x-hidden'
-				onSubmit={form.handleSubmit(handleSubmit)}>
-				<div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
-					<div>
-						<h3 className='text-lg font-semibold text-slate-900'>
-							Edit Placement Statistics
-						</h3>
-						<p className='text-sm text-slate-600'>
-							Manage all placement metrics and student data
-						</p>
-					</div>
-					<div className='flex gap-2'>
-						{message && (
-							<span
-								className={`text-sm ${message === 'Saved' ? 'text-green-600' : 'text-red-600'}`}>
-								{message}
-							</span>
-						)}
-						<Button
-							type='submit'
-							disabled={isPending}
-							className='bg-blue-600 hover:bg-blue-700 text-white'>
-							{isPending ? 'Saving...' : 'Save Changes'}
-						</Button>
-					</div>
-				</div>
+		<AdminForm onSubmit={onSubmit}>
+			<AdminFormSection
+				title='Hero'
+				description='Top banner copy for the statistics page.'>
+				<AdminField label='Icon'>
+					<Select
+						value={form.watch('hero.icon')}
+						onValueChange={v =>
+							form.setValue('hero.icon', v, { shouldDirty: true })
+						}>
+						<SelectTrigger>
+							<SelectValue />
+						</SelectTrigger>
+						<SelectContent>
+							{SUPPORTED_ICON_NAMES.map(icon => (
+								<SelectItem key={icon} value={icon}>
+									{icon}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				</AdminField>
+				<AdminField label='Title'>
+					<Input {...form.register('hero.title')} />
+				</AdminField>
+				<AdminField label='Subtitle'>
+					<Textarea rows={2} {...form.register('hero.subtitle')} />
+				</AdminField>
+				<AdminField label='Background gradient (Tailwind classes)'>
+					<Input {...form.register('hero.gradient')} />
+				</AdminField>
+			</AdminFormSection>
 
-				{/* Hero Section */}
-				<div className='space-y-4 border-t pt-4'>
-					<h4 className='font-semibold text-slate-900'>Hero Section</h4>
+			<AdminFormSection
+				title='Config'
+				description='Comma-separated years and departments. These drive the filter dropdowns.'>
+				<AdminField label='Years' hint='Example: 2020, 2021, 2022'>
+					<Input {...form.register('years')} />
+				</AdminField>
+				<AdminField label='Departments' hint='Example: CSE, IT, ECE'>
+					<Input {...form.register('departments')} />
+				</AdminField>
+			</AdminFormSection>
 
-					<FormField
-						control={form.control}
-						name='hero.icon'
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Icon</FormLabel>
-								<Select
-									onValueChange={field.onChange}
-									defaultValue={field.value}>
-									<FormControl>
+			<AdminFormSection title='Overall stats (per year)'>
+				<AdminItemList>
+					{overallArr.fields.map((field, index) => (
+						<AdminItemCard
+							key={field.id}
+							index={index}
+							total={overallArr.fields.length}
+							title={
+								form.watch(`overallStats.${index}.year`) || `Year ${index + 1}`
+							}
+							onMove={d => overallArr.move(index, index + d)}
+							onRemove={() => overallArr.remove(index)}>
+							<AdminFieldGrid>
+								<AdminField label='Year'>
+									<Input
+										{...form.register(`overallStats.${index}.year` as const)}
+									/>
+								</AdminField>
+								<AdminField label='Placement rate (%)'>
+									<Input
+										type='number'
+										step='0.1'
+										{...form.register(
+											`overallStats.${index}.placementRate` as const,
+											{ valueAsNumber: true }
+										)}
+									/>
+								</AdminField>
+								<AdminField label='Total students'>
+									<Input
+										type='number'
+										{...form.register(
+											`overallStats.${index}.totalStudents` as const,
+											{ valueAsNumber: true }
+										)}
+									/>
+								</AdminField>
+								<AdminField label='Students placed'>
+									<Input
+										type='number'
+										{...form.register(
+											`overallStats.${index}.studentsPlaced` as const,
+											{ valueAsNumber: true }
+										)}
+									/>
+								</AdminField>
+								<AdminField label='Companies visited'>
+									<Input
+										type='number'
+										{...form.register(
+											`overallStats.${index}.companiesVisited` as const,
+											{ valueAsNumber: true }
+										)}
+									/>
+								</AdminField>
+								<AdminField label='Highest package (LPA)'>
+									<Input
+										type='number'
+										step='0.1'
+										{...form.register(
+											`overallStats.${index}.highestPackage` as const,
+											{ valueAsNumber: true }
+										)}
+									/>
+								</AdminField>
+								<AdminField label='Average package (LPA)'>
+									<Input
+										type='number'
+										step='0.1'
+										{...form.register(
+											`overallStats.${index}.averagePackage` as const,
+											{ valueAsNumber: true }
+										)}
+									/>
+								</AdminField>
+								<AdminField label='Median package (LPA)'>
+									<Input
+										type='number'
+										step='0.1'
+										{...form.register(
+											`overallStats.${index}.medianPackage` as const,
+											{ valueAsNumber: true }
+										)}
+									/>
+								</AdminField>
+							</AdminFieldGrid>
+						</AdminItemCard>
+					))}
+				</AdminItemList>
+				{overallArr.fields.length === 0 && (
+					<AdminEmptyState title='No year stats yet' />
+				)}
+				<AddRowButton
+					onClick={() =>
+						overallArr.append({
+							year: '',
+							placementRate: 0,
+							totalStudents: 0,
+							studentsPlaced: 0,
+							companiesVisited: 0,
+							highestPackage: 0,
+							averagePackage: 0,
+							medianPackage: 0
+						})
+					}>
+					Add year stats
+				</AddRowButton>
+			</AdminFormSection>
+
+			<AdminFormSection title='Department stats (per year × dept)'>
+				<AdminItemList>
+					{deptArr.fields.map((field, index) => (
+						<AdminItemCard
+							key={field.id}
+							index={index}
+							total={deptArr.fields.length}
+							title={
+								`${form.watch(`departmentStats.${index}.department`) || '—'} · ${form.watch(`departmentStats.${index}.year`) || '—'}`
+							}
+							onMove={d => deptArr.move(index, index + d)}
+							onRemove={() => deptArr.remove(index)}>
+							<AdminFieldGrid>
+								<AdminField label='Year'>
+									<Input
+										{...form.register(`departmentStats.${index}.year` as const)}
+									/>
+								</AdminField>
+								<AdminField label='Department'>
+									<Select
+										value={
+											form.watch(`departmentStats.${index}.department`) || 'CSE'
+										}
+										onValueChange={v =>
+											form.setValue(`departmentStats.${index}.department`, v, {
+												shouldDirty: true
+											})
+										}>
 										<SelectTrigger>
 											<SelectValue />
 										</SelectTrigger>
-									</FormControl>
-									<SelectContent>
-										{SUPPORTED_ICON_NAMES.map(icon => (
-											<SelectItem key={icon} value={icon}>
-												{icon}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
+										<SelectContent>
+											{DEPARTMENT_OPTIONS.map(d => (
+												<SelectItem key={d} value={d}>
+													{d}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								</AdminField>
+								<AdminField label='Placed'>
+									<Input
+										type='number'
+										{...form.register(
+											`departmentStats.${index}.placed` as const,
+											{ valueAsNumber: true }
+										)}
+									/>
+								</AdminField>
+								<AdminField label='Total'>
+									<Input
+										type='number'
+										{...form.register(`departmentStats.${index}.total` as const, {
+											valueAsNumber: true
+										})}
+									/>
+								</AdminField>
+								<AdminField label='Avg package (LPA)'>
+									<Input
+										type='number'
+										step='0.1'
+										{...form.register(
+											`departmentStats.${index}.avgPackage` as const,
+											{ valueAsNumber: true }
+										)}
+									/>
+								</AdminField>
+								<AdminField label='Highest (LPA)'>
+									<Input
+										type='number'
+										step='0.1'
+										{...form.register(
+											`departmentStats.${index}.highest` as const,
+											{ valueAsNumber: true }
+										)}
+									/>
+								</AdminField>
+								<AdminField label='Companies'>
+									<Input
+										type='number'
+										{...form.register(
+											`departmentStats.${index}.companies` as const,
+											{ valueAsNumber: true }
+										)}
+									/>
+								</AdminField>
+							</AdminFieldGrid>
+						</AdminItemCard>
+					))}
+				</AdminItemList>
+				{deptArr.fields.length === 0 && (
+					<AdminEmptyState title='No department stats yet' />
+				)}
+				<AddRowButton
+					onClick={() =>
+						deptArr.append({
+							department: 'CSE',
+							year: '',
+							placed: 0,
+							total: 0,
+							avgPackage: 0,
+							highest: 0,
+							companies: 0
+						})
+					}>
+					Add row
+				</AddRowButton>
+			</AdminFormSection>
 
-					<FormField
-						control={form.control}
-						name='hero.title'
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Title</FormLabel>
-								<FormControl>
-									<Input {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
+			<AdminFormSection title='Package distribution'>
+				<AdminItemList>
+					{pkgArr.fields.map((field, index) => (
+						<AdminItemCard
+							key={field.id}
+							index={index}
+							total={pkgArr.fields.length}
+							title={
+								form.watch(`packageDistribution.${index}.range`) ||
+								`Range ${index + 1}`
+							}
+							onMove={d => pkgArr.move(index, index + d)}
+							onRemove={() => pkgArr.remove(index)}>
+							<AdminFieldGrid cols={3}>
+								<AdminField label='Range'>
+									<Input
+										placeholder='3-5 LPA'
+										{...form.register(
+											`packageDistribution.${index}.range` as const
+										)}
+									/>
+								</AdminField>
+								<AdminField label='Count'>
+									<Input
+										type='number'
+										{...form.register(
+											`packageDistribution.${index}.count` as const,
+											{ valueAsNumber: true }
+										)}
+									/>
+								</AdminField>
+								<AdminField label='Percentage'>
+									<Input
+										type='number'
+										step='0.1'
+										{...form.register(
+											`packageDistribution.${index}.percentage` as const,
+											{ valueAsNumber: true }
+										)}
+									/>
+								</AdminField>
+							</AdminFieldGrid>
+						</AdminItemCard>
+					))}
+				</AdminItemList>
+				{pkgArr.fields.length === 0 && (
+					<AdminEmptyState title='No ranges yet' />
+				)}
+				<AddRowButton
+					onClick={() =>
+						pkgArr.append({ range: '', count: 0, percentage: 0 })
+					}>
+					Add range
+				</AddRowButton>
+			</AdminFormSection>
 
-					<FormField
-						control={form.control}
-						name='hero.subtitle'
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Subtitle</FormLabel>
-								<FormControl>
-									<Textarea {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-
-					<FormField
-						control={form.control}
-						name='hero.gradient'
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Gradient</FormLabel>
-								<Select
-									onValueChange={field.onChange}
-									defaultValue={field.value}>
-									<FormControl>
+			<AdminFormSection title='Sector-wise data'>
+				<AdminItemList>
+					{sectorArr.fields.map((field, index) => (
+						<AdminItemCard
+							key={field.id}
+							index={index}
+							total={sectorArr.fields.length}
+							title={
+								form.watch(`sectorWiseData.${index}.sector`) ||
+								`Sector ${index + 1}`
+							}
+							onMove={d => sectorArr.move(index, index + d)}
+							onRemove={() => sectorArr.remove(index)}>
+							<AdminFieldGrid>
+								<AdminField label='Sector'>
+									<Input
+										{...form.register(
+											`sectorWiseData.${index}.sector` as const
+										)}
+									/>
+								</AdminField>
+								<AdminField label='Percentage'>
+									<Input
+										type='number'
+										step='0.1'
+										{...form.register(
+											`sectorWiseData.${index}.percentage` as const,
+											{ valueAsNumber: true }
+										)}
+									/>
+								</AdminField>
+								<AdminField label='Color gradient'>
+									<Select
+										value={
+											form.watch(`sectorWiseData.${index}.color`) ||
+											COLOR_OPTIONS[0]
+										}
+										onValueChange={v =>
+											form.setValue(`sectorWiseData.${index}.color`, v, {
+												shouldDirty: true
+											})
+										}>
 										<SelectTrigger>
 											<SelectValue />
 										</SelectTrigger>
-									</FormControl>
-									<SelectContent>
-										{GRADIENT_OPTIONS.map(gradient => (
-											<SelectItem key={gradient} value={gradient}>
-												{gradient}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-				</div>
-
-				{/* Configuration */}
-				<div className='space-y-4 border-t pt-4'>
-					<h4 className='font-semibold text-slate-900'>Configuration</h4>
-
-					<FormField
-						control={form.control}
-						name='years'
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Academic Years (comma-separated)</FormLabel>
-								<FormControl>
-									<Input {...field} placeholder='2024, 2023, 2022' />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-
-					<FormField
-						control={form.control}
-						name='departments'
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Departments (comma-separated)</FormLabel>
-								<FormControl>
-									<Input {...field} placeholder='All, CSE, IT, ECE, EEE, MBA' />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-				</div>
-
-				{/* Overall Stats */}
-				<div className='space-y-4 border-t pt-4'>
-					<div className='flex items-center justify-between'>
-						<h4 className='font-semibold text-slate-900'>Overall Statistics</h4>
-						<Button
-							type='button'
-							size='sm'
-							variant='outline'
-							onClick={() =>
-								overallStatsFields.append({
-									year: '2024',
-									placementRate: 0,
-									totalStudents: 0,
-									studentsPlaced: 0,
-									companiesVisited: 0,
-									highestPackage: 0,
-									averagePackage: 0,
-									medianPackage: 0
-								})
-							}>
-							<Plus className='w-4 h-4 mr-1' />
-							Add Year Stats
-						</Button>
-					</div>
-
-					{overallStatsFields.fields.map((field, index) => (
-						<div
-							key={field.id}
-							className='p-4 border rounded-lg space-y-3 bg-slate-50'>
-							<div className='flex justify-between items-center'>
-								<h5 className='font-medium text-sm'>
-									Year Stats #{index + 1}
-								</h5>
-								<Button
-									type='button'
-									size='sm'
-									variant='ghost'
-									onClick={() => overallStatsFields.remove(index)}>
-									<Trash2 className='w-4 h-4 text-red-600' />
-								</Button>
-							</div>
-
-							<div className='grid grid-cols-2 gap-3'>
-								<FormField
-									control={form.control}
-									name={`overallStats.${index}.year`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel className='text-xs'>Year</FormLabel>
-											<FormControl>
-												<Input {...field} placeholder='2024' />
-											</FormControl>
-										</FormItem>
+										<SelectContent>
+											{COLOR_OPTIONS.map(c => (
+												<SelectItem key={c} value={c}>
+													{c}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								</AdminField>
+							</AdminFieldGrid>
+							<AdminField label='Companies' hint='Comma separated.'>
+								<Input
+									{...form.register(
+										`sectorWiseData.${index}.companies` as const
 									)}
 								/>
-
-								<FormField
-									control={form.control}
-									name={`overallStats.${index}.placementRate`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel className='text-xs'>
-												Placement Rate (%)
-											</FormLabel>
-											<FormControl>
-												<Input
-													{...field}
-													type='number'
-													onChange={e =>
-														field.onChange(parseFloat(e.target.value))
-													}
-												/>
-											</FormControl>
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`overallStats.${index}.totalStudents`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel className='text-xs'>Total Students</FormLabel>
-											<FormControl>
-												<Input
-													{...field}
-													type='number'
-													onChange={e =>
-														field.onChange(parseInt(e.target.value))
-													}
-												/>
-											</FormControl>
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`overallStats.${index}.studentsPlaced`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel className='text-xs'>
-												Students Placed
-											</FormLabel>
-											<FormControl>
-												<Input
-													{...field}
-													type='number'
-													onChange={e =>
-														field.onChange(parseInt(e.target.value))
-													}
-												/>
-											</FormControl>
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`overallStats.${index}.companiesVisited`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel className='text-xs'>
-												Companies Visited
-											</FormLabel>
-											<FormControl>
-												<Input
-													{...field}
-													type='number'
-													onChange={e =>
-														field.onChange(parseInt(e.target.value))
-													}
-												/>
-											</FormControl>
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`overallStats.${index}.highestPackage`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel className='text-xs'>
-												Highest Package (LPA)
-											</FormLabel>
-											<FormControl>
-												<Input
-													{...field}
-													type='number'
-													step='0.1'
-													onChange={e =>
-														field.onChange(parseFloat(e.target.value))
-													}
-												/>
-											</FormControl>
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`overallStats.${index}.averagePackage`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel className='text-xs'>
-												Average Package (LPA)
-											</FormLabel>
-											<FormControl>
-												<Input
-													{...field}
-													type='number'
-													step='0.1'
-													onChange={e =>
-														field.onChange(parseFloat(e.target.value))
-													}
-												/>
-											</FormControl>
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`overallStats.${index}.medianPackage`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel className='text-xs'>
-												Median Package (LPA)
-											</FormLabel>
-											<FormControl>
-												<Input
-													{...field}
-													type='number'
-													step='0.1'
-													onChange={e =>
-														field.onChange(parseFloat(e.target.value))
-													}
-												/>
-											</FormControl>
-										</FormItem>
-									)}
-								/>
-							</div>
-						</div>
+							</AdminField>
+						</AdminItemCard>
 					))}
-				</div>
+				</AdminItemList>
+				{sectorArr.fields.length === 0 && (
+					<AdminEmptyState title='No sectors yet' />
+				)}
+				<AddRowButton
+					onClick={() =>
+						sectorArr.append({
+							sector: '',
+							percentage: 0,
+							companies: '',
+							color: COLOR_OPTIONS[0]
+						})
+					}>
+					Add sector
+				</AddRowButton>
+			</AdminFormSection>
 
-				{/* Department Stats */}
-				<div className='space-y-4 border-t pt-4'>
-					<div className='flex items-center justify-between'>
-						<h4 className='font-semibold text-slate-900'>
-							Department Statistics
-						</h4>
-						<Button
-							type='button'
-							size='sm'
-							variant='outline'
-							onClick={() =>
-								departmentStatsFields.append({
-									year: '2024',
-									department: 'CSE',
-									placed: 0,
-									total: 0,
-									avgPackage: 0,
-									highest: 0,
-									companies: 0
-								})
-							}>
-							<Plus className='w-4 h-4 mr-1' />
-							Add Department
-						</Button>
-					</div>
-
-					{departmentStatsFields.fields.map((field, index) => (
-						<div
+			<AdminFormSection title='Yearly trends'>
+				<AdminItemList>
+					{trendArr.fields.map((field, index) => (
+						<AdminItemCard
 							key={field.id}
-							className='p-4 border rounded-lg space-y-3 bg-slate-50'>
-							<div className='flex justify-between items-center'>
-								<h5 className='font-medium text-sm'>
-									Department #{index + 1}
-								</h5>
-								<Button
-									type='button'
-									size='sm'
-									variant='ghost'
-									onClick={() => departmentStatsFields.remove(index)}>
-									<Trash2 className='w-4 h-4 text-red-600' />
-								</Button>
-							</div>
-
-							<div className='grid grid-cols-2 gap-3'>
-								<FormField
-									control={form.control}
-									name={`departmentStats.${index}.year`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel className='text-xs'>Year</FormLabel>
-											<FormControl>
-												<Input {...field} />
-											</FormControl>
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`departmentStats.${index}.department`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel className='text-xs'>Department</FormLabel>
-											<Select
-												onValueChange={field.onChange}
-												defaultValue={field.value}>
-												<FormControl>
-													<SelectTrigger>
-														<SelectValue />
-													</SelectTrigger>
-												</FormControl>
-												<SelectContent>
-													{DEPARTMENT_OPTIONS.map(dept => (
-														<SelectItem key={dept} value={dept}>
-															{dept}
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`departmentStats.${index}.placed`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel className='text-xs'>Placed</FormLabel>
-											<FormControl>
-												<Input
-													{...field}
-													type='number'
-													onChange={e =>
-														field.onChange(parseInt(e.target.value))
-													}
-												/>
-											</FormControl>
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`departmentStats.${index}.total`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel className='text-xs'>Total</FormLabel>
-											<FormControl>
-												<Input
-													{...field}
-													type='number'
-													onChange={e =>
-														field.onChange(parseInt(e.target.value))
-													}
-												/>
-											</FormControl>
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`departmentStats.${index}.avgPackage`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel className='text-xs'>Avg Package</FormLabel>
-											<FormControl>
-												<Input
-													{...field}
-													type='number'
-													step='0.1'
-													onChange={e =>
-														field.onChange(parseFloat(e.target.value))
-													}
-												/>
-											</FormControl>
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`departmentStats.${index}.highest`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel className='text-xs'>
-												Highest Package
-											</FormLabel>
-											<FormControl>
-												<Input
-													{...field}
-													type='number'
-													step='0.1'
-													onChange={e =>
-														field.onChange(parseFloat(e.target.value))
-													}
-												/>
-											</FormControl>
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`departmentStats.${index}.companies`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel className='text-xs'>Companies</FormLabel>
-											<FormControl>
-												<Input
-													{...field}
-													type='number'
-													onChange={e =>
-														field.onChange(parseInt(e.target.value))
-													}
-												/>
-											</FormControl>
-										</FormItem>
-									)}
-								/>
-							</div>
-						</div>
+							index={index}
+							total={trendArr.fields.length}
+							title={
+								form.watch(`yearlyTrends.${index}.year`) || `Year ${index + 1}`
+							}
+							onMove={d => trendArr.move(index, index + d)}
+							onRemove={() => trendArr.remove(index)}>
+							<AdminFieldGrid>
+								<AdminField label='Year'>
+									<Input
+										{...form.register(`yearlyTrends.${index}.year` as const)}
+									/>
+								</AdminField>
+								<AdminField label='Rate (%)'>
+									<Input
+										type='number'
+										step='0.1'
+										{...form.register(`yearlyTrends.${index}.rate` as const, {
+											valueAsNumber: true
+										})}
+									/>
+								</AdminField>
+								<AdminField label='Avg (LPA)'>
+									<Input
+										type='number'
+										step='0.1'
+										{...form.register(`yearlyTrends.${index}.avg` as const, {
+											valueAsNumber: true
+										})}
+									/>
+								</AdminField>
+								<AdminField label='Companies'>
+									<Input
+										type='number'
+										{...form.register(
+											`yearlyTrends.${index}.companies` as const,
+											{ valueAsNumber: true }
+										)}
+									/>
+								</AdminField>
+							</AdminFieldGrid>
+						</AdminItemCard>
 					))}
-				</div>
+				</AdminItemList>
+				{trendArr.fields.length === 0 && (
+					<AdminEmptyState title='No trends yet' />
+				)}
+				<AddRowButton
+					onClick={() =>
+						trendArr.append({ year: '', rate: 0, avg: 0, companies: 0 })
+					}>
+					Add year
+				</AddRowButton>
+			</AdminFormSection>
 
-				{/* Package Distribution */}
-				<div className='border rounded-lg'>
-					<button
-						type='button'
-						onClick={() => toggleSection('packageDist')}
-						className='w-full flex items-center justify-between p-4 hover:bg-slate-50 transition-colors'>
-						<div className='flex items-center gap-2'>
-							<h4 className='font-semibold text-slate-900'>
-								Package Distribution
-							</h4>
-							<span className='text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full'>
-								{packageDistFields.fields.length} ranges
-							</span>
-						</div>
-						<div className='flex items-center gap-2'>
-							<Button
-								type='button'
-								size='sm'
-								variant='outline'
-								onClick={(e) => {
-									e.stopPropagation();
-									packageDistFields.append({
-										range: '₹0-5 LPA',
-										count: 0,
-										percentage: 0
-									});
-								}}>
-								<Plus className='w-4 h-4' />
-							</Button>
-							{expandedSections.packageDist ? (
-								<ChevronUp className='w-5 h-5 text-slate-500' />
-							) : (
-								<ChevronDown className='w-5 h-5 text-slate-500' />
-							)}
-						</div>
-					</button>
-					{expandedSections.packageDist && (
-						<div className='p-4 pt-0 space-y-4'>
-							{packageDistFields.fields.map((field, index) => (
-								<div
-									key={field.id}
-									className='p-4 border rounded-lg space-y-3 bg-slate-50'>
-									<div className='flex justify-between items-center'>
-										<h5 className='font-medium text-sm'>Range #{index + 1}</h5>
-										<Button
-											type='button'
-											size='sm'
-											variant='ghost'
-											onClick={() => packageDistFields.remove(index)}>
-											<Trash2 className='w-4 h-4 text-red-600' />
-										</Button>
-									</div>
-
-									<div className='grid grid-cols-3 gap-3'>
-										<FormField
-											control={form.control}
-											name={`packageDistribution.${index}.range`}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel className='text-xs'>Range</FormLabel>
-													<FormControl>
-														<Input {...field} placeholder='₹5-7 LPA' />
-													</FormControl>
-												</FormItem>
+			<AdminFormSection title='Student placements'>
+				<AdminItemList>
+					{studentArr.fields.map((field, index) => {
+						const image = form.watch(`studentPlacements.${index}.image`);
+						return (
+							<AdminItemCard
+								key={field.id}
+								index={index}
+								total={studentArr.fields.length}
+								title={
+									form.watch(`studentPlacements.${index}.name`) ||
+									`Student ${index + 1}`
+								}
+								subtitle={
+									form.watch(`studentPlacements.${index}.company`) || undefined
+								}
+								onMove={d => studentArr.move(index, index + d)}
+								onRemove={() => studentArr.remove(index)}>
+								<AdminFieldGrid>
+									<AdminField label='Name'>
+										<Input
+											{...form.register(
+												`studentPlacements.${index}.name` as const
 											)}
 										/>
-
-										<FormField
-											control={form.control}
-											name={`packageDistribution.${index}.count`}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel className='text-xs'>Count</FormLabel>
-													<FormControl>
-														<Input
-															{...field}
-															type='number'
-															onChange={e =>
-																field.onChange(parseInt(e.target.value) || 0)
-															}
-														/>
-													</FormControl>
-												</FormItem>
+									</AdminField>
+									<AdminField label='Department'>
+										<Input
+											{...form.register(
+												`studentPlacements.${index}.department` as const
 											)}
 										/>
-
-										<FormField
-											control={form.control}
-											name={`packageDistribution.${index}.percentage`}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel className='text-xs'>Percentage</FormLabel>
-													<FormControl>
-														<Input
-															{...field}
-															type='number'
-															step='0.1'
-															onChange={e =>
-																field.onChange(parseFloat(e.target.value) || 0)
-															}
-														/>
-													</FormControl>
-												</FormItem>
+									</AdminField>
+									<AdminField label='Company'>
+										<Input
+											{...form.register(
+												`studentPlacements.${index}.company` as const
 											)}
+										/>
+									</AdminField>
+									<AdminField label='Package (LPA)'>
+										<Input
+											type='number'
+											step='0.1'
+											{...form.register(
+												`studentPlacements.${index}.package` as const,
+												{ valueAsNumber: true }
+											)}
+										/>
+									</AdminField>
+									<AdminField label='Batch'>
+										<Input
+											{...form.register(
+												`studentPlacements.${index}.batch` as const
+											)}
+										/>
+									</AdminField>
+									<AdminField label='Role'>
+										<Input
+											{...form.register(
+												`studentPlacements.${index}.role` as const
+											)}
+										/>
+									</AdminField>
+								</AdminFieldGrid>
+								<AdminField label='Image (optional)'>
+									<Input
+										placeholder='Image URL'
+										{...form.register(
+											`studentPlacements.${index}.image` as const
+										)}
+									/>
+									<div className='mt-2'>
+										<UploadButton
+											onUpload={url =>
+												form.setValue(
+													`studentPlacements.${index}.image`,
+													url,
+													{ shouldDirty: true }
+												)
+											}
+											buttonText='Upload image'
 										/>
 									</div>
-								</div>
-							))}
-						</div>
-					)}
-				</div>
+									{image && (
+										<div className='mt-3'>
+											{/* eslint-disable-next-line @next/next/no-img-element */}
+											<img
+												src={image}
+												alt='Student preview'
+												className='h-16 w-16 rounded-full border border-slate-200 object-cover'
+											/>
+										</div>
+									)}
+								</AdminField>
+							</AdminItemCard>
+						);
+					})}
+				</AdminItemList>
+				{studentArr.fields.length === 0 && (
+					<AdminEmptyState title='No student placements yet' />
+				)}
+				<AddRowButton
+					onClick={() =>
+						studentArr.append({
+							name: '',
+							department: '',
+							company: '',
+							package: 0,
+							batch: '',
+							role: '',
+							image: ''
+						})
+					}>
+					Add student
+				</AddRowButton>
+			</AdminFormSection>
 
-				{/* Sector-wise Data */}
-				<div className='border rounded-lg'>
-					<button
-						type='button'
-						onClick={() => toggleSection('sectors')}
-						className='w-full flex items-center justify-between p-4 hover:bg-slate-50 transition-colors'>
-						<div className='flex items-center gap-2'>
-							<h4 className='font-semibold text-slate-900'>Sector-wise Data</h4>
-							<span className='text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full'>
-								{sectorFields.fields.length} sectors
-							</span>
-						</div>
-						<div className='flex items-center gap-2'>
-							<Button
-								type='button'
-								size='sm'
-								variant='outline'
-								onClick={(e) => {
-									e.stopPropagation();
-									sectorFields.append({
-										sector: 'IT Services',
-										percentage: 0,
-										companies: '',
-										color: 'from-blue-500 to-cyan-600'
-									});
-								}}>
-								<Plus className='w-4 h-4' />
-							</Button>
-							{expandedSections.sectors ? (
-								<ChevronUp className='w-5 h-5 text-slate-500' />
-							) : (
-								<ChevronDown className='w-5 h-5 text-slate-500' />
-							)}
-						</div>
-					</button>
-					{expandedSections.sectors && (
-						<div className='p-4 pt-0 space-y-4'>
-							{sectorFields.fields.map((field, index) => (
-								<div
-									key={field.id}
-									className='p-4 border rounded-lg space-y-3 bg-slate-50'>
-									<div className='flex justify-between items-center'>
-										<h5 className='font-medium text-sm'>Sector #{index + 1}</h5>
-										<Button
-											type='button'
-											size='sm'
-											variant='ghost'
-											onClick={() => sectorFields.remove(index)}>
-											<Trash2 className='w-4 h-4 text-red-600' />
-										</Button>
-									</div>
-
-									<div className='grid grid-cols-2 gap-3'>
-										<FormField
-											control={form.control}
-											name={`sectorWiseData.${index}.sector`}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel className='text-xs'>Sector Name</FormLabel>
-													<FormControl>
-														<Input {...field} placeholder='IT Services' />
-													</FormControl>
-												</FormItem>
-											)}
-										/>
-
-										<FormField
-											control={form.control}
-											name={`sectorWiseData.${index}.percentage`}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel className='text-xs'>Percentage</FormLabel>
-													<FormControl>
-														<Input
-															{...field}
-															type='number'
-															step='0.1'
-															onChange={e =>
-																field.onChange(parseFloat(e.target.value) || 0)
-															}
-														/>
-													</FormControl>
-												</FormItem>
-											)}
-										/>
-
-										<FormField
-											control={form.control}
-											name={`sectorWiseData.${index}.companies`}
-											render={({ field }) => (
-												<FormItem className='col-span-2'>
-													<FormLabel className='text-xs'>
-														Companies (comma-separated)
-													</FormLabel>
-													<FormControl>
-														<Input {...field} placeholder='TCS, Infosys, Wipro' />
-													</FormControl>
-												</FormItem>
-											)}
-										/>
-
-										<FormField
-											control={form.control}
-											name={`sectorWiseData.${index}.color`}
-											render={({ field }) => (
-												<FormItem className='col-span-2'>
-													<FormLabel className='text-xs'>Color Gradient</FormLabel>
-													<Select
-														onValueChange={field.onChange}
-														value={field.value}>
-														<FormControl>
-															<SelectTrigger>
-																<SelectValue />
-															</SelectTrigger>
-														</FormControl>
-														<SelectContent>
-															{COLOR_OPTIONS.map(color => (
-																<SelectItem key={color} value={color}>
-																	<div className='flex items-center gap-2'>
-																		<div
-																			className={`w-16 h-4 rounded bg-gradient-to-r ${color}`}
-																		/>
-																		<span className='text-xs'>{color}</span>
-																	</div>
-																</SelectItem>
-															))}
-														</SelectContent>
-													</Select>
-												</FormItem>
-											)}
-										/>
-									</div>
-								</div>
-							))}
-						</div>
-					)}
-				</div>
-
-				{/* Yearly Trends */}
-				<div className='border rounded-lg'>
-					<button
-						type='button'
-						onClick={() => toggleSection('trends')}
-						className='w-full flex items-center justify-between p-4 hover:bg-slate-50 transition-colors'>
-						<div className='flex items-center gap-2'>
-							<h4 className='font-semibold text-slate-900'>Yearly Trends</h4>
-							<span className='text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full'>
-								{trendsFields.fields.length} years
-							</span>
-						</div>
-						<div className='flex items-center gap-2'>
-							<Button
-								type='button'
-								size='sm'
-								variant='outline'
-								onClick={(e) => {
-									e.stopPropagation();
-									trendsFields.append({
-										year: '2024',
-										rate: 0,
-										avg: 0,
-										companies: 0
-									});
-								}}>
-								<Plus className='w-4 h-4' />
-							</Button>
-							{expandedSections.trends ? (
-								<ChevronUp className='w-5 h-5 text-slate-500' />
-							) : (
-								<ChevronDown className='w-5 h-5 text-slate-500' />
-							)}
-						</div>
-					</button>
-					{expandedSections.trends && (
-						<div className='p-4 pt-0 space-y-4'>
-							{trendsFields.fields.map((field, index) => (
-								<div
-									key={field.id}
-									className='p-4 border rounded-lg space-y-3 bg-slate-50'>
-									<div className='flex justify-between items-center'>
-										<h5 className='font-medium text-sm'>Year #{index + 1}</h5>
-										<Button
-											type='button'
-											size='sm'
-											variant='ghost'
-											onClick={() => trendsFields.remove(index)}>
-											<Trash2 className='w-4 h-4 text-red-600' />
-										</Button>
-									</div>
-
-									<div className='grid grid-cols-2 gap-3'>
-										<FormField
-											control={form.control}
-											name={`yearlyTrends.${index}.year`}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel className='text-xs'>Year</FormLabel>
-													<FormControl>
-														<Input {...field} placeholder='2024' />
-													</FormControl>
-												</FormItem>
-											)}
-										/>
-
-										<FormField
-											control={form.control}
-											name={`yearlyTrends.${index}.rate`}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel className='text-xs'>
-														Placement Rate (%)
-													</FormLabel>
-													<FormControl>
-														<Input
-															{...field}
-															type='number'
-															step='0.1'
-															onChange={e =>
-																field.onChange(parseFloat(e.target.value) || 0)
-															}
-														/>
-													</FormControl>
-												</FormItem>
-											)}
-										/>
-
-										<FormField
-											control={form.control}
-											name={`yearlyTrends.${index}.avg`}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel className='text-xs'>
-														Avg Package (LPA)
-													</FormLabel>
-													<FormControl>
-														<Input
-															{...field}
-															type='number'
-															step='0.1'
-															onChange={e =>
-																field.onChange(parseFloat(e.target.value) || 0)
-															}
-														/>
-													</FormControl>
-												</FormItem>
-											)}
-										/>
-
-										<FormField
-											control={form.control}
-											name={`yearlyTrends.${index}.companies`}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel className='text-xs'>
-														Companies Visited
-													</FormLabel>
-													<FormControl>
-														<Input
-															{...field}
-															type='number'
-															onChange={e =>
-																field.onChange(parseInt(e.target.value) || 0)
-															}
-														/>
-													</FormControl>
-												</FormItem>
-											)}
-										/>
-									</div>
-								</div>
-							))}
-						</div>
-					)}
-				</div>
-
-				{/* Student Placements */}
-				<div className='border rounded-lg'>
-					<button
-						type='button'
-						onClick={() => toggleSection('students')}
-						className='w-full flex items-center justify-between p-4 hover:bg-slate-50 transition-colors'>
-						<div className='flex items-center gap-2'>
-							<h4 className='font-semibold text-slate-900'>
-								Student Placements
-							</h4>
-							<span className='text-xs bg-pink-100 text-pink-700 px-2 py-1 rounded-full'>
-								{studentsFields.fields.length} students
-							</span>
-						</div>
-						<div className='flex items-center gap-2'>
-							<Button
-								type='button'
-								size='sm'
-								variant='outline'
-								onClick={(e) => {
-									e.stopPropagation();
-									studentsFields.append({
-										name: '',
-										department: 'CSE',
-										company: '',
-										package: 0,
-										batch: '2024',
-										role: ''
-									});
-								}}>
-								<Plus className='w-4 h-4' />
-							</Button>
-							{expandedSections.students ? (
-								<ChevronUp className='w-5 h-5 text-slate-500' />
-							) : (
-								<ChevronDown className='w-5 h-5 text-slate-500' />
-							)}
-						</div>
-					</button>
-					{expandedSections.students && (
-						<div className='p-4 pt-0 space-y-4'>
-							{studentsFields.fields.map((field, index) => (
-								<div
-									key={field.id}
-									className='p-4 border rounded-lg space-y-3 bg-slate-50'>
-									<div className='flex justify-between items-center'>
-										<h5 className='font-medium text-sm'>Student #{index + 1}</h5>
-										<Button
-											type='button'
-											size='sm'
-											variant='ghost'
-											onClick={() => studentsFields.remove(index)}>
-											<Trash2 className='w-4 h-4 text-red-600' />
-										</Button>
-									</div>
-
-									<div className='grid grid-cols-2 gap-3'>
-										<FormField
-											control={form.control}
-											name={`studentPlacements.${index}.name`}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel className='text-xs'>Name</FormLabel>
-													<FormControl>
-														<Input {...field} placeholder='Student Name' />
-													</FormControl>
-												</FormItem>
-											)}
-										/>
-
-										<FormField
-											control={form.control}
-											name={`studentPlacements.${index}.department`}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel className='text-xs'>Department</FormLabel>
-													<Select
-														onValueChange={field.onChange}
-														value={field.value}>
-														<FormControl>
-															<SelectTrigger>
-																<SelectValue />
-															</SelectTrigger>
-														</FormControl>
-														<SelectContent>
-															{DEPARTMENT_OPTIONS.map(dept => (
-																<SelectItem key={dept} value={dept}>
-																	{dept}
-																</SelectItem>
-															))}
-														</SelectContent>
-													</Select>
-												</FormItem>
-											)}
-										/>
-
-										<FormField
-											control={form.control}
-											name={`studentPlacements.${index}.company`}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel className='text-xs'>Company</FormLabel>
-													<FormControl>
-														<Input {...field} placeholder='Company Name' />
-													</FormControl>
-												</FormItem>
-											)}
-										/>
-
-										<FormField
-											control={form.control}
-											name={`studentPlacements.${index}.package`}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel className='text-xs'>Package (LPA)</FormLabel>
-													<FormControl>
-														<Input
-															{...field}
-															type='number'
-															step='0.1'
-															onChange={e =>
-																field.onChange(parseFloat(e.target.value) || 0)
-															}
-														/>
-													</FormControl>
-												</FormItem>
-											)}
-										/>
-
-										<FormField
-											control={form.control}
-											name={`studentPlacements.${index}.batch`}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel className='text-xs'>Batch</FormLabel>
-													<FormControl>
-														<Input {...field} placeholder='2024' />
-													</FormControl>
-												</FormItem>
-											)}
-										/>
-
-										<FormField
-											control={form.control}
-											name={`studentPlacements.${index}.role`}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel className='text-xs'>Role</FormLabel>
-													<FormControl>
-														<Input {...field} placeholder='Software Engineer' />
-													</FormControl>
-												</FormItem>
-											)}
-										/>
-
-										<FormField
-											control={form.control}
-											name={`studentPlacements.${index}.image`}
-											render={({ field }) => (
-												<FormItem className='col-span-2'>
-													<FormLabel className='text-xs'>Student Image</FormLabel>
-													<FormControl>
-														<div className='space-y-2'>
-															<Input {...field} placeholder='Image URL (optional)' />
-															<UploadButton
-																onUpload={(url) => field.onChange(url)}
-																buttonText='Upload Student Image'
-																className='w-full'
-															/>
-															{field.value ? (
-																<div className='mt-2'>
-																	<img
-																		src={field.value}
-																		alt='Student preview'
-																		className='w-20 h-20 rounded-full object-cover border-2 border-blue-200'
-																	/>
-																</div>
-															) : (
-																<p className='text-sm text-gray-500'>Initials avatar will be shown if no image uploaded</p>
-															)}
-														</div>
-													</FormControl>
-												</FormItem>
-											)}
-										/>
-									</div>
-								</div>
-							))}
-						</div>
-					)}
-				</div>
-
-				{/* Submit Button at Bottom */}
-				<div className='border-t pt-4 sticky bottom-0 bg-white'>
-					<Button
-						type='submit'
-						disabled={isPending}
-						className='w-full bg-blue-600 hover:bg-blue-700 text-white'>
-						{isPending ? 'Saving...' : 'Save All Changes'}
-					</Button>
-				</div>
-			</form>
-		</Form>
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }

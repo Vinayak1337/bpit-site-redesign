@@ -181,6 +181,144 @@ export const PUBLIC_TO_ADMIN_PAGE_MAP: Record<string, AdminPageCoverage> = {
 		editingMode: 'none',
 		note: 'Page-level admin editor is not finished yet.'
 	},
+	'/academia/library/advisory-committee': {
+		adminHref: null,
+		status: 'missing',
+		editingMode: 'none',
+		note: 'Library child page admin editor is not finished yet.'
+	},
+	'/academia/library/book-acquisition': {
+		adminHref: null,
+		status: 'missing',
+		editingMode: 'none',
+		note: 'Library child page admin editor is not finished yet.'
+	},
+	'/academia/library/book-bank': {
+		adminHref: null,
+		status: 'missing',
+		editingMode: 'none',
+		note: 'Library child page admin editor is not finished yet.'
+	},
+	'/academia/library/collection': {
+		adminHref: null,
+		status: 'missing',
+		editingMode: 'none',
+		note: 'Library child page admin editor is not finished yet.'
+	},
+	'/academia/library/contact': {
+		adminHref: null,
+		status: 'missing',
+		editingMode: 'none',
+		note: 'Library child page admin editor is not finished yet.'
+	},
+	'/academia/library/delnet': {
+		adminHref: null,
+		status: 'missing',
+		editingMode: 'none',
+		note: 'Library child page admin editor is not finished yet.'
+	},
+	'/academia/library/digital-library': {
+		adminHref: null,
+		status: 'missing',
+		editingMode: 'none',
+		note: 'Library child page admin editor is not finished yet.'
+	},
+	'/academia/library/downloads': {
+		adminHref: null,
+		status: 'missing',
+		editingMode: 'none',
+		note: 'Library child page admin editor is not finished yet.'
+	},
+	'/academia/library/e-resources': {
+		adminHref: null,
+		status: 'missing',
+		editingMode: 'none',
+		note: 'Library child page admin editor is not finished yet.'
+	},
+	'/academia/library/information': {
+		adminHref: null,
+		status: 'missing',
+		editingMode: 'none',
+		note: 'Library child page admin editor is not finished yet.'
+	},
+	'/academia/library/moocs': {
+		adminHref: null,
+		status: 'missing',
+		editingMode: 'none',
+		note: 'Library child page admin editor is not finished yet.'
+	},
+	'/academia/library/ndli': {
+		adminHref: null,
+		status: 'missing',
+		editingMode: 'none',
+		note: 'Library child page admin editor is not finished yet.'
+	},
+	'/academia/library/newspapers': {
+		adminHref: null,
+		status: 'missing',
+		editingMode: 'none',
+		note: 'Library child page admin editor is not finished yet.'
+	},
+	'/academia/library/photocopy-service': {
+		adminHref: null,
+		status: 'missing',
+		editingMode: 'none',
+		note: 'Library child page admin editor is not finished yet.'
+	},
+	'/academia/library/rules': {
+		adminHref: null,
+		status: 'missing',
+		editingMode: 'none',
+		note: 'Library child page admin editor is not finished yet.'
+	},
+	'/academia/library/self-learning': {
+		adminHref: null,
+		status: 'missing',
+		editingMode: 'none',
+		note: 'Library child page admin editor is not finished yet.'
+	},
+	'/academia/library/services': {
+		adminHref: null,
+		status: 'missing',
+		editingMode: 'none',
+		note: 'Library child page admin editor is not finished yet.'
+	},
+	'/academia/library/staff': {
+		adminHref: null,
+		status: 'missing',
+		editingMode: 'none',
+		note: 'Library child page admin editor is not finished yet.'
+	},
+	'/academia/library/timings': {
+		adminHref: null,
+		status: 'missing',
+		editingMode: 'none',
+		note: 'Library child page admin editor is not finished yet.'
+	},
+	'/academia/library/useful-links': {
+		adminHref: null,
+		status: 'missing',
+		editingMode: 'none',
+		note: 'Library child page admin editor is not finished yet.'
+	},
+	'/academia/library/weeding-out': {
+		adminHref: null,
+		status: 'missing',
+		editingMode: 'none',
+		note: 'Library child page admin editor is not finished yet.'
+	},
+	'/privacy-policy': {
+		adminHref: null,
+		status: 'missing',
+		editingMode: 'none',
+		note: 'Legal page admin editor is not implemented.'
+	},
+	'/terms-of-service': {
+		adminHref: null,
+		status: 'missing',
+		editingMode: 'none',
+		note: 'Legal page admin editor is not implemented.'
+	},
 	'/placements/overview': {
 		adminHref: '/admin/placements/overview',
 		status: 'complete',

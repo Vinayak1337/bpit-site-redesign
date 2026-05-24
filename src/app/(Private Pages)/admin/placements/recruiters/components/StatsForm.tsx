@@ -1,15 +1,33 @@
 'use client';
 
-import React, { useState, useTransition, useEffect } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
-import { Plus, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue
+} from '@/components/ui/select';
 import { SUPPORTED_ICON_NAMES } from '@/components/about/icons';
-import { updateRecruitersData, type RecruitersData } from '@/app/(Private Pages)/actions/recruiters';
+import {
+	updateRecruitersData,
+	type RecruitersData
+} from '@/app/(Private Pages)/actions/recruiters';
 import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
+import {
+	AddRowButton,
+	AdminEmptyState,
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	AdminItemCard,
+	AdminItemList,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 const COLOR_OPTIONS = [
 	'from-blue-500 to-blue-700',
@@ -28,9 +46,9 @@ interface StatsFormProps {
 	onChange?: (data: RecruitersData) => void;
 }
 
-export default function StatsForm({ initialData, pageSlug, onChange }: StatsFormProps) {
+export default function StatsForm({ initialData, onChange }: StatsFormProps) {
 	const [isPending, startTransition] = useTransition();
-	const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 
 	const form = useForm({
 		defaultValues: {
@@ -38,155 +56,123 @@ export default function StatsForm({ initialData, pageSlug, onChange }: StatsForm
 		}
 	});
 
-	const { fields, append, remove } = useFieldArray({
+	const { fields, append, remove, move } = useFieldArray({
 		control: form.control,
 		name: 'stats'
 	});
 
-	// Watch for changes and update preview in real-time
 	useEffect(() => {
-		const subscription = form.watch((values) => {
+		const sub = form.watch(values => {
 			if (onChange) {
-				const updatedData: RecruitersData = {
+				onChange({
 					...initialData,
-					stats: (values.stats || []).filter(Boolean) as any
-				};
-				onChange(updatedData);
+					stats: (values.stats || []).filter(Boolean) as RecruitersData['stats']
+				});
+				setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 			}
 		});
-		return () => subscription.unsubscribe();
+		return () => sub.unsubscribe();
 	}, [form, onChange, initialData]);
 
-	const onSubmit = async (values: any) => {
-		setSaveStatus('saving');
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
+	const onSubmit = form.handleSubmit(values => {
+		setStatus({ kind: 'saving' });
 		startTransition(async () => {
 			try {
 				const admin = await requireAdmin();
-
 				const updatedData: RecruitersData = {
 					...initialData,
 					stats: values.stats
 				};
-
 				await updateRecruitersData(updatedData, admin.id);
-				
-				if (onChange) {
-					onChange(updatedData);
-				}
-
-				setSaveStatus('saved');
-				setTimeout(() => setSaveStatus('idle'), 2000);
+				onChange?.(updatedData);
+				setStatus({ kind: 'success', message: 'Saved' });
 			} catch (error) {
 				console.error('Failed to save:', error);
-				setSaveStatus('error');
+				setStatus({ kind: 'error', message: 'Save failed' });
 			}
 		});
-	};
+	});
 
 	return (
-		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
-				<div className='space-y-4'>
+		<AdminForm onSubmit={onSubmit}>
+			<AdminFormSection title='Recruiter stats'>
+				<AdminItemList>
 					{fields.map((field, index) => (
-						<div key={field.id} className='p-4 border rounded-lg space-y-4'>
-							<div className='flex items-center justify-between'>
-								<h4 className='font-semibold'>Stat Card {index + 1}</h4>
-								<Button
-									type='button'
-									variant='ghost'
-									size='sm'
-									onClick={() => remove(index)}
-								>
-									<Trash2 className='h-4 w-4' />
-								</Button>
-							</div>
-
-							<div className='grid grid-cols-2 gap-4'>
-								<FormField
-									control={form.control}
-									name={`stats.${index}.icon`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Icon</FormLabel>
-											<Select onValueChange={field.onChange} value={field.value}>
-												<FormControl>
-													<SelectTrigger>
-														<SelectValue />
-													</SelectTrigger>
-												</FormControl>
-												<SelectContent>
-													{SUPPORTED_ICON_NAMES.map(icon => (
-														<SelectItem key={icon} value={icon}>
-															{icon}
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-											<FormMessage />
-										</FormItem>
-									)}
+						<AdminItemCard
+							key={field.id}
+							index={index}
+							total={fields.length}
+							title={
+								form.watch(`stats.${index}.label`) || `Stat ${index + 1}`
+							}
+							subtitle={form.watch(`stats.${index}.value`) || undefined}
+							onMove={d => move(index, index + d)}
+							onRemove={() => remove(index)}>
+							<AdminFieldGrid>
+								<AdminField label='Icon'>
+									<Select
+										value={form.watch(`stats.${index}.icon`) || 'TrendingUp'}
+										onValueChange={v =>
+											form.setValue(`stats.${index}.icon`, v, {
+												shouldDirty: true
+											})
+										}>
+										<SelectTrigger>
+											<SelectValue />
+										</SelectTrigger>
+										<SelectContent>
+											{SUPPORTED_ICON_NAMES.map(icon => (
+												<SelectItem key={icon} value={icon}>
+													{icon}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								</AdminField>
+								<AdminField label='Color'>
+									<Select
+										value={form.watch(`stats.${index}.color`) || COLOR_OPTIONS[0]}
+										onValueChange={v =>
+											form.setValue(`stats.${index}.color`, v, {
+												shouldDirty: true
+											})
+										}>
+										<SelectTrigger>
+											<SelectValue />
+										</SelectTrigger>
+										<SelectContent>
+											{COLOR_OPTIONS.map(color => (
+												<SelectItem key={color} value={color}>
+													{color}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								</AdminField>
+							</AdminFieldGrid>
+							<AdminField label='Value'>
+								<Input
+									placeholder='500+'
+									{...form.register(`stats.${index}.value` as const)}
 								/>
-
-								<FormField
-									control={form.control}
-									name={`stats.${index}.color`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Color</FormLabel>
-											<Select onValueChange={field.onChange} value={field.value}>
-												<FormControl>
-													<SelectTrigger>
-														<SelectValue />
-													</SelectTrigger>
-												</FormControl>
-												<SelectContent>
-													{COLOR_OPTIONS.map(color => (
-														<SelectItem key={color} value={color}>
-															{color}
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-											<FormMessage />
-										</FormItem>
-									)}
+							</AdminField>
+							<AdminField label='Label'>
+								<Input
+									placeholder='Partner Companies'
+									{...form.register(`stats.${index}.label` as const)}
 								/>
-							</div>
-
-							<FormField
-								control={form.control}
-								name={`stats.${index}.value`}
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Value</FormLabel>
-										<FormControl>
-											<Input {...field} placeholder='500+' />
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-
-							<FormField
-								control={form.control}
-								name={`stats.${index}.label`}
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Label</FormLabel>
-										<FormControl>
-											<Input {...field} placeholder='Partner Companies' />
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-						</div>
+							</AdminField>
+						</AdminItemCard>
 					))}
-				</div>
-
-				<Button
-					type='button'
-					variant='outline'
+				</AdminItemList>
+				{fields.length === 0 && <AdminEmptyState title='No stats yet' />}
+				<AddRowButton
 					onClick={() =>
 						append({
 							icon: 'TrendingUp',
@@ -194,21 +180,12 @@ export default function StatsForm({ initialData, pageSlug, onChange }: StatsForm
 							label: '',
 							color: COLOR_OPTIONS[0]
 						})
-					}
-				>
-					<Plus className='h-4 w-4 mr-2' />
-					Add Stat Card
-				</Button>
+					}>
+					Add stat card
+				</AddRowButton>
+			</AdminFormSection>
 
-				<div className='flex items-center space-x-2'>
-					<Button type='submit' disabled={isPending}>
-						{isPending ? 'Saving...' : saveStatus === 'saved' ? 'Saved!' : 'Save Changes'}
-					</Button>
-					{saveStatus === 'error' && (
-						<span className='text-sm text-red-600'>Failed to save</span>
-					)}
-				</div>
-			</form>
-		</Form>
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }

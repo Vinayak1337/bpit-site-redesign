@@ -51,27 +51,29 @@ const FooterEngagementSection = ({
 					<FooterNewsletterForm />
 				</div>
 
-				<div>
-					<h4 className='text-white font-medium mb-4'>Follow Us</h4>
-					<div className='flex flex-wrap gap-3'>
-						{socialLinks.map((social, index) => (
-							<motion.a
-								key={social.label}
-								href={social.href}
-								target='_blank'
-								rel='noopener noreferrer'
-								className={`w-12 h-12 bg-gradient-to-r ${social.gradientClass} rounded-xl flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 group`}
-								whileHover={{ scale: 1.1, rotate: 5 }}
-								whileTap={{ scale: 0.95 }}
-								initial={{ opacity: 0, scale: 0.8 }}
-								animate={isVisible ? { opacity: 1, scale: 1 } : {}}
-								transition={{ duration: 0.4, delay: 0.1 * index }}
-								aria-label={social.ariaLabel}>
-								<social.icon className='w-5 h-5 text-white group-hover:scale-110 transition-transform' />
-							</motion.a>
-						))}
+				{socialLinks.length > 0 && (
+					<div>
+						<h4 className='text-white font-medium mb-4'>Follow Us</h4>
+						<div className='flex flex-wrap gap-3'>
+							{socialLinks.map((social, index) => (
+								<motion.a
+									key={social.label}
+									href={social.href}
+									target='_blank'
+									rel='noopener noreferrer'
+									className={`w-12 h-12 bg-gradient-to-r ${social.gradientClass} rounded-xl flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 group`}
+									whileHover={{ scale: 1.1, rotate: 5 }}
+									whileTap={{ scale: 0.95 }}
+									initial={{ opacity: 0, scale: 0.8 }}
+									animate={isVisible ? { opacity: 1, scale: 1 } : {}}
+									transition={{ duration: 0.4, delay: 0.1 * index }}
+									aria-label={social.ariaLabel}>
+									<social.icon className='w-5 h-5 text-white group-hover:scale-110 transition-transform' />
+								</motion.a>
+							))}
+						</div>
 					</div>
-				</div>
+				)}
 			</div>
 		</motion.div>
 	);

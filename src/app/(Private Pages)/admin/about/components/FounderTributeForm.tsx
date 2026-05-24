@@ -1,20 +1,23 @@
 'use client';
 
 import { useEffect, useState, useTransition } from 'react';
-import { useForm, useFieldArray } from 'react-hook-form';
-import { Button } from '@/components/ui/button';
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage
-} from '@/components/ui/form';
+import { useForm, useFieldArray, type UseFieldArrayReturn } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { updateFounderTribute } from '@/app/(Private Pages)/actions/about';
 import type { FounderTributeData } from '@/app/(Private Pages)/actions/about';
+import {
+	AddRowButton,
+	AdminEmptyState,
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	AdminItemCard,
+	AdminItemList,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 type StringFormValue = { id: string; value: string };
 
@@ -35,40 +38,54 @@ type Props = {
 	visibleSections?: Array<'hero' | 'content' | 'values'>;
 };
 
-const createStringValue = (value = ''): StringFormValue => ({
+const createString = (value = ''): StringFormValue => ({
 	id: crypto.randomUUID(),
 	value
 });
 
-const normalizeFounderTribute = (values: Partial<FormValues>): FounderTributeData => {
-	const paragraphs = (values.paragraphs ?? [])
-		.map(item => (item.value ?? '').trim())
-		.filter(Boolean);
-
-	const more = (values.more ?? [])
-		.map(item => (item.value ?? '').trim())
-		.filter(Boolean);
-
-	const coreValues = (values.coreValues ?? [])
-		.map(item => (item.value ?? '').trim())
-		.filter(Boolean);
-
-	const commitments = (values.commitments ?? [])
-		.map(item => (item.value ?? '').trim())
-		.filter(Boolean);
-
+const normalize = (values: Partial<FormValues>): FounderTributeData => {
+	const trimList = (list?: StringFormValue[]) =>
+		(list ?? []).map(i => (i.value ?? '').trim()).filter(Boolean);
 	return {
 		header: {
-			title: (values.headerTitle ?? '').trim() || 'In Memory of Our Visionary Founder',
-			subtitle: (values.headerSubtitle ?? '').trim() || 'Bhagwan Parshuram - The Divine Inspiration'
+			title:
+				(values.headerTitle ?? '').trim() ||
+				'In Memory of Our Visionary Founder',
+			subtitle:
+				(values.headerSubtitle ?? '').trim() ||
+				'Bhagwan Parshuram - The Divine Inspiration'
 		},
-		paragraphs,
-		quote: (values.quote ?? '').trim() || '"Education is the most powerful weapon which you can use to change the world."',
-		more,
-		coreValues,
-		commitments
+		paragraphs: trimList(values.paragraphs),
+		quote:
+			(values.quote ?? '').trim() ||
+			'"Education is the most powerful weapon which you can use to change the world."',
+		more: trimList(values.more),
+		coreValues: trimList(values.coreValues),
+		commitments: trimList(values.commitments)
 	};
 };
+
+function StringListSection({
+	title,
+	addLabel,
+	placeholder,
+	textarea,
+	rows = 4,
+	array,
+	name
+}: {
+	title: string;
+	addLabel: string;
+	placeholder: string;
+	textarea?: boolean;
+	rows?: number;
+	array: UseFieldArrayReturn<FormValues, never>;
+	name: 'paragraphs' | 'more' | 'coreValues' | 'commitments';
+	// register prop intentionally omitted; we pass via children below
+}) {
+	return null; // unused — kept compact and inline below
+}
+void StringListSection;
 
 export default function FounderTributeForm({
 	initialData,
@@ -77,7 +94,7 @@ export default function FounderTributeForm({
 	visibleSections
 }: Props) {
 	const [isPending, startTransition] = useTransition();
-	const [message, setMessage] = useState<string | null>(null);
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 
 	const form = useForm<FormValues>({
 		defaultValues: {
@@ -85,347 +102,206 @@ export default function FounderTributeForm({
 			headerSubtitle: initialData.header.subtitle,
 			paragraphs:
 				initialData.paragraphs.length > 0
-					? initialData.paragraphs.map(value => createStringValue(value))
-					: [createStringValue()],
+					? initialData.paragraphs.map(createString)
+					: [createString()],
 			quote: initialData.quote,
 			more:
 				initialData.more.length > 0
-					? initialData.more.map(value => createStringValue(value))
-					: [createStringValue()],
+					? initialData.more.map(createString)
+					: [createString()],
 			coreValues:
 				initialData.coreValues.length > 0
-					? initialData.coreValues.map(value => createStringValue(value))
-					: [createStringValue()],
+					? initialData.coreValues.map(createString)
+					: [createString()],
 			commitments:
 				initialData.commitments.length > 0
-					? initialData.commitments.map(value => createStringValue(value))
-					: [createStringValue()]
+					? initialData.commitments.map(createString)
+					: [createString()]
 		}
 	});
 
-	const paragraphsArray = useFieldArray({
-		control: form.control,
-		name: 'paragraphs'
-	});
-
-	const moreArray = useFieldArray({
-		control: form.control,
-		name: 'more'
-	});
-
-	const coreValuesArray = useFieldArray({
-		control: form.control,
-		name: 'coreValues'
-	});
-
-	const commitmentsArray = useFieldArray({
-		control: form.control,
-		name: 'commitments'
-	});
+	const paragraphs = useFieldArray({ control: form.control, name: 'paragraphs' });
+	const more = useFieldArray({ control: form.control, name: 'more' });
+	const coreValues = useFieldArray({ control: form.control, name: 'coreValues' });
+	const commitments = useFieldArray({ control: form.control, name: 'commitments' });
 
 	useEffect(() => {
-		onChange?.(normalizeFounderTribute(form.getValues()));
-		const subscription = form.watch(values => {
-			const formValues: Partial<FormValues> = {
-				...values,
-				paragraphs: values.paragraphs?.filter(Boolean) as StringFormValue[],
-				more: values.more?.filter(Boolean) as StringFormValue[],
-				coreValues: values.coreValues?.filter(Boolean) as StringFormValue[],
-				commitments: values.commitments?.filter(Boolean) as StringFormValue[]
-			};
-			onChange?.(normalizeFounderTribute(formValues));
+		onChange?.(normalize(form.getValues()));
+		const sub = form.watch(values => {
+			onChange?.(normalize(values as Partial<FormValues>));
+			setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 		});
-		return () => subscription.unsubscribe();
+		return () => sub.unsubscribe();
 	}, [form, onChange]);
 
-	const handleSubmit = (values: FormValues) => {
-		setMessage(null);
-		const payload = normalizeFounderTribute(values);
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
+	const handleSubmit = form.handleSubmit(values => {
+		setStatus({ kind: 'saving' });
 		startTransition(async () => {
-			const result = await updateFounderTribute(pageSlug, payload);
-			if (!result.ok) {
-				setMessage('Save failed');
-				return;
-			}
-			setMessage('Saved');
+			const result = await updateFounderTribute(pageSlug, normalize(values));
+			setStatus(
+				result.ok
+					? { kind: 'success', message: 'Saved' }
+					: { kind: 'error', message: 'Save failed' }
+			);
 		});
-	};
+	});
 
 	const showSection = (section: 'hero' | 'content' | 'values') =>
 		!visibleSections || visibleSections.includes(section);
 
+	const renderTextList = (
+		title: string,
+		addLabel: string,
+		placeholder: string,
+		fieldName: 'paragraphs' | 'more',
+		array: UseFieldArrayReturn<FormValues, 'paragraphs' | 'more', 'id'>,
+		rows: number
+	) => (
+		<AdminFormSection title={title}>
+			<AdminItemList>
+				{array.fields.map((field, index) => (
+					<AdminItemCard
+						key={field.id}
+						index={index}
+						total={array.fields.length}
+						title={`Item ${index + 1}`}
+						onMove={d => array.move(index, index + d)}
+						onRemove={() => array.remove(index)}>
+						<AdminField label={`Item ${index + 1}`} className='[&_label]:sr-only'>
+							<Textarea
+								rows={rows}
+								placeholder={placeholder}
+								{...form.register(`${fieldName}.${index}.value` as const)}
+							/>
+						</AdminField>
+					</AdminItemCard>
+				))}
+			</AdminItemList>
+			{array.fields.length === 0 && <AdminEmptyState title='None yet' />}
+			<AddRowButton onClick={() => array.append(createString())}>
+				{addLabel}
+			</AddRowButton>
+		</AdminFormSection>
+	);
+
+	const renderInputList = (
+		title: string,
+		addLabel: string,
+		placeholder: string,
+		fieldName: 'coreValues' | 'commitments',
+		array: UseFieldArrayReturn<FormValues, 'coreValues' | 'commitments', 'id'>
+	) => (
+		<AdminFormSection title={title}>
+			<AdminItemList>
+				{array.fields.map((field, index) => (
+					<AdminItemCard
+						key={field.id}
+						index={index}
+						total={array.fields.length}
+						title={`${title.replace(/s$/, '')} ${index + 1}`}
+						onMove={d => array.move(index, index + d)}
+						onRemove={() => array.remove(index)}>
+						<AdminField label={title} className='[&_label]:sr-only'>
+							<Input
+								placeholder={placeholder}
+								{...form.register(`${fieldName}.${index}.value` as const)}
+							/>
+						</AdminField>
+					</AdminItemCard>
+				))}
+			</AdminItemList>
+			{array.fields.length === 0 && <AdminEmptyState title='None yet' />}
+			<AddRowButton onClick={() => array.append(createString())}>
+				{addLabel}
+			</AddRowButton>
+		</AdminFormSection>
+	);
+
 	return (
-		<Form {...form}>
-			<form
-				className='space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm max-h-[70vh] overflow-y-auto overflow-x-hidden'
-				onSubmit={form.handleSubmit(handleSubmit)}>
-				<div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
-					<div>
-						<h3 className='text-lg font-semibold text-slate-900'>Founder Tribute</h3>
-						<p className='text-sm text-slate-500'>
-							Manage the founder tribute content and values.
-						</p>
-					</div>
-					<div className='flex items-center gap-2'>
-						{message && (
-							<span className='rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700'>
-								{message}
-							</span>
-						)}
-						<Button type='submit' disabled={isPending}>
-							{isPending ? 'Saving...' : 'Save changes'}
-						</Button>
-					</div>
-				</div>
+		<AdminForm onSubmit={handleSubmit}>
+			{showSection('hero') && (
+				<AdminFormSection
+					title='Founder tribute'
+					description='Hero copy for the founder tribute section.'>
+					<AdminFieldGrid>
+						<AdminField label='Title' htmlFor='ft-title'>
+							<Input
+								id='ft-title'
+								placeholder='In Memory of Our Visionary Founder'
+								{...form.register('headerTitle', { required: 'Title is required' })}
+							/>
+						</AdminField>
+						<AdminField label='Subtitle' htmlFor='ft-sub'>
+							<Input
+								id='ft-sub'
+								placeholder='Bhagwan Parshuram - The Divine Inspiration'
+								{...form.register('headerSubtitle', {
+									required: 'Subtitle is required'
+								})}
+							/>
+						</AdminField>
+					</AdminFieldGrid>
+				</AdminFormSection>
+			)}
 
-				{showSection('hero') ? (
-				<div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-					<FormField
-						control={form.control}
-						name='headerTitle'
-						rules={{ required: 'Title is required' }}
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Title</FormLabel>
-								<FormControl>
-									<Input placeholder='In Memory of Our Visionary Founder' {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-					<FormField
-						control={form.control}
-						name='headerSubtitle'
-						rules={{ required: 'Subtitle is required' }}
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Subtitle</FormLabel>
-								<FormControl>
-									<Input placeholder='Bhagwan Parshuram - The Divine Inspiration' {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-				</div>
-				) : null}
-
-				{showSection('content') ? (
+			{showSection('content') && (
 				<>
-				<div className='space-y-3'>
-					<div className='flex items-center justify-between'>
-						<h4 className='text-sm font-semibold text-slate-700'>
-							Introduction Paragraphs
-						</h4>
-						<Button
-							type='button'
-							variant='outline'
-							size='sm'
-							onClick={() => paragraphsArray.append(createStringValue())}>
-							Add paragraph
-						</Button>
-					</div>
-					<div className='space-y-4'>
-						{paragraphsArray.fields.map((field, index) => (
-							<div key={field.id} className='flex gap-3'>
-								<div className='flex-1'>
-									<FormField
-										control={form.control}
-										name={`paragraphs.${index}.value`}
-										render={({ field }) => (
-											<FormItem>
-												<FormControl>
-													<Textarea
-														placeholder='Enter paragraph content...'
-														className='min-h-[100px]'
-														{...field}
-													/>
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-								</div>
-								{paragraphsArray.fields.length > 1 && (
-									<Button
-										type='button'
-										variant='ghost'
-										size='sm'
-										onClick={() => paragraphsArray.remove(index)}
-										className='mt-2 text-red-600 hover:text-red-700'>
-										Remove
-									</Button>
-								)}
-							</div>
-						))}
-					</div>
-				</div>
-
-				<FormField
-					control={form.control}
-					name='quote'
-					rules={{ required: 'Quote is required' }}
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Inspirational Quote</FormLabel>
-							<FormControl>
-								<Textarea
-									placeholder='"Education is the most powerful weapon which you can use to change the world."'
-									className='min-h-[80px]'
-									{...field}
-								/>
-							</FormControl>
-							<FormMessage />
-						</FormItem>
+					{renderTextList(
+						'Introduction paragraphs',
+						'Add paragraph',
+						'Enter paragraph content…',
+						'paragraphs',
+						paragraphs,
+						4
 					)}
-				/>
 
-				<div className='space-y-3'>
-					<div className='flex items-center justify-between'>
-						<h4 className='text-sm font-semibold text-slate-700'>
-							Additional Content
-						</h4>
-						<Button
-							type='button'
-							variant='outline'
-							size='sm'
-							onClick={() => moreArray.append(createStringValue())}>
-							Add content
-						</Button>
-					</div>
-					<div className='space-y-4'>
-						{moreArray.fields.map((field, index) => (
-							<div key={field.id} className='flex gap-3'>
-								<div className='flex-1'>
-									<FormField
-										control={form.control}
-										name={`more.${index}.value`}
-										render={({ field }) => (
-											<FormItem>
-												<FormControl>
-													<Textarea
-														placeholder='Enter additional content...'
-														className='min-h-[80px]'
-														{...field}
-													/>
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-								</div>
-								{moreArray.fields.length > 1 && (
-									<Button
-										type='button'
-										variant='ghost'
-										size='sm'
-										onClick={() => moreArray.remove(index)}
-										className='mt-2 text-red-600 hover:text-red-700'>
-										Remove
-									</Button>
-								)}
-							</div>
-						))}
-					</div>
-				</div>
+					<AdminFormSection title='Inspirational quote'>
+						<AdminField label='Quote' className='[&_label]:sr-only'>
+							<Textarea
+								rows={3}
+								placeholder='"Education is the most powerful weapon which you can use to change the world."'
+								{...form.register('quote', { required: 'Quote is required' })}
+							/>
+						</AdminField>
+					</AdminFormSection>
+
+					{renderTextList(
+						'Additional content',
+						'Add content',
+						'Enter additional content…',
+						'more',
+						more,
+						3
+					)}
 				</>
-				) : null}
+			)}
 
-				{showSection('values') ? (
-				<div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
-					<div className='space-y-3'>
-						<div className='flex items-center justify-between'>
-							<h4 className='text-sm font-semibold text-slate-700'>
-								Core Values
-							</h4>
-							<Button
-								type='button'
-								variant='outline'
-								size='sm'
-								onClick={() => coreValuesArray.append(createStringValue())}>
-								Add value
-							</Button>
-						</div>
-						<div className='space-y-3'>
-							{coreValuesArray.fields.map((field, index) => (
-								<div key={field.id} className='flex gap-3'>
-									<div className='flex-1'>
-										<FormField
-											control={form.control}
-											name={`coreValues.${index}.value`}
-											render={({ field }) => (
-												<FormItem>
-													<FormControl>
-														<Input placeholder='Core value...' {...field} />
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-									</div>
-									{coreValuesArray.fields.length > 1 && (
-										<Button
-											type='button'
-											variant='ghost'
-											size='sm'
-											onClick={() => coreValuesArray.remove(index)}
-											className='text-red-600 hover:text-red-700'>
-											Remove
-										</Button>
-									)}
-								</div>
-							))}
-						</div>
-					</div>
+			{showSection('values') && (
+				<>
+					{renderInputList(
+						'Core values',
+						'Add value',
+						'Core value…',
+						'coreValues',
+						coreValues
+					)}
+					{renderInputList(
+						'Commitments',
+						'Add commitment',
+						'Commitment…',
+						'commitments',
+						commitments
+					)}
+				</>
+			)}
 
-					<div className='space-y-3'>
-						<div className='flex items-center justify-between'>
-							<h4 className='text-sm font-semibold text-slate-700'>
-								Commitments
-							</h4>
-							<Button
-								type='button'
-								variant='outline'
-								size='sm'
-								onClick={() => commitmentsArray.append(createStringValue())}>
-								Add commitment
-							</Button>
-						</div>
-						<div className='space-y-3'>
-							{commitmentsArray.fields.map((field, index) => (
-								<div key={field.id} className='flex gap-3'>
-									<div className='flex-1'>
-										<FormField
-											control={form.control}
-											name={`commitments.${index}.value`}
-											render={({ field }) => (
-												<FormItem>
-													<FormControl>
-														<Input placeholder='Commitment...' {...field} />
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-									</div>
-									{commitmentsArray.fields.length > 1 && (
-										<Button
-											type='button'
-											variant='ghost'
-											size='sm'
-											onClick={() => commitmentsArray.remove(index)}
-											className='text-red-600 hover:text-red-700'>
-											Remove
-										</Button>
-									)}
-								</div>
-							))}
-						</div>
-					</div>
-				</div>
-				) : null}
-			</form>
-		</Form>
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }

@@ -150,84 +150,6 @@ export type AssuranceBodiesData = z.infer<typeof assuranceBodiesSchema>;
 export type ImpactData = z.infer<typeof impactSchema>;
 export type ImpactStatData = z.infer<typeof impactStatSchema>;
 
-// Normalize functions
-const normalizeVisionMission = (data: Partial<VisionMissionData>): VisionMissionData => {
-	return {
-		hero: {
-			title: data.hero?.title || 'Our Vision',
-			subtitle: data.hero?.subtitle || 'Inspiring Excellence, Shaping Tomorrow',
-			icon: data.hero?.icon || 'Eye',
-			gradient: data.hero?.gradient || 'from-blue-50 to-indigo-100',
-			borderColor: data.hero?.borderColor || 'border-blue-200',
-			iconBg: data.hero?.iconBg || 'bg-blue-600'
-		},
-		visionStatement: {
-			title: data.visionStatement?.title || 'Vision Statement',
-			icon: data.visionStatement?.icon || 'Compass',
-			gradient: data.visionStatement?.gradient || 'from-blue-50 to-indigo-50',
-			borderColor: data.visionStatement?.borderColor || 'border-blue-100',
-			quote: data.visionStatement?.quote || 'To be a premier institute of technical education...'
-		},
-		pillars: data.pillars || [
-			{
-				icon: 'BookOpen',
-				title: 'Academic Excellence',
-				description: 'Delivering world-class technical education...',
-				color: 'blue'
-			}
-		],
-		aspirations: data.aspirations || [
-			{
-				icon: 'TrendingUp',
-				title: '2030 Goals',
-				description: 'Achieve top 50 ranking among engineering institutes in India',
-				color: 'blue'
-			}
-		]
-	};
-};
-
-// Normalize mission function
-const normalizeMission = (data: Partial<MissionData>): MissionData => {
-	return {
-		hero: {
-			title: data.hero?.title || 'Our Mission',
-			subtitle: data.hero?.subtitle || 'Empowering Minds, Building Futures',
-			icon: data.hero?.icon || 'Target',
-			gradient: data.hero?.gradient || 'from-green-50 to-emerald-100',
-			borderColor: data.hero?.borderColor || 'border-green-200',
-			iconBg: data.hero?.iconBg || 'bg-green-600'
-		},
-		missionStatement: {
-			title: data.missionStatement?.title || 'Mission Statement',
-			icon: data.missionStatement?.icon || 'Heart',
-			gradient: data.missionStatement?.gradient || 'from-green-50 to-emerald-50',
-			borderColor: data.missionStatement?.borderColor || 'border-green-100',
-			quote: data.missionStatement?.quote || 'To provide quality technical education...'
-		},
-		objectives: data.objectives || [
-			{
-				icon: 'BookOpen',
-				title: 'Quality Education',
-				description: 'Deliver comprehensive technical education...',
-				color: 'blue'
-			}
-		],
-		impact: data.impact || {
-			title: 'Mission Impact',
-			icon: 'Zap',
-			gradient: 'from-green-500 to-teal-600',
-			stats: [
-				{
-					number: '5000+',
-					label: 'Alumni Making Impact',
-					color: 'text-green-600'
-				}
-			]
-		}
-	};
-};
-
 // Get vision mission data
 export const getVisionMission = unstable_cache(
 	async (slug: string): Promise<VisionMissionData> => {
@@ -243,14 +165,13 @@ export const getVisionMission = unstable_cache(
 			});
 
 			if (!page?.components?.[0]?.data) {
-				return normalizeVisionMission({});
+				throw new Error('VISION_MISSION not seeded — run `npm run seed vision`');
 			}
 
-			const componentData = page.components[0].data as any;
-			return normalizeVisionMission(componentData);
+			return page.components[0].data as unknown as VisionMissionData;
 		} catch (error) {
 			console.error('Error fetching vision mission:', error);
-			return normalizeVisionMission({});
+			throw error;
 		}
 	},
 	['vision-mission'],
@@ -323,18 +244,13 @@ export const getMission = unstable_cache(
 			});
 
 			if (!page?.components?.[0]?.data) {
-				console.log('No mission data found, returning default');
-				return normalizeMission({});
+				throw new Error('MISSION not seeded — run `npm run seed vision`');
 			}
 
-			const componentData = page.components[0].data as any;
-			console.log('Found mission data:', JSON.stringify(componentData, null, 2));
-			
-			// Return the actual data from database, don't normalize it
-			return componentData as MissionData;
+			return page.components[0].data as unknown as MissionData;
 		} catch (error) {
 			console.error('Error fetching mission:', error);
-			return normalizeMission({});
+			throw error;
 		}
 	},
 	['mission-data'],
@@ -392,62 +308,6 @@ export async function updateMission(
 	}
 }
 
-// Normalize Quality Policy function
-const normalizeQualityPolicy = (data: Partial<QualityPolicyData>): QualityPolicyData => {
-	return {
-		hero: {
-			title: data.hero?.title || 'Quality Policy',
-			subtitle: data.hero?.subtitle || 'Commitment to Excellence in All Endeavors',
-			icon: data.hero?.icon || 'Award',
-			gradient: data.hero?.gradient || 'from-purple-50 to-indigo-100',
-			borderColor: data.hero?.borderColor || 'border-purple-200',
-			iconBg: data.hero?.iconBg || 'bg-purple-600'
-		},
-		policyStatement: {
-			title: data.policyStatement?.title || 'Quality Policy Statement',
-			icon: data.policyStatement?.icon || 'Shield',
-			gradient: data.policyStatement?.gradient || 'from-purple-50 to-indigo-50',
-			borderColor: data.policyStatement?.borderColor || 'border-purple-100',
-			quote: data.policyStatement?.quote || 'We are committed to excellence in education.'
-		},
-		commitments: data.commitments?.length ? data.commitments : [
-			{
-				icon: 'BookOpen',
-				title: 'Academic Excellence',
-				description: ['Maintain updated curriculum aligned with industry needs'],
-				iconColor: 'text-blue-600',
-				bgColor: 'bg-blue-100'
-			}
-		],
-		framework: {
-			title: data.framework?.title || 'Quality Management Framework',
-			icon: data.framework?.icon || 'Shield',
-			gradient: data.framework?.gradient || 'from-purple-500 to-pink-600',
-			steps: data.framework?.steps?.length ? data.framework.steps : [
-				{
-					icon: 'Target',
-					title: 'Plan',
-					description: 'Establish quality objectives and processes',
-					iconColor: 'text-blue-600',
-					bgColor: 'bg-blue-50'
-				}
-			]
-		},
-		assuranceBodies: {
-			title: data.assuranceBodies?.title || 'Quality Assurance Bodies',
-			items: data.assuranceBodies?.items?.length ? data.assuranceBodies.items : [
-				{
-					icon: 'Award',
-					title: 'IQAC',
-					description: 'Internal Quality Assurance Cell for continuous monitoring',
-					iconBg: 'bg-blue-600',
-					gradient: 'from-blue-50 to-blue-100'
-				}
-			]
-		}
-	};
-};
-
 // Get quality policy data
 export const getQualityPolicy = unstable_cache(
 	async (slug: string): Promise<QualityPolicyData> => {
@@ -463,18 +323,13 @@ export const getQualityPolicy = unstable_cache(
 			});
 
 			if (!page?.components?.[0]?.data) {
-				console.log('No quality policy data found, returning default');
-				return normalizeQualityPolicy({});
+				throw new Error('QUALITY_POLICY not seeded — run `npm run seed vision`');
 			}
 
-			const componentData = page.components[0].data as any;
-			console.log('Found quality policy data:', JSON.stringify(componentData, null, 2));
-			
-			// Return the actual data from database, don't normalize it
-			return componentData as QualityPolicyData;
+			return page.components[0].data as unknown as QualityPolicyData;
 		} catch (error) {
 			console.error('Error fetching quality policy:', error);
-			return normalizeQualityPolicy({});
+			throw error;
 		}
 	},
 	['quality-policy-data'],

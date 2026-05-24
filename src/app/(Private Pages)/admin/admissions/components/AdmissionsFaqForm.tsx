@@ -2,16 +2,8 @@
 
 import { useEffect, useMemo, useState, useTransition } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel
-} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
 import {
 	type AdmissionsFaqContact,
 	type AdmissionsFaqIntro,
@@ -20,6 +12,18 @@ import {
 	updateAdmissionsFaqIntro,
 	updateAdmissionsFaqItems
 } from '@/app/(Private Pages)/actions/admissions';
+import {
+	AddRowButton,
+	AdminEmptyState,
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	AdminItemCard,
+	AdminItemList,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 type FaqPageData = {
 	intro: AdmissionsFaqIntro;
@@ -52,12 +56,10 @@ type FormValues = {
 };
 
 let nextFaqItemId = 100000;
-
 const createFaqItemId = () => {
 	nextFaqItemId += 1;
 	return nextFaqItemId;
 };
-
 const createItem = () => ({
 	id: createFaqItemId(),
 	question: '',
@@ -98,7 +100,7 @@ export default function AdmissionsFaqForm({
 	visibleSections
 }: Props) {
 	const [isPending, startTransition] = useTransition();
-	const [message, setMessage] = useState<string | null>(null);
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 
 	const defaults = useMemo<FormValues>(
 		() => ({
@@ -109,11 +111,11 @@ export default function AdmissionsFaqForm({
 			items:
 				initialData.items.length > 0
 					? initialData.items.map(item => ({
-					id: item.id,
-					question: item.question,
-					answer: item.answer,
-					category: item.category
-				}))
+							id: item.id,
+							question: item.question,
+							answer: item.answer,
+							category: item.category
+						}))
 					: [createItem()],
 			contactTitle: initialData.contact.title,
 			contactDescription: initialData.contact.description,
@@ -133,107 +135,154 @@ export default function AdmissionsFaqForm({
 
 	useEffect(() => {
 		onChange?.(normalizeData(form.getValues()));
-		const subscription = form.watch(values => {
+		const sub = form.watch(values => {
 			onChange?.(normalizeData(values as FormValues));
+			setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 		});
-		return () => subscription.unsubscribe();
+		return () => sub.unsubscribe();
 	}, [form, onChange]);
 
-	const handleSubmit = (values: FormValues) => {
-		setMessage(null);
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
+	const handleSubmit = form.handleSubmit(values => {
+		setStatus({ kind: 'saving' });
 		const payload = normalizeData(values);
 		startTransition(async () => {
-			const tasks = [];
-			if (includes(visibleSections, 'intro')) {
+			const tasks: Promise<{ ok: boolean }>[] = [];
+			if (includes(visibleSections, 'intro'))
 				tasks.push(updateAdmissionsFaqIntro(payload.intro));
-			}
-			if (includes(visibleSections, 'items')) {
+			if (includes(visibleSections, 'items'))
 				tasks.push(updateAdmissionsFaqItems(payload.items));
-			}
-			if (includes(visibleSections, 'contact')) {
+			if (includes(visibleSections, 'contact'))
 				tasks.push(updateAdmissionsFaqContact(payload.contact));
-			}
 			const results = await Promise.all(tasks);
-			setMessage(results.every(result => result.ok) ? 'Saved' : 'Save failed');
+			setStatus(
+				results.every(r => r.ok)
+					? { kind: 'success', message: 'Saved' }
+					: { kind: 'error', message: 'Save failed' }
+			);
 		});
-	};
+	});
 
 	return (
-		<Form {...form}>
-			<form
-				className='space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm max-h-[70vh] overflow-y-auto'
-				onSubmit={form.handleSubmit(handleSubmit)}>
-				<div className='flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between'>
-					<div>
-						<h3 className='text-lg font-semibold text-slate-900'>Admissions FAQs</h3>
-						<p className='text-sm text-slate-500'>
-							Manage the intro, question library, and contact help block.
-						</p>
-					</div>
-					<div className='flex items-center gap-2'>
-						{message ? (
-							<span className='rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700'>
-								{message}
-							</span>
-						) : null}
-						<Button type='submit' disabled={isPending}>
-							{isPending ? 'Saving...' : 'Save changes'}
-						</Button>
-					</div>
-				</div>
+		<AdminForm onSubmit={handleSubmit}>
+			{includes(visibleSections, 'intro') && (
+				<AdminFormSection
+					title='Intro'
+					description='Heading copy shown above the FAQ list.'>
+					<AdminField label='Badge' htmlFor='faq-badge'>
+						<Input id='faq-badge' {...form.register('badge')} />
+					</AdminField>
+					<AdminField label='Title' htmlFor='faq-title'>
+						<Input id='faq-title' {...form.register('title')} />
+					</AdminField>
+					<AdminField label='Subtitle' htmlFor='faq-subtitle'>
+						<Textarea
+							id='faq-subtitle'
+							rows={3}
+							className='resize-none'
+							{...form.register('subtitle')}
+						/>
+					</AdminField>
+					<AdminField label='Browse title' htmlFor='faq-browse'>
+						<Input id='faq-browse' {...form.register('browseTitle')} />
+					</AdminField>
+				</AdminFormSection>
+			)}
 
-				{includes(visibleSections, 'intro') ? (
-					<section className='space-y-4 rounded-xl border border-slate-200 bg-slate-50/60 p-5'>
-						<h4 className='text-sm font-semibold uppercase tracking-[0.16em] text-slate-600'>Intro</h4>
-						<FormField control={form.control} name='badge' render={({ field }) => <FormItem><FormLabel>Badge</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-						<FormField control={form.control} name='title' render={({ field }) => <FormItem><FormLabel>Title</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-						<FormField control={form.control} name='subtitle' render={({ field }) => <FormItem><FormLabel>Subtitle</FormLabel><FormControl><Textarea rows={3} className='resize-none' {...field} /></FormControl></FormItem>} />
-						<FormField control={form.control} name='browseTitle' render={({ field }) => <FormItem><FormLabel>Browse title</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-					</section>
-				) : null}
+			{includes(visibleSections, 'items') && (
+				<AdminFormSection title='FAQ items'>
+					<AdminItemList>
+						{itemsArray.fields.map((field, index) => (
+							<AdminItemCard
+								key={field.id}
+								index={index}
+								total={itemsArray.fields.length}
+								title={form.watch(`items.${index}.question`) || `FAQ ${index + 1}`}
+								subtitle={form.watch(`items.${index}.category`) || undefined}
+								onMove={d => itemsArray.move(index, index + d)}
+								onRemove={() => itemsArray.remove(index)}>
+								<AdminFieldGrid>
+									<AdminField label='ID'>
+										<Input
+											type='number'
+											{...form.register(`items.${index}.id` as const, {
+												valueAsNumber: true
+											})}
+										/>
+									</AdminField>
+									<AdminField label='Category'>
+										<Input {...form.register(`items.${index}.category` as const)} />
+									</AdminField>
+								</AdminFieldGrid>
+								<AdminField label='Question'>
+									<Textarea
+										rows={2}
+										className='resize-none'
+										{...form.register(`items.${index}.question` as const)}
+									/>
+								</AdminField>
+								<AdminField label='Answer'>
+									<Textarea
+										rows={4}
+										className='resize-none'
+										{...form.register(`items.${index}.answer` as const)}
+									/>
+								</AdminField>
+							</AdminItemCard>
+						))}
+					</AdminItemList>
+					{itemsArray.fields.length === 0 && (
+						<AdminEmptyState
+							title='No FAQs yet'
+							description='Add a question and answer pair to get started.'
+						/>
+					)}
+					<AddRowButton onClick={() => itemsArray.append(createItem())}>
+						Add FAQ
+					</AddRowButton>
+				</AdminFormSection>
+			)}
 
-				{includes(visibleSections, 'items') ? (
-					<section className='space-y-4 rounded-xl border border-slate-200 bg-slate-50/60 p-5'>
-						<div className='flex items-center justify-between'>
-							<h4 className='text-sm font-semibold uppercase tracking-[0.16em] text-slate-600'>FAQ items</h4>
-							<Button type='button' variant='outline' size='sm' onClick={() => itemsArray.append(createItem())}>
-								Add item
-							</Button>
-						</div>
-						<div className='space-y-4'>
-							{itemsArray.fields.map((field, index) => (
-								<div key={field.id} className='space-y-4 rounded-xl border border-slate-200 bg-white p-4'>
-									<div className='flex items-center justify-between'>
-										<span className='text-sm font-medium text-slate-700'>FAQ {index + 1}</span>
-										<Button type='button' variant='ghost' size='sm' onClick={() => itemsArray.remove(index)}>
-											Remove
-										</Button>
-									</div>
-									<div className='grid gap-4 sm:grid-cols-2'>
-										<FormField control={form.control} name={`items.${index}.id`} render={({ field }) => <FormItem><FormLabel>ID</FormLabel><FormControl><Input type='number' {...field} onChange={event => field.onChange(Number(event.target.value))} /></FormControl></FormItem>} />
-										<FormField control={form.control} name={`items.${index}.category`} render={({ field }) => <FormItem><FormLabel>Category</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-										<FormField control={form.control} name={`items.${index}.question`} render={({ field }) => <FormItem className='sm:col-span-2'><FormLabel>Question</FormLabel><FormControl><Textarea rows={2} className='resize-none' {...field} /></FormControl></FormItem>} />
-										<FormField control={form.control} name={`items.${index}.answer`} render={({ field }) => <FormItem className='sm:col-span-2'><FormLabel>Answer</FormLabel><FormControl><Textarea rows={4} className='resize-none' {...field} /></FormControl></FormItem>} />
-									</div>
-								</div>
-							))}
-						</div>
-					</section>
-				) : null}
+			{includes(visibleSections, 'contact') && (
+				<AdminFormSection
+					title='Contact help'
+					description='Help block shown below the FAQ list.'>
+					<AdminField label='Title' htmlFor='faq-ct-title'>
+						<Input id='faq-ct-title' {...form.register('contactTitle')} />
+					</AdminField>
+					<AdminField label='Description' htmlFor='faq-ct-desc'>
+						<Textarea
+							id='faq-ct-desc'
+							rows={3}
+							className='resize-none'
+							{...form.register('contactDescription')}
+						/>
+					</AdminField>
+					<AdminFieldGrid>
+						<AdminField label='Phone' htmlFor='faq-ct-phone'>
+							<Input id='faq-ct-phone' {...form.register('contactPhone')} />
+						</AdminField>
+						<AdminField label='Email' htmlFor='faq-ct-email'>
+							<Input id='faq-ct-email' {...form.register('contactEmail')} />
+						</AdminField>
+					</AdminFieldGrid>
+					<AdminField label='Address' htmlFor='faq-ct-addr'>
+						<Textarea
+							id='faq-ct-addr'
+							rows={3}
+							className='resize-none'
+							{...form.register('contactAddress')}
+						/>
+					</AdminField>
+				</AdminFormSection>
+			)}
 
-				{includes(visibleSections, 'contact') ? (
-					<section className='space-y-4 rounded-xl border border-slate-200 bg-slate-50/60 p-5'>
-						<h4 className='text-sm font-semibold uppercase tracking-[0.16em] text-slate-600'>Contact</h4>
-						<FormField control={form.control} name='contactTitle' render={({ field }) => <FormItem><FormLabel>Title</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-						<FormField control={form.control} name='contactDescription' render={({ field }) => <FormItem><FormLabel>Description</FormLabel><FormControl><Textarea rows={3} className='resize-none' {...field} /></FormControl></FormItem>} />
-						<div className='grid gap-4 sm:grid-cols-2'>
-							<FormField control={form.control} name='contactPhone' render={({ field }) => <FormItem><FormLabel>Phone</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-							<FormField control={form.control} name='contactEmail' render={({ field }) => <FormItem><FormLabel>Email</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-						</div>
-						<FormField control={form.control} name='contactAddress' render={({ field }) => <FormItem><FormLabel>Address</FormLabel><FormControl><Textarea rows={3} className='resize-none' {...field} /></FormControl></FormItem>} />
-					</section>
-				) : null}
-			</form>
-		</Form>
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }

@@ -1,18 +1,9 @@
 'use client';
 
-import { useState, useEffect, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
-import { Plus, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel
-} from '@/components/ui/form';
 import {
 	Select,
 	SelectContent,
@@ -31,6 +22,18 @@ import {
 	type ContactButton
 } from '@/app/(Private Pages)/actions/internships';
 import { SUPPORTED_ICON_NAMES } from '@/components/about/icons';
+import {
+	AddRowButton,
+	AdminEmptyState,
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	AdminItemCard,
+	AdminItemList,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 interface InternshipsFormProps {
 	initialData: InternshipsData;
@@ -38,11 +41,7 @@ interface InternshipsFormProps {
 	onChange?: (data: InternshipsData) => void;
 }
 
-interface CategoryFormValue {
-	name: string;
-}
-
-interface DomainFormValue {
+interface NamedItem {
 	name: string;
 }
 
@@ -55,10 +54,8 @@ interface FormValues {
 	};
 	stats: InternshipStat[];
 	benefits: InternshipBenefit[];
-	filters: CategoryFormValue[];
-	opportunities: (InternshipOpportunity & {
-		domainsArray: DomainFormValue[];
-	})[];
+	filters: NamedItem[];
+	opportunities: (InternshipOpportunity & { domainsArray: NamedItem[] })[];
 	process: ProcessStep[];
 	contact: {
 		title: string;
@@ -69,17 +66,6 @@ interface FormValues {
 		gradient: string;
 	};
 }
-
-const GRADIENT_OPTIONS = [
-	'from-blue-900 via-blue-800 to-blue-900',
-	'from-purple-900 via-purple-800 to-purple-900',
-	'from-green-900 via-green-800 to-green-900',
-	'from-red-900 via-red-800 to-red-900',
-	'from-indigo-900 via-indigo-800 to-indigo-900',
-	'from-cyan-900 via-cyan-800 to-cyan-900',
-	'from-orange-900 via-orange-800 to-orange-900',
-	'from-blue-900 to-blue-800'
-];
 
 const COLOR_OPTIONS = [
 	'from-blue-500 to-blue-700',
@@ -115,30 +101,33 @@ const CATEGORY_OPTIONS = [
 	'Other'
 ];
 
+const toData = (values: FormValues): InternshipsData => ({
+	hero: values.hero,
+	stats: values.stats,
+	benefits: values.benefits,
+	filters: values.filters.map(f => f?.name || '').filter(Boolean),
+	opportunities: values.opportunities.map(opp => ({
+		company: opp?.company || '',
+		title: opp?.title || '',
+		type: opp?.type || '',
+		location: opp?.location || '',
+		description: opp?.description || '',
+		logo: opp?.logo || '',
+		category: opp?.category || '',
+		domains: (opp?.domainsArray || [])
+			.map(d => d?.name || '')
+			.filter(Boolean)
+	})),
+	process: values.process,
+	contact: values.contact
+});
+
 export default function InternshipsForm({
 	initialData,
-	pageSlug,
 	onChange
 }: InternshipsFormProps) {
-	const [message, setMessage] = useState('');
 	const [isPending, startTransition] = useTransition();
-	const [currentData, setCurrentData] = useState<InternshipsData>(initialData);
-	const [expandedSections, setExpandedSections] = useState({
-		hero: true,
-		stats: false,
-		benefits: false,
-		filters: false,
-		opportunities: false,
-		process: false,
-		contact: false
-	});
-
-	const toggleSection = (section: keyof typeof expandedSections) => {
-		setExpandedSections(prev => ({
-			...prev,
-			[section]: !prev[section]
-		}));
-	};
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 
 	const form = useForm<FormValues>({
 		defaultValues: {
@@ -155,1139 +144,581 @@ export default function InternshipsForm({
 		}
 	});
 
-	const statsFields = useFieldArray({
-		control: form.control,
-		name: 'stats'
-	});
-
-	const benefitsFields = useFieldArray({
-		control: form.control,
-		name: 'benefits'
-	});
-
-	const filtersFields = useFieldArray({
-		control: form.control,
-		name: 'filters'
-	});
-
-	const opportunitiesFields = useFieldArray({
+	const statsArray = useFieldArray({ control: form.control, name: 'stats' });
+	const benefitsArray = useFieldArray({ control: form.control, name: 'benefits' });
+	const filtersArray = useFieldArray({ control: form.control, name: 'filters' });
+	const opportunitiesArray = useFieldArray({
 		control: form.control,
 		name: 'opportunities'
 	});
-
-	const processFields = useFieldArray({
-		control: form.control,
-		name: 'process'
-	});
-
-	const contactButtonsFields = useFieldArray({
+	const processArray = useFieldArray({ control: form.control, name: 'process' });
+	const contactButtonsArray = useFieldArray({
 		control: form.control,
 		name: 'contact.buttons'
 	});
 
-	// Watch for changes and update preview
 	useEffect(() => {
-		const subscription = form.watch(values => {
-			const updatedData: InternshipsData = {
-				hero: values.hero as any,
-				stats: values.stats as any,
-				benefits: values.benefits as any,
-				filters: values.filters?.map(f => f?.name || '').filter(Boolean) || [],
-				opportunities:
-					values.opportunities?.map(opp => ({
-						company: opp?.company || '',
-						title: opp?.title || '',
-						type: opp?.type || '',
-						location: opp?.location || '',
-						description: opp?.description || '',
-						logo: opp?.logo || '',
-						category: opp?.category || '',
-						domains: (opp?.domainsArray || [])
-							.map(d => d?.name || '')
-							.filter(Boolean)
-					})) || [],
-				process: values.process as any,
-				contact: values.contact as any
-			};
-			onChange?.(updatedData);
+		const sub = form.watch(values => {
+			onChange?.(toData(values as FormValues));
+			setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 		});
-		return () => subscription.unsubscribe();
+		return () => sub.unsubscribe();
 	}, [form, onChange]);
 
-	const onSubmit = async (values: FormValues) => {
-		setMessage('');
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
+	const onSubmit = form.handleSubmit(values => {
+		setStatus({ kind: 'saving' });
 		startTransition(async () => {
 			try {
 				const admin = await requireAdmin();
-
-				const dataToSubmit: InternshipsData = {
-					hero: values.hero as any,
-					stats: values.stats as any,
-					benefits: values.benefits as any,
-					filters: values.filters.map(f => f?.name || '').filter(Boolean),
-					opportunities: values.opportunities.map(opp => ({
-						company: opp?.company || '',
-						title: opp?.title || '',
-						type: opp?.type || '',
-						location: opp?.location || '',
-						description: opp?.description || '',
-						logo: opp?.logo || '',
-						category: opp?.category || '',
-						domains: (opp?.domainsArray || [])
-							.map(d => d?.name || '')
-							.filter(Boolean)
-					})),
-					process: values.process as any,
-					contact: values.contact as any
-				};
-
-				const result = await updateInternshipsData(dataToSubmit, admin.id);
-
-				if (result.success) {
-					setMessage('Saved');
-					setCurrentData(dataToSubmit);
-				} else {
-					setMessage('Save failed');
-				}
+				const result = await updateInternshipsData(toData(values), admin.id);
+				setStatus(
+					result.success
+						? { kind: 'success', message: 'Saved' }
+						: { kind: 'error', message: 'Save failed' }
+				);
 			} catch (error) {
 				console.error('Error updating internships:', error);
-				setMessage('Save failed');
+				setStatus({ kind: 'error', message: 'Save failed' });
 			}
 		});
-	};
+	});
+
+	const iconSelect = (
+		value: string | undefined,
+		onValueChange: (v: string) => void
+	) => (
+		<Select value={value || 'TrendingUp'} onValueChange={onValueChange}>
+			<SelectTrigger>
+				<SelectValue />
+			</SelectTrigger>
+			<SelectContent>
+				{SUPPORTED_ICON_NAMES.map(icon => (
+					<SelectItem key={icon} value={icon}>
+						{icon}
+					</SelectItem>
+				))}
+			</SelectContent>
+		</Select>
+	);
 
 	return (
-		<Form {...form}>
-			<form
-				onSubmit={form.handleSubmit(onSubmit)}
-				className='space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm max-h-[70vh] overflow-y-auto overflow-x-hidden'>
-				<div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
-					<div>
-						<h3 className='text-lg font-semibold text-slate-900'>
-							Internships Management
-						</h3>
-						<p className='text-sm text-slate-500'>
-							Edit internship opportunities, stats, benefits, and contact
-							information
-						</p>
-					</div>
-					<div className='flex items-center gap-2'>
-						{message && (
-							<span className='rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700'>
-								{message}
-							</span>
-						)}
-						<Button type='submit' disabled={isPending}>
-							{isPending ? 'Saving...' : 'Save changes'}
-						</Button>
-					</div>
-				</div>
-
-				{/* Hero Section */}
-				<div className='border rounded-lg'>
-					<button
-						type='button'
-						onClick={() => toggleSection('hero')}
-						className='w-full flex items-center justify-between p-4 hover:bg-slate-50 transition-colors'>
-						<h3 className='text-lg font-semibold text-slate-900'>
-							Hero Section
-						</h3>
-						{expandedSections.hero ? (
-							<ChevronUp className='w-5 h-5 text-slate-500' />
-						) : (
-							<ChevronDown className='w-5 h-5 text-slate-500' />
-						)}
-					</button>
-
-					{expandedSections.hero && (
-						<div className='p-4 space-y-4 border-t'>
-							<FormField
-								control={form.control}
-								name='hero.icon'
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Icon</FormLabel>
-										<Select onValueChange={field.onChange} value={field.value}>
-											<FormControl>
-												<SelectTrigger>
-													<SelectValue />
-												</SelectTrigger>
-											</FormControl>
-											<SelectContent>
-												{SUPPORTED_ICON_NAMES.map(icon => (
-													<SelectItem key={icon} value={icon}>
-														{icon}
-													</SelectItem>
-												))}
-											</SelectContent>
-										</Select>
-									</FormItem>
-								)}
-							/>
-
-							<FormField
-								control={form.control}
-								name='hero.title'
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Title</FormLabel>
-										<FormControl>
-											<Input {...field} />
-										</FormControl>
-									</FormItem>
-								)}
-							/>
-
-							<FormField
-								control={form.control}
-								name='hero.subtitle'
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Subtitle</FormLabel>
-										<FormControl>
-											<Textarea {...field} rows={2} />
-										</FormControl>
-									</FormItem>
-								)}
-							/>
-
-							<FormField
-								control={form.control}
-								name='hero.gradient'
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Gradient</FormLabel>
-										<Select onValueChange={field.onChange} value={field.value}>
-											<FormControl>
-												<SelectTrigger>
-													<SelectValue />
-												</SelectTrigger>
-											</FormControl>
-											<SelectContent>
-												{GRADIENT_OPTIONS.map(gradient => (
-													<SelectItem key={gradient} value={gradient}>
-														<div className='flex items-center gap-2'>
-															<div
-																className={`w-16 h-4 rounded bg-gradient-to-r ${gradient}`}
-															/>
-															<span className='text-xs'>{gradient}</span>
-														</div>
-													</SelectItem>
-												))}
-											</SelectContent>
-										</Select>
-									</FormItem>
-								)}
-							/>
-						</div>
+		<AdminForm onSubmit={onSubmit}>
+			<AdminFormSection
+				title='Hero'
+				description='Top banner copy for the internships page.'>
+				<AdminField label='Icon'>
+					{iconSelect(form.watch('hero.icon'), v =>
+						form.setValue('hero.icon', v, { shouldDirty: true })
 					)}
-				</div>
+				</AdminField>
+				<AdminField label='Title'>
+					<Input {...form.register('hero.title')} />
+				</AdminField>
+				<AdminField label='Subtitle'>
+					<Textarea rows={2} {...form.register('hero.subtitle')} />
+				</AdminField>
+				<AdminField label='Background gradient (Tailwind classes)'>
+					<Input
+						placeholder='from-blue-900 via-blue-800 to-blue-900'
+						{...form.register('hero.gradient')}
+					/>
+				</AdminField>
+			</AdminFormSection>
 
-				{/* Stats Section */}
-				<div className='border rounded-lg'>
-					<button
-						type='button'
-						onClick={() => toggleSection('stats')}
-						className='w-full flex items-center justify-between p-4 hover:bg-slate-50 transition-colors'>
-						<h3 className='text-lg font-semibold text-slate-900'>
-							Stats Section{' '}
-							<span className='text-sm text-slate-500'>
-								({statsFields.fields.length} stats)
-							</span>
-						</h3>
-						{expandedSections.stats ? (
-							<ChevronUp className='w-5 h-5 text-slate-500' />
-						) : (
-							<ChevronDown className='w-5 h-5 text-slate-500' />
-						)}
-					</button>
-
-					{expandedSections.stats && (
-						<div className='p-4 space-y-4 border-t'>
-							<Button
-								type='button'
-								variant='outline'
-								size='sm'
-								onClick={() =>
-									statsFields.append({
-										icon: 'TrendingUp',
-										value: '0',
-										label: 'New Stat',
-										color: 'from-blue-500 to-blue-700'
-									})
-								}
-								className='w-full'>
-								<Plus className='w-4 h-4 mr-2' />
-								Add Stat
-							</Button>
-
-							{statsFields.fields.map((field, index) => (
-								<div
-									key={field.id}
-									className='p-4 border rounded-lg space-y-4 bg-slate-50'>
-									<div className='flex items-center justify-between'>
-										<span className='font-semibold text-sm'>
-											Stat {index + 1}
-										</span>
-										<Button
-											type='button'
-											variant='ghost'
-											size='sm'
-											onClick={() => statsFields.remove(index)}>
-											<Trash2 className='w-4 h-4 text-red-500' />
-										</Button>
-									</div>
-
-									<FormField
-										control={form.control}
-										name={`stats.${index}.icon`}
-										render={({ field }) => (
-											<FormItem>
-												<FormLabel>Icon</FormLabel>
-												<Select
-													onValueChange={field.onChange}
-													value={field.value}>
-													<FormControl>
-														<SelectTrigger>
-															<SelectValue />
-														</SelectTrigger>
-													</FormControl>
-													<SelectContent>
-														{SUPPORTED_ICON_NAMES.map(icon => (
-															<SelectItem key={icon} value={icon}>
-																{icon}
-															</SelectItem>
-														))}
-													</SelectContent>
-												</Select>
-											</FormItem>
-										)}
-									/>
-
-									<FormField
-										control={form.control}
-										name={`stats.${index}.value`}
-										render={({ field }) => (
-											<FormItem>
-												<FormLabel>Value</FormLabel>
-												<FormControl>
-													<Input {...field} />
-												</FormControl>
-											</FormItem>
-										)}
-									/>
-
-									<FormField
-										control={form.control}
-										name={`stats.${index}.label`}
-										render={({ field }) => (
-											<FormItem>
-												<FormLabel>Label</FormLabel>
-												<FormControl>
-													<Input {...field} />
-												</FormControl>
-											</FormItem>
-										)}
-									/>
-
-									<FormField
-										control={form.control}
-										name={`stats.${index}.color`}
-										render={({ field }) => (
-											<FormItem>
-												<FormLabel>Color</FormLabel>
-												<Select
-													onValueChange={field.onChange}
-													value={field.value}>
-													<FormControl>
-														<SelectTrigger>
-															<SelectValue />
-														</SelectTrigger>
-													</FormControl>
-													<SelectContent>
-														{COLOR_OPTIONS.map(color => (
-															<SelectItem key={color} value={color}>
-																<div className='flex items-center gap-2'>
-																	<div
-																		className={`w-16 h-4 rounded bg-gradient-to-r ${color}`}
-																	/>
-																	<span className='text-xs'>{color}</span>
-																</div>
-															</SelectItem>
-														))}
-													</SelectContent>
-												</Select>
-											</FormItem>
-										)}
-									/>
-								</div>
-							))}
-						</div>
-					)}
-				</div>
-
-				{/* Benefits Section */}
-				<div className='border rounded-lg'>
-					<button
-						type='button'
-						onClick={() => toggleSection('benefits')}
-						className='w-full flex items-center justify-between p-4 hover:bg-slate-50 transition-colors'>
-						<h3 className='text-lg font-semibold text-slate-900'>
-							Benefits Section{' '}
-							<span className='text-sm text-slate-500'>
-								({benefitsFields.fields.length} benefits)
-							</span>
-						</h3>
-						{expandedSections.benefits ? (
-							<ChevronUp className='w-5 h-5 text-slate-500' />
-						) : (
-							<ChevronDown className='w-5 h-5 text-slate-500' />
-						)}
-					</button>
-
-					{expandedSections.benefits && (
-						<div className='p-4 space-y-4 border-t'>
-							<Button
-								type='button'
-								variant='outline'
-								size='sm'
-								onClick={() =>
-									benefitsFields.append({
-										icon: 'Award',
-										title: 'New Benefit',
-										description: 'Description',
-										color: 'blue'
-									})
-								}
-								className='w-full'>
-								<Plus className='w-4 h-4 mr-2' />
-								Add Benefit
-							</Button>
-
-							{benefitsFields.fields.map((field, index) => (
-								<div
-									key={field.id}
-									className='p-4 border rounded-lg space-y-4 bg-slate-50'>
-									<div className='flex items-center justify-between'>
-										<span className='font-semibold text-sm'>
-											Benefit {index + 1}
-										</span>
-										<Button
-											type='button'
-											variant='ghost'
-											size='sm'
-											onClick={() => benefitsFields.remove(index)}>
-											<Trash2 className='w-4 h-4 text-red-500' />
-										</Button>
-									</div>
-
-									<FormField
-										control={form.control}
-										name={`benefits.${index}.icon`}
-										render={({ field }) => (
-											<FormItem>
-												<FormLabel>Icon</FormLabel>
-												<Select
-													onValueChange={field.onChange}
-													value={field.value}>
-													<FormControl>
-														<SelectTrigger>
-															<SelectValue />
-														</SelectTrigger>
-													</FormControl>
-													<SelectContent>
-														{SUPPORTED_ICON_NAMES.map(icon => (
-															<SelectItem key={icon} value={icon}>
-																{icon}
-															</SelectItem>
-														))}
-													</SelectContent>
-												</Select>
-											</FormItem>
-										)}
-									/>
-
-									<FormField
-										control={form.control}
-										name={`benefits.${index}.title`}
-										render={({ field }) => (
-											<FormItem>
-												<FormLabel>Title</FormLabel>
-												<FormControl>
-													<Input {...field} />
-												</FormControl>
-											</FormItem>
-										)}
-									/>
-
-									<FormField
-										control={form.control}
-										name={`benefits.${index}.description`}
-										render={({ field }) => (
-											<FormItem>
-												<FormLabel>Description</FormLabel>
-												<FormControl>
-													<Textarea {...field} rows={2} />
-												</FormControl>
-											</FormItem>
-										)}
-									/>
-
-									<FormField
-										control={form.control}
-										name={`benefits.${index}.color`}
-										render={({ field }) => (
-											<FormItem>
-												<FormLabel>Color</FormLabel>
-												<Select
-													onValueChange={field.onChange}
-													value={field.value}>
-													<FormControl>
-														<SelectTrigger>
-															<SelectValue />
-														</SelectTrigger>
-													</FormControl>
-													<SelectContent>
-														{BENEFIT_COLOR_OPTIONS.map(color => (
-															<SelectItem key={color} value={color}>
-																{color}
-															</SelectItem>
-														))}
-													</SelectContent>
-												</Select>
-											</FormItem>
-										)}
-									/>
-								</div>
-							))}
-						</div>
-					)}
-				</div>
-
-				{/* Filters Section */}
-				<div className='border rounded-lg'>
-					<button
-						type='button'
-						onClick={() => toggleSection('filters')}
-						className='w-full flex items-center justify-between p-4 hover:bg-slate-50 transition-colors'>
-						<h3 className='text-lg font-semibold text-slate-900'>
-							Filters{' '}
-							<span className='text-sm text-slate-500'>
-								({filtersFields.fields.length} filters)
-							</span>
-						</h3>
-						{expandedSections.filters ? (
-							<ChevronUp className='w-5 h-5 text-slate-500' />
-						) : (
-							<ChevronDown className='w-5 h-5 text-slate-500' />
-						)}
-					</button>
-
-					{expandedSections.filters && (
-						<div className='p-4 space-y-4 border-t'>
-							<Button
-								type='button'
-								variant='outline'
-								size='sm'
-								onClick={() => filtersFields.append({ name: 'New Filter' })}
-								className='w-full'>
-								<Plus className='w-4 h-4 mr-2' />
-								Add Filter
-							</Button>
-
-							<div className='grid grid-cols-2 gap-4'>
-								{filtersFields.fields.map((field, index) => (
-									<div key={field.id} className='flex items-center gap-2'>
-										<FormField
-											control={form.control}
-											name={`filters.${index}.name`}
-											render={({ field }) => (
-												<FormItem className='flex-1'>
-													<FormControl>
-														<Input {...field} />
-													</FormControl>
-												</FormItem>
-											)}
-										/>
-										<Button
-											type='button'
-											variant='ghost'
-											size='sm'
-											onClick={() => filtersFields.remove(index)}>
-											<Trash2 className='w-4 h-4 text-red-500' />
-										</Button>
-									</div>
-								))}
-							</div>
-						</div>
-					)}
-				</div>
-
-				{/* Opportunities Section */}
-				<div className='border rounded-lg'>
-					<button
-						type='button'
-						onClick={() => toggleSection('opportunities')}
-						className='w-full flex items-center justify-between p-4 hover:bg-slate-50 transition-colors'>
-						<h3 className='text-lg font-semibold text-slate-900'>
-							Internship Opportunities{' '}
-							<span className='text-sm text-slate-500'>
-								({opportunitiesFields.fields.length} opportunities)
-							</span>
-						</h3>
-						{expandedSections.opportunities ? (
-							<ChevronUp className='w-5 h-5 text-slate-500' />
-						) : (
-							<ChevronDown className='w-5 h-5 text-slate-500' />
-						)}
-					</button>
-
-					{expandedSections.opportunities && (
-						<div className='p-4 space-y-4 border-t'>
-							<Button
-								type='button'
-								variant='outline'
-								size='sm'
-								onClick={() =>
-									opportunitiesFields.append({
-										company: 'New Company',
-										title: 'Internship Title',
-										type: 'Summer Internship',
-										location: 'Location',
-										description: 'Description',
-										logo: '/internships/logo.png',
-										category: 'Technology',
-										domains: [],
-										domainsArray: []
-									})
-								}
-								className='w-full'>
-								<Plus className='w-4 h-4 mr-2' />
-								Add Opportunity
-							</Button>
-
-							{opportunitiesFields.fields.map((field, index) => (
-								<div
-									key={field.id}
-									className='p-4 border rounded-lg space-y-4 bg-slate-50'>
-									<div className='flex items-center justify-between'>
-										<span className='font-semibold text-sm'>
-											Opportunity {index + 1}
-										</span>
-										<Button
-											type='button'
-											variant='ghost'
-											size='sm'
-											onClick={() => opportunitiesFields.remove(index)}>
-											<Trash2 className='w-4 h-4 text-red-500' />
-										</Button>
-									</div>
-
-									<div className='grid grid-cols-2 gap-4'>
-										<FormField
-											control={form.control}
-											name={`opportunities.${index}.company`}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel>Company Name</FormLabel>
-													<FormControl>
-														<Input {...field} />
-													</FormControl>
-												</FormItem>
-											)}
-										/>
-
-										<FormField
-											control={form.control}
-											name={`opportunities.${index}.title`}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel>Title</FormLabel>
-													<FormControl>
-														<Input {...field} />
-													</FormControl>
-												</FormItem>
-											)}
-										/>
-
-										<FormField
-											control={form.control}
-											name={`opportunities.${index}.type`}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel>Type</FormLabel>
-													<Select
-														onValueChange={field.onChange}
-														value={field.value}>
-														<FormControl>
-															<SelectTrigger>
-																<SelectValue />
-															</SelectTrigger>
-														</FormControl>
-														<SelectContent>
-															{INTERNSHIP_TYPE_OPTIONS.map(type => (
-																<SelectItem key={type} value={type}>
-																	{type}
-																</SelectItem>
-															))}
-														</SelectContent>
-													</Select>
-												</FormItem>
-											)}
-										/>
-
-										<FormField
-											control={form.control}
-											name={`opportunities.${index}.category`}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel>Category</FormLabel>
-													<Select
-														onValueChange={field.onChange}
-														value={field.value}>
-														<FormControl>
-															<SelectTrigger>
-																<SelectValue />
-															</SelectTrigger>
-														</FormControl>
-														<SelectContent>
-															{CATEGORY_OPTIONS.map(category => (
-																<SelectItem key={category} value={category}>
-																	{category}
-																</SelectItem>
-															))}
-														</SelectContent>
-													</Select>
-												</FormItem>
-											)}
-										/>
-
-										<FormField
-											control={form.control}
-											name={`opportunities.${index}.location`}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel>Location</FormLabel>
-													<FormControl>
-														<Input {...field} />
-													</FormControl>
-												</FormItem>
-											)}
-										/>
-
-										<FormField
-											control={form.control}
-											name={`opportunities.${index}.logo`}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel>Logo Path</FormLabel>
-													<FormControl>
-														<Input {...field} />
-													</FormControl>
-												</FormItem>
-											)}
-										/>
-									</div>
-
-									<FormField
-										control={form.control}
-										name={`opportunities.${index}.description`}
-										render={({ field }) => (
-											<FormItem>
-												<FormLabel>Description</FormLabel>
-												<FormControl>
-													<Textarea {...field} rows={2} />
-												</FormControl>
-											</FormItem>
-										)}
-									/>
-
-									{/* Domains Array */}
-									<div className='border-t pt-4'>
-										<div className='flex items-center justify-between mb-3'>
-											<FormLabel>Focus Areas / Domains</FormLabel>
-											<Button
-												type='button'
-												variant='outline'
-												size='sm'
-												onClick={() => {
-													const currentDomains =
-														form.getValues(
-															`opportunities.${index}.domainsArray`
-														) || [];
-													form.setValue(`opportunities.${index}.domainsArray`, [
-														...currentDomains,
-														{ name: 'New Domain' }
-													]);
-												}}>
-												<Plus className='w-3 h-3 mr-1' />
-												Add Domain
-											</Button>
-										</div>
-										<div className='grid grid-cols-2 gap-2'>
-											{(
-												form.watch(`opportunities.${index}.domainsArray`) || []
-											).map((domain, domainIndex) => (
-												<div
-													key={domainIndex}
-													className='flex items-center gap-2'>
-													<FormField
-														control={form.control}
-														name={`opportunities.${index}.domainsArray.${domainIndex}.name`}
-														render={({ field }) => (
-															<FormItem className='flex-1'>
-																<FormControl>
-																	<Input {...field} placeholder='Domain name' />
-																</FormControl>
-															</FormItem>
-														)}
-													/>
-													<Button
-														type='button'
-														variant='ghost'
-														size='sm'
-														onClick={() => {
-															const currentDomains = form.getValues(
-																`opportunities.${index}.domainsArray`
-															);
-															form.setValue(
-																`opportunities.${index}.domainsArray`,
-																currentDomains.filter(
-																	(_, idx) => idx !== domainIndex
-																)
-															);
-														}}>
-														<Trash2 className='w-3 h-3 text-red-500' />
-													</Button>
-												</div>
-											))}
-										</div>
-									</div>
-								</div>
-							))}
-						</div>
-					)}
-				</div>
-
-				{/* Process Section */}
-				<div className='border rounded-lg'>
-					<button
-						type='button'
-						onClick={() => toggleSection('process')}
-						className='w-full flex items-center justify-between p-4 hover:bg-slate-50 transition-colors'>
-						<h3 className='text-lg font-semibold text-slate-900'>
-							Process Steps{' '}
-							<span className='text-sm text-slate-500'>
-								({processFields.fields.length} steps)
-							</span>
-						</h3>
-						{expandedSections.process ? (
-							<ChevronUp className='w-5 h-5 text-slate-500' />
-						) : (
-							<ChevronDown className='w-5 h-5 text-slate-500' />
-						)}
-					</button>
-
-					{expandedSections.process && (
-						<div className='p-4 space-y-4 border-t'>
-							<Button
-								type='button'
-								variant='outline'
-								size='sm'
-								onClick={() =>
-									processFields.append({
-										title: 'New Step',
-										description: 'Description',
-										icon: 'Users'
-									})
-								}
-								className='w-full'>
-								<Plus className='w-4 h-4 mr-2' />
-								Add Step
-							</Button>
-
-							{processFields.fields.map((field, index) => (
-								<div
-									key={field.id}
-									className='p-4 border rounded-lg space-y-4 bg-slate-50'>
-									<div className='flex items-center justify-between'>
-										<span className='font-semibold text-sm'>
-											Step {index + 1}
-										</span>
-										<Button
-											type='button'
-											variant='ghost'
-											size='sm'
-											onClick={() => processFields.remove(index)}>
-											<Trash2 className='w-4 h-4 text-red-500' />
-										</Button>
-									</div>
-
-									<FormField
-										control={form.control}
-										name={`process.${index}.icon`}
-										render={({ field }) => (
-											<FormItem>
-												<FormLabel>Icon</FormLabel>
-												<Select
-													onValueChange={field.onChange}
-													value={field.value}>
-													<FormControl>
-														<SelectTrigger>
-															<SelectValue />
-														</SelectTrigger>
-													</FormControl>
-													<SelectContent>
-														{SUPPORTED_ICON_NAMES.map(icon => (
-															<SelectItem key={icon} value={icon}>
-																{icon}
-															</SelectItem>
-														))}
-													</SelectContent>
-												</Select>
-											</FormItem>
-										)}
-									/>
-
-									<FormField
-										control={form.control}
-										name={`process.${index}.title`}
-										render={({ field }) => (
-											<FormItem>
-												<FormLabel>Title</FormLabel>
-												<FormControl>
-													<Input {...field} />
-												</FormControl>
-											</FormItem>
-										)}
-									/>
-
-									<FormField
-										control={form.control}
-										name={`process.${index}.description`}
-										render={({ field }) => (
-											<FormItem>
-												<FormLabel>Description</FormLabel>
-												<FormControl>
-													<Textarea {...field} rows={2} />
-												</FormControl>
-											</FormItem>
-										)}
-									/>
-								</div>
-							))}
-						</div>
-					)}
-				</div>
-
-				{/* Contact Section */}
-				<div className='border rounded-lg'>
-					<button
-						type='button'
-						onClick={() => toggleSection('contact')}
-						className='w-full flex items-center justify-between p-4 hover:bg-slate-50 transition-colors'>
-						<h3 className='text-lg font-semibold text-slate-900'>
-							Contact Section
-						</h3>
-						{expandedSections.contact ? (
-							<ChevronUp className='w-5 h-5 text-slate-500' />
-						) : (
-							<ChevronDown className='w-5 h-5 text-slate-500' />
-						)}
-					</button>
-
-					{expandedSections.contact && (
-						<div className='p-4 space-y-4 border-t'>
-							<FormField
-								control={form.control}
-								name='contact.title'
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Title</FormLabel>
-										<FormControl>
-											<Input {...field} />
-										</FormControl>
-									</FormItem>
-								)}
-							/>
-
-							<FormField
-								control={form.control}
-								name='contact.subtitle'
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Subtitle</FormLabel>
-										<FormControl>
-											<Textarea {...field} rows={2} />
-										</FormControl>
-									</FormItem>
-								)}
-							/>
-
-							<div className='grid grid-cols-2 gap-4'>
-								<FormField
-									control={form.control}
-									name='contact.phone'
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Phone</FormLabel>
-											<FormControl>
-												<Input {...field} />
-											</FormControl>
-										</FormItem>
+			<AdminFormSection title='Stats'>
+				<AdminItemList>
+					{statsArray.fields.map((field, index) => (
+						<AdminItemCard
+							key={field.id}
+							index={index}
+							total={statsArray.fields.length}
+							title={form.watch(`stats.${index}.label`) || `Stat ${index + 1}`}
+							subtitle={form.watch(`stats.${index}.value`) || undefined}
+							onMove={d => statsArray.move(index, index + d)}
+							onRemove={() => statsArray.remove(index)}>
+							<AdminFieldGrid>
+								<AdminField label='Icon'>
+									{iconSelect(form.watch(`stats.${index}.icon`), v =>
+										form.setValue(`stats.${index}.icon`, v, {
+											shouldDirty: true
+										})
 									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name='contact.email'
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Email</FormLabel>
-											<FormControl>
-												<Input {...field} />
-											</FormControl>
-										</FormItem>
-									)}
-								/>
-							</div>
-
-							<FormField
-								control={form.control}
-								name='contact.gradient'
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Gradient</FormLabel>
-										<Select onValueChange={field.onChange} value={field.value}>
-											<FormControl>
-												<SelectTrigger>
-													<SelectValue />
-												</SelectTrigger>
-											</FormControl>
-											<SelectContent>
-												{GRADIENT_OPTIONS.map(gradient => (
-													<SelectItem key={gradient} value={gradient}>
-														<div className='flex items-center gap-2'>
-															<div
-																className={`w-16 h-4 rounded bg-gradient-to-r ${gradient}`}
-															/>
-															<span className='text-xs'>{gradient}</span>
-														</div>
-													</SelectItem>
-												))}
-											</SelectContent>
-										</Select>
-									</FormItem>
-								)}
-							/>
-
-							{/* Contact Buttons */}
-							<div className='border-t pt-4'>
-								<div className='flex items-center justify-between mb-3'>
-									<FormLabel>Action Buttons</FormLabel>
-									<Button
-										type='button'
-										variant='outline'
-										size='sm'
-										onClick={() =>
-											contactButtonsFields.append({
-												text: 'New Button',
-												icon: 'BookOpen',
-												variant: 'primary'
+								</AdminField>
+								<AdminField label='Value'>
+									<Input {...form.register(`stats.${index}.value` as const)} />
+								</AdminField>
+								<AdminField label='Label'>
+									<Input {...form.register(`stats.${index}.label` as const)} />
+								</AdminField>
+								<AdminField label='Color'>
+									<Select
+										value={form.watch(`stats.${index}.color`) || COLOR_OPTIONS[0]}
+										onValueChange={v =>
+											form.setValue(`stats.${index}.color`, v, {
+												shouldDirty: true
 											})
 										}>
-										<Plus className='w-3 h-3 mr-1' />
-										Add Button
-									</Button>
+										<SelectTrigger>
+											<SelectValue />
+										</SelectTrigger>
+										<SelectContent>
+											{COLOR_OPTIONS.map(c => (
+												<SelectItem key={c} value={c}>
+													{c}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								</AdminField>
+							</AdminFieldGrid>
+						</AdminItemCard>
+					))}
+				</AdminItemList>
+				{statsArray.fields.length === 0 && <AdminEmptyState title='No stats yet' />}
+				<AddRowButton
+					onClick={() =>
+						statsArray.append({
+							icon: 'TrendingUp',
+							value: '0',
+							label: 'New Stat',
+							color: COLOR_OPTIONS[0]
+						})
+					}>
+					Add stat
+				</AddRowButton>
+			</AdminFormSection>
+
+			<AdminFormSection title='Benefits'>
+				<AdminItemList>
+					{benefitsArray.fields.map((field, index) => (
+						<AdminItemCard
+							key={field.id}
+							index={index}
+							total={benefitsArray.fields.length}
+							title={
+								form.watch(`benefits.${index}.title`) ||
+								`Benefit ${index + 1}`
+							}
+							onMove={d => benefitsArray.move(index, index + d)}
+							onRemove={() => benefitsArray.remove(index)}>
+							<AdminFieldGrid>
+								<AdminField label='Icon'>
+									{iconSelect(form.watch(`benefits.${index}.icon`), v =>
+										form.setValue(`benefits.${index}.icon`, v, {
+											shouldDirty: true
+										})
+									)}
+								</AdminField>
+								<AdminField label='Color'>
+									<Select
+										value={form.watch(`benefits.${index}.color`) || 'blue'}
+										onValueChange={v =>
+											form.setValue(
+												`benefits.${index}.color`,
+												v as InternshipBenefit['color'],
+												{ shouldDirty: true }
+											)
+										}>
+										<SelectTrigger>
+											<SelectValue />
+										</SelectTrigger>
+										<SelectContent>
+											{BENEFIT_COLOR_OPTIONS.map(c => (
+												<SelectItem key={c} value={c}>
+													{c}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								</AdminField>
+							</AdminFieldGrid>
+							<AdminField label='Title'>
+								<Input {...form.register(`benefits.${index}.title` as const)} />
+							</AdminField>
+							<AdminField label='Description'>
+								<Textarea
+									rows={2}
+									{...form.register(`benefits.${index}.description` as const)}
+								/>
+							</AdminField>
+						</AdminItemCard>
+					))}
+				</AdminItemList>
+				{benefitsArray.fields.length === 0 && (
+					<AdminEmptyState title='No benefits yet' />
+				)}
+				<AddRowButton
+					onClick={() =>
+						benefitsArray.append({
+							icon: 'Award',
+							title: 'New Benefit',
+							description: 'Description',
+							color: 'blue'
+						})
+					}>
+					Add benefit
+				</AddRowButton>
+			</AdminFormSection>
+
+			<AdminFormSection title='Filters'>
+				<AdminItemList>
+					{filtersArray.fields.map((field, index) => (
+						<AdminItemCard
+							key={field.id}
+							index={index}
+							total={filtersArray.fields.length}
+							title={
+								form.watch(`filters.${index}.name`) || `Filter ${index + 1}`
+							}
+							onMove={d => filtersArray.move(index, index + d)}
+							onRemove={() => filtersArray.remove(index)}>
+							<AdminField label={`Filter ${index + 1}`} className='[&_label]:sr-only'>
+								<Input {...form.register(`filters.${index}.name` as const)} />
+							</AdminField>
+						</AdminItemCard>
+					))}
+				</AdminItemList>
+				{filtersArray.fields.length === 0 && (
+					<AdminEmptyState title='No filters yet' />
+				)}
+				<AddRowButton
+					onClick={() => filtersArray.append({ name: 'New Filter' })}>
+					Add filter
+				</AddRowButton>
+			</AdminFormSection>
+
+			<AdminFormSection title='Internship opportunities'>
+				<AdminItemList>
+					{opportunitiesArray.fields.map((field, index) => {
+						const domains =
+							form.watch(`opportunities.${index}.domainsArray`) || [];
+						return (
+							<AdminItemCard
+								key={field.id}
+								index={index}
+								total={opportunitiesArray.fields.length}
+								title={
+									form.watch(`opportunities.${index}.company`) ||
+									`Opportunity ${index + 1}`
+								}
+								subtitle={
+									form.watch(`opportunities.${index}.title`) || undefined
+								}
+								onMove={d => opportunitiesArray.move(index, index + d)}
+								onRemove={() => opportunitiesArray.remove(index)}>
+								<AdminFieldGrid>
+									<AdminField label='Company name'>
+										<Input
+											{...form.register(
+												`opportunities.${index}.company` as const
+											)}
+										/>
+									</AdminField>
+									<AdminField label='Title'>
+										<Input
+											{...form.register(`opportunities.${index}.title` as const)}
+										/>
+									</AdminField>
+									<AdminField label='Type'>
+										<Select
+											value={
+												form.watch(`opportunities.${index}.type`) ||
+												'Summer Internship'
+											}
+											onValueChange={v =>
+												form.setValue(`opportunities.${index}.type`, v, {
+													shouldDirty: true
+												})
+											}>
+											<SelectTrigger>
+												<SelectValue />
+											</SelectTrigger>
+											<SelectContent>
+												{INTERNSHIP_TYPE_OPTIONS.map(t => (
+													<SelectItem key={t} value={t}>
+														{t}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+									</AdminField>
+									<AdminField label='Category'>
+										<Select
+											value={
+												form.watch(`opportunities.${index}.category`) ||
+												'Technology'
+											}
+											onValueChange={v =>
+												form.setValue(`opportunities.${index}.category`, v, {
+													shouldDirty: true
+												})
+											}>
+											<SelectTrigger>
+												<SelectValue />
+											</SelectTrigger>
+											<SelectContent>
+												{CATEGORY_OPTIONS.map(c => (
+													<SelectItem key={c} value={c}>
+														{c}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+									</AdminField>
+									<AdminField label='Location'>
+										<Input
+											{...form.register(
+												`opportunities.${index}.location` as const
+											)}
+										/>
+									</AdminField>
+									<AdminField label='Logo path'>
+										<Input
+											{...form.register(`opportunities.${index}.logo` as const)}
+										/>
+									</AdminField>
+								</AdminFieldGrid>
+								<AdminField label='Description'>
+									<Textarea
+										rows={2}
+										{...form.register(
+											`opportunities.${index}.description` as const
+										)}
+									/>
+								</AdminField>
+								<div className='flex flex-col gap-3'>
+									<p className='text-sm font-medium text-slate-700'>
+										Focus areas / domains
+									</p>
+									<AdminItemList>
+										{domains.map((_, domainIndex) => (
+											<AdminItemCard
+												key={domainIndex}
+												index={domainIndex}
+												total={domains.length}
+												title={`Domain ${domainIndex + 1}`}
+												onMove={d => {
+													const j = domainIndex + d;
+													if (j < 0 || j >= domains.length) return;
+													const next = [...domains];
+													[next[domainIndex], next[j]] = [
+														next[j],
+														next[domainIndex]
+													];
+													form.setValue(
+														`opportunities.${index}.domainsArray`,
+														next,
+														{ shouldDirty: true }
+													);
+												}}
+												onRemove={() => {
+													const next = domains.filter(
+														(_, idx) => idx !== domainIndex
+													);
+													form.setValue(
+														`opportunities.${index}.domainsArray`,
+														next,
+														{ shouldDirty: true }
+													);
+												}}>
+												<AdminField
+													label={`Domain ${domainIndex + 1}`}
+													className='[&_label]:sr-only'>
+													<Input
+														placeholder='Domain name'
+														{...form.register(
+															`opportunities.${index}.domainsArray.${domainIndex}.name` as const
+														)}
+													/>
+												</AdminField>
+											</AdminItemCard>
+										))}
+									</AdminItemList>
+									<AddRowButton
+										onClick={() => {
+											const current =
+												form.getValues(
+													`opportunities.${index}.domainsArray`
+												) || [];
+											form.setValue(
+												`opportunities.${index}.domainsArray`,
+												[...current, { name: 'New Domain' }],
+												{ shouldDirty: true }
+											);
+										}}>
+										Add domain
+									</AddRowButton>
 								</div>
+							</AdminItemCard>
+						);
+					})}
+				</AdminItemList>
+				{opportunitiesArray.fields.length === 0 && (
+					<AdminEmptyState title='No opportunities yet' />
+				)}
+				<AddRowButton
+					onClick={() =>
+						opportunitiesArray.append({
+							company: 'New Company',
+							title: 'Internship Title',
+							type: 'Summer Internship',
+							location: 'Location',
+							description: 'Description',
+							logo: '/internships/logo.png',
+							category: 'Technology',
+							domains: [],
+							domainsArray: []
+						})
+					}>
+					Add opportunity
+				</AddRowButton>
+			</AdminFormSection>
 
-								{contactButtonsFields.fields.map((field, index) => (
-									<div
-										key={field.id}
-										className='p-3 border rounded-lg space-y-3 bg-white mb-3'>
-										<div className='flex items-center justify-between'>
-											<span className='text-sm font-semibold'>
-												Button {index + 1}
-											</span>
-											<Button
-												type='button'
-												variant='ghost'
-												size='sm'
-												onClick={() => contactButtonsFields.remove(index)}>
-												<Trash2 className='w-3 h-3 text-red-500' />
-											</Button>
-										</div>
+			<AdminFormSection title='Process steps'>
+				<AdminItemList>
+					{processArray.fields.map((field, index) => (
+						<AdminItemCard
+							key={field.id}
+							index={index}
+							total={processArray.fields.length}
+							title={
+								form.watch(`process.${index}.title`) || `Step ${index + 1}`
+							}
+							onMove={d => processArray.move(index, index + d)}
+							onRemove={() => processArray.remove(index)}>
+							<AdminField label='Icon'>
+								{iconSelect(form.watch(`process.${index}.icon`), v =>
+									form.setValue(`process.${index}.icon`, v, {
+										shouldDirty: true
+									})
+								)}
+							</AdminField>
+							<AdminField label='Title'>
+								<Input {...form.register(`process.${index}.title` as const)} />
+							</AdminField>
+							<AdminField label='Description'>
+								<Textarea
+									rows={2}
+									{...form.register(`process.${index}.description` as const)}
+								/>
+							</AdminField>
+						</AdminItemCard>
+					))}
+				</AdminItemList>
+				{processArray.fields.length === 0 && (
+					<AdminEmptyState title='No steps yet' />
+				)}
+				<AddRowButton
+					onClick={() =>
+						processArray.append({
+							title: 'New Step',
+							description: 'Description',
+							icon: 'Users'
+						})
+					}>
+					Add step
+				</AddRowButton>
+			</AdminFormSection>
 
-										<FormField
-											control={form.control}
-											name={`contact.buttons.${index}.text`}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel>Text</FormLabel>
-													<FormControl>
-														<Input {...field} />
-													</FormControl>
-												</FormItem>
+			<AdminFormSection title='Contact'>
+				<AdminField label='Title'>
+					<Input {...form.register('contact.title')} />
+				</AdminField>
+				<AdminField label='Subtitle'>
+					<Textarea rows={2} {...form.register('contact.subtitle')} />
+				</AdminField>
+				<AdminFieldGrid>
+					<AdminField label='Phone'>
+						<Input {...form.register('contact.phone')} />
+					</AdminField>
+					<AdminField label='Email'>
+						<Input {...form.register('contact.email')} />
+					</AdminField>
+				</AdminFieldGrid>
+				<AdminField label='Background gradient (Tailwind classes)'>
+					<Input {...form.register('contact.gradient')} />
+				</AdminField>
+
+				<div className='flex flex-col gap-3'>
+					<p className='text-sm font-medium text-slate-700'>Action buttons</p>
+					<AdminItemList>
+						{contactButtonsArray.fields.map((field, index) => (
+							<AdminItemCard
+								key={field.id}
+								index={index}
+								total={contactButtonsArray.fields.length}
+								title={
+									form.watch(`contact.buttons.${index}.text`) ||
+									`Button ${index + 1}`
+								}
+								onMove={d => contactButtonsArray.move(index, index + d)}
+								onRemove={() => contactButtonsArray.remove(index)}>
+								<AdminFieldGrid cols={3}>
+									<AdminField label='Text'>
+										<Input
+											{...form.register(
+												`contact.buttons.${index}.text` as const
 											)}
 										/>
-
-										<FormField
-											control={form.control}
-											name={`contact.buttons.${index}.icon`}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel>Icon</FormLabel>
-													<Select
-														onValueChange={field.onChange}
-														value={field.value}>
-														<FormControl>
-															<SelectTrigger>
-																<SelectValue />
-															</SelectTrigger>
-														</FormControl>
-														<SelectContent>
-															{SUPPORTED_ICON_NAMES.map(icon => (
-																<SelectItem key={icon} value={icon}>
-																	{icon}
-																</SelectItem>
-															))}
-														</SelectContent>
-													</Select>
-												</FormItem>
-											)}
-										/>
-
-										<FormField
-											control={form.control}
-											name={`contact.buttons.${index}.variant`}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel>Variant</FormLabel>
-													<Select
-														onValueChange={field.onChange}
-														value={field.value}>
-														<FormControl>
-															<SelectTrigger>
-																<SelectValue />
-															</SelectTrigger>
-														</FormControl>
-														<SelectContent>
-															<SelectItem value='primary'>Primary</SelectItem>
-															<SelectItem value='secondary'>
-																Secondary
-															</SelectItem>
-														</SelectContent>
-													</Select>
-												</FormItem>
-											)}
-										/>
-									</div>
-								))}
-							</div>
-						</div>
+									</AdminField>
+									<AdminField label='Icon'>
+										{iconSelect(
+											form.watch(`contact.buttons.${index}.icon`),
+											v =>
+												form.setValue(`contact.buttons.${index}.icon`, v, {
+													shouldDirty: true
+												})
+										)}
+									</AdminField>
+									<AdminField label='Variant'>
+										<Select
+											value={
+												form.watch(`contact.buttons.${index}.variant`) ||
+												'primary'
+											}
+											onValueChange={v =>
+												form.setValue(
+													`contact.buttons.${index}.variant`,
+													v as ContactButton['variant'],
+													{ shouldDirty: true }
+												)
+											}>
+											<SelectTrigger>
+												<SelectValue />
+											</SelectTrigger>
+											<SelectContent>
+												<SelectItem value='primary'>Primary</SelectItem>
+												<SelectItem value='secondary'>Secondary</SelectItem>
+											</SelectContent>
+										</Select>
+									</AdminField>
+								</AdminFieldGrid>
+							</AdminItemCard>
+						))}
+					</AdminItemList>
+					{contactButtonsArray.fields.length === 0 && (
+						<AdminEmptyState title='No buttons yet' />
 					)}
+					<AddRowButton
+						onClick={() =>
+							contactButtonsArray.append({
+								text: 'New Button',
+								icon: 'BookOpen',
+								variant: 'primary'
+							})
+						}>
+						Add button
+					</AddRowButton>
 				</div>
-			</form>
-		</Form>
+			</AdminFormSection>
+
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }

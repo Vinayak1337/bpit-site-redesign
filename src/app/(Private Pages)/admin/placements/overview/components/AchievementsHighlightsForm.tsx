@@ -2,17 +2,8 @@
 
 import { useEffect, useState, useTransition } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage
-} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
 import {
 	Select,
 	SelectContent,
@@ -23,7 +14,18 @@ import {
 import type { PlacementOverviewData } from '@/app/(Private Pages)/actions/placement-overview';
 import { updatePlacementOverview } from '@/app/(Private Pages)/actions/placement-overview';
 import { SUPPORTED_ICON_NAMES } from '@/components/about/icons';
-import { Plus, Trash2 } from 'lucide-react';
+import {
+	AddRowButton,
+	AdminEmptyState,
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	AdminItemCard,
+	AdminItemList,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 type AchievementFormValue = {
 	id: string;
@@ -86,75 +88,88 @@ const createEmptyHighlight = (): HighlightFormValue => ({
 	initials: ''
 });
 
-export default function AchievementsHighlightsForm({ initialData, pageSlug, onChange }: Props) {
+export default function AchievementsHighlightsForm({
+	initialData,
+	pageSlug,
+	onChange
+}: Props) {
 	const [isPending, startTransition] = useTransition();
-	const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 
 	const form = useForm<FormValues>({
 		defaultValues: {
 			achievementsTitle: initialData.achievementsTitle || '',
 			achievementsDescription: initialData.achievementsDescription || '',
-			achievements: initialData.achievements.length > 0 ? initialData.achievements : [createEmptyAchievement()],
+			achievements:
+				initialData.achievements.length > 0
+					? initialData.achievements
+					: [createEmptyAchievement()],
 			highlightsTitle: initialData.highlightsTitle || '',
 			highlightsDescription: initialData.highlightsDescription || '',
-			highlights: initialData.highlights.length > 0 ? initialData.highlights : [createEmptyHighlight()]
+			highlights:
+				initialData.highlights.length > 0
+					? initialData.highlights
+					: [createEmptyHighlight()]
 		}
 	});
 
-	const achievementsArray = useFieldArray({
+	const achievements = useFieldArray({
 		control: form.control,
 		name: 'achievements'
 	});
-
-	const highlightsArray = useFieldArray({
+	const highlights = useFieldArray({
 		control: form.control,
 		name: 'highlights'
 	});
 
-	const iconOptions = SUPPORTED_ICON_NAMES;
-
 	useEffect(() => {
-		const subscription = form.watch((values) => {
+		const sub = form.watch(values => {
 			if (onChange) {
-				const updatedData: PlacementOverviewData = {
+				onChange({
 					...initialData,
 					achievementsTitle: values.achievementsTitle || '',
 					achievementsDescription: values.achievementsDescription || '',
 					achievements: (values.achievements || [])
-						.map(achievement => ({
-							id: achievement?.id || crypto.randomUUID(),
-							title: (achievement?.title ?? '').trim(),
-							description: (achievement?.description ?? '').trim(),
-							icon: achievement?.icon?.trim().length ? achievement.icon.trim() : FALLBACK_ICON,
-							highlight: (achievement?.highlight ?? '').trim(),
-							category: (achievement?.category ?? '').trim(),
-							department: (achievement?.department ?? '').trim(),
-							iconColor: achievement?.iconColor ?? 'blue',
-							categoryColor: achievement?.categoryColor ?? 'blue',
-							highlightColor: achievement?.highlightColor ?? 'blue'
+						.map(a => ({
+							id: a?.id || crypto.randomUUID(),
+							title: (a?.title ?? '').trim(),
+							description: (a?.description ?? '').trim(),
+							icon: a?.icon?.trim().length ? a.icon.trim() : FALLBACK_ICON,
+							highlight: (a?.highlight ?? '').trim(),
+							category: (a?.category ?? '').trim(),
+							department: (a?.department ?? '').trim(),
+							iconColor: a?.iconColor ?? 'blue',
+							categoryColor: a?.categoryColor ?? 'blue',
+							highlightColor: a?.highlightColor ?? 'blue'
 						}))
-						.filter(achievement => achievement.title.length > 0),
+						.filter(a => a.title.length > 0),
 					highlightsTitle: values.highlightsTitle || '',
 					highlightsDescription: values.highlightsDescription || '',
 					highlights: (values.highlights || [])
-						.map(highlight => ({
-							id: highlight?.id || crypto.randomUUID(),
-							department: (highlight?.department ?? '').trim(),
-							maxPackage: (highlight?.maxPackage ?? '').trim(),
-							avgPackage: (highlight?.avgPackage ?? '').trim(),
-							color: highlight?.color ?? 'blue',
-							initials: (highlight?.initials ?? '').trim()
+						.map(h => ({
+							id: h?.id || crypto.randomUUID(),
+							department: (h?.department ?? '').trim(),
+							maxPackage: (h?.maxPackage ?? '').trim(),
+							avgPackage: (h?.avgPackage ?? '').trim(),
+							color: h?.color ?? 'blue',
+							initials: (h?.initials ?? '').trim()
 						}))
-						.filter(highlight => highlight.department.length > 0)
-				};
-				onChange(updatedData);
+						.filter(h => h.department.length > 0)
+				});
+				setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 			}
 		});
-		return () => subscription.unsubscribe();
+		return () => sub.unsubscribe();
 	}, [form, onChange, initialData]);
 
-	const onSubmit = async (values: FormValues) => {
-		setSaveStatus('saving');
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
+	const onSubmit = form.handleSubmit(values => {
+		setStatus({ kind: 'saving' });
 		startTransition(async () => {
 			try {
 				const updatedData: PlacementOverviewData = {
@@ -162,387 +177,251 @@ export default function AchievementsHighlightsForm({ initialData, pageSlug, onCh
 					achievementsTitle: values.achievementsTitle,
 					achievementsDescription: values.achievementsDescription,
 					achievements: values.achievements
-						.map(achievement => ({
-							id: achievement.id,
-							title: (achievement.title ?? '').trim(),
-							description: (achievement.description ?? '').trim(),
-							icon: achievement.icon?.trim().length ? achievement.icon.trim() : FALLBACK_ICON,
-							highlight: (achievement.highlight ?? '').trim(),
-							category: (achievement.category ?? '').trim(),
-							department: (achievement.department ?? '').trim(),
-							iconColor: achievement.iconColor ?? 'blue',
-							categoryColor: achievement.categoryColor ?? 'blue',
-							highlightColor: achievement.highlightColor ?? 'blue'
+						.map(a => ({
+							id: a.id,
+							title: (a.title ?? '').trim(),
+							description: (a.description ?? '').trim(),
+							icon: a.icon?.trim().length ? a.icon.trim() : FALLBACK_ICON,
+							highlight: (a.highlight ?? '').trim(),
+							category: (a.category ?? '').trim(),
+							department: (a.department ?? '').trim(),
+							iconColor: a.iconColor ?? 'blue',
+							categoryColor: a.categoryColor ?? 'blue',
+							highlightColor: a.highlightColor ?? 'blue'
 						}))
-						.filter(achievement => achievement.title.length > 0),
+						.filter(a => a.title.length > 0),
 					highlightsTitle: values.highlightsTitle,
 					highlightsDescription: values.highlightsDescription,
 					highlights: values.highlights
-						.map(highlight => ({
-							id: highlight.id,
-							department: (highlight.department ?? '').trim(),
-							maxPackage: (highlight.maxPackage ?? '').trim(),
-							avgPackage: (highlight.avgPackage ?? '').trim(),
-							color: highlight.color ?? 'blue',
-							initials: (highlight.initials ?? '').trim()
+						.map(h => ({
+							id: h.id,
+							department: (h.department ?? '').trim(),
+							maxPackage: (h.maxPackage ?? '').trim(),
+							avgPackage: (h.avgPackage ?? '').trim(),
+							color: h.color ?? 'blue',
+							initials: (h.initials ?? '').trim()
 						}))
-						.filter(highlight => highlight.department.length > 0)
+						.filter(h => h.department.length > 0)
 				};
-
 				await updatePlacementOverview(pageSlug, updatedData);
-				setSaveStatus('saved');
-				setTimeout(() => setSaveStatus('idle'), 2000);
+				setStatus({ kind: 'success', message: 'Saved' });
 			} catch (error) {
 				console.error('Failed to save:', error);
-				setSaveStatus('error');
-				setTimeout(() => setSaveStatus('idle'), 3000);
+				setStatus({ kind: 'error', message: 'Save failed' });
 			}
 		});
-	};
+	});
 
 	return (
-		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-				{/* Achievements Section Headers */}
-				<div className="space-y-4">
-					<h3 className="text-lg font-semibold text-slate-900">Achievements Section</h3>
-					
-					<FormField
-						control={form.control}
-						name="achievementsTitle"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Achievements Title</FormLabel>
-								<FormControl>
-									<Input placeholder="Notable Achievements" {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
+		<AdminForm onSubmit={onSubmit}>
+			<AdminFormSection
+				title='Achievements section'
+				description='Headline copy shown above the achievements list.'>
+				<AdminField label='Title' htmlFor='ah-title'>
+					<Input
+						id='ah-title'
+						placeholder='Notable Achievements'
+						{...form.register('achievementsTitle')}
 					/>
-
-					<FormField
-						control={form.control}
-						name="achievementsDescription"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Achievements Description</FormLabel>
-								<FormControl>
-									<Textarea 
-										placeholder="Brief description of achievements"
-										rows={3}
-										{...field} 
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
+				</AdminField>
+				<AdminField label='Description' htmlFor='ah-desc'>
+					<Textarea
+						id='ah-desc'
+						rows={3}
+						placeholder='Brief description of achievements'
+						{...form.register('achievementsDescription')}
 					/>
-				</div>
+				</AdminField>
+			</AdminFormSection>
 
-				{/* Achievements */}
-				<div className="space-y-4">
-					<div className="flex items-center justify-between">
-						<h3 className="text-lg font-semibold text-slate-900">Achievements</h3>
-						<Button
-							type="button"
-							variant="outline"
-							size="sm"
-							onClick={() => achievementsArray.append(createEmptyAchievement())}
-						>
-							<Plus className="w-4 h-4 mr-2" />
-							Add Achievement
-						</Button>
-					</div>
-					<div className="space-y-4">
-						{achievementsArray.fields.map((field, index) => (
-							<div
-								key={field.id}
-								className="rounded-lg border border-slate-200 p-4 space-y-4 bg-slate-50/50"
-							>
-								<div className="flex items-center justify-between">
-									<span className="text-sm font-medium text-slate-700">
-										Achievement {index + 1}
-									</span>
-									<Button
-										type="button"
-										variant="ghost"
-										size="sm"
-										onClick={() => achievementsArray.remove(index)}
-									>
-										<Trash2 className="w-4 h-4" />
-									</Button>
-								</div>
-								<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-									<FormField
-										control={form.control}
-										name={`achievements.${index}.title`}
-										rules={{ required: 'Title is required' }}
-										render={({ field: titleField }) => (
-											<FormItem>
-												<FormLabel>Title</FormLabel>
-												<FormControl>
-													<Input placeholder="Achievement title" {...titleField} />
-												</FormControl>
-												<FormMessage />
-											</FormItem>
+			<AdminFormSection title='Achievements'>
+				<AdminItemList>
+					{achievements.fields.map((field, index) => (
+						<AdminItemCard
+							key={field.id}
+							index={index}
+							total={achievements.fields.length}
+							title={
+								form.watch(`achievements.${index}.title`) ||
+								`Achievement ${index + 1}`
+							}
+							subtitle={
+								form.watch(`achievements.${index}.category`) || undefined
+							}
+							onMove={d => achievements.move(index, index + d)}
+							onRemove={() => achievements.remove(index)}>
+							<AdminFieldGrid>
+								<AdminField label='Title'>
+									<Input
+										placeholder='Achievement title'
+										{...form.register(
+											`achievements.${index}.title` as const,
+											{ required: true }
 										)}
 									/>
-									<FormField
-										control={form.control}
-										name={`achievements.${index}.category`}
-										render={({ field: categoryField }) => (
-											<FormItem>
-												<FormLabel>Category</FormLabel>
-												<FormControl>
-													<Input placeholder="e.g., Placement Record" {...categoryField} />
-												</FormControl>
-												<FormMessage />
-											</FormItem>
+								</AdminField>
+								<AdminField label='Category'>
+									<Input
+										placeholder='e.g. Placement Record'
+										{...form.register(
+											`achievements.${index}.category` as const
 										)}
 									/>
-									<FormField
-										control={form.control}
-										name={`achievements.${index}.highlight`}
-										render={({ field: highlightField }) => (
-											<FormItem>
-												<FormLabel>Highlight</FormLabel>
-												<FormControl>
-													<Input placeholder="e.g., 95% Success Rate" {...highlightField} />
-												</FormControl>
-												<FormMessage />
-											</FormItem>
+								</AdminField>
+								<AdminField label='Highlight'>
+									<Input
+										placeholder='e.g. 95% Success Rate'
+										{...form.register(
+											`achievements.${index}.highlight` as const
 										)}
 									/>
-									<FormField
-										control={form.control}
-										name={`achievements.${index}.department`}
-										render={({ field: deptField }) => (
-											<FormItem>
-												<FormLabel>Department</FormLabel>
-												<FormControl>
-													<Input placeholder="Department name" {...deptField} />
-												</FormControl>
-												<FormMessage />
-											</FormItem>
+								</AdminField>
+								<AdminField label='Department'>
+									<Input
+										placeholder='Department name'
+										{...form.register(
+											`achievements.${index}.department` as const
 										)}
 									/>
-									<FormField
-										control={form.control}
-										name={`achievements.${index}.icon`}
-										render={({ field: iconField }) => (
-											<FormItem>
-												<FormLabel>Icon</FormLabel>
-												<FormControl>
-													<Select
-														onValueChange={iconField.onChange}
-														value={iconField.value}
-													>
-														<SelectTrigger>
-															<SelectValue placeholder="Select icon" />
-														</SelectTrigger>
-														<SelectContent>
-															{iconOptions.map(option => (
-																<SelectItem key={option} value={option}>
-																	{option}
-																</SelectItem>
-															))}
-														</SelectContent>
-													</Select>
-												</FormControl>
-												<FormMessage />
-											</FormItem>
+								</AdminField>
+								<AdminField label='Icon'>
+									<Select
+										value={
+											form.watch(`achievements.${index}.icon`) || FALLBACK_ICON
+										}
+										onValueChange={v =>
+											form.setValue(`achievements.${index}.icon`, v, {
+												shouldDirty: true
+											})
+										}>
+										<SelectTrigger>
+											<SelectValue placeholder='Select icon' />
+										</SelectTrigger>
+										<SelectContent>
+											{SUPPORTED_ICON_NAMES.map(option => (
+												<SelectItem key={option} value={option}>
+													{option}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								</AdminField>
+								<AdminField label='Icon color'>
+									<Input
+										placeholder='from-blue-500 to-blue-700'
+										{...form.register(
+											`achievements.${index}.iconColor` as const
 										)}
 									/>
-									<FormField
-										control={form.control}
-										name={`achievements.${index}.iconColor`}
-										render={({ field: colorField }) => (
-											<FormItem>
-												<FormLabel>Icon Color</FormLabel>
-												<FormControl>
-													<Input placeholder="from-blue-500 to-blue-700" {...colorField} />
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-									<FormField
-										control={form.control}
-										name={`achievements.${index}.description`}
-										render={({ field: descField }) => (
-											<FormItem className="col-span-2">
-												<FormLabel>Description</FormLabel>
-												<FormControl>
-													<Textarea placeholder="Achievement description" rows={2} {...descField} />
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-								</div>
-							</div>
-						))}
-					</div>
-				</div>
+								</AdminField>
+							</AdminFieldGrid>
+							<AdminField label='Description'>
+								<Textarea
+									rows={2}
+									placeholder='Achievement description'
+									{...form.register(
+										`achievements.${index}.description` as const
+									)}
+								/>
+							</AdminField>
+						</AdminItemCard>
+					))}
+				</AdminItemList>
+				{achievements.fields.length === 0 && (
+					<AdminEmptyState title='No achievements yet' />
+				)}
+				<AddRowButton
+					onClick={() => achievements.append(createEmptyAchievement())}>
+					Add achievement
+				</AddRowButton>
+			</AdminFormSection>
 
-				{/* Highlights Section Headers */}
-				<div className="space-y-4">
-					<h3 className="text-lg font-semibold text-slate-900">Highlights Section</h3>
-					
-					<FormField
-						control={form.control}
-						name="highlightsTitle"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Highlights Title</FormLabel>
-								<FormControl>
-									<Input placeholder="Placement Highlights" {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
+			<AdminFormSection
+				title='Highlights section'
+				description='Headline copy shown above the department highlight cards.'>
+				<AdminField label='Highlights title' htmlFor='hl-title'>
+					<Input
+						id='hl-title'
+						placeholder='Placement Highlights'
+						{...form.register('highlightsTitle')}
 					/>
-
-					<FormField
-						control={form.control}
-						name="highlightsDescription"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Highlights Description</FormLabel>
-								<FormControl>
-									<Textarea 
-										placeholder="Brief description of highlights"
-										rows={3}
-										{...field} 
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
+				</AdminField>
+				<AdminField label='Highlights description' htmlFor='hl-desc'>
+					<Textarea
+						id='hl-desc'
+						rows={3}
+						placeholder='Brief description of highlights'
+						{...form.register('highlightsDescription')}
 					/>
-				</div>
+				</AdminField>
+			</AdminFormSection>
 
-				{/* Highlights */}
-				<div className="space-y-4">
-					<div className="flex items-center justify-between">
-						<h3 className="text-lg font-semibold text-slate-900">Department Highlights</h3>
-						<Button
-							type="button"
-							variant="outline"
-							size="sm"
-							onClick={() => highlightsArray.append(createEmptyHighlight())}
-						>
-							<Plus className="w-4 h-4 mr-2" />
-							Add Highlight
-						</Button>
-					</div>
-					<div className="space-y-4">
-						{highlightsArray.fields.map((field, index) => (
-							<div
-								key={field.id}
-								className="rounded-lg border border-slate-200 p-4 space-y-4 bg-slate-50/50"
-							>
-								<div className="flex items-center justify-between">
-									<span className="text-sm font-medium text-slate-700">
-										Highlight {index + 1}
-									</span>
-									<Button
-										type="button"
-										variant="ghost"
-										size="sm"
-										onClick={() => highlightsArray.remove(index)}
-									>
-										<Trash2 className="w-4 h-4" />
-									</Button>
-								</div>
-								<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-									<FormField
-										control={form.control}
-										name={`highlights.${index}.department`}
-										rules={{ required: 'Department is required' }}
-										render={({ field: deptField }) => (
-											<FormItem>
-												<FormLabel>Department</FormLabel>
-												<FormControl>
-													<Input placeholder="e.g., Computer Science" {...deptField} />
-												</FormControl>
-												<FormMessage />
-											</FormItem>
+			<AdminFormSection title='Department highlights'>
+				<AdminItemList>
+					{highlights.fields.map((field, index) => (
+						<AdminItemCard
+							key={field.id}
+							index={index}
+							total={highlights.fields.length}
+							title={
+								form.watch(`highlights.${index}.department`) ||
+								`Highlight ${index + 1}`
+							}
+							subtitle={form.watch(`highlights.${index}.initials`) || undefined}
+							onMove={d => highlights.move(index, index + d)}
+							onRemove={() => highlights.remove(index)}>
+							<AdminFieldGrid>
+								<AdminField label='Department'>
+									<Input
+										placeholder='e.g. Computer Science'
+										{...form.register(
+											`highlights.${index}.department` as const,
+											{ required: true }
 										)}
 									/>
-									<FormField
-										control={form.control}
-										name={`highlights.${index}.initials`}
-										render={({ field: initialsField }) => (
-											<FormItem>
-												<FormLabel>Initials</FormLabel>
-												<FormControl>
-													<Input placeholder="e.g., CSE" {...initialsField} />
-												</FormControl>
-												<FormMessage />
-											</FormItem>
+								</AdminField>
+								<AdminField label='Initials'>
+									<Input
+										placeholder='CSE'
+										{...form.register(`highlights.${index}.initials` as const)}
+									/>
+								</AdminField>
+								<AdminField label='Max package'>
+									<Input
+										placeholder='₹45 LPA'
+										{...form.register(
+											`highlights.${index}.maxPackage` as const
 										)}
 									/>
-									<FormField
-										control={form.control}
-										name={`highlights.${index}.maxPackage`}
-										render={({ field: maxField }) => (
-											<FormItem>
-												<FormLabel>Max Package</FormLabel>
-												<FormControl>
-													<Input placeholder="e.g., ₹45 LPA" {...maxField} />
-												</FormControl>
-												<FormMessage />
-											</FormItem>
+								</AdminField>
+								<AdminField label='Average package'>
+									<Input
+										placeholder='₹8.5 LPA'
+										{...form.register(
+											`highlights.${index}.avgPackage` as const
 										)}
 									/>
-									<FormField
-										control={form.control}
-										name={`highlights.${index}.avgPackage`}
-										render={({ field: avgField }) => (
-											<FormItem>
-												<FormLabel>Average Package</FormLabel>
-												<FormControl>
-													<Input placeholder="e.g., ₹8.5 LPA" {...avgField} />
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
+								</AdminField>
+								<AdminField label='Color'>
+									<Input
+										placeholder='from-blue-500 to-blue-700'
+										{...form.register(`highlights.${index}.color` as const)}
 									/>
-									<FormField
-										control={form.control}
-										name={`highlights.${index}.color`}
-										render={({ field: colorField }) => (
-											<FormItem>
-												<FormLabel>Color</FormLabel>
-												<FormControl>
-													<Input placeholder="from-blue-500 to-blue-700" {...colorField} />
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-								</div>
-							</div>
-						))}
-					</div>
-				</div>
+								</AdminField>
+							</AdminFieldGrid>
+						</AdminItemCard>
+					))}
+				</AdminItemList>
+				{highlights.fields.length === 0 && (
+					<AdminEmptyState title='No highlights yet' />
+				)}
+				<AddRowButton
+					onClick={() => highlights.append(createEmptyHighlight())}>
+					Add highlight
+				</AddRowButton>
+			</AdminFormSection>
 
-				<div className="flex items-center justify-between pt-6 border-t">
-					<div>
-						{saveStatus === 'saved' && (
-							<p className="text-sm text-green-600">Changes saved successfully!</p>
-						)}
-						{saveStatus === 'error' && (
-							<p className="text-sm text-red-600">Failed to save changes.</p>
-						)}
-					</div>
-					<Button type="submit" disabled={isPending || saveStatus === 'saving'}>
-						{saveStatus === 'saving' ? 'Saving...' : 'Save Changes'}
-					</Button>
-				</div>
-			</form>
-		</Form>
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }

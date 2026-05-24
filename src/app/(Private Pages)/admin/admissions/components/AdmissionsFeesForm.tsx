@@ -3,16 +3,10 @@
 import { useEffect, useMemo, useState, useTransition } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
 import { useFieldArray, useForm } from 'react-hook-form';
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel
-} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
+import { Trash2 } from 'lucide-react';
 import {
 	type AdmissionsFeeProgram,
 	type AdmissionsFeesMeta,
@@ -28,6 +22,19 @@ import {
 	SelectValue
 } from '@/components/ui/select';
 import { createClientId } from '@/lib/utils';
+import {
+	AddRowButton,
+	AdminEmptyState,
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	AdminItemCard,
+	AdminItemList,
+	AdminReorderControls,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 type FeesPageData = {
 	meta: AdmissionsFeesMeta;
@@ -46,7 +53,6 @@ type FeeComponentFormValue = {
 	amount: number;
 	description: string;
 };
-
 type FeeBreakdownFormValue = {
 	id: string;
 	title: string;
@@ -54,7 +60,6 @@ type FeeBreakdownFormValue = {
 	description: string;
 	components: FeeComponentFormValue[];
 };
-
 type FeeYearFormValue = {
 	id: string;
 	year: number;
@@ -62,7 +67,6 @@ type FeeYearFormValue = {
 	note: string;
 	breakdowns: FeeBreakdownFormValue[];
 };
-
 type FeeProgramFormValue = {
 	id: string;
 	name: string;
@@ -114,12 +118,8 @@ type FormValues = {
 };
 
 const splitLines = (value: string) =>
-	value
-		.split('\n')
-		.map(item => item.trim())
-		.filter(Boolean);
-
-const sumAmounts = (amounts: number[]) => amounts.reduce((sum, amount) => sum + amount, 0);
+	value.split('\n').map(i => i.trim()).filter(Boolean);
+const sumAmounts = (a: number[]) => a.reduce((s, n) => s + n, 0);
 
 const createFeeComponent = () => ({
 	id: createClientId('admissions-fees-component'),
@@ -127,7 +127,6 @@ const createFeeComponent = () => ({
 	amount: 0,
 	description: ''
 });
-
 const createFeeBreakdown = () => ({
 	id: createClientId('admissions-fees-breakdown'),
 	title: '',
@@ -135,7 +134,6 @@ const createFeeBreakdown = () => ({
 	description: '',
 	components: [createFeeComponent()]
 });
-
 const createFeeYear = () => ({
 	id: createClientId('admissions-fees-year'),
 	year: 1,
@@ -143,7 +141,6 @@ const createFeeYear = () => ({
 	note: '',
 	breakdowns: [createFeeBreakdown()]
 });
-
 const createFeeProgram = (): FeeProgramFormValue => ({
 	id: '',
 	name: '',
@@ -159,42 +156,42 @@ const createFeeProgram = (): FeeProgramFormValue => ({
 const includes = <T extends string>(visibleSections: T[] | undefined, value: T) =>
 	!visibleSections || visibleSections.includes(value);
 
-function normalizePrograms(programs: FeeProgramFormValue[]): AdmissionsFeeProgram[] {
+function normalizePrograms(
+	programs: FeeProgramFormValue[]
+): AdmissionsFeeProgram[] {
 	return programs
 		.map(program => {
 			const years = program.years
 				.map(year => {
 					const breakdowns = year.breakdowns
-						.map(breakdown => {
-							const components = breakdown.components
-								.map(component => ({
-									name: component.name.trim(),
-									amount: Number(component.amount) || 0,
-									description: component.description.trim()
+						.map(b => {
+							const components = b.components
+								.map(c => ({
+									name: c.name.trim(),
+									amount: Number(c.amount) || 0,
+									description: c.description.trim()
 								}))
-								.filter(component => component.name);
+								.filter(c => c.name);
 							return {
-								id: breakdown.id.trim(),
-								title: breakdown.title.trim(),
-								shortLabel: breakdown.shortLabel.trim(),
-								description: breakdown.description.trim(),
-								totalAmount: sumAmounts(components.map(component => component.amount)),
+								id: b.id.trim(),
+								title: b.title.trim(),
+								shortLabel: b.shortLabel.trim(),
+								description: b.description.trim(),
+								totalAmount: sumAmounts(components.map(c => c.amount)),
 								components
 							};
 						})
-						.filter(breakdown => breakdown.title && breakdown.components.length > 0);
+						.filter(b => b.title && b.components.length > 0);
 					return {
 						year: Number(year.year) || 1,
 						title: year.title.trim(),
 						note: year.note.trim(),
 						breakdowns,
 						feeGroups: [],
-						totalYearFee: sumAmounts(
-							breakdowns.map(breakdown => breakdown.totalAmount)
-						)
+						totalYearFee: sumAmounts(breakdowns.map(b => b.totalAmount))
 					};
 				})
-				.filter(year => year.title || year.breakdowns.length > 0);
+				.filter(y => y.title || y.breakdowns.length > 0);
 
 			return {
 				id: program.id.trim(),
@@ -206,10 +203,10 @@ function normalizePrograms(programs: FeeProgramFormValue[]): AdmissionsFeeProgra
 				description: program.description.trim(),
 				paymentNote: program.paymentNote.trim(),
 				years,
-				totalProgramFee: sumAmounts(years.map(year => year.totalYearFee))
+				totalProgramFee: sumAmounts(years.map(y => y.totalYearFee))
 			};
 		})
-		.filter(program => program.id && program.name && program.duration && program.years.length > 0);
+		.filter(p => p.id && p.name && p.duration && p.years.length > 0);
 }
 
 function normalizeData(values: FormValues): FeesPageData {
@@ -254,194 +251,251 @@ function normalizeData(values: FormValues): FeesPageData {
 	};
 }
 
-function FeeBreakdownFields({
+/* ------------------------------------------------------------------ */
+/*  Nested sub-sections — flat, no bordered cards (one-container rule) */
+/* ------------------------------------------------------------------ */
+
+function ComponentsList({
 	form,
 	programIndex,
 	yearIndex,
-	index,
-	onRemove
+	breakdownIndex
 }: {
 	form: UseFormReturn<FormValues>;
 	programIndex: number;
 	yearIndex: number;
-	index: number;
-	onRemove: () => void;
+	breakdownIndex: number;
 }) {
 	const componentsArray = useFieldArray({
 		control: form.control,
-		name: `programs.${programIndex}.years.${yearIndex}.breakdowns.${index}.components`
+		name: `programs.${programIndex}.years.${yearIndex}.breakdowns.${breakdownIndex}.components`
 	});
-
 	return (
-		<div className='space-y-4 rounded-xl border border-slate-200 bg-white p-4'>
-			<div className='flex items-center justify-between'>
-				<span className='text-sm font-medium text-slate-700'>Breakdown {index + 1}</span>
-				<Button type='button' variant='ghost' size='sm' onClick={onRemove}>
-					Remove
-				</Button>
-			</div>
-			<div className='grid gap-4 sm:grid-cols-2'>
-				<FormField control={form.control} name={`programs.${programIndex}.years.${yearIndex}.breakdowns.${index}.id`} render={({ field }) => <FormItem><FormLabel>Breakdown ID</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-				<FormField control={form.control} name={`programs.${programIndex}.years.${yearIndex}.breakdowns.${index}.shortLabel`} render={({ field }) => <FormItem><FormLabel>Short label</FormLabel><FormControl><Input placeholder='Sem 1' {...field} /></FormControl></FormItem>} />
-				<FormField control={form.control} name={`programs.${programIndex}.years.${yearIndex}.breakdowns.${index}.title`} render={({ field }) => <FormItem className='sm:col-span-2'><FormLabel>Title</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-				<FormField control={form.control} name={`programs.${programIndex}.years.${yearIndex}.breakdowns.${index}.description`} render={({ field }) => <FormItem className='sm:col-span-2'><FormLabel>Description</FormLabel><FormControl><Textarea rows={2} className='resize-none' {...field} /></FormControl></FormItem>} />
-			</div>
-
-			<div className='space-y-3 rounded-xl border border-slate-200 bg-slate-50/70 p-4'>
-				<div className='flex items-center justify-between'>
-					<h6 className='text-xs font-semibold uppercase tracking-[0.16em] text-slate-600'>Fee components</h6>
-					<Button type='button' variant='outline' size='sm' onClick={() => componentsArray.append(createFeeComponent())}>
-						Add component
-					</Button>
-				</div>
-				{componentsArray.fields.map((field, componentIndex) => (
-					<div key={field.id} className='space-y-4 rounded-xl border border-slate-200 bg-white p-4'>
-						<div className='flex items-center justify-between'>
-							<span className='text-sm font-medium text-slate-700'>Component {componentIndex + 1}</span>
-							<Button type='button' variant='ghost' size='sm' onClick={() => componentsArray.remove(componentIndex)}>
-								Remove
-							</Button>
-						</div>
-						<div className='grid gap-4 sm:grid-cols-2'>
-							<FormField control={form.control} name={`programs.${programIndex}.years.${yearIndex}.breakdowns.${index}.components.${componentIndex}.name`} render={({ field }) => <FormItem><FormLabel>Name</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-							<FormField control={form.control} name={`programs.${programIndex}.years.${yearIndex}.breakdowns.${index}.components.${componentIndex}.amount`} render={({ field }) => <FormItem><FormLabel>Amount</FormLabel><FormControl><Input type='number' {...field} onChange={event => field.onChange(Number(event.target.value))} /></FormControl></FormItem>} />
-							<FormField control={form.control} name={`programs.${programIndex}.years.${yearIndex}.breakdowns.${index}.components.${componentIndex}.description`} render={({ field }) => <FormItem className='sm:col-span-2'><FormLabel>Description</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-						</div>
+		<div className='flex flex-col gap-2'>
+			<p className='text-xs font-medium text-slate-500'>Fee components</p>
+			{componentsArray.fields.map((field, ci) => (
+				<div
+					key={field.id}
+					className='grid grid-cols-12 items-start gap-2'>
+					<div className='col-span-12 sm:col-span-5'>
+						<Input
+							placeholder='Tuition fee'
+							{...form.register(
+								`programs.${programIndex}.years.${yearIndex}.breakdowns.${breakdownIndex}.components.${ci}.name` as const
+							)}
+						/>
 					</div>
-				))}
-			</div>
+					<div className='col-span-6 sm:col-span-2'>
+						<Input
+							type='number'
+							placeholder='0'
+							{...form.register(
+								`programs.${programIndex}.years.${yearIndex}.breakdowns.${breakdownIndex}.components.${ci}.amount` as const,
+								{ valueAsNumber: true }
+							)}
+						/>
+					</div>
+					<div className='col-span-5 sm:col-span-4'>
+						<Input
+							placeholder='Description'
+							{...form.register(
+								`programs.${programIndex}.years.${yearIndex}.breakdowns.${breakdownIndex}.components.${ci}.description` as const
+							)}
+						/>
+					</div>
+					<div className='col-span-1 flex justify-end'>
+						<Button
+							type='button'
+							variant='ghost'
+							size='icon'
+							className='h-9 w-9 text-slate-500 hover:bg-rose-50 hover:text-rose-600'
+							onClick={() => componentsArray.remove(ci)}
+							aria-label='Remove component'>
+							<Trash2 className='h-4 w-4' />
+						</Button>
+					</div>
+				</div>
+			))}
+			<AddRowButton onClick={() => componentsArray.append(createFeeComponent())}>
+				Add component
+			</AddRowButton>
 		</div>
 	);
 }
 
-function FeeYearFields({
+function BreakdownsList({
 	form,
 	programIndex,
-	index,
-	onRemove
+	yearIndex
 }: {
 	form: UseFormReturn<FormValues>;
 	programIndex: number;
-	index: number;
-	onRemove: () => void;
+	yearIndex: number;
 }) {
 	const breakdownsArray = useFieldArray({
 		control: form.control,
-		name: `programs.${programIndex}.years.${index}.breakdowns`
+		name: `programs.${programIndex}.years.${yearIndex}.breakdowns`
 	});
-
 	return (
-		<div className='space-y-4 rounded-xl border border-slate-200 bg-white p-4'>
-			<div className='flex items-center justify-between'>
-				<span className='text-sm font-medium text-slate-700'>Year {index + 1}</span>
-				<Button type='button' variant='ghost' size='sm' onClick={onRemove}>
-					Remove
-				</Button>
-			</div>
-			<div className='grid gap-4 sm:grid-cols-2'>
-				<FormField control={form.control} name={`programs.${programIndex}.years.${index}.year`} render={({ field }) => <FormItem><FormLabel>Year number</FormLabel><FormControl><Input type='number' {...field} onChange={event => field.onChange(Number(event.target.value))} /></FormControl></FormItem>} />
-				<FormField control={form.control} name={`programs.${programIndex}.years.${index}.title`} render={({ field }) => <FormItem><FormLabel>Title</FormLabel><FormControl><Input placeholder='First Year' {...field} /></FormControl></FormItem>} />
-				<FormField control={form.control} name={`programs.${programIndex}.years.${index}.note`} render={({ field }) => <FormItem className='sm:col-span-2'><FormLabel>Note</FormLabel><FormControl><Textarea rows={2} className='resize-none' {...field} /></FormControl></FormItem>} />
-			</div>
-
-			<div className='space-y-4 rounded-xl border border-slate-200 bg-slate-50/70 p-4'>
-				<div className='flex items-center justify-between'>
-					<h6 className='text-xs font-semibold uppercase tracking-[0.16em] text-slate-600'>Breakdowns</h6>
-					<Button type='button' variant='outline' size='sm' onClick={() => breakdownsArray.append(createFeeBreakdown())}>
-						Add breakdown
-					</Button>
-				</div>
-				<div className='space-y-4'>
-					{breakdownsArray.fields.map((field, breakdownIndex) => (
-						<FeeBreakdownFields
-							key={field.id}
-							form={form}
-							programIndex={programIndex}
-							yearIndex={index}
-							index={breakdownIndex}
-							onRemove={() => breakdownsArray.remove(breakdownIndex)}
+		<div className='flex flex-col gap-4'>
+			<p className='text-xs font-medium uppercase tracking-wide text-slate-500'>
+				Breakdowns
+			</p>
+			{breakdownsArray.fields.map((field, bi) => (
+				<div
+					key={field.id}
+					className='flex flex-col gap-3 border-l-2 border-slate-200 pl-4'>
+					<div className='flex items-center justify-between gap-2'>
+						<p className='text-sm font-semibold text-slate-800'>
+							{form.watch(
+								`programs.${programIndex}.years.${yearIndex}.breakdowns.${bi}.title`
+							) || `Breakdown ${bi + 1}`}
+						</p>
+						<div className='flex items-center gap-1'>
+							<AdminReorderControls
+								onUp={() => breakdownsArray.move(bi, bi - 1)}
+								onDown={() => breakdownsArray.move(bi, bi + 1)}
+								disableUp={bi === 0}
+								disableDown={bi === breakdownsArray.fields.length - 1}
+							/>
+							<Button
+								type='button'
+								variant='ghost'
+								size='icon'
+								className='h-8 w-8 text-slate-500 hover:bg-rose-50 hover:text-rose-600'
+								onClick={() => breakdownsArray.remove(bi)}
+								aria-label='Remove breakdown'>
+								<Trash2 className='h-4 w-4' />
+							</Button>
+						</div>
+					</div>
+					<AdminFieldGrid>
+						<AdminField label='Breakdown ID'>
+							<Input
+								{...form.register(
+									`programs.${programIndex}.years.${yearIndex}.breakdowns.${bi}.id` as const
+								)}
+							/>
+						</AdminField>
+						<AdminField label='Short label'>
+							<Input
+								placeholder='Sem 1'
+								{...form.register(
+									`programs.${programIndex}.years.${yearIndex}.breakdowns.${bi}.shortLabel` as const
+								)}
+							/>
+						</AdminField>
+					</AdminFieldGrid>
+					<AdminField label='Title'>
+						<Input
+							{...form.register(
+								`programs.${programIndex}.years.${yearIndex}.breakdowns.${bi}.title` as const
+							)}
 						/>
-					))}
+					</AdminField>
+					<AdminField label='Description'>
+						<Textarea
+							rows={2}
+							className='resize-none'
+							{...form.register(
+								`programs.${programIndex}.years.${yearIndex}.breakdowns.${bi}.description` as const
+							)}
+						/>
+					</AdminField>
+					<ComponentsList
+						form={form}
+						programIndex={programIndex}
+						yearIndex={yearIndex}
+						breakdownIndex={bi}
+					/>
 				</div>
-			</div>
+			))}
+			<AddRowButton onClick={() => breakdownsArray.append(createFeeBreakdown())}>
+				Add breakdown
+			</AddRowButton>
 		</div>
 	);
 }
 
-function FeeProgramFields({
+function YearsList({
 	form,
-	index,
-	onRemove
+	programIndex
 }: {
 	form: UseFormReturn<FormValues>;
-	index: number;
-	onRemove: () => void;
+	programIndex: number;
 }) {
 	const yearsArray = useFieldArray({
 		control: form.control,
-		name: `programs.${index}.years`
+		name: `programs.${programIndex}.years`
 	});
-
 	return (
-		<div className='space-y-5 rounded-2xl border border-slate-200 bg-white p-5'>
-			<div className='flex items-center justify-between'>
-				<h5 className='text-sm font-semibold text-slate-800'>Program {index + 1}</h5>
-				<Button type='button' variant='ghost' size='sm' onClick={onRemove}>
-					Remove
-				</Button>
-			</div>
-			<div className='grid gap-4 sm:grid-cols-2'>
-				<FormField control={form.control} name={`programs.${index}.id`} render={({ field }) => <FormItem><FormLabel>Program ID</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-				<FormField
-					control={form.control}
-					name={`programs.${index}.icon`}
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Icon</FormLabel>
-							<Select value={field.value} onValueChange={field.onChange}>
-								<FormControl>
-									<SelectTrigger>
-										<SelectValue placeholder='Select icon' />
-									</SelectTrigger>
-								</FormControl>
-								<SelectContent>
-									{ADMISSIONS_ICON_NAMES.map(icon => (
-										<SelectItem key={icon} value={icon}>
-											{icon}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-						</FormItem>
-					)}
-				/>
-				<FormField control={form.control} name={`programs.${index}.name`} render={({ field }) => <FormItem className='sm:col-span-2'><FormLabel>Name</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-				<FormField control={form.control} name={`programs.${index}.shortName`} render={({ field }) => <FormItem><FormLabel>Short name</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-				<FormField control={form.control} name={`programs.${index}.duration`} render={({ field }) => <FormItem><FormLabel>Duration</FormLabel><FormControl><Input placeholder='4 Years' {...field} /></FormControl></FormItem>} />
-				<FormField control={form.control} name={`programs.${index}.color`} render={({ field }) => <FormItem><FormLabel>Color hint</FormLabel><FormControl><Input placeholder='blue' {...field} /></FormControl></FormItem>} />
-				<FormField control={form.control} name={`programs.${index}.paymentNote`} render={({ field }) => <FormItem><FormLabel>Payment note</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-				<FormField control={form.control} name={`programs.${index}.description`} render={({ field }) => <FormItem className='sm:col-span-2'><FormLabel>Description</FormLabel><FormControl><Textarea rows={3} className='resize-none' {...field} /></FormControl></FormItem>} />
-			</div>
-
-			<div className='space-y-4 rounded-xl border border-slate-200 bg-slate-50/70 p-4'>
-				<div className='flex items-center justify-between'>
-					<h6 className='text-xs font-semibold uppercase tracking-[0.16em] text-slate-600'>Annual cards</h6>
-					<Button type='button' variant='outline' size='sm' onClick={() => yearsArray.append(createFeeYear())}>
-						Add year
-					</Button>
-				</div>
-				<div className='space-y-4'>
-					{yearsArray.fields.map((field, yearIndex) => (
-						<FeeYearFields
-							key={field.id}
-							form={form}
-							programIndex={index}
-							index={yearIndex}
-							onRemove={() => yearsArray.remove(yearIndex)}
+		<div className='flex flex-col gap-5'>
+			<p className='text-xs font-medium uppercase tracking-wide text-slate-500'>
+				Annual cards
+			</p>
+			{yearsArray.fields.map((field, yi) => (
+				<div key={field.id} className='flex flex-col gap-3'>
+					<div className='flex items-center justify-between gap-2'>
+						<p className='text-sm font-semibold text-slate-800'>
+							{form.watch(`programs.${programIndex}.years.${yi}.title`) ||
+								`Year ${yi + 1}`}
+						</p>
+						<div className='flex items-center gap-1'>
+							<AdminReorderControls
+								onUp={() => yearsArray.move(yi, yi - 1)}
+								onDown={() => yearsArray.move(yi, yi + 1)}
+								disableUp={yi === 0}
+								disableDown={yi === yearsArray.fields.length - 1}
+							/>
+							<Button
+								type='button'
+								variant='ghost'
+								size='icon'
+								className='h-8 w-8 text-slate-500 hover:bg-rose-50 hover:text-rose-600'
+								onClick={() => yearsArray.remove(yi)}
+								aria-label='Remove year'>
+								<Trash2 className='h-4 w-4' />
+							</Button>
+						</div>
+					</div>
+					<AdminFieldGrid>
+						<AdminField label='Year number'>
+							<Input
+								type='number'
+								{...form.register(
+									`programs.${programIndex}.years.${yi}.year` as const,
+									{ valueAsNumber: true }
+								)}
+							/>
+						</AdminField>
+						<AdminField label='Title'>
+							<Input
+								placeholder='First Year'
+								{...form.register(
+									`programs.${programIndex}.years.${yi}.title` as const
+								)}
+							/>
+						</AdminField>
+					</AdminFieldGrid>
+					<AdminField label='Note'>
+						<Textarea
+							rows={2}
+							className='resize-none'
+							{...form.register(
+								`programs.${programIndex}.years.${yi}.note` as const
+							)}
 						/>
-					))}
+					</AdminField>
+					<BreakdownsList
+						form={form}
+						programIndex={programIndex}
+						yearIndex={yi}
+					/>
 				</div>
-			</div>
+			))}
+			<AddRowButton onClick={() => yearsArray.append(createFeeYear())}>
+				Add year
+			</AddRowButton>
 		</div>
 	);
 }
@@ -452,7 +506,7 @@ export default function AdmissionsFeesForm({
 	visibleSections
 }: Props) {
 	const [isPending, startTransition] = useTransition();
-	const [message, setMessage] = useState<string | null>(null);
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 
 	const defaults = useMemo<FormValues>(
 		() => ({
@@ -499,21 +553,23 @@ export default function AdmissionsFeesForm({
 				color: program.color ?? '',
 				description: program.description ?? '',
 				paymentNote: program.paymentNote ?? '',
-				years: program.years.map((year, yearIndex) => ({
-					id: `${program.id}-year-${year.year}-${yearIndex}`,
+				years: program.years.map((year, yi) => ({
+					id: `${program.id}-year-${year.year}-${yi}`,
 					year: year.year,
 					title: year.title,
 					note: year.note ?? '',
-					breakdowns: (year.breakdowns ?? []).map((breakdown, breakdownIndex) => ({
-						id: breakdown.id ?? `${program.id}-year-${year.year}-breakdown-${breakdownIndex}`,
-						title: breakdown.title,
-						shortLabel: breakdown.shortLabel ?? '',
-						description: breakdown.description ?? '',
-						components: breakdown.components.map((component, componentIndex) => ({
-							id: `${program.id}-year-${year.year}-breakdown-${breakdownIndex}-component-${componentIndex}`,
-							name: component.name,
-							amount: component.amount,
-							description: component.description ?? ''
+					breakdowns: (year.breakdowns ?? []).map((b, bi) => ({
+						id:
+							b.id ??
+							`${program.id}-year-${year.year}-breakdown-${bi}`,
+						title: b.title,
+						shortLabel: b.shortLabel ?? '',
+						description: b.description ?? '',
+						components: b.components.map((c, ci) => ({
+							id: `${program.id}-year-${year.year}-breakdown-${bi}-component-${ci}`,
+							name: c.name,
+							amount: c.amount,
+							description: c.description ?? ''
 						}))
 					}))
 				}))
@@ -523,7 +579,10 @@ export default function AdmissionsFeesForm({
 	);
 
 	const form = useForm<FormValues>({ defaultValues: defaults });
-	const programsArray = useFieldArray({ control: form.control, name: 'programs' });
+	const programsArray = useFieldArray({
+		control: form.control,
+		name: 'programs'
+	});
 
 	useEffect(() => {
 		form.reset(defaults);
@@ -531,129 +590,307 @@ export default function AdmissionsFeesForm({
 
 	useEffect(() => {
 		onChange?.(normalizeData(form.getValues()));
-		const subscription = form.watch(values => {
-			onChange?.(normalizeData(values as FormValues));
+		const sub = form.watch(v => {
+			onChange?.(normalizeData(v as FormValues));
+			setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 		});
-		return () => subscription.unsubscribe();
+		return () => sub.unsubscribe();
 	}, [form, onChange]);
 
-	const handleSubmit = (values: FormValues) => {
-		setMessage(null);
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
+	const handleSubmit = form.handleSubmit(values => {
+		setStatus({ kind: 'saving' });
 		const payload = normalizeData(values);
 		startTransition(async () => {
-			const tasks = [];
-			if (includes(visibleSections, 'meta')) {
+			const tasks: Promise<{ ok: boolean }>[] = [];
+			if (includes(visibleSections, 'meta'))
 				tasks.push(updateAdmissionsFeesMeta(payload.meta));
-			}
-			if (includes(visibleSections, 'programs')) {
+			if (includes(visibleSections, 'programs'))
 				tasks.push(updateAdmissionsFeePrograms(payload.programs));
-			}
 			const results = await Promise.all(tasks);
-			setMessage(results.every(result => result.ok) ? 'Saved' : 'Save failed');
+			setStatus(
+				results.every(r => r.ok)
+					? { kind: 'success', message: 'Saved' }
+					: { kind: 'error', message: 'Save failed' }
+			);
 		});
-	};
+	});
 
 	return (
-		<Form {...form}>
-			<form
-				className='space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm max-h-[70vh] overflow-y-auto'
-				onSubmit={form.handleSubmit(handleSubmit)}>
-				<div className='flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between'>
-					<div>
-						<h3 className='text-lg font-semibold text-slate-900'>Fee Structure</h3>
-						<p className='text-sm text-slate-500'>
-							Manage fee page copy, support messaging, and complete program breakdowns.
-						</p>
-					</div>
-					<div className='flex items-center gap-2'>
-						{message ? (
-							<span className='rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700'>
-								{message}
-							</span>
-						) : null}
-						<Button type='submit' disabled={isPending}>
-							{isPending ? 'Saving...' : 'Save changes'}
-						</Button>
-					</div>
-				</div>
+		<AdminForm onSubmit={handleSubmit}>
+			{includes(visibleSections, 'meta') && (
+				<>
+					<AdminFormSection
+						title='Hero and program selector'
+						description='Top-of-page messaging and the program-picker copy.'>
+						<AdminField label='Title'>
+							<Input {...form.register('title')} />
+						</AdminField>
+						<AdminField label='Subtitle'>
+							<Input {...form.register('subtitle')} />
+						</AdminField>
+						<AdminField label='Description'>
+							<Textarea
+								rows={3}
+								className='resize-none'
+								{...form.register('description')}
+							/>
+						</AdminField>
+						<AdminFieldGrid>
+							<AdminField label='Academic session'>
+								<Input {...form.register('academicSession')} />
+							</AdminField>
+							<AdminField label='Billing note'>
+								<Input {...form.register('billingNote')} />
+							</AdminField>
+							<AdminField label='Selector eyebrow'>
+								<Input {...form.register('selectorEyebrow')} />
+							</AdminField>
+							<AdminField label='Selector title'>
+								<Input {...form.register('selectorTitle')} />
+							</AdminField>
+						</AdminFieldGrid>
+						<AdminField label='Selector description'>
+							<Textarea
+								rows={3}
+								className='resize-none'
+								{...form.register('selectorDescription')}
+							/>
+						</AdminField>
+						<AdminFieldGrid>
+							<AdminField label='Overview eyebrow'>
+								<Input {...form.register('overviewEyebrow')} />
+							</AdminField>
+							<AdminField label='Program total label'>
+								<Input {...form.register('programTotalLabel')} />
+							</AdminField>
+							<AdminField label='Annual views label'>
+								<Input {...form.register('annualViewsLabel')} />
+							</AdminField>
+							<AdminField label='Breakdown panels label'>
+								<Input {...form.register('breakdownPanelsLabel')} />
+							</AdminField>
+							<AdminField label='Payment note title'>
+								<Input {...form.register('paymentNoteTitle')} />
+							</AdminField>
+						</AdminFieldGrid>
+					</AdminFormSection>
 
-				{includes(visibleSections, 'meta') ? (
-					<>
-						<section className='space-y-4 rounded-xl border border-slate-200 bg-slate-50/60 p-5'>
-							<h4 className='text-sm font-semibold uppercase tracking-[0.16em] text-slate-600'>Hero and program selector</h4>
-							<FormField control={form.control} name='title' render={({ field }) => <FormItem><FormLabel>Title</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-							<FormField control={form.control} name='subtitle' render={({ field }) => <FormItem><FormLabel>Subtitle</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-							<FormField control={form.control} name='description' render={({ field }) => <FormItem><FormLabel>Description</FormLabel><FormControl><Textarea rows={3} className='resize-none' {...field} /></FormControl></FormItem>} />
-							<div className='grid gap-4 sm:grid-cols-2'>
-								<FormField control={form.control} name='academicSession' render={({ field }) => <FormItem><FormLabel>Academic session</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-								<FormField control={form.control} name='billingNote' render={({ field }) => <FormItem><FormLabel>Billing note</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-								<FormField control={form.control} name='selectorEyebrow' render={({ field }) => <FormItem><FormLabel>Selector eyebrow</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-								<FormField control={form.control} name='selectorTitle' render={({ field }) => <FormItem><FormLabel>Selector title</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-								<FormField control={form.control} name='selectorDescription' render={({ field }) => <FormItem className='sm:col-span-2'><FormLabel>Selector description</FormLabel><FormControl><Textarea rows={3} className='resize-none' {...field} /></FormControl></FormItem>} />
-								<FormField control={form.control} name='overviewEyebrow' render={({ field }) => <FormItem><FormLabel>Overview eyebrow</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-								<FormField control={form.control} name='programTotalLabel' render={({ field }) => <FormItem><FormLabel>Program total label</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-								<FormField control={form.control} name='annualViewsLabel' render={({ field }) => <FormItem><FormLabel>Annual views label</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-								<FormField control={form.control} name='breakdownPanelsLabel' render={({ field }) => <FormItem><FormLabel>Breakdown panels label</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-								<FormField control={form.control} name='paymentNoteTitle' render={({ field }) => <FormItem><FormLabel>Payment note title</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-							</div>
-						</section>
+					<AdminFormSection title='Annual sections and notes'>
+						<AdminFieldGrid>
+							<AdminField label='Snapshot eyebrow'>
+								<Input {...form.register('snapshotEyebrow')} />
+							</AdminField>
+							<AdminField label='Snapshot title'>
+								<Input {...form.register('snapshotTitle')} />
+							</AdminField>
+						</AdminFieldGrid>
+						<AdminField label='Snapshot description'>
+							<Textarea
+								rows={3}
+								className='resize-none'
+								{...form.register('snapshotDescription')}
+							/>
+						</AdminField>
+						<AdminFieldGrid>
+							<AdminField label='Year sections label'>
+								<Input {...form.register('yearSectionsLabel')} />
+							</AdminField>
+							<AdminField label='Year total label'>
+								<Input {...form.register('yearTotalLabel')} />
+							</AdminField>
+							<AdminField label='Breakdown eyebrow'>
+								<Input {...form.register('breakdownEyebrow')} />
+							</AdminField>
+							<AdminField label='Breakdown title'>
+								<Input {...form.register('breakdownTitle')} />
+							</AdminField>
+						</AdminFieldGrid>
+						<AdminField label='Breakdown description'>
+							<Textarea
+								rows={3}
+								className='resize-none'
+								{...form.register('breakdownDescription')}
+							/>
+						</AdminField>
+						<AdminFieldGrid>
+							<AdminField label='Annual heads eyebrow'>
+								<Input {...form.register('annualHeadsEyebrow')} />
+							</AdminField>
+							<AdminField label='Annual heads title'>
+								<Input {...form.register('annualHeadsTitle')} />
+							</AdminField>
+						</AdminFieldGrid>
+						<AdminField label='Annual heads description'>
+							<Textarea
+								rows={3}
+								className='resize-none'
+								{...form.register('annualHeadsDescription')}
+							/>
+						</AdminField>
+						<AdminFieldGrid>
+							<AdminField label='Important notes eyebrow'>
+								<Input {...form.register('importantNotesEyebrow')} />
+							</AdminField>
+							<AdminField label='Important notes title'>
+								<Input {...form.register('importantNotesTitle')} />
+							</AdminField>
+						</AdminFieldGrid>
+						<AdminField
+							label='Important notes'
+							hint='One note per line.'>
+							<Textarea
+								rows={5}
+								className='resize-none'
+								placeholder='One note per line'
+								{...form.register('importantNotesText')}
+							/>
+						</AdminField>
+					</AdminFormSection>
 
-						<section className='space-y-4 rounded-xl border border-slate-200 bg-slate-50/60 p-5'>
-							<h4 className='text-sm font-semibold uppercase tracking-[0.16em] text-slate-600'>Annual sections and notes</h4>
-							<div className='grid gap-4 sm:grid-cols-2'>
-								<FormField control={form.control} name='snapshotEyebrow' render={({ field }) => <FormItem><FormLabel>Snapshot eyebrow</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-								<FormField control={form.control} name='snapshotTitle' render={({ field }) => <FormItem><FormLabel>Snapshot title</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-								<FormField control={form.control} name='snapshotDescription' render={({ field }) => <FormItem className='sm:col-span-2'><FormLabel>Snapshot description</FormLabel><FormControl><Textarea rows={3} className='resize-none' {...field} /></FormControl></FormItem>} />
-								<FormField control={form.control} name='yearSectionsLabel' render={({ field }) => <FormItem><FormLabel>Year sections label</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-								<FormField control={form.control} name='yearTotalLabel' render={({ field }) => <FormItem><FormLabel>Year total label</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-								<FormField control={form.control} name='breakdownEyebrow' render={({ field }) => <FormItem><FormLabel>Breakdown eyebrow</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-								<FormField control={form.control} name='breakdownTitle' render={({ field }) => <FormItem><FormLabel>Breakdown title</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-								<FormField control={form.control} name='breakdownDescription' render={({ field }) => <FormItem className='sm:col-span-2'><FormLabel>Breakdown description</FormLabel><FormControl><Textarea rows={3} className='resize-none' {...field} /></FormControl></FormItem>} />
-								<FormField control={form.control} name='annualHeadsEyebrow' render={({ field }) => <FormItem><FormLabel>Annual heads eyebrow</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-								<FormField control={form.control} name='annualHeadsTitle' render={({ field }) => <FormItem><FormLabel>Annual heads title</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-								<FormField control={form.control} name='annualHeadsDescription' render={({ field }) => <FormItem className='sm:col-span-2'><FormLabel>Annual heads description</FormLabel><FormControl><Textarea rows={3} className='resize-none' {...field} /></FormControl></FormItem>} />
-								<FormField control={form.control} name='importantNotesEyebrow' render={({ field }) => <FormItem><FormLabel>Important notes eyebrow</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-								<FormField control={form.control} name='importantNotesTitle' render={({ field }) => <FormItem><FormLabel>Important notes title</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-								<FormField control={form.control} name='importantNotesText' render={({ field }) => <FormItem className='sm:col-span-2'><FormLabel>Important notes</FormLabel><FormControl><Textarea rows={5} className='resize-none' placeholder='One note per line' {...field} /></FormControl></FormItem>} />
-							</div>
-						</section>
+					<AdminFormSection title='Support'>
+						<AdminFieldGrid>
+							<AdminField label='Support eyebrow'>
+								<Input {...form.register('supportEyebrow')} />
+							</AdminField>
+							<AdminField label='Support title'>
+								<Input {...form.register('supportTitle')} />
+							</AdminField>
+						</AdminFieldGrid>
+						<AdminField label='Support message'>
+							<Textarea
+								rows={3}
+								className='resize-none'
+								{...form.register('supportMessage')}
+							/>
+						</AdminField>
+						<AdminFieldGrid>
+							<AdminField label='Support email'>
+								<Input {...form.register('supportEmail')} />
+							</AdminField>
+							<AdminField label='Support phone'>
+								<Input {...form.register('supportPhone')} />
+							</AdminField>
+							<AdminField label='Support card title'>
+								<Input {...form.register('supportCardTitle')} />
+							</AdminField>
+						</AdminFieldGrid>
+						<AdminField label='Support card description'>
+							<Textarea
+								rows={3}
+								className='resize-none'
+								{...form.register('supportCardDescription')}
+							/>
+						</AdminField>
+					</AdminFormSection>
+				</>
+			)}
 
-						<section className='space-y-4 rounded-xl border border-slate-200 bg-slate-50/60 p-5'>
-							<h4 className='text-sm font-semibold uppercase tracking-[0.16em] text-slate-600'>Support</h4>
-							<div className='grid gap-4 sm:grid-cols-2'>
-								<FormField control={form.control} name='supportEyebrow' render={({ field }) => <FormItem><FormLabel>Support eyebrow</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-								<FormField control={form.control} name='supportTitle' render={({ field }) => <FormItem><FormLabel>Support title</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-								<FormField control={form.control} name='supportMessage' render={({ field }) => <FormItem className='sm:col-span-2'><FormLabel>Support message</FormLabel><FormControl><Textarea rows={3} className='resize-none' {...field} /></FormControl></FormItem>} />
-								<FormField control={form.control} name='supportEmail' render={({ field }) => <FormItem><FormLabel>Support email</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-								<FormField control={form.control} name='supportPhone' render={({ field }) => <FormItem><FormLabel>Support phone</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-								<FormField control={form.control} name='supportCardTitle' render={({ field }) => <FormItem><FormLabel>Support card title</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-								<FormField control={form.control} name='supportCardDescription' render={({ field }) => <FormItem className='sm:col-span-2'><FormLabel>Support card description</FormLabel><FormControl><Textarea rows={3} className='resize-none' {...field} /></FormControl></FormItem>} />
-							</div>
-						</section>
-					</>
-				) : null}
+			{includes(visibleSections, 'programs') && (
+				<AdminFormSection title='Program fee ledgers'>
+					<AdminItemList>
+						{programsArray.fields.map((field, index) => (
+							<AdminItemCard
+								key={field.id}
+								index={index}
+								total={programsArray.fields.length}
+								title={
+									form.watch(`programs.${index}.name`) || `Program ${index + 1}`
+								}
+								subtitle={
+									form.watch(`programs.${index}.duration`) || undefined
+								}
+								onMove={d => programsArray.move(index, index + d)}
+								onRemove={() => programsArray.remove(index)}>
+								<AdminFieldGrid>
+									<AdminField label='Program ID'>
+										<Input
+											{...form.register(`programs.${index}.id` as const)}
+										/>
+									</AdminField>
+									<AdminField label='Icon'>
+										<Select
+											value={
+												form.watch(`programs.${index}.icon`) || 'GraduationCap'
+											}
+											onValueChange={v =>
+												form.setValue(`programs.${index}.icon`, v, {
+													shouldDirty: true
+												})
+											}>
+											<SelectTrigger>
+												<SelectValue placeholder='Select icon' />
+											</SelectTrigger>
+											<SelectContent>
+												{ADMISSIONS_ICON_NAMES.map(icon => (
+													<SelectItem key={icon} value={icon}>
+														{icon}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+									</AdminField>
+								</AdminFieldGrid>
+								<AdminField label='Name'>
+									<Input
+										{...form.register(`programs.${index}.name` as const)}
+									/>
+								</AdminField>
+								<AdminFieldGrid>
+									<AdminField label='Short name'>
+										<Input
+											{...form.register(`programs.${index}.shortName` as const)}
+										/>
+									</AdminField>
+									<AdminField label='Duration'>
+										<Input
+											placeholder='4 Years'
+											{...form.register(`programs.${index}.duration` as const)}
+										/>
+									</AdminField>
+									<AdminField label='Color hint'>
+										<Input
+											placeholder='blue'
+											{...form.register(`programs.${index}.color` as const)}
+										/>
+									</AdminField>
+									<AdminField label='Payment note'>
+										<Input
+											{...form.register(
+												`programs.${index}.paymentNote` as const
+											)}
+										/>
+									</AdminField>
+								</AdminFieldGrid>
+								<AdminField label='Description'>
+									<Textarea
+										rows={3}
+										className='resize-none'
+										{...form.register(
+											`programs.${index}.description` as const
+										)}
+									/>
+								</AdminField>
+								<YearsList form={form} programIndex={index} />
+							</AdminItemCard>
+						))}
+					</AdminItemList>
+					{programsArray.fields.length === 0 && (
+						<AdminEmptyState title='No programs yet' />
+					)}
+					<AddRowButton
+						onClick={() => programsArray.append(createFeeProgram())}>
+						Add program
+					</AddRowButton>
+				</AdminFormSection>
+			)}
 
-				{includes(visibleSections, 'programs') ? (
-					<section className='space-y-4 rounded-xl border border-slate-200 bg-slate-50/60 p-5'>
-						<div className='flex items-center justify-between'>
-							<h4 className='text-sm font-semibold uppercase tracking-[0.16em] text-slate-600'>Program fee ledgers</h4>
-							<Button type='button' variant='outline' size='sm' onClick={() => programsArray.append(createFeeProgram())}>
-								Add program
-							</Button>
-						</div>
-						<div className='space-y-5'>
-							{programsArray.fields.map((field, index) => (
-								<FeeProgramFields
-									key={field.id}
-									form={form}
-									index={index}
-									onRemove={() => programsArray.remove(index)}
-								/>
-							))}
-						</div>
-					</section>
-				) : null}
-			</form>
-		</Form>
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }

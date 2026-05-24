@@ -82,6 +82,16 @@ const statusFilters: Array<{ key: StatusFilter; label: string }> = [
 ];
 
 const subpagesByGroup: Record<string, SubpageGroup[]> = {
+	main: [
+		{
+			key: 'legal-subpages',
+			label: 'Legal',
+			items: [
+				{ title: 'Privacy Policy', href: '/privacy-policy' },
+				{ title: 'Terms of Service', href: '/terms-of-service' }
+			]
+		}
+	],
 	about: [
 		{
 			key: 'about-subpages',
@@ -124,6 +134,35 @@ const subpagesByGroup: Record<string, SubpageGroup[]> = {
 					title: 'Grievance Redressal',
 					href: '/statutory-committees/grievance-redressal'
 				}
+			]
+		}
+	],
+	academics: [
+		{
+			key: 'library-subpages',
+			label: 'Library Child Pages',
+			items: [
+				{ title: 'Library Advisory Committee', href: '/academia/library/advisory-committee' },
+				{ title: 'Book Acquisition', href: '/academia/library/book-acquisition' },
+				{ title: 'Book Bank', href: '/academia/library/book-bank' },
+				{ title: 'Collection', href: '/academia/library/collection' },
+				{ title: 'Contact', href: '/academia/library/contact' },
+				{ title: 'Delnet', href: '/academia/library/delnet' },
+				{ title: 'Digital Library', href: '/academia/library/digital-library' },
+				{ title: 'Downloads', href: '/academia/library/downloads' },
+				{ title: 'E-resources', href: '/academia/library/e-resources' },
+				{ title: 'Information', href: '/academia/library/information' },
+				{ title: 'MOOCS', href: '/academia/library/moocs' },
+				{ title: 'NDLI', href: '/academia/library/ndli' },
+				{ title: 'Newspapers', href: '/academia/library/newspapers' },
+				{ title: 'Photocopy Service', href: '/academia/library/photocopy-service' },
+				{ title: 'Rules', href: '/academia/library/rules' },
+				{ title: 'Self Learning', href: '/academia/library/self-learning' },
+				{ title: 'Services', href: '/academia/library/services' },
+				{ title: 'Staff', href: '/academia/library/staff' },
+				{ title: 'Timings', href: '/academia/library/timings' },
+				{ title: 'Useful Links', href: '/academia/library/useful-links' },
+				{ title: 'Weeding Out', href: '/academia/library/weeding-out' }
 			]
 		}
 	],

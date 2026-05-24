@@ -1,13 +1,28 @@
 'use client';
 
-import React, { useState, useTransition, useEffect } from 'react';
+import React, { useEffect, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue
+} from '@/components/ui/select';
 import { SUPPORTED_ICON_NAMES } from '@/components/about/icons';
-import { updateTrainingPlacement, type TrainingPlacementData } from '@/app/(Private Pages)/actions/training-placement';
+import {
+	updateTrainingPlacement,
+	type TrainingPlacementData
+} from '@/app/(Private Pages)/actions/training-placement';
+import {
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 const GRADIENT_OPTIONS = [
 	'from-blue-900 via-blue-800 to-blue-900',
@@ -22,9 +37,9 @@ interface HeroFormProps {
 	onChange?: (data: TrainingPlacementData) => void;
 }
 
-export default function HeroForm({ initialData, pageSlug, onChange }: HeroFormProps) {
+export default function HeroForm({ initialData, onChange }: HeroFormProps) {
 	const [isPending, startTransition] = useTransition();
-	const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 
 	const form = useForm({
 		defaultValues: {
@@ -37,11 +52,10 @@ export default function HeroForm({ initialData, pageSlug, onChange }: HeroFormPr
 		}
 	});
 
-	// Watch for changes and update preview in real-time
 	useEffect(() => {
-		const subscription = form.watch((values) => {
+		const sub = form.watch(values => {
 			if (onChange) {
-				const updatedData: TrainingPlacementData = {
+				onChange({
 					...initialData,
 					hero: {
 						icon: values.icon || 'Users',
@@ -51,15 +65,21 @@ export default function HeroForm({ initialData, pageSlug, onChange }: HeroFormPr
 						iconColor: values.iconColor || 'white',
 						textColor: values.textColor || 'white'
 					}
-				};
-				onChange(updatedData);
+				});
 			}
+			setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 		});
-		return () => subscription.unsubscribe();
+		return () => sub.unsubscribe();
 	}, [form, onChange, initialData]);
 
-	const onSubmit = async (values: any) => {
-		setSaveStatus('saving');
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
+	const onSubmit = form.handleSubmit(values => {
+		setStatus({ kind: 'saving' });
 		startTransition(async () => {
 			try {
 				const updatedData: TrainingPlacementData = {
@@ -73,117 +93,70 @@ export default function HeroForm({ initialData, pageSlug, onChange }: HeroFormPr
 						textColor: values.textColor
 					}
 				};
-
 				await updateTrainingPlacement(updatedData);
-				
-				if (onChange) {
-					onChange(updatedData);
-				}
-
-				setSaveStatus('saved');
-				setTimeout(() => setSaveStatus('idle'), 2000);
+				onChange?.(updatedData);
+				setStatus({ kind: 'success', message: 'Saved' });
 			} catch (error) {
 				console.error('Failed to save:', error);
-				setSaveStatus('error');
+				setStatus({ kind: 'error', message: 'Save failed' });
 			}
 		});
-	};
+	});
 
 	return (
-		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
-				<div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-					<FormField
-						control={form.control}
-						name='icon'
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Icon</FormLabel>
-								<Select onValueChange={field.onChange} value={field.value}>
-									<FormControl>
-										<SelectTrigger>
-											<SelectValue />
-										</SelectTrigger>
-									</FormControl>
-									<SelectContent>
-										{SUPPORTED_ICON_NAMES.map(icon => (
-											<SelectItem key={icon} value={icon}>
-												{icon}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-								<FormMessage />
-							</FormItem>
-						)}
+		<AdminForm onSubmit={onSubmit}>
+			<AdminFormSection
+				title='Hero section'
+				description='Top-of-page banner for the training & placement page.'>
+				<AdminFieldGrid>
+					<AdminField label='Icon'>
+						<Select
+							value={form.watch('icon')}
+							onValueChange={v => form.setValue('icon', v)}>
+							<SelectTrigger>
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								{SUPPORTED_ICON_NAMES.map(icon => (
+									<SelectItem key={icon} value={icon}>
+										{icon}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					</AdminField>
+					<AdminField label='Background gradient'>
+						<Select
+							value={form.watch('gradient')}
+							onValueChange={v => form.setValue('gradient', v)}>
+							<SelectTrigger>
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								{GRADIENT_OPTIONS.map(g => (
+									<SelectItem key={g} value={g}>
+										{g}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					</AdminField>
+				</AdminFieldGrid>
+				<AdminField label='Title'>
+					<Input
+						placeholder='About Training & Placement'
+						{...form.register('title')}
 					/>
-
-					<FormField
-						control={form.control}
-						name='gradient'
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Background Gradient</FormLabel>
-								<Select onValueChange={field.onChange} value={field.value}>
-									<FormControl>
-										<SelectTrigger>
-											<SelectValue />
-										</SelectTrigger>
-									</FormControl>
-									<SelectContent>
-										{GRADIENT_OPTIONS.map(gradient => (
-											<SelectItem key={gradient} value={gradient}>
-												{gradient}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-								<FormMessage />
-							</FormItem>
-						)}
+				</AdminField>
+				<AdminField label='Subtitle'>
+					<Input
+						placeholder='Empowering students…'
+						{...form.register('subtitle')}
 					/>
+				</AdminField>
+			</AdminFormSection>
 
-					<FormField
-						control={form.control}
-						name='title'
-						render={({ field }) => (
-							<FormItem className='md:col-span-2'>
-								<FormLabel>Title</FormLabel>
-								<FormControl>
-									<Input {...field} placeholder='About Training & Placement' />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-
-					<FormField
-						control={form.control}
-						name='subtitle'
-						render={({ field }) => (
-							<FormItem className='md:col-span-2'>
-								<FormLabel>Subtitle</FormLabel>
-								<FormControl>
-									<Input {...field} placeholder='Empowering students...' />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-				</div>
-
-				<div className='flex items-center gap-3'>
-					<Button type='submit' disabled={isPending}>
-						{isPending ? 'Saving...' : 'Save Changes'}
-					</Button>
-					{saveStatus === 'saved' && (
-						<span className='text-sm text-green-600'>✓ Saved successfully</span>
-					)}
-					{saveStatus === 'error' && (
-						<span className='text-sm text-red-600'>Failed to save</span>
-					)}
-				</div>
-			</form>
-		</Form>
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }

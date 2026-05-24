@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "test:site-chrome": "node scripts/verify-site-chrome.mjs",
     "prebuild": "npx prisma generate",
     "postbuild": "next-sitemap",
     "prisma:push": "prisma db push",

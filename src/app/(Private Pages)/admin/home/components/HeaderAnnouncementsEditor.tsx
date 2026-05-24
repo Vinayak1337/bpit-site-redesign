@@ -4,6 +4,7 @@ import React, { useMemo, useState } from 'react';
 import Editable from '@/components/ui/Editable';
 import Header from '@/components/header/header';
 import HeaderAnnouncementsForm from '@/app/(Private Pages)/admin/home/components/HeaderAnnouncementsForm';
+import { defaultSiteChromeConfig } from '@/data/site-chrome';
 
 import type { ContactType } from '@prisma/client';
 
@@ -43,7 +44,11 @@ export default function HeaderAnnouncementsEditor({
 					onChange={setItems}
 				/>
 			}>
-			<Header contacts={contacts} announcementsData={mergedAnnouncements} />
+			<Header
+				contacts={contacts}
+				announcementsData={mergedAnnouncements}
+				siteChromeConfig={defaultSiteChromeConfig}
+			/>
 		</Editable>
 	);
 }

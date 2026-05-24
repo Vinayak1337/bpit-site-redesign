@@ -33,7 +33,12 @@ const SCRIPTS = {
 	grievance: 'seed-statutory-committees.cjs', // Placeholder if added to script
 
 	gallery: 'seed-gallery.cjs',
-	'mandatory-disclosure': 'seed-mandatory-disclosure.cjs'
+	'mandatory-disclosure': 'seed-mandatory-disclosure.cjs',
+
+	// Global site chrome (navbar + footer)
+	'site-chrome': 'seed-site-chrome.cjs',
+	navbar: 'seed-site-chrome.cjs',
+	footer: 'seed-site-chrome.cjs'
 };
 
 const args = process.argv.slice(2);

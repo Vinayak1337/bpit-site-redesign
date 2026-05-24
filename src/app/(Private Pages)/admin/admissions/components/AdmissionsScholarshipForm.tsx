@@ -2,17 +2,8 @@
 
 import { useEffect, useMemo, useState, useTransition } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage
-} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
 import {
 	type AdmissionsScholarshipCategory,
 	type AdmissionsScholarshipIntro,
@@ -32,6 +23,18 @@ import {
 	SelectValue
 } from '@/components/ui/select';
 import { createClientId } from '@/lib/utils';
+import {
+	AddRowButton,
+	AdminEmptyState,
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	AdminItemCard,
+	AdminItemList,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 type ScholarshipPageData = {
 	intro: AdmissionsScholarshipIntro;
@@ -82,13 +85,13 @@ const createCategory = () => ({
 	portalUrl: ''
 });
 
-const createNote = () => ({ id: createClientId('admissions-scholarship-note'), value: '' });
+const createNote = () => ({
+	id: createClientId('admissions-scholarship-note'),
+	value: ''
+});
 
 const splitLines = (value: string) =>
-	value
-		.split('\n')
-		.map(item => item.trim())
-		.filter(Boolean);
+	value.split('\n').map(i => i.trim()).filter(Boolean);
 
 const includes = <T extends string>(visibleSections: T[] | undefined, value: T) =>
 	!visibleSections || visibleSections.includes(value);
@@ -102,21 +105,21 @@ const normalizeData = (values: FormValues): ScholarshipPageData => ({
 		beforeApplyDescription: values.beforeApplyDescription.trim()
 	},
 	categories: values.categories
-		.map(category => ({
-			title: category.title.trim(),
-			icon: category.icon.trim(),
-			badge: category.badge.trim(),
-			accent: category.accent.trim(),
-			scholarships: splitLines(category.scholarshipsText),
-			portal: category.portal.trim(),
-			portalUrl: category.portalUrl.trim()
+		.map(c => ({
+			title: c.title.trim(),
+			icon: c.icon.trim(),
+			badge: c.badge.trim(),
+			accent: c.accent.trim(),
+			scholarships: splitLines(c.scholarshipsText),
+			portal: c.portal.trim(),
+			portalUrl: c.portalUrl.trim()
 		}))
-		.filter(category => category.title && category.badge),
+		.filter(c => c.title && c.badge),
 	notes: {
 		eyebrow: '',
 		title: values.notesTitle.trim(),
 		description: values.notesDescription.trim(),
-		items: values.notesItems.map(item => item.value.trim()).filter(Boolean)
+		items: values.notesItems.map(i => i.value.trim()).filter(Boolean)
 	},
 	support: {
 		title: values.supportTitle.trim(),
@@ -132,7 +135,7 @@ export default function AdmissionsScholarshipForm({
 	visibleSections
 }: Props) {
 	const [isPending, startTransition] = useTransition();
-	const [message, setMessage] = useState<string | null>(null);
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 
 	const defaults = useMemo<FormValues>(
 		() => ({
@@ -143,25 +146,25 @@ export default function AdmissionsScholarshipForm({
 			beforeApplyDescription: initialData.intro.beforeApplyDescription,
 			categories:
 				initialData.categories.length > 0
-					? initialData.categories.map((category, index) => ({
-					id: `scholarship-category-${index}`,
-					title: category.title,
-					icon: category.icon,
-					badge: category.badge,
-					accent: category.accent,
-					scholarshipsText: category.scholarships.join('\n'),
-					portal: category.portal ?? '',
-					portalUrl: category.portalUrl ?? ''
-				}))
+					? initialData.categories.map((c, i) => ({
+							id: `scholarship-category-${i}`,
+							title: c.title,
+							icon: c.icon,
+							badge: c.badge,
+							accent: c.accent,
+							scholarshipsText: c.scholarships.join('\n'),
+							portal: c.portal ?? '',
+							portalUrl: c.portalUrl ?? ''
+						}))
 					: [createCategory()],
 			notesTitle: initialData.notes.title,
 			notesDescription: initialData.notes.description,
 			notesItems:
 				initialData.notes.items.length > 0
-					? initialData.notes.items.map((item, index) => ({
-					id: `scholarship-note-${index}`,
-					value: item
-				}))
+					? initialData.notes.items.map((item, i) => ({
+							id: `scholarship-note-${i}`,
+							value: item
+						}))
 					: [createNote()],
 			supportTitle: initialData.support.title,
 			supportDescription: initialData.support.description,
@@ -176,7 +179,10 @@ export default function AdmissionsScholarshipForm({
 		control: form.control,
 		name: 'categories'
 	});
-	const notesArray = useFieldArray({ control: form.control, name: 'notesItems' });
+	const notesArray = useFieldArray({
+		control: form.control,
+		name: 'notesItems'
+	});
 
 	useEffect(() => {
 		form.reset(defaults);
@@ -184,182 +190,227 @@ export default function AdmissionsScholarshipForm({
 
 	useEffect(() => {
 		onChange?.(normalizeData(form.getValues()));
-		const subscription = form.watch(values => {
-			onChange?.(normalizeData(values as FormValues));
+		const sub = form.watch(v => {
+			onChange?.(normalizeData(v as FormValues));
+			setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 		});
-		return () => subscription.unsubscribe();
+		return () => sub.unsubscribe();
 	}, [form, onChange]);
 
-	const handleSubmit = (values: FormValues) => {
-		setMessage(null);
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
+	const handleSubmit = form.handleSubmit(values => {
+		setStatus({ kind: 'saving' });
 		const payload = normalizeData(values);
 		startTransition(async () => {
-			const tasks = [];
-			if (includes(visibleSections, 'intro')) {
+			const tasks: Promise<{ ok: boolean }>[] = [];
+			if (includes(visibleSections, 'intro'))
 				tasks.push(updateAdmissionsScholarshipIntro(payload.intro));
-			}
-			if (includes(visibleSections, 'categories')) {
-				tasks.push(updateAdmissionsScholarshipCategories(payload.categories));
-			}
-			if (includes(visibleSections, 'notes')) {
+			if (includes(visibleSections, 'categories'))
+				tasks.push(
+					updateAdmissionsScholarshipCategories(payload.categories)
+				);
+			if (includes(visibleSections, 'notes'))
 				tasks.push(updateAdmissionsScholarshipNotes(payload.notes));
-			}
-			if (includes(visibleSections, 'support')) {
+			if (includes(visibleSections, 'support'))
 				tasks.push(updateAdmissionsScholarshipSupport(payload.support));
-			}
 			const results = await Promise.all(tasks);
-			setMessage(results.every(result => result.ok) ? 'Saved' : 'Save failed');
+			setStatus(
+				results.every(r => r.ok)
+					? { kind: 'success', message: 'Saved' }
+					: { kind: 'error', message: 'Save failed' }
+			);
 		});
-	};
+	});
 
 	return (
-		<Form {...form}>
-			<form
-				className='space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm max-h-[70vh] overflow-y-auto'
-				onSubmit={form.handleSubmit(handleSubmit)}>
-				<div className='flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between'>
-					<div>
-						<h3 className='text-lg font-semibold text-slate-900'>Scholarships</h3>
-						<p className='text-sm text-slate-500'>
-							Manage scholarship copy, portal cards, notes, and support details.
-						</p>
-					</div>
-					<div className='flex items-center gap-2'>
-						{message ? (
-							<span className='rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700'>
-								{message}
-							</span>
-						) : null}
-						<Button type='submit' disabled={isPending}>
-							{isPending ? 'Saving...' : 'Save changes'}
-						</Button>
-					</div>
-				</div>
+		<AdminForm onSubmit={handleSubmit}>
+			{includes(visibleSections, 'intro') && (
+				<AdminFormSection title='Intro'>
+					<AdminField label='Badge'>
+						<Input {...form.register('introBadge')} />
+					</AdminField>
+					<AdminField label='Title'>
+						<Input {...form.register('introTitle')} />
+					</AdminField>
+					<AdminField label='Subtitle'>
+						<Textarea
+							rows={3}
+							className='resize-none'
+							{...form.register('introSubtitle')}
+						/>
+					</AdminField>
+					<AdminField label='Before apply title'>
+						<Input {...form.register('beforeApplyTitle')} />
+					</AdminField>
+					<AdminField label='Before apply description'>
+						<Textarea
+							rows={4}
+							className='resize-none'
+							{...form.register('beforeApplyDescription')}
+						/>
+					</AdminField>
+				</AdminFormSection>
+			)}
 
-				{includes(visibleSections, 'intro') ? (
-					<section className='space-y-4 rounded-xl border border-slate-200 bg-slate-50/60 p-5'>
-						<h4 className='text-sm font-semibold uppercase tracking-[0.16em] text-slate-600'>Intro</h4>
-						<FormField control={form.control} name='introBadge' render={({ field }) => <FormItem><FormLabel>Badge</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>} />
-						<FormField control={form.control} name='introTitle' render={({ field }) => <FormItem><FormLabel>Title</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>} />
-						<FormField control={form.control} name='introSubtitle' render={({ field }) => <FormItem><FormLabel>Subtitle</FormLabel><FormControl><Textarea rows={3} className='resize-none' {...field} /></FormControl><FormMessage /></FormItem>} />
-						<FormField control={form.control} name='beforeApplyTitle' render={({ field }) => <FormItem><FormLabel>Before apply title</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>} />
-						<FormField control={form.control} name='beforeApplyDescription' render={({ field }) => <FormItem><FormLabel>Before apply description</FormLabel><FormControl><Textarea rows={4} className='resize-none' {...field} /></FormControl><FormMessage /></FormItem>} />
-					</section>
-				) : null}
-
-				{includes(visibleSections, 'categories') ? (
-					<section className='space-y-4 rounded-xl border border-slate-200 bg-slate-50/60 p-5'>
-						<div className='flex items-center justify-between'>
-							<h4 className='text-sm font-semibold uppercase tracking-[0.16em] text-slate-600'>
-								Portal categories
-							</h4>
-							<Button
-								type='button'
-								variant='outline'
-								size='sm'
-								onClick={() => categoriesArray.append(createCategory())}>
-								Add category
-							</Button>
-						</div>
-						<div className='space-y-4'>
-							{categoriesArray.fields.map((field, index) => (
-								<div key={field.id} className='space-y-4 rounded-xl border border-slate-200 bg-white p-4'>
-									<div className='flex items-center justify-between'>
-										<span className='text-sm font-medium text-slate-700'>Category {index + 1}</span>
-										<Button type='button' variant='ghost' size='sm' onClick={() => categoriesArray.remove(index)}>
-											Remove
-										</Button>
-									</div>
-									<div className='grid gap-4 sm:grid-cols-2'>
-										<FormField control={form.control} name={`categories.${index}.title`} render={({ field }) => <FormItem><FormLabel>Title</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-										<FormField control={form.control} name={`categories.${index}.badge`} render={({ field }) => <FormItem><FormLabel>Badge</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-										<FormField
-											control={form.control}
-											name={`categories.${index}.icon`}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel>Icon</FormLabel>
-													<Select value={field.value} onValueChange={field.onChange}>
-														<FormControl>
-															<SelectTrigger>
-																<SelectValue placeholder='Select icon' />
-															</SelectTrigger>
-														</FormControl>
-														<SelectContent>
-															{ADMISSIONS_ICON_NAMES.map(icon => (
-																<SelectItem key={icon} value={icon}>
-																	{icon}
-																</SelectItem>
-															))}
-														</SelectContent>
-													</Select>
-												</FormItem>
+			{includes(visibleSections, 'categories') && (
+				<AdminFormSection title='Portal categories'>
+					<AdminItemList>
+						{categoriesArray.fields.map((field, index) => (
+							<AdminItemCard
+								key={field.id}
+								index={index}
+								total={categoriesArray.fields.length}
+								title={
+									form.watch(`categories.${index}.title`) ||
+									`Category ${index + 1}`
+								}
+								subtitle={form.watch(`categories.${index}.badge`) || undefined}
+								onMove={d => categoriesArray.move(index, index + d)}
+								onRemove={() => categoriesArray.remove(index)}>
+								<AdminFieldGrid>
+									<AdminField label='Title'>
+										<Input
+											{...form.register(`categories.${index}.title` as const)}
+										/>
+									</AdminField>
+									<AdminField label='Badge'>
+										<Input
+											{...form.register(`categories.${index}.badge` as const)}
+										/>
+									</AdminField>
+									<AdminField label='Icon'>
+										<Select
+											value={form.watch(`categories.${index}.icon`) || 'Award'}
+											onValueChange={v =>
+												form.setValue(`categories.${index}.icon`, v, {
+													shouldDirty: true
+												})
+											}>
+											<SelectTrigger>
+												<SelectValue placeholder='Select icon' />
+											</SelectTrigger>
+											<SelectContent>
+												{ADMISSIONS_ICON_NAMES.map(icon => (
+													<SelectItem key={icon} value={icon}>
+														{icon}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+									</AdminField>
+									<AdminField label='Accent classes'>
+										<Input
+											{...form.register(`categories.${index}.accent` as const)}
+										/>
+									</AdminField>
+									<AdminField label='Portal label'>
+										<Input
+											{...form.register(`categories.${index}.portal` as const)}
+										/>
+									</AdminField>
+									<AdminField label='Portal URL'>
+										<Input
+											placeholder='https://…'
+											{...form.register(
+												`categories.${index}.portalUrl` as const
 											)}
 										/>
-										<FormField control={form.control} name={`categories.${index}.accent`} render={({ field }) => <FormItem><FormLabel>Accent classes</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-										<FormField control={form.control} name={`categories.${index}.portal`} render={({ field }) => <FormItem><FormLabel>Portal label</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-										<FormField control={form.control} name={`categories.${index}.portalUrl`} render={({ field }) => <FormItem><FormLabel>Portal URL</FormLabel><FormControl><Input placeholder='https://...' {...field} /></FormControl></FormItem>} />
-									</div>
-									<FormField
-										control={form.control}
-										name={`categories.${index}.scholarshipsText`}
-										render={({ field }) => (
-											<FormItem>
-												<FormLabel>Scholarships</FormLabel>
-												<FormControl>
-													<Textarea
-														rows={5}
-														className='resize-none'
-														placeholder='One scholarship per line'
-														{...field}
-													/>
-												</FormControl>
-												<p className='text-xs text-slate-500'>Use one line per scholarship.</p>
-											</FormItem>
+									</AdminField>
+								</AdminFieldGrid>
+								<AdminField
+									label='Scholarships'
+									hint='Use one line per scholarship.'>
+									<Textarea
+										rows={5}
+										className='resize-none'
+										placeholder='One scholarship per line'
+										{...form.register(
+											`categories.${index}.scholarshipsText` as const
 										)}
 									/>
-								</div>
-							))}
-						</div>
-					</section>
-				) : null}
+								</AdminField>
+							</AdminItemCard>
+						))}
+					</AdminItemList>
+					{categoriesArray.fields.length === 0 && (
+						<AdminEmptyState title='No categories yet' />
+					)}
+					<AddRowButton
+						onClick={() => categoriesArray.append(createCategory())}>
+						Add category
+					</AddRowButton>
+				</AdminFormSection>
+			)}
 
-				{includes(visibleSections, 'notes') ? (
-					<section className='space-y-4 rounded-xl border border-slate-200 bg-slate-50/60 p-5'>
-						<h4 className='text-sm font-semibold uppercase tracking-[0.16em] text-slate-600'>Notes</h4>
-						<FormField control={form.control} name='notesTitle' render={({ field }) => <FormItem><FormLabel>Title</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-						<FormField control={form.control} name='notesDescription' render={({ field }) => <FormItem><FormLabel>Description</FormLabel><FormControl><Textarea rows={3} className='resize-none' {...field} /></FormControl></FormItem>} />
-						<div className='flex items-center justify-between'>
-							<p className='text-sm font-medium text-slate-700'>Note items</p>
-							<Button type='button' variant='outline' size='sm' onClick={() => notesArray.append(createNote())}>
-								Add note
-							</Button>
-						</div>
-						<div className='space-y-3'>
-							{notesArray.fields.map((field, index) => (
-								<div key={field.id} className='flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-4'>
-									<FormField control={form.control} name={`notesItems.${index}.value`} render={({ field }) => <FormItem className='flex-1'><FormLabel>Note</FormLabel><FormControl><Textarea rows={2} className='resize-none' {...field} /></FormControl></FormItem>} />
-									<Button type='button' variant='ghost' size='sm' onClick={() => notesArray.remove(index)}>
-										Remove
-									</Button>
-								</div>
-							))}
-						</div>
-					</section>
-				) : null}
+			{includes(visibleSections, 'notes') && (
+				<AdminFormSection title='Notes'>
+					<AdminField label='Title'>
+						<Input {...form.register('notesTitle')} />
+					</AdminField>
+					<AdminField label='Description'>
+						<Textarea
+							rows={3}
+							className='resize-none'
+							{...form.register('notesDescription')}
+						/>
+					</AdminField>
+					<AdminItemList>
+						{notesArray.fields.map((field, index) => (
+							<AdminItemCard
+								key={field.id}
+								index={index}
+								total={notesArray.fields.length}
+								title={`Note ${index + 1}`}
+								onMove={d => notesArray.move(index, index + d)}
+								onRemove={() => notesArray.remove(index)}>
+								<AdminField label='Note'>
+									<Textarea
+										rows={2}
+										className='resize-none'
+										{...form.register(`notesItems.${index}.value` as const)}
+									/>
+								</AdminField>
+							</AdminItemCard>
+						))}
+					</AdminItemList>
+					{notesArray.fields.length === 0 && (
+						<AdminEmptyState title='No notes yet' />
+					)}
+					<AddRowButton onClick={() => notesArray.append(createNote())}>
+						Add note
+					</AddRowButton>
+				</AdminFormSection>
+			)}
 
-				{includes(visibleSections, 'support') ? (
-					<section className='space-y-4 rounded-xl border border-slate-200 bg-slate-50/60 p-5'>
-						<h4 className='text-sm font-semibold uppercase tracking-[0.16em] text-slate-600'>Support</h4>
-						<FormField control={form.control} name='supportTitle' render={({ field }) => <FormItem><FormLabel>Title</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-						<FormField control={form.control} name='supportDescription' render={({ field }) => <FormItem><FormLabel>Description</FormLabel><FormControl><Textarea rows={3} className='resize-none' {...field} /></FormControl></FormItem>} />
-						<div className='grid gap-4 sm:grid-cols-2'>
-							<FormField control={form.control} name='supportEmail' render={({ field }) => <FormItem><FormLabel>Email</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-							<FormField control={form.control} name='supportPhone' render={({ field }) => <FormItem><FormLabel>Phone</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-						</div>
-					</section>
-				) : null}
-			</form>
-		</Form>
+			{includes(visibleSections, 'support') && (
+				<AdminFormSection title='Support'>
+					<AdminField label='Title'>
+						<Input {...form.register('supportTitle')} />
+					</AdminField>
+					<AdminField label='Description'>
+						<Textarea
+							rows={3}
+							className='resize-none'
+							{...form.register('supportDescription')}
+						/>
+					</AdminField>
+					<AdminFieldGrid>
+						<AdminField label='Email'>
+							<Input {...form.register('supportEmail')} />
+						</AdminField>
+						<AdminField label='Phone'>
+							<Input {...form.register('supportPhone')} />
+						</AdminField>
+					</AdminFieldGrid>
+				</AdminFormSection>
+			)}
+
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }

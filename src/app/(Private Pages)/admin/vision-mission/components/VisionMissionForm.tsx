@@ -1,18 +1,10 @@
 'use client';
 
-import { useEffect, useMemo, useState, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
+import type { UseFieldArrayReturn } from 'react-hook-form';
 import { useFieldArray, useForm } from 'react-hook-form';
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage
-} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
 import {
 	Select,
 	SelectContent,
@@ -20,11 +12,20 @@ import {
 	SelectTrigger,
 	SelectValue
 } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Loader2, Save, Plus, Trash2 } from 'lucide-react';
 import type { VisionMissionData } from '@/app/(Private Pages)/actions/vision-mission';
 import { updateVisionMission } from '@/app/(Private Pages)/actions/vision-mission';
 import { SUPPORTED_ICON_NAMES } from '@/components/about/icons';
+import {
+	AddRowButton,
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	AdminItemCard,
+	AdminItemList,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 type PillarFormValue = {
 	id: string;
@@ -33,7 +34,6 @@ type PillarFormValue = {
 	description: string;
 	color: VisionMissionData['pillars'][number]['color'];
 };
-
 type AspirationFormValue = {
 	id: string;
 	icon: string;
@@ -57,7 +57,9 @@ type Props = {
 	initialData: VisionMissionData;
 	pageSlug: string;
 	onChange?: (data: VisionMissionData) => void;
-	visibleSections?: Array<'hero' | 'visionStatement' | 'pillars' | 'aspirations'>;
+	visibleSections?: Array<
+		'hero' | 'visionStatement' | 'pillars' | 'aspirations'
+	>;
 };
 
 const COLOR_OPTIONS: VisionMissionData['pillars'][number]['color'][] = [
@@ -69,16 +71,13 @@ const COLOR_OPTIONS: VisionMissionData['pillars'][number]['color'][] = [
 	'indigo'
 ];
 
-const FALLBACK_ICON = 'Eye';
-
 const createEmptyPillar = (): PillarFormValue => ({
 	id: crypto.randomUUID(),
-	icon: FALLBACK_ICON,
+	icon: 'Eye',
 	title: '',
 	description: '',
 	color: 'blue'
 });
-
 const createEmptyAspiration = (): AspirationFormValue => ({
 	id: crypto.randomUUID(),
 	icon: 'TrendingUp',
@@ -87,33 +86,30 @@ const createEmptyAspiration = (): AspirationFormValue => ({
 	color: 'blue'
 });
 
-const normalizeVisionMission = (values: Partial<FormValues>): VisionMissionData => {
-	const pillars = (values.pillars ?? [])
-		.map(pillar => ({
-			icon: pillar.icon?.trim().length ? pillar.icon.trim() : FALLBACK_ICON,
-			title: (pillar.title ?? '').trim(),
-			description: (pillar.description ?? '').trim(),
-			color: COLOR_OPTIONS.includes(pillar.color ?? 'blue')
-				? pillar.color ?? 'blue'
-				: 'blue'
-		}))
-		.filter(pillar => pillar.title.length > 0 && pillar.description.length > 0);
-
-	const aspirations = (values.aspirations ?? [])
-		.map(aspiration => ({
-			icon: aspiration.icon?.trim().length ? aspiration.icon.trim() : 'TrendingUp',
-			title: (aspiration.title ?? '').trim(),
-			description: (aspiration.description ?? '').trim(),
-			color: COLOR_OPTIONS.includes(aspiration.color ?? 'blue')
-				? aspiration.color ?? 'blue'
-				: 'blue'
-		}))
-		.filter(aspiration => aspiration.title.length > 0 && aspiration.description.length > 0);
+const normalizeVisionMission = (
+	values: Partial<FormValues>
+): VisionMissionData => {
+	const mapItems = <T extends PillarFormValue | AspirationFormValue>(
+		list: T[] | undefined,
+		fallbackIcon: string
+	) =>
+		(list ?? [])
+			.map(i => ({
+				icon: i.icon?.trim().length ? i.icon.trim() : fallbackIcon,
+				title: (i.title ?? '').trim(),
+				description: (i.description ?? '').trim(),
+				color: COLOR_OPTIONS.includes(i.color ?? 'blue')
+					? i.color ?? 'blue'
+					: 'blue'
+			}))
+			.filter(i => i.title.length > 0 && i.description.length > 0);
 
 	return {
 		hero: {
 			title: (values.heroTitle ?? '').trim() || 'Our Vision',
-			subtitle: (values.heroSubtitle ?? '').trim() || 'Inspiring Excellence, Shaping Tomorrow',
+			subtitle:
+				(values.heroSubtitle ?? '').trim() ||
+				'Inspiring Excellence, Shaping Tomorrow',
 			icon: (values.heroIcon ?? '').trim() || 'Eye',
 			gradient: 'from-blue-50 to-indigo-100',
 			borderColor: 'border-blue-200',
@@ -126,10 +122,109 @@ const normalizeVisionMission = (values: Partial<FormValues>): VisionMissionData 
 			borderColor: 'border-blue-100',
 			quote: (values.visionQuote ?? '').trim() || ''
 		},
-		pillars,
-		aspirations
+		pillars: mapItems(values.pillars, 'Eye'),
+		aspirations: mapItems(values.aspirations, 'TrendingUp')
 	};
 };
+
+function ItemListSection({
+	title,
+	addLabel,
+	fieldName,
+	array,
+	form,
+	defaultIcon,
+	createEmpty
+}: {
+	title: string;
+	addLabel: string;
+	fieldName: 'pillars' | 'aspirations';
+	array: UseFieldArrayReturn<FormValues, 'pillars' | 'aspirations', 'id'>;
+	form: ReturnType<typeof useForm<FormValues>>;
+	defaultIcon: string;
+	createEmpty: () => PillarFormValue | AspirationFormValue;
+}) {
+	return (
+		<AdminFormSection title={title}>
+			<AdminItemList>
+				{array.fields.map((field, index) => (
+					<AdminItemCard
+						key={field.id}
+						index={index}
+						total={array.fields.length}
+						title={
+							form.watch(`${fieldName}.${index}.title`) || `Item ${index + 1}`
+						}
+						onMove={d => array.move(index, index + d)}
+						onRemove={
+							array.fields.length > 1 ? () => array.remove(index) : undefined
+						}>
+						<AdminFieldGrid>
+							<AdminField label='Icon'>
+								<Select
+									value={form.watch(`${fieldName}.${index}.icon`) || defaultIcon}
+									onValueChange={v =>
+										form.setValue(`${fieldName}.${index}.icon`, v, {
+											shouldDirty: true
+										})
+									}>
+									<SelectTrigger>
+										<SelectValue placeholder='Select an icon' />
+									</SelectTrigger>
+									<SelectContent>
+										{SUPPORTED_ICON_NAMES.map(icon => (
+											<SelectItem key={icon} value={icon}>
+												{icon}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							</AdminField>
+							<AdminField label='Color'>
+								<Select
+									value={form.watch(`${fieldName}.${index}.color`) || 'blue'}
+									onValueChange={v =>
+										form.setValue(
+											`${fieldName}.${index}.color`,
+											v as PillarFormValue['color'],
+											{ shouldDirty: true }
+										)
+									}>
+									<SelectTrigger>
+										<SelectValue placeholder='Select a color' />
+									</SelectTrigger>
+									<SelectContent>
+										{COLOR_OPTIONS.map(color => (
+											<SelectItem key={color} value={color}>
+												{color.charAt(0).toUpperCase() + color.slice(1)}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							</AdminField>
+						</AdminFieldGrid>
+						<AdminField label='Title'>
+							<Input
+								placeholder='Item title'
+								{...form.register(`${fieldName}.${index}.title` as const)}
+							/>
+						</AdminField>
+						<AdminField label='Description'>
+							<Textarea
+								rows={3}
+								placeholder='Item description'
+								{...form.register(`${fieldName}.${index}.description` as const)}
+							/>
+						</AdminField>
+					</AdminItemCard>
+				))}
+			</AdminItemList>
+			<AddRowButton onClick={() => array.append(createEmpty())}>
+				{addLabel}
+			</AddRowButton>
+		</AdminFormSection>
+	);
+}
 
 export default function VisionMissionForm({
 	initialData,
@@ -138,7 +233,7 @@ export default function VisionMissionForm({
 	visibleSections
 }: Props) {
 	const [isPending, startTransition] = useTransition();
-	const [message, setMessage] = useState<string | null>(null);
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 
 	const form = useForm<FormValues>({
 		defaultValues: {
@@ -148,509 +243,177 @@ export default function VisionMissionForm({
 			visionTitle: initialData.visionStatement.title,
 			visionIcon: initialData.visionStatement.icon,
 			visionQuote: initialData.visionStatement.quote,
-			pillars: initialData.pillars.length > 0 
-				? initialData.pillars.map(pillar => ({
-					id: crypto.randomUUID(),
-					icon: pillar.icon,
-					title: pillar.title,
-					description: pillar.description,
-					color: pillar.color
-				}))
-				: [createEmptyPillar()],
-			aspirations: initialData.aspirations.length > 0 
-				? initialData.aspirations.map(aspiration => ({
-					id: crypto.randomUUID(),
-					icon: aspiration.icon,
-					title: aspiration.title,
-					description: aspiration.description,
-					color: aspiration.color
-				}))
-				: [createEmptyAspiration()]
+			pillars:
+				initialData.pillars.length > 0
+					? initialData.pillars.map(p => ({
+							id: crypto.randomUUID(),
+							icon: p.icon,
+							title: p.title,
+							description: p.description,
+							color: p.color
+						}))
+					: [createEmptyPillar()],
+			aspirations:
+				initialData.aspirations.length > 0
+					? initialData.aspirations.map(a => ({
+							id: crypto.randomUUID(),
+							icon: a.icon,
+							title: a.title,
+							description: a.description,
+							color: a.color
+						}))
+					: [createEmptyAspiration()]
 		}
 	});
 
-	const pillarsArray = useFieldArray({
-		control: form.control,
-		name: 'pillars'
-	});
-
-	const aspirationsArray = useFieldArray({
+	const pillarsArr = useFieldArray({ control: form.control, name: 'pillars' });
+	const aspirationsArr = useFieldArray({
 		control: form.control,
 		name: 'aspirations'
 	});
 
 	useEffect(() => {
 		onChange?.(normalizeVisionMission(form.getValues()));
-		const subscription = form.watch(values => {
-			const formValues: Partial<FormValues> = {
-				...values,
-				pillars: values.pillars?.filter(Boolean) as PillarFormValue[],
-				aspirations: values.aspirations?.filter(Boolean) as AspirationFormValue[]
-			};
-			onChange?.(normalizeVisionMission(formValues));
+		const sub = form.watch(values => {
+			onChange?.(
+				normalizeVisionMission({
+					...values,
+					pillars: values.pillars?.filter(Boolean) as PillarFormValue[],
+					aspirations: values.aspirations?.filter(
+						Boolean
+					) as AspirationFormValue[]
+				})
+			);
+			setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 		});
-		return () => subscription.unsubscribe();
+		return () => sub.unsubscribe();
 	}, [form, onChange]);
 
-	const handleSubmit = (values: FormValues) => {
-		setMessage(null);
-		const payload = normalizeVisionMission(values);
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
+	const handleSubmit = form.handleSubmit(values => {
+		setStatus({ kind: 'saving' });
 		startTransition(async () => {
 			try {
-				await updateVisionMission(pageSlug, payload);
-				setMessage('Saved');
+				await updateVisionMission(pageSlug, normalizeVisionMission(values));
+				setStatus({ kind: 'success', message: 'Saved' });
 			} catch (error) {
-				console.error('Failed to update vision mission:', error);
-				setMessage('Save failed');
+				console.error('Error updating vision-mission:', error);
+				setStatus({ kind: 'error', message: 'Save failed' });
 			}
 		});
-	};
+	});
 
-	const iconOptions = useMemo(() => {
-		const unique = new Set(SUPPORTED_ICON_NAMES);
-		return Array.from(unique);
-	}, []);
 	const showSection = (
-		section: 'hero' | 'visionStatement' | 'pillars' | 'aspirations'
-	) => !visibleSections || visibleSections.includes(section);
+		s: 'hero' | 'visionStatement' | 'pillars' | 'aspirations'
+	) => !visibleSections || visibleSections.includes(s);
 
 	return (
-		<Form {...form}>
-			<form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-8 max-w-5xl mx-auto pb-24'>
-				
-				<div className='flex items-center justify-between'>
-					<div>
-						<h3 className='text-lg font-semibold text-gray-900'>Vision & Mission</h3>
-						<p className='text-sm text-gray-500'>Edit vision statement, pillars, and future aspirations.</p>
-					</div>
-					<div className='flex items-center gap-2'>
-						{message && (
-							<span className='rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700'>
-								{message}
-							</span>
-						)}
-						<Button type='submit' disabled={isPending}>
-							{isPending ? (
-								<>
-									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-									Saving...
-								</>
-							) : (
-								<>
-									<Save className="mr-2 h-4 w-4" />
-									Save Changes
-								</>
-							)}
-						</Button>
-					</div>
-				</div>
+		<AdminForm onSubmit={handleSubmit}>
+			{showSection('hero') && (
+				<AdminFormSection title='Hero section'>
+					<AdminFieldGrid>
+						<AdminField label='Title'>
+							<Input
+								placeholder='Our Vision'
+								{...form.register('heroTitle')}
+							/>
+						</AdminField>
+						<AdminField label='Subtitle'>
+							<Input
+								placeholder='Inspiring Excellence, Shaping Tomorrow'
+								{...form.register('heroSubtitle')}
+							/>
+						</AdminField>
+						<AdminField label='Icon'>
+							<Select
+								value={form.watch('heroIcon') || ''}
+								onValueChange={v =>
+									form.setValue('heroIcon', v, { shouldDirty: true })
+								}>
+								<SelectTrigger>
+									<SelectValue placeholder='Select an icon' />
+								</SelectTrigger>
+								<SelectContent>
+									{SUPPORTED_ICON_NAMES.map(icon => (
+										<SelectItem key={icon} value={icon}>
+											{icon}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+						</AdminField>
+					</AdminFieldGrid>
+				</AdminFormSection>
+			)}
 
-				{/* Hero Section */}
-				{showSection('hero') ? (
-				<Card>
-					<CardHeader>
-						<CardTitle>Hero Section</CardTitle>
-					</CardHeader>
-					<CardContent className='space-y-4'>
-						<div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-							<FormField
-								control={form.control}
-								name='heroTitle'
-								rules={{ required: 'Title is required' }}
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Title</FormLabel>
-										<FormControl>
-											<Input placeholder='Our Vision' {...field} />
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
+			{showSection('visionStatement') && (
+				<AdminFormSection title='Vision statement'>
+					<AdminFieldGrid>
+						<AdminField label='Title'>
+							<Input
+								placeholder='Vision Statement'
+								{...form.register('visionTitle')}
 							/>
-							<FormField
-								control={form.control}
-								name='heroSubtitle'
-								rules={{ required: 'Subtitle is required' }}
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Subtitle</FormLabel>
-										<FormControl>
-											<Input placeholder='Inspiring Excellence, Shaping Tomorrow' {...field} />
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-							<FormField
-								control={form.control}
-								name='heroIcon'
-								render={({ field }) => (
-									<FormItem className='sm:col-span-2'>
-										<FormLabel>Icon</FormLabel>
-										<FormControl>
-											<Select
-												onValueChange={field.onChange}
-												value={field.value}>
-												<SelectTrigger>
-													<SelectValue placeholder='Select icon' />
-												</SelectTrigger>
-												<SelectContent>
-													{iconOptions.map(option => (
-														<SelectItem key={option} value={option}>
-															{option}
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-						</div>
-					</CardContent>
-				</Card>
-				) : null}
+						</AdminField>
+						<AdminField label='Icon'>
+							<Select
+								value={form.watch('visionIcon') || ''}
+								onValueChange={v =>
+									form.setValue('visionIcon', v, { shouldDirty: true })
+								}>
+								<SelectTrigger>
+									<SelectValue placeholder='Select an icon' />
+								</SelectTrigger>
+								<SelectContent>
+									{SUPPORTED_ICON_NAMES.map(icon => (
+										<SelectItem key={icon} value={icon}>
+											{icon}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+						</AdminField>
+					</AdminFieldGrid>
+					<AdminField label='Quote'>
+						<Textarea
+							rows={4}
+							placeholder='Vision statement content…'
+							{...form.register('visionQuote')}
+						/>
+					</AdminField>
+				</AdminFormSection>
+			)}
 
-				{/* Vision Statement */}
-				{showSection('visionStatement') ? (
-				<Card>
-					<CardHeader>
-						<CardTitle>Vision Statement</CardTitle>
-					</CardHeader>
-					<CardContent className='space-y-4'>
-						<div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-							<FormField
-								control={form.control}
-								name='visionTitle'
-								rules={{ required: 'Title is required' }}
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Title</FormLabel>
-										<FormControl>
-											<Input placeholder='Vision Statement' {...field} />
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-							<FormField
-								control={form.control}
-								name='visionIcon'
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Icon</FormLabel>
-										<FormControl>
-											<Select
-												onValueChange={field.onChange}
-												value={field.value}>
-												<SelectTrigger>
-													<SelectValue placeholder='Select icon' />
-												</SelectTrigger>
-												<SelectContent>
-													{iconOptions.map(option => (
-														<SelectItem key={option} value={option}>
-															{option}
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-							<FormField
-								control={form.control}
-								name='visionQuote'
-								rules={{ required: 'Vision quote is required' }}
-								render={({ field }) => (
-									<FormItem className='sm:col-span-2'>
-										<FormLabel>Vision Quote</FormLabel>
-										<FormControl>
-											<Textarea 
-												{...field} 
-												placeholder='To be a premier institute of technical education...'
-												rows={4}
-											/>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-						</div>
-					</CardContent>
-				</Card>
-				) : null}
+			{showSection('pillars') && (
+				<ItemListSection
+					title='Pillars'
+					addLabel='Add pillar'
+					fieldName='pillars'
+					array={pillarsArr}
+					form={form}
+					defaultIcon='Eye'
+					createEmpty={createEmptyPillar}
+				/>
+			)}
 
-				{/* Vision Pillars */}
-				{showSection('pillars') ? (
-				<div className='space-y-4'>
-					<div className='flex items-center justify-between'>
-						<h3 className='text-xl font-semibold'>Vision Pillars</h3>
-						<Button
-							type='button'
-							variant='outline'
-							size='sm'
-							onClick={() => pillarsArray.append(createEmptyPillar())}>
-							<Plus className="w-4 h-4 mr-2" />
-							Add Pillar
-						</Button>
-					</div>
-					<div className='grid md:grid-cols-2 gap-4'>
-						{pillarsArray.fields.map((field, index) => (
-							<Card key={field.id} className='relative'>
-								<div className='absolute top-2 right-2'>
-									<Button
-										type='button'
-										variant='ghost'
-										size='icon'
-										className="h-8 w-8 text-red-500 hover:bg-red-50"
-										onClick={() =>
-											pillarsArray.remove(index < 0 ? 0 : index)
-										}>
-										<Trash2 className='w-4 h-4' />
-									</Button>
-								</div>
-								<CardContent className='pt-6 space-y-4'>
-									<div className='grid grid-cols-1 gap-4'>
-										<FormField
-											control={form.control}
-											name={`pillars.${index}.title`}
-											rules={{ required: 'Title is required' }}
-											render={({ field: titleField }) => (
-												<FormItem>
-													<FormLabel>Title</FormLabel>
-													<FormControl>
-														<Input placeholder='Academic Excellence' {...titleField} />
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-										<div className='grid grid-cols-2 gap-4'>
-											<FormField
-												control={form.control}
-												name={`pillars.${index}.icon`}
-												render={({ field: iconField }) => (
-													<FormItem>
-														<FormLabel>Icon</FormLabel>
-														<FormControl>
-															<Select
-																onValueChange={iconField.onChange}
-																value={iconField.value}>
-																<SelectTrigger>
-																	<SelectValue placeholder='Select icon' />
-																</SelectTrigger>
-																<SelectContent>
-																	{iconOptions.map(option => (
-																		<SelectItem key={option} value={option}>
-																			{option}
-																		</SelectItem>
-																	))}
-																</SelectContent>
-															</Select>
-														</FormControl>
-														<FormMessage />
-													</FormItem>
-												)}
-											/>
-											<FormField
-												control={form.control}
-												name={`pillars.${index}.color`}
-												render={({ field: colorField }) => (
-													<FormItem>
-														<FormLabel>Color</FormLabel>
-														<FormControl>
-															<Select
-																onValueChange={colorField.onChange}
-																value={colorField.value}>
-																<SelectTrigger>
-																	<SelectValue placeholder='Select color' />
-																</SelectTrigger>
-																<SelectContent>
-																	{COLOR_OPTIONS.map(color => (
-																		<SelectItem key={color} value={color}>
-																			{color.charAt(0).toUpperCase() +
-																				color.slice(1)}
-																		</SelectItem>
-																	))}
-																</SelectContent>
-															</Select>
-														</FormControl>
-														<FormMessage />
-													</FormItem>
-												)}
-											/>
-										</div>
-										<FormField
-											control={form.control}
-											name={`pillars.${index}.description`}
-											rules={{ required: 'Description is required' }}
-											render={({ field: descField }) => (
-												<FormItem>
-													<FormLabel>Description</FormLabel>
-													<FormControl>
-														<Textarea 
-															{...descField} 
-															placeholder='Delivering world-class technical education...'
-															rows={3}
-														/>
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-									</div>
-								</CardContent>
-							</Card>
-						))}
-					</div>
-				</div>
-				) : null}
+			{showSection('aspirations') && (
+				<ItemListSection
+					title='Aspirations'
+					addLabel='Add aspiration'
+					fieldName='aspirations'
+					array={aspirationsArr}
+					form={form}
+					defaultIcon='TrendingUp'
+					createEmpty={createEmptyAspiration}
+				/>
+			)}
 
-				{/* Future Aspirations */}
-				{showSection('aspirations') ? (
-				<div className='space-y-4'>
-					<div className='flex items-center justify-between'>
-						<h3 className='text-xl font-semibold'>Future Aspirations</h3>
-						<Button
-							type='button'
-							variant='outline'
-							size='sm'
-							onClick={() => aspirationsArray.append(createEmptyAspiration())}>
-							<Plus className="w-4 h-4 mr-2" />
-							Add Aspiration
-						</Button>
-					</div>
-					<div className='grid md:grid-cols-2 gap-4'>
-						{aspirationsArray.fields.map((field, index) => (
-							<Card key={field.id} className='relative'>
-								<div className='absolute top-2 right-2'>
-									<Button
-										type='button'
-										variant='ghost'
-										size='icon'
-										className="h-8 w-8 text-red-500 hover:bg-red-50"
-										onClick={() =>
-											aspirationsArray.remove(index < 0 ? 0 : index)
-										}>
-										<Trash2 className='w-4 h-4' />
-									</Button>
-								</div>
-								<CardContent className='pt-6 space-y-4'>
-									<div className='grid grid-cols-1 gap-4'>
-										<FormField
-											control={form.control}
-											name={`aspirations.${index}.title`}
-											rules={{ required: 'Title is required' }}
-											render={({ field: titleField }) => (
-												<FormItem>
-													<FormLabel>Title</FormLabel>
-													<FormControl>
-														<Input placeholder='2030 Goals' {...titleField} />
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-										<div className='grid grid-cols-2 gap-4'>
-											<FormField
-												control={form.control}
-												name={`aspirations.${index}.icon`}
-												render={({ field: iconField }) => (
-													<FormItem>
-														<FormLabel>Icon</FormLabel>
-														<FormControl>
-															<Select
-																onValueChange={iconField.onChange}
-																value={iconField.value}>
-																<SelectTrigger>
-																	<SelectValue placeholder='Select icon' />
-																</SelectTrigger>
-																<SelectContent>
-																	{iconOptions.map(option => (
-																		<SelectItem key={option} value={option}>
-																			{option}
-																		</SelectItem>
-																	))}
-																</SelectContent>
-															</Select>
-														</FormControl>
-														<FormMessage />
-													</FormItem>
-												)}
-											/>
-											<FormField
-												control={form.control}
-												name={`aspirations.${index}.color`}
-												render={({ field: colorField }) => (
-													<FormItem>
-														<FormLabel>Color</FormLabel>
-														<FormControl>
-															<Select
-																onValueChange={colorField.onChange}
-																value={colorField.value}>
-																<SelectTrigger>
-																	<SelectValue placeholder='Select color' />
-																</SelectTrigger>
-																<SelectContent>
-																	{COLOR_OPTIONS.map(color => (
-																		<SelectItem key={color} value={color}>
-																			{color.charAt(0).toUpperCase() +
-																				color.slice(1)}
-																		</SelectItem>
-																	))}
-																</SelectContent>
-															</Select>
-														</FormControl>
-														<FormMessage />
-													</FormItem>
-												)}
-											/>
-										</div>
-										<FormField
-											control={form.control}
-											name={`aspirations.${index}.description`}
-											rules={{ required: 'Description is required' }}
-											render={({ field: descField }) => (
-												<FormItem>
-													<FormLabel>Description</FormLabel>
-													<FormControl>
-														<Textarea 
-															{...descField} 
-															placeholder='Achieve top 50 ranking...'
-															rows={3}
-														/>
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-									</div>
-								</CardContent>
-							</Card>
-						))}
-					</div>
-				</div>
-				) : null}
-
-				<div className="sticky bottom-4 bg-white p-4 border rounded-xl shadow-lg flex justify-end z-50">
-					<Button type='submit' disabled={isPending} className='w-full md:w-auto min-w-[150px]'>
-						{isPending ? (
-							<>
-								<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-								Saving...
-							</>
-						) : (
-							<>
-								<Save className="mr-2 h-4 w-4" />
-								Save Changes
-							</>
-						)}
-					</Button>
-				</div>
-			</form>
-		</Form>
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }

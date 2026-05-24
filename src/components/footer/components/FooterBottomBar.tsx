@@ -8,8 +8,7 @@ type FooterBottomBarProps = {
 
 const policyLinks = [
 	{ label: 'Privacy Policy', href: '/privacy-policy' },
-	{ label: 'Terms of Service', href: '/terms-of-service' },
-	{ label: 'Sitemap', href: '/sitemap.xml' }
+	{ label: 'Terms of Service', href: '/terms-of-service' }
 ];
 
 const FooterBottomBar = ({

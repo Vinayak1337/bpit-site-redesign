@@ -2,12 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { ContactType } from '@prisma/client';
-import {
-	buildDepartmentLinks,
-	buildQuickLinks,
-	footerAchievements,
-	footerSocialLinks
-} from '@/components/footer/data';
+import { buildDepartmentLinks } from '@/components/footer/data';
 import FooterScrollToTopButton from '@/components/footer/components/FooterScrollToTopButton';
 import FooterBackgroundEffects from '@/components/footer/components/FooterBackgroundEffects';
 import FooterHeaderSection from '@/components/footer/components/FooterHeaderSection';
@@ -20,7 +15,27 @@ import type {
 	FooterParticle,
 	FooterContactItem
 } from '@/components/footer/types';
-import { MapPin, Phone, Mail } from 'lucide-react';
+import {
+	Award,
+	BookOpen,
+	Briefcase,
+	Building2,
+	Calendar,
+	Facebook,
+	GraduationCap,
+	Instagram,
+	Link2,
+	Linkedin,
+	Mail,
+	MapPin,
+	Phone,
+	Shield,
+	Trophy,
+	Twitter,
+	Users,
+	Youtube
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 type ContactDTO = {
 	type: ContactType;
@@ -30,11 +45,29 @@ type ContactDTO = {
 
 type BPITFooterProps = {
 	contacts: ContactDTO[];
-	bottomLeftContent: FooterBottomLeftContent;
+	siteChromeConfig: SiteChromeConfig;
 };
 
 const PARTICLE_COUNT = 20;
 const MOBILE_BREAKPOINT = 768;
+
+const iconMap: Record<string, LucideIcon> = {
+	Award,
+	BookOpen,
+	Briefcase,
+	Building2,
+	Calendar,
+	Facebook,
+	GraduationCap,
+	Instagram,
+	Link2,
+	Linkedin,
+	Shield,
+	Trophy,
+	Twitter,
+	Users,
+	Youtube
+};
 
 const createParticles = (): FooterParticle[] =>
 	Array.from({ length: PARTICLE_COUNT }, (_, index) => ({
@@ -47,7 +80,13 @@ const createParticles = (): FooterParticle[] =>
 
 const sanitizeTelephone = (input: string): string => input.replace(/[^+\d]/g, '');
 
-const BPITFooter = ({ contacts, bottomLeftContent }: BPITFooterProps) => {
+const byOrder = <T extends { order?: number }>(items: T[]): T[] =>
+	[...items].sort((first, second) => (first.order ?? 0) - (second.order ?? 0));
+
+const getIcon = (iconName: string | undefined): LucideIcon =>
+	iconName ? iconMap[iconName] ?? Link2 : Link2;
+
+const BPITFooter = ({ contacts, siteChromeConfig }: BPITFooterProps) => {
 	const [expandedSection, setExpandedSection] = useState<string | null>(null);
 	const [isFooterVisible, setIsFooterVisible] = useState(false);
 	const [showScrollTop, setShowScrollTop] = useState(false);
@@ -104,8 +143,43 @@ const BPITFooter = ({ contacts, bottomLeftContent }: BPITFooterProps) => {
 		};
 	}, [isClient]);
 
-	const quickLinks = useMemo(() => buildQuickLinks(), []);
+	const quickLinks = useMemo(
+		() =>
+			byOrder(siteChromeConfig.footer.quickLinks ?? [])
+				.filter(link => link.enabled && link.label.trim() && link.href.trim())
+				.map(link => ({
+					name: link.label,
+					href: link.href,
+					icon: getIcon(link.icon),
+					isExternal: link.href.startsWith('http')
+				})),
+		[siteChromeConfig.footer.quickLinks]
+	);
 	const departmentLinks = useMemo(() => buildDepartmentLinks(), []);
+	const footerAchievements = useMemo(
+		() =>
+			byOrder(siteChromeConfig.footer.stats ?? [])
+				.filter(stat => stat.enabled && stat.number.trim() && stat.label.trim())
+				.map(stat => ({
+					number: stat.number,
+					label: stat.label,
+					icon: getIcon(stat.icon)
+				})),
+		[siteChromeConfig.footer.stats]
+	);
+	const footerSocialLinks = useMemo(
+		() =>
+			byOrder(siteChromeConfig.footer.socialLinks ?? [])
+				.filter(link => link.enabled && link.label.trim() && link.href.trim())
+				.map(link => ({
+					label: link.label,
+					href: link.href,
+					icon: getIcon(link.icon),
+					gradientClass: link.gradientClass || 'from-blue-600 to-blue-700',
+					ariaLabel: link.ariaLabel || `Visit BPIT on ${link.label}`
+				})),
+		[siteChromeConfig.footer.socialLinks]
+	);
 
 	const contactItems = useMemo<FooterContactItem[]>(() => {
 		const phoneContacts = contacts.filter(contact => contact.type === ContactType.PHONE);
@@ -213,7 +287,7 @@ const BPITFooter = ({ contacts, bottomLeftContent }: BPITFooterProps) => {
 						/>
 					</div>
 					<FooterBottomBar
-						bottomLeftContent={bottomLeftContent}
+						bottomLeftContent={siteChromeConfig.footer.bottomText}
 						isVisible={isFooterVisible}
 					/>
 				</div>

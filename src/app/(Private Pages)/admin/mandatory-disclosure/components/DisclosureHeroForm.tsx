@@ -1,14 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'react-toastify';
-import { Loader2, Save } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 
 import { updateMandatoryDisclosure } from '@/app/(Private Pages)/actions/mandatory-disclosure';
@@ -16,6 +13,13 @@ import {
 	DisclosureData,
 	disclosureDataSchema
 } from '@/lib/schemas/mandatory-disclosure';
+import {
+	AdminField,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 interface DisclosureHeroFormProps {
 	initialData: DisclosureData;
@@ -27,72 +31,72 @@ export default function DisclosureHeroForm({
 	onChange
 }: DisclosureHeroFormProps) {
 	const [isSaving, setIsSaving] = useState(false);
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 
 	const form = useForm<DisclosureData>({
 		resolver: zodResolver(disclosureDataSchema),
 		defaultValues: initialData
 	});
 
-	const { register, watch, handleSubmit } = form;
-
-	// Watch for changes to update preview
 	useEffect(() => {
-		const subscription = watch(value => {
+		const sub = form.watch(value => {
 			if (onChange) {
-				const updatedData = {
+				onChange({
 					...initialData,
 					...value,
-					hero: value.hero as any
-				} as DisclosureData;
-				onChange(updatedData);
+					hero: value.hero as DisclosureData['hero']
+				} as DisclosureData);
 			}
+			setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 		});
-		return () => subscription.unsubscribe();
-	}, [watch, onChange, initialData]);
+		return () => sub.unsubscribe();
+	}, [form, onChange, initialData]);
 
-	async function onSubmit(data: DisclosureData) {
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
+	const handleSubmit = form.handleSubmit(async data => {
 		setIsSaving(true);
+		setStatus({ kind: 'saving' });
 		try {
-			// Merge with existing items as this form only edits hero
-			const dataToSave = {
-				...initialData,
-				hero: data.hero
-			};
-			await updateMandatoryDisclosure(dataToSave);
+			await updateMandatoryDisclosure({ ...initialData, hero: data.hero });
+			setStatus({ kind: 'success', message: 'Saved' });
 			toast.success('Hero section updated successfully');
 		} catch (error) {
 			console.error(error);
+			setStatus({ kind: 'error', message: 'Save failed' });
 			toast.error('Failed to update hero section');
 		} finally {
 			setIsSaving(false);
 		}
-	}
+	});
 
 	return (
-		<form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
-			<div className='flex justify-end'>
-				<Button type='submit' disabled={isSaving}>
-					{isSaving && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
-					<Save className='mr-2 h-4 w-4' />
-					Save Changes
-				</Button>
-			</div>
-
-			<div className='space-y-4'>
-				<div className='space-y-2'>
-					<Label>Title</Label>
-					<Input {...register('hero.title')} placeholder='Page Title' />
-				</div>
-
-				<div className='space-y-2'>
-					<Label>Description</Label>
+		<AdminForm onSubmit={handleSubmit}>
+			<AdminFormSection
+				title='Disclosure hero'
+				description='Headline and description shown above the disclosure index.'>
+				<AdminField label='Title' htmlFor='dh-title'>
+					<Input
+						id='dh-title'
+						placeholder='Page Title'
+						{...form.register('hero.title')}
+					/>
+				</AdminField>
+				<AdminField label='Description' htmlFor='dh-desc'>
 					<Textarea
-						{...register('hero.description')}
+						id='dh-desc'
 						placeholder='Page Description'
 						rows={3}
+						{...form.register('hero.description')}
 					/>
-				</div>
-			</div>
-		</form>
+				</AdminField>
+			</AdminFormSection>
+
+			<AdminFormFooter status={status} saving={isSaving} />
+		</AdminForm>
 	);
 }

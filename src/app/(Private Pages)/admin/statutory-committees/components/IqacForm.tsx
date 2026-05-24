@@ -3,17 +3,27 @@
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Trash2, Plus, Save, Loader2 } from 'lucide-react';
-import { updateIqac, type IqacData } from '@/app/(Private Pages)/actions/statutory-committees';
-import { useTransition, useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+	updateIqac,
+	type IqacData
+} from '@/app/(Private Pages)/actions/statutory-committees';
+import { useEffect, useState, useTransition } from 'react';
+import {
+	AddRowButton,
+	AdminEmptyState,
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	AdminItemCard,
+	AdminItemList,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 const schema = z.object({
-	// Hero removed as it inherits from parent layout
 	about: z.object({
 		title: z.string().min(1, 'Title is required'),
 		content: z.array(z.string().min(1, 'Paragraph cannot be empty')),
@@ -78,267 +88,371 @@ export default function IqacForm({
 	visibleSections
 }: Props) {
 	const [isPending, startTransition] = useTransition();
-	const [statusMessage, setStatusMessage] = useState<{
-		type: 'success' | 'error';
-		text: string;
-	} | null>(null);
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
+
 	const restData = { ...initialData };
 	delete (restData as Partial<IqacData>).hero;
-	
+
 	const { register, control, handleSubmit, watch } = useForm<FormData>({
 		resolver: zodResolver(schema),
 		defaultValues: restData as FormData
 	});
 
-	const aboutContentFields = useFieldArray({ control, name: 'about.content' as any });
-	const objectivesFields = useFieldArray({ control, name: 'objectives' });
-	const functionsFields = useFieldArray({ control, name: 'functions' as any });
-	const membersFields = useFieldArray({ control, name: 'committeeMembers' });
-	const initiativesFields = useFieldArray({ control, name: 'initiatives' });
-	const aqarReportsFields = useFieldArray({ control, name: 'aqar.reports' as any });
+	const aboutContent = useFieldArray({
+		control,
+		name: 'about.content' as never
+	});
+	const objectives = useFieldArray({ control, name: 'objectives' });
+	const functions = useFieldArray({ control, name: 'functions' as never });
+	const members = useFieldArray({ control, name: 'committeeMembers' });
+	const initiatives = useFieldArray({ control, name: 'initiatives' });
+	const aqarReports = useFieldArray({ control, name: 'aqar.reports' as never });
 
 	const watchedData = watch();
 	useEffect(() => {
-		if (onChange) {
-			onChange({ ...initialData, ...watchedData } as IqacData);
-		}
+		onChange?.({ ...initialData, ...watchedData } as IqacData);
+		setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 	}, [watchedData, onChange, initialData]);
 
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
 	const showSection = (
-		section: 'about' | 'objectives' | 'functions' | 'members' | 'initiatives' | 'aqar'
+		section:
+			| 'about'
+			| 'objectives'
+			| 'functions'
+			| 'members'
+			| 'initiatives'
+			| 'aqar'
 	) => !visibleSections || visibleSections.includes(section);
 
-	const onSubmit = (data: FormData) => {
-		setStatusMessage(null);
+	const onSubmit = handleSubmit(data => {
+		setStatus({ kind: 'saving' });
 		startTransition(async () => {
 			try {
 				await updateIqac({ ...initialData, ...data }, pageSlug);
-				setStatusMessage({ type: 'success', text: 'Saved successfully.' });
+				setStatus({ kind: 'success', message: 'Saved' });
 			} catch (error) {
 				console.error(error);
-				setStatusMessage({ type: 'error', text: 'Failed to save.' });
+				setStatus({ kind: 'error', message: 'Save failed' });
 			}
 		});
-	};
+	});
 
 	return (
-		<form onSubmit={handleSubmit(onSubmit)} className='space-y-8 max-w-5xl mx-auto pb-24'>
-			
-			{/* About Section */}
+		<AdminForm onSubmit={onSubmit}>
 			{showSection('about') && (
-			<Card>
-				<CardHeader>
-					<CardTitle>About IQAC</CardTitle>
-				</CardHeader>
-				<CardContent className='space-y-6'>
-					<div>
-						<Label>Title</Label>
-						<Input {...register('about.title')} />
+				<AdminFormSection
+					title='About IQAC'
+					description='Identity, vision, mission, and intro paragraphs.'>
+					<AdminField label='Title' htmlFor='iq-about-title'>
+						<Input id='iq-about-title' {...register('about.title')} />
+					</AdminField>
+					<AdminField label='Vision statement' htmlFor='iq-vision'>
+						<Textarea id='iq-vision' rows={3} {...register('about.vision')} />
+					</AdminField>
+					<AdminField label='Mission statement' htmlFor='iq-mission'>
+						<Textarea id='iq-mission' rows={3} {...register('about.mission')} />
+					</AdminField>
+					<div className='flex flex-col gap-3'>
+						<p className='text-sm font-medium text-slate-700'>
+							About content paragraphs
+						</p>
+						<AdminItemList>
+							{aboutContent.fields.map((field, index) => (
+								<AdminItemCard
+									key={field.id}
+									index={index}
+									total={aboutContent.fields.length}
+									title={`Paragraph ${index + 1}`}
+									onMove={d => aboutContent.move(index, index + d)}
+									onRemove={() => aboutContent.remove(index)}>
+									<AdminField label={`Paragraph ${index + 1}`} className='[&_label]:sr-only'>
+										<Textarea
+											rows={3}
+											{...register(`about.content.${index}` as const)}
+										/>
+									</AdminField>
+								</AdminItemCard>
+							))}
+						</AdminItemList>
+						{aboutContent.fields.length === 0 && (
+							<AdminEmptyState title='No paragraphs yet' />
+						)}
+						<AddRowButton onClick={() => aboutContent.append('' as never)}>
+							Add paragraph
+						</AddRowButton>
 					</div>
-					<div>
-						<Label>Vision Statement</Label>
-						<Textarea {...register('about.vision')} rows={3} />
-					</div>
-					<div>
-						<Label>Mission Statement</Label>
-						<Textarea {...register('about.mission')} rows={3} />
-					</div>
-					
-					<div className="space-y-2">
-						<div className='flex justify-between items-center'>
-							<Label>About Content Paragraphs</Label>
-							<Button type='button' size='sm' variant='outline' onClick={() => aboutContentFields.append('')}>
-								<Plus className='w-4 h-4 mr-2' /> Add Paragraph
-							</Button>
-						</div>
-						{aboutContentFields.fields.map((field, index) => (
-							<div key={field.id} className='flex gap-2'>
-								<Textarea {...register(`about.content.${index}` as const)} rows={3} />
-								<Button type='button' size='icon' variant='ghost' className="text-red-500" onClick={() => aboutContentFields.remove(index)}>
-									<Trash2 className='w-4 h-4' />
-								</Button>
-							</div>
-						))}
-					</div>
-				</CardContent>
-			</Card>
+				</AdminFormSection>
 			)}
 
-			{/* Objectives */}
 			{showSection('objectives') && (
-			<div className='space-y-4'>
-				<div className='flex items-center justify-between'>
-					<h3 className='text-xl font-semibold'>Objectives</h3>
-					<Button type='button' size='sm' variant='outline' onClick={() => objectivesFields.append({ title: '', description: '', icon: 'Target', iconColor: 'text-blue-600' })}>
-						<Plus className='w-4 h-4 mr-2' /> Add Objective
-					</Button>
-				</div>
-				<div className="grid md:grid-cols-2 gap-4">
-					{objectivesFields.fields.map((field, index) => (
-						<Card key={field.id} className='relative'>
-							<div className='absolute top-2 right-2'>
-								<Button type='button' size='icon' variant='ghost' className="h-8 w-8 text-red-500 hover:bg-red-50" onClick={() => objectivesFields.remove(index)}>
-									<Trash2 className='w-4 h-4' />
-								</Button>
-							</div>
-							<CardContent className="pt-6 space-y-3">
-								<div><Label>Title</Label><Input {...register(`objectives.${index}.title`)} /></div>
-								<div className="grid grid-cols-2 gap-2">
-									<div><Label>Icon</Label><Input {...register(`objectives.${index}.icon`)} /></div>
-									<div><Label>Color</Label><Input {...register(`objectives.${index}.iconColor`)} /></div>
-								</div>
-								<div><Label>Description</Label><Textarea {...register(`objectives.${index}.description`)} rows={2} /></div>
-							</CardContent>
-						</Card>
-					))}
-				</div>
-			</div>
-			)}
-
-			{/* Functions */}
-			{showSection('functions') && (
-			<Card>
-				<CardHeader>
-					<div className='flex items-center justify-between'>
-						<CardTitle>Functions</CardTitle>
-						<Button type='button' size='sm' variant='outline' onClick={() => functionsFields.append('')}>
-							<Plus className='w-4 h-4 mr-2' /> Add Function
-						</Button>
-					</div>
-				</CardHeader>
-				<CardContent className="space-y-2">
-					{functionsFields.fields.map((field, index) => (
-						<div key={field.id} className='flex gap-2 items-center'>
-							<span className="text-sm font-mono text-gray-500 w-6">{index + 1}.</span>
-							<Input {...register(`functions.${index}` as const)} />
-							<Button type='button' size='icon' variant='ghost' className="text-red-500" onClick={() => functionsFields.remove(index)}>
-								<Trash2 className='w-4 h-4' />
-							</Button>
-						</div>
-					))}
-				</CardContent>
-			</Card>
-			)}
-
-			{/* Committee Members */}
-			{showSection('members') && (
-			<div className='space-y-4'>
-				<div className='flex items-center justify-between'>
-					<h3 className='text-xl font-semibold'>Committee Members</h3>
-					<Button type='button' size='sm' variant='outline' onClick={() => membersFields.append({ name: '', designation: '', department: '' })}>
-						<Plus className='w-4 h-4 mr-2' /> Add Member
-					</Button>
-				</div>
-				<div className="grid md:grid-cols-2 gap-4">
-					{membersFields.fields.map((field, index) => (
-						<Card key={field.id} className='relative'>
-							<div className='absolute top-2 right-2'>
-								<Button type='button' size='icon' variant='ghost' className="h-8 w-8 text-red-500 hover:bg-red-50" onClick={() => membersFields.remove(index)}>
-									<Trash2 className='w-4 h-4' />
-								</Button>
-							</div>
-							<CardContent className="pt-6 space-y-3">
-								<div><Label>Name</Label><Input {...register(`committeeMembers.${index}.name`)} /></div>
-								<div><Label>Designation</Label><Input {...register(`committeeMembers.${index}.designation`)} /></div>
-								<div><Label>Department</Label><Input {...register(`committeeMembers.${index}.department`)} /></div>
-								<div><Label>Qualification</Label><Input {...register(`committeeMembers.${index}.qualification`)} /></div>
-							</CardContent>
-						</Card>
-					))}
-				</div>
-			</div>
-			)}
-
-			{/* Initiatives */}
-			{showSection('initiatives') && (
-			<div className='space-y-4'>
-				<div className='flex items-center justify-between'>
-					<h3 className='text-xl font-semibold'>Initiatives</h3>
-					<Button type='button' size='sm' variant='outline' onClick={() => initiativesFields.append({ title: '', description: '', icon: 'Award', iconColor: 'text-purple-600' })}>
-						<Plus className='w-4 h-4 mr-2' /> Add Initiative
-					</Button>
-				</div>
-				<div className="grid md:grid-cols-2 gap-4">
-					{initiativesFields.fields.map((field, index) => (
-						<Card key={field.id} className='relative'>
-							<div className='absolute top-2 right-2'>
-								<Button type='button' size='icon' variant='ghost' className="h-8 w-8 text-red-500 hover:bg-red-50" onClick={() => initiativesFields.remove(index)}>
-									<Trash2 className='w-4 h-4' />
-								</Button>
-							</div>
-							<CardContent className="pt-6 space-y-3">
-								<div><Label>Title</Label><Input {...register(`initiatives.${index}.title`)} /></div>
-								<div className="grid grid-cols-2 gap-2">
-									<div><Label>Icon</Label><Input {...register(`initiatives.${index}.icon`)} /></div>
-									<div><Label>Color</Label><Input {...register(`initiatives.${index}.iconColor`)} /></div>
-								</div>
-								<div><Label>Description</Label><Textarea {...register(`initiatives.${index}.description`)} rows={2} /></div>
-							</CardContent>
-						</Card>
-					))}
-				</div>
-			</div>
-			)}
-
-			{/* AQAR Reports */}
-			{showSection('aqar') && (
-			<Card>
-				<CardHeader>
-					<CardTitle>AQAR Reports</CardTitle>
-				</CardHeader>
-				<CardContent className='space-y-6'>
-					<div className="grid md:grid-cols-2 gap-4">
-						<div><Label>Section Title</Label><Input {...register('aqar.title')} /></div>
-						<div><Label>Description</Label><Textarea {...register('aqar.description')} rows={2} /></div>
-					</div>
-					
-					<div className='space-y-4'>
-						<div className='flex justify-between items-center'>
-							<Label className="text-base">Report Files</Label>
-							<Button type='button' size='sm' variant='outline' onClick={() => aqarReportsFields.append({ year: '', title: '', description: '', buttonText: 'Download PDF', buttonColor: 'bg-green-600' })}>
-								<Plus className='w-4 h-4 mr-2' /> Add Report
-							</Button>
-						</div>
-						{aqarReportsFields.fields.map((field, index) => (
-							<div key={field.id} className='border p-4 rounded-lg relative bg-gray-50/50'>
-								<Button type='button' size='icon' variant='ghost' className='absolute top-2 right-2 text-red-500' onClick={() => aqarReportsFields.remove(index)}>
-									<Trash2 className='w-4 h-4' />
-								</Button>
-								<div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-									<div><Label>Year</Label><Input {...register(`aqar.reports.${index}.year`)} /></div>
-									<div className="md:col-span-2"><Label>Title</Label><Input {...register(`aqar.reports.${index}.title`)} /></div>
-									<div className='md:col-span-3'><Label>Description</Label><Input {...register(`aqar.reports.${index}.description`)} /></div>
-								</div>
-							</div>
+				<AdminFormSection title='Objectives'>
+					<AdminItemList>
+						{objectives.fields.map((field, index) => (
+							<AdminItemCard
+								key={field.id}
+								index={index}
+								total={objectives.fields.length}
+								title={
+									watch(`objectives.${index}.title`) || `Objective ${index + 1}`
+								}
+								onMove={d => objectives.move(index, index + d)}
+								onRemove={() => objectives.remove(index)}>
+								<AdminField label='Title'>
+									<Input {...register(`objectives.${index}.title` as const)} />
+								</AdminField>
+								<AdminFieldGrid>
+									<AdminField label='Icon'>
+										<Input {...register(`objectives.${index}.icon` as const)} />
+									</AdminField>
+									<AdminField label='Color'>
+										<Input
+											{...register(`objectives.${index}.iconColor` as const)}
+										/>
+									</AdminField>
+								</AdminFieldGrid>
+								<AdminField label='Description'>
+									<Textarea
+										rows={2}
+										{...register(`objectives.${index}.description` as const)}
+									/>
+								</AdminField>
+							</AdminItemCard>
 						))}
-					</div>
-				</CardContent>
-			</Card>
+					</AdminItemList>
+					{objectives.fields.length === 0 && (
+						<AdminEmptyState title='No objectives yet' />
+					)}
+					<AddRowButton
+						onClick={() =>
+							objectives.append({
+								title: '',
+								description: '',
+								icon: 'Target',
+								iconColor: 'text-blue-600'
+							})
+						}>
+						Add objective
+					</AddRowButton>
+				</AdminFormSection>
 			)}
 
-			<div className="sticky bottom-4 bg-white p-4 border rounded-xl shadow-lg flex justify-end z-50">
-				{statusMessage ? (
-					<div
-						className={`mr-3 self-center text-sm font-medium ${
-							statusMessage.type === 'error' ? 'text-red-600' : 'text-emerald-600'
-						}`}>
-						{statusMessage.text}
-					</div>
-				) : null}
-				<Button type='submit' disabled={isPending} className='w-full md:w-auto min-w-[150px]'>
-					{isPending ? (
-						<>
-							<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-							Saving...
-						</>
-					) : (
-						<>
-							<Save className="mr-2 h-4 w-4" />
-							Save Changes
-						</>
+			{showSection('functions') && (
+				<AdminFormSection title='Functions'>
+					<AdminItemList>
+						{functions.fields.map((field, index) => (
+							<AdminItemCard
+								key={field.id}
+								index={index}
+								total={functions.fields.length}
+								title={`Function ${index + 1}`}
+								onMove={d => functions.move(index, index + d)}
+								onRemove={() => functions.remove(index)}>
+								<AdminField label={`Function ${index + 1}`} className='[&_label]:sr-only'>
+									<Input {...register(`functions.${index}` as const)} />
+								</AdminField>
+							</AdminItemCard>
+						))}
+					</AdminItemList>
+					{functions.fields.length === 0 && (
+						<AdminEmptyState title='No functions yet' />
 					)}
-				</Button>
-			</div>
-		</form>
+					<AddRowButton onClick={() => functions.append('' as never)}>
+						Add function
+					</AddRowButton>
+				</AdminFormSection>
+			)}
+
+			{showSection('members') && (
+				<AdminFormSection title='Committee members'>
+					<AdminItemList>
+						{members.fields.map((field, index) => (
+							<AdminItemCard
+								key={field.id}
+								index={index}
+								total={members.fields.length}
+								title={
+									watch(`committeeMembers.${index}.name`) ||
+									`Member ${index + 1}`
+								}
+								subtitle={
+									watch(`committeeMembers.${index}.designation`) || undefined
+								}
+								onMove={d => members.move(index, index + d)}
+								onRemove={() => members.remove(index)}>
+								<AdminFieldGrid>
+									<AdminField label='Name'>
+										<Input
+											{...register(`committeeMembers.${index}.name` as const)}
+										/>
+									</AdminField>
+									<AdminField label='Designation'>
+										<Input
+											{...register(
+												`committeeMembers.${index}.designation` as const
+											)}
+										/>
+									</AdminField>
+									<AdminField label='Department'>
+										<Input
+											{...register(
+												`committeeMembers.${index}.department` as const
+											)}
+										/>
+									</AdminField>
+									<AdminField label='Qualification'>
+										<Input
+											{...register(
+												`committeeMembers.${index}.qualification` as const
+											)}
+										/>
+									</AdminField>
+								</AdminFieldGrid>
+							</AdminItemCard>
+						))}
+					</AdminItemList>
+					{members.fields.length === 0 && (
+						<AdminEmptyState title='No members yet' />
+					)}
+					<AddRowButton
+						onClick={() =>
+							members.append({ name: '', designation: '', department: '' })
+						}>
+						Add member
+					</AddRowButton>
+				</AdminFormSection>
+			)}
+
+			{showSection('initiatives') && (
+				<AdminFormSection title='Initiatives'>
+					<AdminItemList>
+						{initiatives.fields.map((field, index) => (
+							<AdminItemCard
+								key={field.id}
+								index={index}
+								total={initiatives.fields.length}
+								title={
+									watch(`initiatives.${index}.title`) ||
+									`Initiative ${index + 1}`
+								}
+								onMove={d => initiatives.move(index, index + d)}
+								onRemove={() => initiatives.remove(index)}>
+								<AdminField label='Title'>
+									<Input {...register(`initiatives.${index}.title` as const)} />
+								</AdminField>
+								<AdminFieldGrid>
+									<AdminField label='Icon'>
+										<Input
+											{...register(`initiatives.${index}.icon` as const)}
+										/>
+									</AdminField>
+									<AdminField label='Color'>
+										<Input
+											{...register(`initiatives.${index}.iconColor` as const)}
+										/>
+									</AdminField>
+								</AdminFieldGrid>
+								<AdminField label='Description'>
+									<Textarea
+										rows={2}
+										{...register(`initiatives.${index}.description` as const)}
+									/>
+								</AdminField>
+							</AdminItemCard>
+						))}
+					</AdminItemList>
+					{initiatives.fields.length === 0 && (
+						<AdminEmptyState title='No initiatives yet' />
+					)}
+					<AddRowButton
+						onClick={() =>
+							initiatives.append({
+								title: '',
+								description: '',
+								icon: 'Award',
+								iconColor: 'text-purple-600'
+							})
+						}>
+						Add initiative
+					</AddRowButton>
+				</AdminFormSection>
+			)}
+
+			{showSection('aqar') && (
+				<AdminFormSection
+					title='AQAR reports'
+					description='Section heading copy and per-year report metadata.'>
+					<AdminFieldGrid>
+						<AdminField label='Section title'>
+							<Input {...register('aqar.title')} />
+						</AdminField>
+						<AdminField label='Description'>
+							<Textarea rows={2} {...register('aqar.description')} />
+						</AdminField>
+					</AdminFieldGrid>
+
+					<div className='flex flex-col gap-3'>
+						<p className='text-sm font-medium text-slate-700'>Report files</p>
+						<AdminItemList>
+							{aqarReports.fields.map((field, index) => (
+								<AdminItemCard
+									key={field.id}
+									index={index}
+									total={aqarReports.fields.length}
+									title={
+										watch(`aqar.reports.${index}.title`) ||
+										`Report ${index + 1}`
+									}
+									subtitle={watch(`aqar.reports.${index}.year`) || undefined}
+									onMove={d => aqarReports.move(index, index + d)}
+									onRemove={() => aqarReports.remove(index)}>
+									<AdminFieldGrid cols={3}>
+										<AdminField label='Year'>
+											<Input
+												{...register(`aqar.reports.${index}.year` as const)}
+											/>
+										</AdminField>
+										<AdminField label='Title' className='md:col-span-2'>
+											<Input
+												{...register(`aqar.reports.${index}.title` as const)}
+											/>
+										</AdminField>
+									</AdminFieldGrid>
+									<AdminField label='Description'>
+										<Input
+											{...register(
+												`aqar.reports.${index}.description` as const
+											)}
+										/>
+									</AdminField>
+								</AdminItemCard>
+							))}
+						</AdminItemList>
+						{aqarReports.fields.length === 0 && (
+							<AdminEmptyState title='No reports yet' />
+						)}
+						<AddRowButton
+							onClick={() =>
+								aqarReports.append({
+									year: '',
+									title: '',
+									description: '',
+									buttonText: 'Download PDF',
+									buttonColor: 'bg-green-600'
+								})
+							}>
+							Add report
+						</AddRowButton>
+					</div>
+				</AdminFormSection>
+			)}
+
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }

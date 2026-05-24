@@ -2,17 +2,8 @@
 
 import { useEffect, useState, useTransition } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage
-} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
 import {
 	Select,
 	SelectContent,
@@ -24,7 +15,18 @@ import type { PlacementOverviewData } from '@/app/(Private Pages)/actions/placem
 import { updatePlacementOverview } from '@/app/(Private Pages)/actions/placement-overview';
 import { SUPPORTED_ICON_NAMES } from '@/components/about/icons';
 import UploadButton from '@/components/cloudinary/upload-button';
-import { Plus, Trash2 } from 'lucide-react';
+import {
+	AddRowButton,
+	AdminEmptyState,
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	AdminItemCard,
+	AdminItemList,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 type FeatureFormValue = {
 	id: string;
@@ -63,6 +65,7 @@ type Props = {
 };
 
 const FALLBACK_ICON = 'GraduationCap';
+const DEFAULT_GRADIENT = 'bg-gradient-to-br from-blue-500 to-blue-600';
 
 const createEmptyFeature = (): FeatureFormValue => ({
 	id: crypto.randomUUID(),
@@ -81,7 +84,7 @@ const createEmptyTeamMember = (): TeamMemberFormValue => ({
 	email: '',
 	image: '',
 	initials: '',
-	gradientColor: 'bg-gradient-to-br from-blue-500 to-blue-600',
+	gradientColor: DEFAULT_GRADIENT,
 	textColor: 'text-white'
 });
 
@@ -91,9 +94,7 @@ export default function ServicesTeamForm({
 	onChange
 }: Props) {
 	const [isPending, startTransition] = useTransition();
-	const [saveStatus, setSaveStatus] = useState<
-		'idle' | 'saving' | 'saved' | 'error'
-	>('idle');
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 
 	const form = useForm<FormValues>({
 		defaultValues: {
@@ -112,502 +113,315 @@ export default function ServicesTeamForm({
 		}
 	});
 
-	const featuresArray = useFieldArray({
-		control: form.control,
-		name: 'features'
-	});
-
-	const teamMembersArray = useFieldArray({
+	const features = useFieldArray({ control: form.control, name: 'features' });
+	const teamMembers = useFieldArray({
 		control: form.control,
 		name: 'teamMembers'
 	});
 
-	const iconOptions = SUPPORTED_ICON_NAMES;
-
 	useEffect(() => {
-		const subscription = form.watch(values => {
-			if (onChange) {
-				const updatedData: PlacementOverviewData = {
-					...initialData,
-					servicesTitle: values.servicesTitle || '',
-					servicesDescription: values.servicesDescription || '',
-					features: (values.features || [])
-						.map(feature => ({
-							id: feature?.id || crypto.randomUUID(),
-							icon: feature?.icon?.trim().length
-								? feature.icon.trim()
-								: FALLBACK_ICON,
-							title: (feature?.title ?? '').trim(),
-							description: (feature?.description ?? '').trim(),
-							color: feature?.color ?? 'blue',
-							iconColor: feature?.iconColor ?? 'blue',
-							textColor: feature?.textColor ?? 'black'
-						}))
-						.filter(
-							feature =>
-								feature.title.length > 0 && feature.description.length > 0
-						),
-					teamTitle: values.teamTitle || '',
-					teamDescription: values.teamDescription || '',
-					teamMembers: (values.teamMembers || [])
-						.map(member => ({
-							id: member?.id || crypto.randomUUID(),
-							name: (member?.name ?? '').trim(),
-							position: (member?.position ?? '').trim(),
-							email: (member?.email ?? '').trim(),
-							image: (member?.image ?? '').trim(),
-							initials: (member?.initials ?? '').trim(),
-							gradientColor:
-								member?.gradientColor ??
-								'bg-gradient-to-br from-blue-500 to-blue-600',
-							textColor: member?.textColor ?? 'text-white'
-						}))
-						.filter(
-							member => member.name.length > 0 && member.position.length > 0
-						)
-				};
-				onChange(updatedData);
-			}
+		const sub = form.watch(values => {
+			if (!onChange) return;
+			onChange({
+				...initialData,
+				servicesTitle: values.servicesTitle || '',
+				servicesDescription: values.servicesDescription || '',
+				features: (values.features || [])
+					.map(f => ({
+						id: f?.id || crypto.randomUUID(),
+						icon: f?.icon?.trim().length ? f.icon.trim() : FALLBACK_ICON,
+						title: (f?.title ?? '').trim(),
+						description: (f?.description ?? '').trim(),
+						color: f?.color ?? 'blue',
+						iconColor: f?.iconColor ?? 'blue',
+						textColor: f?.textColor ?? 'black'
+					}))
+					.filter(f => f.title.length > 0 && f.description.length > 0),
+				teamTitle: values.teamTitle || '',
+				teamDescription: values.teamDescription || '',
+				teamMembers: (values.teamMembers || [])
+					.map(m => ({
+						id: m?.id || crypto.randomUUID(),
+						name: (m?.name ?? '').trim(),
+						position: (m?.position ?? '').trim(),
+						email: (m?.email ?? '').trim(),
+						image: (m?.image ?? '').trim(),
+						initials: (m?.initials ?? '').trim(),
+						gradientColor: m?.gradientColor ?? DEFAULT_GRADIENT,
+						textColor: m?.textColor ?? 'text-white'
+					}))
+					.filter(m => m.name.length > 0 && m.position.length > 0)
+			});
+			setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 		});
-		return () => subscription.unsubscribe();
+		return () => sub.unsubscribe();
 	}, [form, onChange, initialData]);
 
-	const onSubmit = async (values: FormValues) => {
-		setSaveStatus('saving');
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
+	const onSubmit = form.handleSubmit(values => {
+		setStatus({ kind: 'saving' });
 		startTransition(async () => {
 			try {
-				const updatedData: PlacementOverviewData = {
+				await updatePlacementOverview(pageSlug, {
 					...initialData,
 					servicesTitle: values.servicesTitle,
 					servicesDescription: values.servicesDescription,
 					features: values.features
-						.map(feature => ({
-							id: feature.id,
-							icon: feature.icon?.trim().length
-								? feature.icon.trim()
-								: FALLBACK_ICON,
-							title: (feature.title ?? '').trim(),
-							description: (feature.description ?? '').trim(),
-							color: feature.color ?? 'blue',
-							iconColor: feature.iconColor ?? 'blue',
-							textColor: feature.textColor ?? 'black'
+						.map(f => ({
+							id: f.id,
+							icon: f.icon?.trim().length ? f.icon.trim() : FALLBACK_ICON,
+							title: (f.title ?? '').trim(),
+							description: (f.description ?? '').trim(),
+							color: f.color ?? 'blue',
+							iconColor: f.iconColor ?? 'blue',
+							textColor: f.textColor ?? 'black'
 						}))
-						.filter(
-							feature =>
-								feature.title.length > 0 && feature.description.length > 0
-						),
+						.filter(f => f.title.length > 0 && f.description.length > 0),
 					teamTitle: values.teamTitle,
 					teamDescription: values.teamDescription,
 					teamMembers: values.teamMembers
-						.map(member => ({
-							id: member.id,
-							name: (member.name ?? '').trim(),
-							position: (member.position ?? '').trim(),
-							email: (member.email ?? '').trim(),
-							image: (member.image ?? '').trim(),
-							initials: (member.initials ?? '').trim(),
-							gradientColor:
-								member.gradientColor ??
-								'bg-gradient-to-br from-blue-500 to-blue-600',
-							textColor: member.textColor ?? 'text-white'
+						.map(m => ({
+							id: m.id,
+							name: (m.name ?? '').trim(),
+							position: (m.position ?? '').trim(),
+							email: (m.email ?? '').trim(),
+							image: (m.image ?? '').trim(),
+							initials: (m.initials ?? '').trim(),
+							gradientColor: m.gradientColor ?? DEFAULT_GRADIENT,
+							textColor: m.textColor ?? 'text-white'
 						}))
-						.filter(
-							member => member.name.length > 0 && member.position.length > 0
-						)
-				};
-
-				await updatePlacementOverview(pageSlug, updatedData);
-				setSaveStatus('saved');
-				setTimeout(() => setSaveStatus('idle'), 2000);
+						.filter(m => m.name.length > 0 && m.position.length > 0)
+				});
+				setStatus({ kind: 'success', message: 'Saved' });
 			} catch (error) {
 				console.error('Failed to save:', error);
-				setSaveStatus('error');
-				setTimeout(() => setSaveStatus('idle'), 3000);
+				setStatus({ kind: 'error', message: 'Save failed' });
 			}
 		});
-	};
+	});
 
 	return (
-		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
-				{/* Services Section */}
-				<div className='space-y-4'>
-					<h3 className='text-lg font-semibold text-slate-900'>
-						Services Section
-					</h3>
-
-					<FormField
-						control={form.control}
-						name='servicesTitle'
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Services Title</FormLabel>
-								<FormControl>
-									<Input placeholder='Our Services' {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
+		<AdminForm onSubmit={onSubmit}>
+			<AdminFormSection
+				title='Services section'
+				description='Headline copy shown above the services grid.'>
+				<AdminField label='Services title' htmlFor='st-title'>
+					<Input
+						id='st-title'
+						placeholder='Our Services'
+						{...form.register('servicesTitle')}
 					/>
+				</AdminField>
+				<AdminField label='Services description' htmlFor='st-desc'>
+					<Textarea
+						id='st-desc'
+						rows={3}
+						placeholder='Brief description'
+						{...form.register('servicesDescription')}
+					/>
+				</AdminField>
+			</AdminFormSection>
 
-					<FormField
-						control={form.control}
-						name='servicesDescription'
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Services Description</FormLabel>
-								<FormControl>
-									<Textarea
-										placeholder='Brief description of services'
-										rows={3}
-										{...field}
+			<AdminFormSection title='Features'>
+				<AdminItemList>
+					{features.fields.map((field, index) => (
+						<AdminItemCard
+							key={field.id}
+							index={index}
+							total={features.fields.length}
+							title={
+								form.watch(`features.${index}.title`) || `Feature ${index + 1}`
+							}
+							onMove={d => features.move(index, index + d)}
+							onRemove={() => features.remove(index)}>
+							<AdminFieldGrid>
+								<AdminField label='Title'>
+									<Input
+										placeholder='Feature title'
+										{...form.register(`features.${index}.title` as const)}
 									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-				</div>
+								</AdminField>
+								<AdminField label='Icon'>
+									<Select
+										value={form.watch(`features.${index}.icon`) || FALLBACK_ICON}
+										onValueChange={v =>
+											form.setValue(`features.${index}.icon`, v, {
+												shouldDirty: true
+											})
+										}>
+										<SelectTrigger>
+											<SelectValue placeholder='Select icon' />
+										</SelectTrigger>
+										<SelectContent>
+											{SUPPORTED_ICON_NAMES.map(option => (
+												<SelectItem key={option} value={option}>
+													{option}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								</AdminField>
+								<AdminField label='Color'>
+									<Input
+										placeholder='blue'
+										{...form.register(`features.${index}.color` as const)}
+									/>
+								</AdminField>
+								<AdminField label='Icon color'>
+									<Input
+										placeholder='blue'
+										{...form.register(`features.${index}.iconColor` as const)}
+									/>
+								</AdminField>
+							</AdminFieldGrid>
+							<AdminField label='Description'>
+								<Textarea
+									rows={2}
+									placeholder='Feature description'
+									{...form.register(`features.${index}.description` as const)}
+								/>
+							</AdminField>
+						</AdminItemCard>
+					))}
+				</AdminItemList>
+				{features.fields.length === 0 && (
+					<AdminEmptyState title='No features yet' />
+				)}
+				<AddRowButton onClick={() => features.append(createEmptyFeature())}>
+					Add feature
+				</AddRowButton>
+			</AdminFormSection>
 
-				{/* Features */}
-				<div className='space-y-4'>
-					<div className='flex items-center justify-between'>
-						<h3 className='text-lg font-semibold text-slate-900'>Features</h3>
-						<Button
-							type='button'
-							variant='outline'
-							size='sm'
-							onClick={() => featuresArray.append(createEmptyFeature())}>
-							<Plus className='w-4 h-4 mr-2' />
-							Add Feature
-						</Button>
-					</div>
-					<div className='space-y-4'>
-						{featuresArray.fields.map((field, index) => (
-							<div
+			<AdminFormSection
+				title='Team section'
+				description='Headline copy shown above the team grid.'>
+				<AdminField label='Team title' htmlFor='tm-title'>
+					<Input
+						id='tm-title'
+						placeholder='Meet the Team'
+						{...form.register('teamTitle')}
+					/>
+				</AdminField>
+				<AdminField label='Team description' htmlFor='tm-desc'>
+					<Textarea
+						id='tm-desc'
+						rows={3}
+						placeholder='Brief description'
+						{...form.register('teamDescription')}
+					/>
+				</AdminField>
+			</AdminFormSection>
+
+			<AdminFormSection title='Team members'>
+				<AdminItemList>
+					{teamMembers.fields.map((field, index) => {
+						const image = form.watch(`teamMembers.${index}.image`);
+						return (
+							<AdminItemCard
 								key={field.id}
-								className='rounded-lg border border-slate-200 p-4 space-y-4 bg-slate-50/50'>
-								<div className='flex items-center justify-between'>
-									<span className='text-sm font-medium text-slate-700'>
-										Feature {index + 1}
-									</span>
-									<Button
-										type='button'
-										variant='ghost'
-										size='sm'
-										onClick={() => featuresArray.remove(index)}>
-										<Trash2 className='w-4 h-4' />
-									</Button>
-								</div>
-								<div className='grid grid-cols-1 gap-4'>
-									<FormField
-										control={form.control}
-										name={`features.${index}.title`}
-										rules={{ required: 'Title is required' }}
-										render={({ field: titleField }) => (
-											<FormItem>
-												<FormLabel>Title</FormLabel>
-												<FormControl>
-													<Input placeholder='Feature title' {...titleField} />
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
+								index={index}
+								total={teamMembers.fields.length}
+								title={
+									form.watch(`teamMembers.${index}.name`) ||
+									`Member ${index + 1}`
+								}
+								subtitle={
+									form.watch(`teamMembers.${index}.position`) || undefined
+								}
+								onMove={d => teamMembers.move(index, index + d)}
+								onRemove={() => teamMembers.remove(index)}>
+								<AdminFieldGrid>
+									<AdminField label='Name'>
+										<Input
+											placeholder='Dr. Jane Doe'
+											{...form.register(`teamMembers.${index}.name` as const)}
+										/>
+									</AdminField>
+									<AdminField label='Position'>
+										<Input
+											placeholder='Placement Officer'
+											{...form.register(
+												`teamMembers.${index}.position` as const
+											)}
+										/>
+									</AdminField>
+									<AdminField label='Email'>
+										<Input
+											type='email'
+											placeholder='jane@bpitindia.edu.in'
+											{...form.register(`teamMembers.${index}.email` as const)}
+										/>
+									</AdminField>
+									<AdminField label='Initials'>
+										<Input
+											placeholder='JD'
+											{...form.register(
+												`teamMembers.${index}.initials` as const
+											)}
+										/>
+									</AdminField>
+									<AdminField label='Gradient color'>
+										<Input
+											placeholder='bg-gradient-to-br from-blue-500 to-blue-600'
+											{...form.register(
+												`teamMembers.${index}.gradientColor` as const
+											)}
+										/>
+									</AdminField>
+									<AdminField label='Text color'>
+										<Input
+											placeholder='text-white'
+											{...form.register(
+												`teamMembers.${index}.textColor` as const
+											)}
+										/>
+									</AdminField>
+								</AdminFieldGrid>
+								<AdminField label='Profile image'>
+									<Input
+										placeholder='Image URL'
+										{...form.register(`teamMembers.${index}.image` as const)}
 									/>
-									<FormField
-										control={form.control}
-										name={`features.${index}.description`}
-										rules={{ required: 'Description is required' }}
-										render={({ field: descField }) => (
-											<FormItem>
-												<FormLabel>Description</FormLabel>
-												<FormControl>
-													<Textarea
-														placeholder='Feature description'
-														rows={3}
-														{...descField}
-													/>
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-									<FormField
-										control={form.control}
-										name={`features.${index}.icon`}
-										render={({ field: iconField }) => (
-											<FormItem>
-												<FormLabel>Icon</FormLabel>
-												<FormControl>
-													<Select
-														onValueChange={iconField.onChange}
-														value={iconField.value}>
-														<SelectTrigger>
-															<SelectValue placeholder='Select icon' />
-														</SelectTrigger>
-														<SelectContent>
-															{iconOptions.map(option => (
-																<SelectItem key={option} value={option}>
-																	{option}
-																</SelectItem>
-															))}
-														</SelectContent>
-													</Select>
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-									<FormField
-										control={form.control}
-										name={`features.${index}.iconColor`}
-										render={({ field: colorField }) => (
-											<FormItem>
-												<FormLabel>Icon Color</FormLabel>
-												<FormControl>
-													<Input
-														placeholder='from-blue-500 to-blue-700'
-														{...colorField}
-													/>
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-								</div>
-							</div>
-						))}
-					</div>
-				</div>
+									<div className='mt-2'>
+										<UploadButton
+											onUpload={(url: string) =>
+												form.setValue(`teamMembers.${index}.image`, url, {
+													shouldDirty: true
+												})
+											}
+											buttonText='Upload image'
+										/>
+									</div>
+									{image && (
+										<div className='mt-3 h-16 w-16 overflow-hidden rounded-full border border-slate-200'>
+											{/* eslint-disable-next-line @next/next/no-img-element */}
+											<img
+												src={image}
+												alt='Preview'
+												className='h-full w-full object-cover'
+											/>
+										</div>
+									)}
+								</AdminField>
+							</AdminItemCard>
+						);
+					})}
+				</AdminItemList>
+				{teamMembers.fields.length === 0 && (
+					<AdminEmptyState title='No team members yet' />
+				)}
+				<AddRowButton
+					onClick={() => teamMembers.append(createEmptyTeamMember())}>
+					Add member
+				</AddRowButton>
+			</AdminFormSection>
 
-				{/* Team Section */}
-				<div className='space-y-4'>
-					<h3 className='text-lg font-semibold text-slate-900'>Team Section</h3>
-
-					<FormField
-						control={form.control}
-						name='teamTitle'
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Team Title</FormLabel>
-								<FormControl>
-									<Input placeholder='Our Team' {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-
-					<FormField
-						control={form.control}
-						name='teamDescription'
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Team Description</FormLabel>
-								<FormControl>
-									<Textarea
-										placeholder='Brief description of the team'
-										rows={3}
-										{...field}
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-				</div>
-
-				{/* Team Members */}
-				<div className='space-y-4'>
-					<div className='flex items-center justify-between'>
-						<h3 className='text-lg font-semibold text-slate-900'>
-							Team Members
-						</h3>
-						<Button
-							type='button'
-							variant='outline'
-							size='sm'
-							onClick={() => teamMembersArray.append(createEmptyTeamMember())}>
-							<Plus className='w-4 h-4 mr-2' />
-							Add Member
-						</Button>
-					</div>
-					<div className='space-y-4'>
-						{teamMembersArray.fields.map((field, index) => (
-							<div
-								key={field.id}
-								className='rounded-lg border border-slate-200 p-4 space-y-4 bg-slate-50/50'>
-								<div className='flex items-center justify-between'>
-									<span className='text-sm font-medium text-slate-700'>
-										Member {index + 1}
-									</span>
-									<Button
-										type='button'
-										variant='ghost'
-										size='sm'
-										onClick={() => teamMembersArray.remove(index)}>
-										<Trash2 className='w-4 h-4' />
-									</Button>
-								</div>
-								<div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-									<FormField
-										control={form.control}
-										name={`teamMembers.${index}.name`}
-										rules={{ required: 'Name is required' }}
-										render={({ field: nameField }) => (
-											<FormItem>
-												<FormLabel>Name</FormLabel>
-												<FormControl>
-													<Input placeholder='Member name' {...nameField} />
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-									<FormField
-										control={form.control}
-										name={`teamMembers.${index}.position`}
-										rules={{ required: 'Position is required' }}
-										render={({ field: posField }) => (
-											<FormItem>
-												<FormLabel>Position</FormLabel>
-												<FormControl>
-													<Input placeholder='Position/Role' {...posField} />
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-									<FormField
-										control={form.control}
-										name={`teamMembers.${index}.email`}
-										rules={{ required: 'Email is required' }}
-										render={({ field: emailField }) => (
-											<FormItem>
-												<FormLabel>Email</FormLabel>
-												<FormControl>
-													<Input
-														placeholder='email@example.com'
-														{...emailField}
-													/>
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-									<FormField
-										control={form.control}
-										name={`teamMembers.${index}.image`}
-										render={({ field: imageField }) => (
-											<FormItem className='sm:col-span-2'>
-												<FormLabel>Profile Image</FormLabel>
-												<FormControl>
-													<div className='space-y-2'>
-														<Input
-															placeholder='Image URL (optional)'
-															{...imageField}
-														/>
-														<UploadButton
-															onUpload={url => {
-																imageField.onChange(url);
-																form.setValue(`teamMembers.${index}.image`, url, {
-																	shouldDirty: true
-																});
-															}}
-															buttonText='Upload Profile Image'
-															className='sm:w-auto'
-														/>
-														{imageField.value ? (
-															<div className='mt-2'>
-																<img
-																	src={imageField.value}
-																	alt='Profile preview'
-																	className='w-20 h-20 rounded-full object-cover border-2 border-blue-200'
-																/>
-															</div>
-														) : (
-															<p className='text-sm text-gray-500'>
-																Initials will be shown as avatar if no image is uploaded
-															</p>
-														)}
-													</div>
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-									<FormField
-										control={form.control}
-										name={`teamMembers.${index}.initials`}
-										rules={{ required: 'Initials are required' }}
-										render={({ field: initialsField }) => (
-											<FormItem>
-												<FormLabel>Initials</FormLabel>
-												<FormControl>
-													<Input
-														placeholder='e.g. JD'
-														maxLength={3}
-														{...initialsField}
-													/>
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-									<FormField
-										control={form.control}
-										name={`teamMembers.${index}.gradientColor`}
-										render={({ field: gradientField }) => (
-											<FormItem>
-												<FormLabel>Avatar Color</FormLabel>
-												<FormControl>
-													<Input
-														placeholder='e.g. bg-gradient-to-br from-blue-500 to-blue-600'
-														{...gradientField}
-													/>
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-									<FormField
-										control={form.control}
-										name={`teamMembers.${index}.textColor`}
-										render={({ field: textColorField }) => (
-											<FormItem>
-												<FormLabel>Initials Text Color</FormLabel>
-												<FormControl>
-													<Input
-														placeholder='e.g. text-white'
-														{...textColorField}
-													/>
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-								</div>
-							</div>
-						))}
-					</div>
-				</div>
-
-				<div className='flex items-center justify-between pt-6 border-t'>
-					<div>
-						{saveStatus === 'saved' && (
-							<p className='text-sm text-green-600'>
-								Changes saved successfully!
-							</p>
-						)}
-						{saveStatus === 'error' && (
-							<p className='text-sm text-red-600'>Failed to save changes.</p>
-						)}
-					</div>
-					<Button type='submit' disabled={isPending || saveStatus === 'saving'}>
-						{saveStatus === 'saving' ? 'Saving...' : 'Save Changes'}
-					</Button>
-				</div>
-			</form>
-		</Form>
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }

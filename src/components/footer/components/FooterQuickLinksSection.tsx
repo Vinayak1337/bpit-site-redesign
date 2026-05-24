@@ -20,6 +20,10 @@ const FooterQuickLinksSection = ({
 	expandedSection,
 	onToggle
 }: FooterQuickLinksSectionProps) => {
+	if (links.length === 0) {
+		return null;
+	}
+
 	const isExpanded = expandedSection === SECTION_ID || !isMobile;
 
 	return (

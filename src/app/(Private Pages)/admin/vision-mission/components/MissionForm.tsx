@@ -1,18 +1,9 @@
 'use client';
 
-import { useEffect, useMemo, useState, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage
-} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
 import {
 	Select,
 	SelectContent,
@@ -23,6 +14,17 @@ import {
 import type { MissionData } from '@/app/(Private Pages)/actions/vision-mission';
 import { updateMission } from '@/app/(Private Pages)/actions/vision-mission';
 import { SUPPORTED_ICON_NAMES } from '@/components/about/icons';
+import {
+	AddRowButton,
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	AdminItemCard,
+	AdminItemList,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 type ObjectiveFormValue = {
 	id: string;
@@ -56,7 +58,9 @@ type Props = {
 	initialData: MissionData;
 	pageSlug: string;
 	onChange?: (data: MissionData) => void;
-	visibleSections?: Array<'hero' | 'missionStatement' | 'objectives' | 'impact'>;
+	visibleSections?: Array<
+		'hero' | 'missionStatement' | 'objectives' | 'impact'
+	>;
 };
 
 const COLOR_OPTIONS: MissionData['objectives'][number]['color'][] = [
@@ -68,8 +72,6 @@ const COLOR_OPTIONS: MissionData['objectives'][number]['color'][] = [
 	'indigo'
 ];
 
-const FALLBACK_ICON = 'Target';
-
 const createEmptyObjective = (): ObjectiveFormValue => ({
 	id: crypto.randomUUID(),
 	icon: 'BookOpen',
@@ -77,7 +79,6 @@ const createEmptyObjective = (): ObjectiveFormValue => ({
 	description: '',
 	color: 'blue'
 });
-
 const createEmptyImpactStat = (): ImpactStatFormValue => ({
 	id: crypto.randomUUID(),
 	number: '',
@@ -87,28 +88,30 @@ const createEmptyImpactStat = (): ImpactStatFormValue => ({
 
 const normalizeMission = (values: Partial<FormValues>): MissionData => {
 	const objectives = (values.objectives ?? [])
-		.map(objective => ({
-			icon: objective.icon?.trim().length ? objective.icon.trim() : 'BookOpen',
-			title: (objective.title ?? '').trim(),
-			description: (objective.description ?? '').trim(),
-			color: COLOR_OPTIONS.includes(objective.color ?? 'blue')
-				? objective.color ?? 'blue'
+		.map(o => ({
+			icon: o.icon?.trim().length ? o.icon.trim() : 'BookOpen',
+			title: (o.title ?? '').trim(),
+			description: (o.description ?? '').trim(),
+			color: COLOR_OPTIONS.includes(o.color ?? 'blue')
+				? o.color ?? 'blue'
 				: 'blue'
 		}))
-		.filter(objective => objective.title.length > 0 && objective.description.length > 0);
+		.filter(o => o.title.length > 0 && o.description.length > 0);
 
 	const impactStats = (values.impactStats ?? [])
-		.map(stat => ({
-			number: (stat.number ?? '').trim(),
-			label: (stat.label ?? '').trim(),
-			color: (stat.color ?? '').trim() || 'text-green-600'
+		.map(s => ({
+			number: (s.number ?? '').trim(),
+			label: (s.label ?? '').trim(),
+			color: (s.color ?? '').trim() || 'text-green-600'
 		}))
-		.filter(stat => stat.number.length > 0 && stat.label.length > 0);
+		.filter(s => s.number.length > 0 && s.label.length > 0);
 
 	return {
 		hero: {
 			title: (values.heroTitle ?? '').trim() || 'Our Mission',
-			subtitle: (values.heroSubtitle ?? '').trim() || 'Empowering Minds, Building Futures',
+			subtitle:
+				(values.heroSubtitle ?? '').trim() ||
+				'Empowering Minds, Building Futures',
 			icon: (values.heroIcon ?? '').trim() || 'Target',
 			gradient: 'from-green-50 to-emerald-100',
 			borderColor: 'border-green-200',
@@ -138,7 +141,7 @@ export default function MissionForm({
 	visibleSections
 }: Props) {
 	const [isPending, startTransition] = useTransition();
-	const [message, setMessage] = useState<string | null>(null);
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 
 	const form = useForm<FormValues>({
 		defaultValues: {
@@ -148,464 +151,317 @@ export default function MissionForm({
 			missionTitle: initialData.missionStatement.title,
 			missionIcon: initialData.missionStatement.icon,
 			missionQuote: initialData.missionStatement.quote,
-			objectives: initialData.objectives.length > 0 
-				? initialData.objectives.map(objective => ({
-					id: crypto.randomUUID(),
-					icon: objective.icon,
-					title: objective.title,
-					description: objective.description,
-					color: objective.color
-				}))
-				: [createEmptyObjective()],
+			objectives:
+				initialData.objectives.length > 0
+					? initialData.objectives.map(o => ({
+							id: crypto.randomUUID(),
+							icon: o.icon,
+							title: o.title,
+							description: o.description,
+							color: o.color
+						}))
+					: [createEmptyObjective()],
 			impactTitle: initialData.impact.title,
 			impactIcon: initialData.impact.icon,
-			impactStats: initialData.impact.stats.length > 0
-				? initialData.impact.stats.map(stat => ({
-					id: crypto.randomUUID(),
-					number: stat.number,
-					label: stat.label,
-					color: stat.color
-				}))
-				: [createEmptyImpactStat()]
+			impactStats:
+				initialData.impact.stats.length > 0
+					? initialData.impact.stats.map(s => ({
+							id: crypto.randomUUID(),
+							number: s.number,
+							label: s.label,
+							color: s.color
+						}))
+					: [createEmptyImpactStat()]
 		}
 	});
 
-	const {
-		fields: objectiveFields,
-		append: appendObjective,
-		remove: removeObjective
-	} = useFieldArray({
+	const objectivesArr = useFieldArray({
 		control: form.control,
 		name: 'objectives'
 	});
-
-	const {
-		fields: impactStatFields,
-		append: appendImpactStat,
-		remove: removeImpactStat
-	} = useFieldArray({
+	const statsArr = useFieldArray({
 		control: form.control,
 		name: 'impactStats'
 	});
 
 	useEffect(() => {
 		onChange?.(normalizeMission(form.getValues()));
-		const subscription = form.watch(values => {
+		const sub = form.watch(values => {
 			const formValues: Partial<FormValues> = {
 				...values,
 				objectives: values.objectives?.filter(Boolean) as ObjectiveFormValue[],
-				impactStats: values.impactStats?.filter(Boolean) as ImpactStatFormValue[]
+				impactStats: values.impactStats?.filter(
+					Boolean
+				) as ImpactStatFormValue[]
 			};
 			onChange?.(normalizeMission(formValues));
+			setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 		});
-		return () => subscription.unsubscribe();
+		return () => sub.unsubscribe();
 	}, [form, onChange]);
 
-	const onSubmit = async (values: FormValues) => {
-		setMessage(null);
-		const normalized = normalizeMission(values);
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
+	const onSubmit = form.handleSubmit(values => {
+		setStatus({ kind: 'saving' });
 		startTransition(async () => {
 			try {
-				await updateMission(pageSlug, normalized);
-				setMessage('Mission updated successfully!');
-				setTimeout(() => setMessage(null), 3000);
+				await updateMission(pageSlug, normalizeMission(values));
+				setStatus({ kind: 'success', message: 'Saved' });
 			} catch (error) {
 				console.error('Error updating mission:', error);
-				setMessage('Save failed');
-				setTimeout(() => setMessage(null), 3000);
+				setStatus({ kind: 'error', message: 'Save failed' });
 			}
 		});
-	};
+	});
 
 	const showSection = (
-		section: 'hero' | 'missionStatement' | 'objectives' | 'impact'
-	) => !visibleSections || visibleSections.includes(section);
+		s: 'hero' | 'missionStatement' | 'objectives' | 'impact'
+	) => !visibleSections || visibleSections.includes(s);
 
 	return (
-		<Form {...form}>
-			<form
-				className='space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm max-h-[70vh] overflow-y-auto overflow-x-hidden'
-				onSubmit={form.handleSubmit(onSubmit)}>
-				
-				<div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
-					<div>
-						<h3 className='text-lg font-semibold text-slate-900'>
-							Mission
-						</h3>
-						<p className='text-sm text-slate-500'>
-							Edit mission statement, objectives, and impact metrics.
-						</p>
-					</div>
-					<div className='flex items-center gap-2'>
-						{message && (
-							<span className='rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700'>
-								{message}
-							</span>
-						)}
-						<Button type='submit' disabled={isPending}>
-							{isPending ? 'Saving...' : 'Save changes'}
-						</Button>
-					</div>
-				</div>
-
-				{/* Hero Section */}
-				{showSection('hero') ? (
-				<div className='space-y-4'>
-					<h4 className='text-sm font-semibold text-slate-700'>Hero Section</h4>
-					<div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-						<FormField
-							control={form.control}
-							name="heroTitle"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Title</FormLabel>
-									<FormControl>
-										<Input placeholder="Our Mission" {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name="heroSubtitle"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Subtitle</FormLabel>
-									<FormControl>
-										<Input placeholder="Empowering Minds, Building Futures" {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name="heroIcon"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Icon</FormLabel>
-									<Select onValueChange={field.onChange} defaultValue={field.value}>
-										<FormControl>
-											<SelectTrigger>
-												<SelectValue placeholder="Select an icon" />
-											</SelectTrigger>
-										</FormControl>
-										<SelectContent>
-											{SUPPORTED_ICON_NAMES.map((iconName) => (
-												<SelectItem key={iconName} value={iconName}>
-													{iconName}
-												</SelectItem>
-											))}
-										</SelectContent>
-									</Select>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-					</div>
-				</div>
-				) : null}
-
-				{/* Mission Statement */}
-				{showSection('missionStatement') ? (
-				<div className="space-y-4">
-					<h3 className="text-lg font-semibold text-gray-900">Mission Statement</h3>
-					<div className="grid grid-cols-1 gap-4">
-						<FormField
-							control={form.control}
-							name="missionTitle"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Title</FormLabel>
-									<FormControl>
-										<Input placeholder="Mission Statement" {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name="missionIcon"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Icon</FormLabel>
-									<Select onValueChange={field.onChange} defaultValue={field.value}>
-										<FormControl>
-											<SelectTrigger>
-												<SelectValue placeholder="Select an icon" />
-											</SelectTrigger>
-										</FormControl>
-										<SelectContent>
-											{SUPPORTED_ICON_NAMES.map((iconName) => (
-												<SelectItem key={iconName} value={iconName}>
-													{iconName}
-												</SelectItem>
-											))}
-										</SelectContent>
-									</Select>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name="missionQuote"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Quote</FormLabel>
-									<FormControl>
-										<Textarea 
-											placeholder="Mission statement content..."
-											rows={4}
-											{...field}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-					</div>
-				</div>
-				) : null}
-
-				{/* Objectives */}
-				{showSection('objectives') ? (
-				<div className="space-y-4">
-					<div className="flex justify-between items-center">
-						<h3 className="text-lg font-semibold text-gray-900">Mission Objectives</h3>
-						<Button
-							type="button"
-							variant="outline"
-							size="sm"
-							onClick={() => appendObjective(createEmptyObjective())}
-						>
-							Add Objective
-						</Button>
-					</div>
-					{objectiveFields.map((field, index) => (
-						<div key={field.id} className="border rounded-lg p-4 space-y-4">
-							<div className="flex justify-between items-center">
-								<h4 className="font-medium">Objective {index + 1}</h4>
-								{objectiveFields.length > 1 && (
-									<Button
-										type="button"
-										variant="ghost"
-										size="sm"
-										onClick={() => removeObjective(index)}
-									>
-										Remove
-									</Button>
-								)}
-							</div>
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-								<FormField
-									control={form.control}
-									name={`objectives.${index}.icon`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Icon</FormLabel>
-											<Select onValueChange={field.onChange} defaultValue={field.value}>
-												<FormControl>
-													<SelectTrigger>
-														<SelectValue placeholder="Select an icon" />
-													</SelectTrigger>
-												</FormControl>
-												<SelectContent>
-													{SUPPORTED_ICON_NAMES.map((iconName) => (
-														<SelectItem key={iconName} value={iconName}>
-															{iconName}
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-								<FormField
-									control={form.control}
-									name={`objectives.${index}.color`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Color</FormLabel>
-											<Select onValueChange={field.onChange} defaultValue={field.value}>
-												<FormControl>
-													<SelectTrigger>
-														<SelectValue placeholder="Select a color" />
-													</SelectTrigger>
-												</FormControl>
-												<SelectContent>
-													{COLOR_OPTIONS.map((color) => (
-														<SelectItem key={color} value={color}>
-															<div className="flex items-center space-x-2">
-																<div className={`w-4 h-4 rounded bg-${color}-100 border border-${color}-200`}></div>
-																<span className="capitalize">{color}</span>
-															</div>
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							</div>
-							<FormField
-								control={form.control}
-								name={`objectives.${index}.title`}
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Title</FormLabel>
-										<FormControl>
-											<Input placeholder="Objective title" {...field} />
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
+		<AdminForm onSubmit={onSubmit}>
+			{showSection('hero') && (
+				<AdminFormSection title='Hero section'>
+					<AdminFieldGrid>
+						<AdminField label='Title'>
+							<Input
+								placeholder='Our Mission'
+								{...form.register('heroTitle')}
 							/>
-							<FormField
-								control={form.control}
-								name={`objectives.${index}.description`}
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Description</FormLabel>
-										<FormControl>
-											<Textarea 
-												placeholder="Objective description"
-												rows={3}
-												{...field}
-											/>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
+						</AdminField>
+						<AdminField label='Subtitle'>
+							<Input
+								placeholder='Empowering Minds, Building Futures'
+								{...form.register('heroSubtitle')}
 							/>
-						</div>
-					))}
-				</div>
-				) : null}
+						</AdminField>
+						<AdminField label='Icon'>
+							<Select
+								value={form.watch('heroIcon') || ''}
+								onValueChange={v =>
+									form.setValue('heroIcon', v, { shouldDirty: true })
+								}>
+								<SelectTrigger>
+									<SelectValue placeholder='Select an icon' />
+								</SelectTrigger>
+								<SelectContent>
+									{SUPPORTED_ICON_NAMES.map(icon => (
+										<SelectItem key={icon} value={icon}>
+											{icon}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+						</AdminField>
+					</AdminFieldGrid>
+				</AdminFormSection>
+			)}
 
-				{/* Impact Section */}
-				{showSection('impact') ? (
-				<div className="space-y-4">
-					<h3 className="text-lg font-semibold text-gray-900">Mission Impact</h3>
-					<div className="grid grid-cols-1 gap-4">
-						<FormField
-							control={form.control}
-							name="impactTitle"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Title</FormLabel>
-									<FormControl>
-										<Input placeholder="Mission Impact" {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
+			{showSection('missionStatement') && (
+				<AdminFormSection title='Mission statement'>
+					<AdminFieldGrid>
+						<AdminField label='Title'>
+							<Input
+								placeholder='Mission Statement'
+								{...form.register('missionTitle')}
+							/>
+						</AdminField>
+						<AdminField label='Icon'>
+							<Select
+								value={form.watch('missionIcon') || ''}
+								onValueChange={v =>
+									form.setValue('missionIcon', v, { shouldDirty: true })
+								}>
+								<SelectTrigger>
+									<SelectValue placeholder='Select an icon' />
+								</SelectTrigger>
+								<SelectContent>
+									{SUPPORTED_ICON_NAMES.map(icon => (
+										<SelectItem key={icon} value={icon}>
+											{icon}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+						</AdminField>
+					</AdminFieldGrid>
+					<AdminField label='Quote'>
+						<Textarea
+							rows={4}
+							placeholder='Mission statement content…'
+							{...form.register('missionQuote')}
 						/>
-						<FormField
-							control={form.control}
-							name="impactIcon"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Icon</FormLabel>
-									<Select onValueChange={field.onChange} defaultValue={field.value}>
-										<FormControl>
+					</AdminField>
+				</AdminFormSection>
+			)}
+
+			{showSection('objectives') && (
+				<AdminFormSection title='Mission objectives'>
+					<AdminItemList>
+						{objectivesArr.fields.map((field, index) => (
+							<AdminItemCard
+								key={field.id}
+								index={index}
+								total={objectivesArr.fields.length}
+								title={
+									form.watch(`objectives.${index}.title`) ||
+									`Objective ${index + 1}`
+								}
+								onMove={d => objectivesArr.move(index, index + d)}
+								onRemove={
+									objectivesArr.fields.length > 1
+										? () => objectivesArr.remove(index)
+										: undefined
+								}>
+								<AdminFieldGrid>
+									<AdminField label='Icon'>
+										<Select
+											value={form.watch(`objectives.${index}.icon`) || ''}
+											onValueChange={v =>
+												form.setValue(`objectives.${index}.icon`, v, {
+													shouldDirty: true
+												})
+											}>
 											<SelectTrigger>
-												<SelectValue placeholder="Select an icon" />
+												<SelectValue placeholder='Select an icon' />
 											</SelectTrigger>
-										</FormControl>
-										<SelectContent>
-											{SUPPORTED_ICON_NAMES.map((iconName) => (
-												<SelectItem key={iconName} value={iconName}>
-													{iconName}
-												</SelectItem>
-											))}
-										</SelectContent>
-									</Select>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-					</div>
-
-					{/* Impact Stats */}
-					<div className="space-y-4">
-						<div className="flex justify-between items-center">
-							<h4 className="font-medium">Impact Statistics</h4>
-							<Button
-								type="button"
-								variant="outline"
-								size="sm"
-								onClick={() => appendImpactStat(createEmptyImpactStat())}
-							>
-								Add Stat
-							</Button>
-						</div>
-						{impactStatFields.map((field, index) => (
-							<div key={field.id} className="border rounded-lg p-4 space-y-4">
-								<div className="flex justify-between items-center">
-									<h5 className="font-medium">Statistic {index + 1}</h5>
-									{impactStatFields.length > 1 && (
-										<Button
-											type="button"
-											variant="ghost"
-											size="sm"
-											onClick={() => removeImpactStat(index)}
-										>
-											Remove
-										</Button>
-									)}
-								</div>
-								<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-									<FormField
-										control={form.control}
-										name={`impactStats.${index}.number`}
-										render={({ field }) => (
-											<FormItem>
-												<FormLabel>Number</FormLabel>
-												<FormControl>
-													<Input placeholder="5000+" {...field} />
-												</FormControl>
-												<FormMessage />
-											</FormItem>
+											<SelectContent>
+												{SUPPORTED_ICON_NAMES.map(icon => (
+													<SelectItem key={icon} value={icon}>
+														{icon}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+									</AdminField>
+									<AdminField label='Color'>
+										<Select
+											value={form.watch(`objectives.${index}.color`) || 'blue'}
+											onValueChange={v =>
+												form.setValue(
+													`objectives.${index}.color`,
+													v as ObjectiveFormValue['color'],
+													{ shouldDirty: true }
+												)
+											}>
+											<SelectTrigger>
+												<SelectValue placeholder='Select a color' />
+											</SelectTrigger>
+											<SelectContent>
+												{COLOR_OPTIONS.map(color => (
+													<SelectItem key={color} value={color}>
+														{color.charAt(0).toUpperCase() + color.slice(1)}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+									</AdminField>
+								</AdminFieldGrid>
+								<AdminField label='Title'>
+									<Input
+										placeholder='Objective title'
+										{...form.register(`objectives.${index}.title` as const)}
+									/>
+								</AdminField>
+								<AdminField label='Description'>
+									<Textarea
+										rows={3}
+										placeholder='Objective description'
+										{...form.register(
+											`objectives.${index}.description` as const
 										)}
 									/>
-									<FormField
-										control={form.control}
-										name={`impactStats.${index}.label`}
-										render={({ field }) => (
-											<FormItem>
-												<FormLabel>Label</FormLabel>
-												<FormControl>
-													<Input placeholder="Alumni Making Impact" {...field} />
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-									<FormField
-										control={form.control}
-										name={`impactStats.${index}.color`}
-										render={({ field }) => (
-											<FormItem>
-												<FormLabel>Color (Tailwind class)</FormLabel>
-												<FormControl>
-													<Input placeholder="text-green-600" {...field} />
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-								</div>
-							</div>
+								</AdminField>
+							</AdminItemCard>
 						))}
-					</div>
-				</div>
-				) : null}
-			</form>
-		</Form>
+					</AdminItemList>
+					<AddRowButton
+						onClick={() => objectivesArr.append(createEmptyObjective())}>
+						Add objective
+					</AddRowButton>
+				</AdminFormSection>
+			)}
+
+			{showSection('impact') && (
+				<AdminFormSection title='Mission impact'>
+					<AdminFieldGrid>
+						<AdminField label='Title'>
+							<Input
+								placeholder='Mission Impact'
+								{...form.register('impactTitle')}
+							/>
+						</AdminField>
+						<AdminField label='Icon'>
+							<Select
+								value={form.watch('impactIcon') || ''}
+								onValueChange={v =>
+									form.setValue('impactIcon', v, { shouldDirty: true })
+								}>
+								<SelectTrigger>
+									<SelectValue placeholder='Select an icon' />
+								</SelectTrigger>
+								<SelectContent>
+									{SUPPORTED_ICON_NAMES.map(icon => (
+										<SelectItem key={icon} value={icon}>
+											{icon}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+						</AdminField>
+					</AdminFieldGrid>
+					<AdminItemList>
+						{statsArr.fields.map((field, index) => (
+							<AdminItemCard
+								key={field.id}
+								index={index}
+								total={statsArr.fields.length}
+								title={
+									form.watch(`impactStats.${index}.label`) ||
+									`Statistic ${index + 1}`
+								}
+								onMove={d => statsArr.move(index, index + d)}
+								onRemove={
+									statsArr.fields.length > 1
+										? () => statsArr.remove(index)
+										: undefined
+								}>
+								<AdminFieldGrid cols={3}>
+									<AdminField label='Number'>
+										<Input
+											placeholder='5000+'
+											{...form.register(`impactStats.${index}.number` as const)}
+										/>
+									</AdminField>
+									<AdminField label='Label'>
+										<Input
+											placeholder='Alumni Making Impact'
+											{...form.register(`impactStats.${index}.label` as const)}
+										/>
+									</AdminField>
+									<AdminField label='Color (Tailwind class)'>
+										<Input
+											placeholder='text-green-600'
+											{...form.register(`impactStats.${index}.color` as const)}
+										/>
+									</AdminField>
+								</AdminFieldGrid>
+							</AdminItemCard>
+						))}
+					</AdminItemList>
+					<AddRowButton
+						onClick={() => statsArr.append(createEmptyImpactStat())}>
+						Add statistic
+					</AddRowButton>
+				</AdminFormSection>
+			)}
+
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }

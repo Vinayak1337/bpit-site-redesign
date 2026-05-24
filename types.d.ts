@@ -171,3 +171,65 @@ interface FooterBottomLeftContent {
 	copyright: string;
 	accreditation: string;
 }
+
+interface SiteChromeLinkItem {
+	id: string;
+	label: string;
+	href: string;
+	description?: string;
+	icon?: string;
+	enabled: boolean;
+	order: number;
+}
+
+interface SiteChromeNavSection {
+	id: string;
+	label: string;
+	icon?: string;
+	enabled: boolean;
+	order: number;
+	items: SiteChromeLinkItem[];
+}
+
+interface SiteChromeLogoConfig {
+	src: string;
+	alt: string;
+}
+
+interface SiteChromeFooterStat {
+	id: string;
+	number: string;
+	label: string;
+	icon?: string;
+	enabled: boolean;
+	order: number;
+}
+
+interface SiteChromeFooterSocialLink {
+	id: string;
+	label: string;
+	href: string;
+	icon?: string;
+	gradientClass?: string;
+	ariaLabel?: string;
+	enabled: boolean;
+	order: number;
+}
+
+interface SiteChromeFooterBottomText {
+	copyright: string;
+	accreditation: string;
+}
+
+interface SiteChromeFooterConfig {
+	quickLinks: SiteChromeLinkItem[];
+	socialLinks: SiteChromeFooterSocialLink[];
+	stats: SiteChromeFooterStat[];
+	bottomText: SiteChromeFooterBottomText;
+}
+
+interface SiteChromeConfig {
+	logo: SiteChromeLogoConfig;
+	navSections: SiteChromeNavSection[];
+	footer: SiteChromeFooterConfig;
+}

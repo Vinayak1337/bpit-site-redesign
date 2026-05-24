@@ -30,6 +30,11 @@ import {
 	SelectValue
 } from '@/components/ui/select';
 import { cn, createClientId } from '@/lib/utils';
+import {
+	AdminForm,
+	AdminFormFooter,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 type ProcessPageData = {
 	meta: AdmissionsProcessMeta;
@@ -224,21 +229,17 @@ function FormSection({
 	className?: string;
 }) {
 	return (
-		<section
-			className={cn(
-				'space-y-4 rounded-xl border border-slate-200 bg-white p-4 sm:p-5',
-				className
-			)}>
-			<div className='flex items-start justify-between gap-4'>
-				<div className='space-y-1'>
-					<h4 className='text-sm font-semibold uppercase tracking-[0.16em] text-slate-600'>
-						{title}
-					</h4>
-					{description ? <p className='text-sm text-slate-500'>{description}</p> : null}
+		<section className={cn('flex flex-col gap-4', className)}>
+			<div className='flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4'>
+				<div className='min-w-0'>
+					<h3 className='text-base font-semibold text-slate-900'>{title}</h3>
+					{description ? (
+						<p className='mt-0.5 text-sm text-slate-500'>{description}</p>
+					) : null}
 				</div>
-				{action}
+				{action ? <div className='flex-shrink-0'>{action}</div> : null}
 			</div>
-			{children}
+			<div className='flex flex-col gap-4'>{children}</div>
 		</section>
 	);
 }
@@ -255,11 +256,9 @@ function Subsection({
 	className?: string;
 }) {
 	return (
-		<div className={cn('space-y-3 border-t border-slate-200 pt-4', className)}>
+		<div className={cn('flex flex-col gap-3', className)}>
 			<div className='flex items-center justify-between gap-3'>
-				<h6 className='text-xs font-semibold uppercase tracking-[0.16em] text-slate-600'>
-					{title}
-				</h6>
+				<p className='text-sm font-semibold text-slate-800'>{title}</p>
 				{action}
 			</div>
 			{children}
@@ -281,14 +280,14 @@ function NestedItem({
 	const [collapsed, setCollapsed] = useState(collapsible);
 
 	return (
-		<div className='rounded-lg border border-slate-200 bg-slate-50/60'>
-			<div className='flex items-center justify-between gap-3 p-3 sm:p-4'>
+		<div className='rounded-lg border border-slate-200 bg-slate-50/60 p-4 transition hover:bg-slate-50'>
+			<div className='flex items-center justify-between gap-3'>
 				{collapsible ? (
 					<button
 						type='button'
 						onClick={() => setCollapsed(c => !c)}
 						className='flex flex-1 items-center gap-1.5 text-left'>
-						<span className='text-sm font-medium text-slate-700'>{title}</span>
+						<span className='text-sm font-semibold text-slate-900'>{title}</span>
 						{collapsed ? (
 							<ChevronDown className='h-3.5 w-3.5 text-slate-400' />
 						) : (
@@ -296,14 +295,12 @@ function NestedItem({
 						)}
 					</button>
 				) : (
-					<span className='text-sm font-medium text-slate-700'>{title}</span>
+					<span className='text-sm font-semibold text-slate-900'>{title}</span>
 				)}
 				{action}
 			</div>
 			{collapsed ? null : (
-				<div className='space-y-3 border-t border-slate-200 p-3 sm:p-4'>
-					{children}
-				</div>
+				<div className='mt-3 flex flex-col gap-3'>{children}</div>
 			)}
 		</div>
 	);
@@ -471,10 +468,15 @@ function CategoryFields({
 	});
 
 	return (
-		<div className='space-y-4 rounded-xl border border-slate-200 bg-white p-4'>
+		<div className='flex flex-col gap-3 rounded-lg border border-slate-200 bg-slate-50/60 p-4 transition hover:bg-slate-50'>
 			<div className='flex items-center justify-between'>
-				<span className='text-sm font-medium text-slate-700'>Category {index + 1}</span>
-				<Button type='button' variant='ghost' size='sm' onClick={onRemove}>
+				<span className='text-sm font-semibold text-slate-900'>Category {index + 1}</span>
+				<Button
+					type='button'
+					variant='ghost'
+					size='sm'
+					className='text-rose-600 hover:bg-rose-50 hover:text-rose-700'
+					onClick={onRemove}>
 					Remove
 				</Button>
 			</div>
@@ -1283,33 +1285,17 @@ export default function AdmissionsProcessForm({
 		});
 	};
 
+	const status: AdminFormStatus = isPending
+		? { kind: 'saving' }
+		: message === 'Saved'
+			? { kind: 'success', message: 'Saved' }
+			: message === 'Save failed'
+				? { kind: 'error', message: 'Save failed' }
+				: { kind: 'idle' };
+
 	return (
 		<Form {...form}>
-			<form
-				className={`space-y-6 ${
-					isImmersiveProgramEditor
-						? 'rounded-none border-0 bg-transparent p-0 shadow-none'
-						: 'max-h-[70vh] overflow-y-auto rounded-xl border border-slate-200 bg-white p-6 shadow-sm'
-				}`}
-				onSubmit={form.handleSubmit(handleSubmit)}>
-				<div className='flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between'>
-					<div>
-						<h3 className='text-lg font-semibold text-slate-900'>Admissions Process</h3>
-						<p className='text-sm text-slate-500'>
-							Manage process taxonomy, supporting copy, and complete program records.
-						</p>
-					</div>
-					<div className='flex items-center gap-2'>
-						{message ? (
-							<span className='rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700'>
-								{message}
-							</span>
-						) : null}
-						<Button type='submit' disabled={isPending}>
-							{isPending ? 'Saving...' : 'Save changes'}
-						</Button>
-					</div>
-				</div>
+			<AdminForm onSubmit={form.handleSubmit(handleSubmit)}>
 
 				{includes(visibleSections, 'meta') ? (
 					<>
@@ -1414,7 +1400,8 @@ export default function AdmissionsProcessForm({
 						</div>
 					</FormSection>
 				) : null}
-			</form>
+				<AdminFormFooter status={status} saving={isPending} />
+			</AdminForm>
 		</Form>
 	);
 }

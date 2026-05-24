@@ -1,16 +1,8 @@
 'use client';
 
-import { useMemo, useState, useTransition } from 'react';
+import { useEffect, useMemo, useState, useTransition } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage
-} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -22,6 +14,19 @@ import {
 } from '@/components/ui/select';
 import CloudinaryUploadButton from '@/components/cloudinary/upload-button';
 import { updateNoticesSection } from '@/app/(Private Pages)/actions/notices';
+import {
+	AddRowButton,
+	AdminEmptyState,
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	AdminItemCard,
+	AdminItemList,
+	AdminToggle,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 const CATEGORY_OPTIONS = [
 	'Academic',
@@ -50,8 +55,8 @@ type NoticeFormValue = {
 	priority: PriorityOption;
 	tags: string;
 	description: string;
-	pinned: 'true' | 'false';
-	urgent: 'true' | 'false';
+	pinned: boolean;
+	urgent: boolean;
 	link: string;
 };
 
@@ -94,17 +99,15 @@ const createEmptyNotice = (): NoticeFormValue => ({
 	priority: 'medium',
 	tags: '',
 	description: '',
-	pinned: 'false',
-	urgent: 'false',
+	pinned: false,
+	urgent: false,
 	link: '/'
 });
 
 const toNotice = (value: NoticeFormValue): Notice | null => {
 	const title = value.title.trim();
 	const description = value.description.trim();
-	if (title.length === 0 && description.length === 0) {
-		return null;
-	}
+	if (title.length === 0 && description.length === 0) return null;
 
 	const parsedId = Number(value.id);
 	const id = Number.isFinite(parsedId) ? parsedId : Date.now();
@@ -124,13 +127,11 @@ const toNotice = (value: NoticeFormValue): Notice | null => {
 		priority: value.priority,
 		tags,
 		description,
-		pinned: value.pinned === 'true',
-		urgent: value.urgent === 'true',
+		pinned: value.pinned,
+		urgent: value.urgent,
 		link: value.link.trim().length > 0 ? value.link.trim() : '/'
 	};
 };
-
-const toTagsString = (tags: string[]): string => tags.join(', ');
 
 const toFormValue = (notice: Notice): NoticeFormValue => ({
 	id: notice.id.toString(),
@@ -145,33 +146,26 @@ const toFormValue = (notice: Notice): NoticeFormValue => ({
 	priority: PRIORITY_OPTIONS.includes(notice.priority as PriorityOption)
 		? (notice.priority as PriorityOption)
 		: 'medium',
-	tags: toTagsString(notice.tags),
+	tags: notice.tags.join(', '),
 	description: notice.description,
-	pinned: notice.pinned ? 'true' : 'false',
-	urgent: notice.urgent ? 'true' : 'false',
+	pinned: Boolean(notice.pinned),
+	urgent: Boolean(notice.urgent),
 	link: notice.link
 });
 
 const normalizeFormValues = (values: Partial<FormValues>): Notice[] =>
 	(values.items ?? [])
 		.map(toNotice)
-		.filter((notice): notice is Notice => notice !== null);
-
-const ensureMinimumItems = (values: FormValues): FormValues => ({
-	items: values.items.length > 0 ? values.items : [createEmptyNotice()]
-});
+		.filter((n): n is Notice => n !== null);
 
 const buildSectionPayload = (
 	mode: NoticeListMode,
 	currentItems: Notice[],
 	otherItems: Notice[]
-): NoticesSectionData => {
-	if (mode === 'notices') {
-		return { notices: currentItems, announcements: otherItems };
-	}
-
-	return { notices: otherItems, announcements: currentItems };
-};
+): NoticesSectionData =>
+	mode === 'notices'
+		? { notices: currentItems, announcements: otherItems }
+		: { notices: otherItems, announcements: currentItems };
 
 export default function NoticesSectionForm({
 	mode,
@@ -180,332 +174,238 @@ export default function NoticesSectionForm({
 	pageSlug,
 	onSaved
 }: NoticesSectionFormProps) {
-	const defaults = useMemo(
-		() => ensureMinimumItems({ items: initialItems.map(toFormValue) }),
+	const defaults = useMemo<FormValues>(
+		() => ({
+			items:
+				initialItems.length > 0
+					? initialItems.map(toFormValue)
+					: [createEmptyNotice()]
+		}),
 		[initialItems]
 	);
 	const form = useForm<FormValues>({ defaultValues: defaults });
 	const [isPending, startTransition] = useTransition();
-	const [message, setMessage] = useState<string | null>(null);
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 	const meta = FORM_META[mode];
 
-	const fieldArray = useFieldArray({
-		control: form.control,
-		name: 'items'
-	});
+	const fieldArray = useFieldArray({ control: form.control, name: 'items' });
 
-	const handleSubmit = (values: FormValues) => {
-		setMessage(null);
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
+	const handleSubmit = form.handleSubmit(values => {
+		setStatus({ kind: 'saving' });
 		const currentItems = normalizeFormValues(values);
 		const payload = buildSectionPayload(mode, currentItems, otherItems);
-
 		startTransition(async () => {
 			const result = await updateNoticesSection(pageSlug, payload);
 			if (!result.ok) {
-				setMessage('Save failed');
+				setStatus({ kind: 'error', message: 'Save failed' });
 				return;
 			}
-			setMessage('Saved');
+			setStatus({ kind: 'success', message: 'Saved' });
 			onSaved?.(payload);
 		});
-	};
+	});
 
 	return (
-		<Form {...form}>
-			<form
-				className='space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm max-h-[70vh] overflow-y-auto overflow-x-hidden'
-				onSubmit={form.handleSubmit(handleSubmit)}>
-				<div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
-					<div>
-						<h3 className='text-lg font-semibold text-slate-900'>{meta.title}</h3>
-						<p className='text-sm text-slate-500'>{meta.description}</p>
-					</div>
-					<div className='flex items-center gap-2'>
-						{message && (
-							<span className='rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700'>
-								{message}
-							</span>
-						)}
-						<Button type='submit' disabled={isPending}>
-							{isPending ? 'Saving...' : 'Save changes'}
-						</Button>
-					</div>
-				</div>
-
-				<div className='flex items-center justify-between'>
-					<h4 className='text-sm font-semibold text-slate-700'>{meta.title}</h4>
-					<Button
-						type='button'
-						variant='outline'
-						size='sm'
-						onClick={() => fieldArray.append(createEmptyNotice())}>
-						Add {meta.singular.toLowerCase()}
-					</Button>
-				</div>
-
-				<div className='space-y-4'>
+		<AdminForm onSubmit={handleSubmit}>
+			<AdminFormSection title={meta.title} description={meta.description}>
+				<AdminItemList>
 					{fieldArray.fields.map((field, index) => (
-						<div
+						<AdminItemCard
 							key={field.id}
-							className='rounded-lg border border-slate-200 bg-white/95 p-5 shadow-sm transition hover:border-slate-300 hover:shadow'>
-							<div className='flex items-start justify-between gap-4'>
-								<h4 className='text-sm font-semibold text-slate-700'>
-									{meta.singular} {index + 1}
-								</h4>
-								<Button
-									type='button'
-									variant='ghost'
-									size='sm'
-									className='rounded-full border border-slate-200 text-slate-500 hover:border-rose-200 hover:bg-rose-100 hover:text-rose-600'
-									onClick={() => fieldArray.remove(index)}
-									disabled={fieldArray.fields.length === 1}>
-									Remove
-								</Button>
-							</div>
+							index={index}
+							total={fieldArray.fields.length}
+							title={
+								form.watch(`items.${index}.title`) ||
+								`${meta.singular} ${index + 1}`
+							}
+							subtitle={form.watch(`items.${index}.subtitle`) || undefined}
+							onMove={d => fieldArray.move(index, index + d)}
+							onRemove={
+								fieldArray.fields.length > 1
+									? () => fieldArray.remove(index)
+									: undefined
+							}>
+							<AdminFieldGrid>
+								<AdminField
+									label='Title'
+									error={
+										form.formState.errors.items?.[index]?.title?.message
+									}>
+									<Input
+										placeholder='Enter title'
+										{...form.register(`items.${index}.title` as const, {
+											required: 'Title is required'
+										})}
+									/>
+								</AdminField>
+								<AdminField label='Subtitle'>
+									<Input
+										placeholder='Enter subtitle'
+										{...form.register(`items.${index}.subtitle` as const)}
+									/>
+								</AdminField>
+								<AdminField
+									label='Date'
+									error={
+										form.formState.errors.items?.[index]?.date?.message
+									}>
+									<Input
+										type='date'
+										{...form.register(`items.${index}.date` as const, {
+											required: 'Date is required'
+										})}
+									/>
+								</AdminField>
+								<AdminField label='Time'>
+									<Input
+										placeholder='10:00 AM'
+										{...form.register(`items.${index}.time` as const)}
+									/>
+								</AdminField>
+								<AdminField label='Category'>
+									<Select
+										value={form.watch(`items.${index}.category`) || 'General'}
+										onValueChange={v =>
+											form.setValue(
+												`items.${index}.category`,
+												v as CategoryOption,
+												{ shouldDirty: true }
+											)
+										}>
+										<SelectTrigger>
+											<SelectValue placeholder='Select category' />
+										</SelectTrigger>
+										<SelectContent>
+											{CATEGORY_OPTIONS.map(option => (
+												<SelectItem key={option} value={option}>
+													{option}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								</AdminField>
+								<AdminField label='Priority'>
+									<Select
+										value={form.watch(`items.${index}.priority`) || 'medium'}
+										onValueChange={v =>
+											form.setValue(
+												`items.${index}.priority`,
+												v as PriorityOption,
+												{ shouldDirty: true }
+											)
+										}>
+										<SelectTrigger>
+											<SelectValue placeholder='Select priority' />
+										</SelectTrigger>
+										<SelectContent>
+											{PRIORITY_OPTIONS.map(option => (
+												<SelectItem key={option} value={option}>
+													{option}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								</AdminField>
+								<AdminField
+									label='Link'
+									error={
+										form.formState.errors.items?.[index]?.link?.message
+									}>
+									<Input
+										placeholder='/'
+										{...form.register(`items.${index}.link` as const, {
+											required: 'Link is required',
+											validate: value =>
+												value.startsWith('/') ||
+												value.startsWith('http://') ||
+												value.startsWith('https://')
+													? true
+													: 'Link must start with "/" or "http(s)://"'
+										})}
+									/>
+								</AdminField>
+								<AdminField label='Tags (comma separated)'>
+									<Input
+										placeholder='Exam, Important'
+										{...form.register(`items.${index}.tags` as const)}
+									/>
+								</AdminField>
+							</AdminFieldGrid>
 
-							<div className='grid gap-4 md:grid-cols-2'>
-								<FormField
-									control={form.control}
-									name={`items.${index}.title` as const}
-									rules={{ required: 'Title is required' }}
-									render={({ field: titleField }) => (
-										<FormItem>
-											<FormLabel>Title</FormLabel>
-											<FormControl>
-												<Input placeholder='Enter title' {...titleField} />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
+							<AdminField label='Description'>
+								<Textarea
+									rows={4}
+									placeholder='Add a short description'
+									{...form.register(`items.${index}.description` as const)}
 								/>
+							</AdminField>
 
-								<FormField
-									control={form.control}
-									name={`items.${index}.subtitle` as const}
-									render={({ field: subtitleField }) => (
-										<FormItem>
-											<FormLabel>Subtitle</FormLabel>
-											<FormControl>
-												<Input placeholder='Enter subtitle' {...subtitleField} />
-											</FormControl>
-										</FormItem>
-									)}
+							<AdminField label='Image URL'>
+								<Input
+									placeholder='https://…'
+									{...form.register(`items.${index}.image` as const)}
 								/>
+								<div className='mt-2 flex flex-wrap gap-2'>
+									<CloudinaryUploadButton
+										buttonText='Upload image'
+										onUpload={url =>
+											form.setValue(`items.${index}.image` as const, url, {
+												shouldDirty: true
+											})
+										}
+									/>
+									<Button
+										type='button'
+										variant='ghost'
+										size='sm'
+										onClick={() =>
+											form.setValue(`items.${index}.image` as const, '', {
+												shouldDirty: true
+											})
+										}>
+										Clear
+									</Button>
+								</div>
+							</AdminField>
 
-								<FormField
-									control={form.control}
-									name={`items.${index}.date` as const}
-									rules={{ required: 'Date is required' }}
-									render={({ field: dateField }) => (
-										<FormItem>
-											<FormLabel>Date</FormLabel>
-											<FormControl>
-												<Input type='date' {...dateField} />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`items.${index}.time` as const}
-									render={({ field: timeField }) => (
-										<FormItem>
-											<FormLabel>Time</FormLabel>
-											<FormControl>
-												<Input placeholder='10:00 AM' {...timeField} />
-											</FormControl>
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`items.${index}.category` as const}
-									render={({ field: categoryField }) => (
-										<FormItem>
-											<FormLabel>Category</FormLabel>
-											<Select
-												value={categoryField.value}
-												onValueChange={categoryField.onChange}>
-												<FormControl>
-													<SelectTrigger>
-														<SelectValue placeholder='Select category' />
-													</SelectTrigger>
-												</FormControl>
-												<SelectContent>
-													{CATEGORY_OPTIONS.map(option => (
-														<SelectItem key={option} value={option}>
-															{option}
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`items.${index}.priority` as const}
-									render={({ field: priorityField }) => (
-										<FormItem>
-											<FormLabel>Priority</FormLabel>
-											<Select
-												value={priorityField.value}
-												onValueChange={priorityField.onChange}>
-												<FormControl>
-													<SelectTrigger>
-														<SelectValue placeholder='Select priority' />
-													</SelectTrigger>
-												</FormControl>
-												<SelectContent>
-													{PRIORITY_OPTIONS.map(option => (
-														<SelectItem key={option} value={option}>
-															{option}
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`items.${index}.pinned` as const}
-									render={({ field: pinnedField }) => (
-										<FormItem>
-											<FormLabel>Pinned</FormLabel>
-											<Select
-												value={pinnedField.value}
-												onValueChange={pinnedField.onChange}>
-												<FormControl>
-													<SelectTrigger>
-														<SelectValue />
-													</SelectTrigger>
-												</FormControl>
-												<SelectContent>
-													<SelectItem value='true'>Yes</SelectItem>
-													<SelectItem value='false'>No</SelectItem>
-												</SelectContent>
-											</Select>
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`items.${index}.urgent` as const}
-									render={({ field: urgentField }) => (
-										<FormItem>
-											<FormLabel>Urgent</FormLabel>
-											<Select
-												value={urgentField.value}
-												onValueChange={urgentField.onChange}>
-												<FormControl>
-													<SelectTrigger>
-														<SelectValue />
-													</SelectTrigger>
-												</FormControl>
-												<SelectContent>
-													<SelectItem value='true'>Yes</SelectItem>
-													<SelectItem value='false'>No</SelectItem>
-												</SelectContent>
-											</Select>
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`items.${index}.link` as const}
-									rules={{
-										required: 'Link is required',
-										validate: value =>
-											value.startsWith('/') ||
-											value.startsWith('http://') ||
-											value.startsWith('https://')
-												? true
-												: 'Link must start with "/" or "http(s)://"'
-									}}
-									render={({ field: linkField }) => (
-										<FormItem>
-											<FormLabel>Link</FormLabel>
-											<FormControl>
-												<Input placeholder='/' {...linkField} />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							</div>
-
-							<FormField
-								control={form.control}
-								name={`items.${index}.description` as const}
-								render={({ field: descriptionField }) => (
-									<FormItem>
-										<FormLabel>Description</FormLabel>
-										<FormControl>
-											<Textarea
-												rows={4}
-												placeholder='Add a short description'
-												{...descriptionField}
-											/>
-										</FormControl>
-									</FormItem>
-								)}
+							<AdminToggle
+								label='Pinned'
+								description='Pinned items rise to the top of the list.'
+								checked={form.watch(`items.${index}.pinned`) ?? false}
+								onChange={v =>
+									form.setValue(`items.${index}.pinned` as const, v, {
+										shouldDirty: true
+									})
+								}
 							/>
-
-							<FormField
-								control={form.control}
-								name={`items.${index}.tags` as const}
-								render={({ field: tagsField }) => (
-									<FormItem>
-										<FormLabel>Tags (comma separated)</FormLabel>
-										<FormControl>
-											<Input placeholder='Exam, Important' {...tagsField} />
-										</FormControl>
-									</FormItem>
-								)}
+							<AdminToggle
+								label='Urgent'
+								description='Urgent items show the urgent indicator on the homepage.'
+								checked={form.watch(`items.${index}.urgent`) ?? false}
+								onChange={v =>
+									form.setValue(`items.${index}.urgent` as const, v, {
+										shouldDirty: true
+									})
+								}
 							/>
-
-							<FormField
-								control={form.control}
-								name={`items.${index}.image` as const}
-								render={({ field: imageField }) => (
-									<FormItem>
-										<FormLabel>Image URL</FormLabel>
-										<FormControl>
-											<Input placeholder='https://...' {...imageField} />
-										</FormControl>
-										<div className='flex gap-2 pt-2'>
-											<CloudinaryUploadButton
-												buttonText='Upload image'
-												onUpload={url =>
-													form.setValue(`items.${index}.image` as const, url, {
-														shouldDirty: true
-													})
-												}
-											/>
-											<Button
-												type='button'
-												variant='ghost'
-												size='sm'
-												onClick={() => imageField.onChange('')}>
-												Clear
-											</Button>
-										</div>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-						</div>
+						</AdminItemCard>
 					))}
-				</div>
-			</form>
-		</Form>
+				</AdminItemList>
+				{fieldArray.fields.length === 0 && (
+					<AdminEmptyState title={`No ${meta.singular.toLowerCase()}s yet`} />
+				)}
+				<AddRowButton onClick={() => fieldArray.append(createEmptyNotice())}>
+					Add {meta.singular.toLowerCase()}
+				</AddRowButton>
+			</AdminFormSection>
+
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }

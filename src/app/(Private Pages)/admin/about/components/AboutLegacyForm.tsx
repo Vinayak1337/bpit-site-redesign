@@ -2,17 +2,8 @@
 
 import { useEffect, useMemo, useState, useTransition } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage
-} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
 import {
 	Select,
 	SelectContent,
@@ -23,6 +14,18 @@ import {
 import type { AboutLegacyData } from '@/app/(Private Pages)/actions/about';
 import { updateAboutLegacy } from '@/app/(Private Pages)/actions/about';
 import { SUPPORTED_ICON_NAMES } from '@/components/about/icons';
+import {
+	AddRowButton,
+	AdminEmptyState,
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	AdminItemCard,
+	AdminItemList,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 type ParagraphFormValue = { id: string; value: string };
 type FeatureFormValue = {
@@ -79,7 +82,9 @@ const normalizeLegacy = (values: Partial<FormValues>): AboutLegacyData => {
 				? feature.color ?? 'blue'
 				: 'blue'
 		}))
-		.filter(feature => feature.title.length > 0 && feature.description.length > 0);
+		.filter(
+			feature => feature.title.length > 0 && feature.description.length > 0
+		);
 
 	return {
 		title: (values.title ?? '').trim() || 'Our Legacy',
@@ -94,7 +99,7 @@ export default function AboutLegacyForm({
 	onChange
 }: Props) {
 	const [isPending, startTransition] = useTransition();
-	const [message, setMessage] = useState<string | null>(null);
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 
 	const form = useForm<FormValues>({
 		defaultValues: {
@@ -111,7 +116,7 @@ export default function AboutLegacyForm({
 							title: feature.title,
 							description: feature.description,
 							color: feature.color
-					  }))
+						}))
 					: [createFeature()]
 		}
 	});
@@ -120,7 +125,6 @@ export default function AboutLegacyForm({
 		control: form.control,
 		name: 'paragraphs'
 	});
-
 	const featuresArray = useFieldArray({
 		control: form.control,
 		name: 'features'
@@ -135,259 +139,181 @@ export default function AboutLegacyForm({
 				features: values.features?.filter(Boolean) as FeatureFormValue[]
 			};
 			onChange?.(normalizeLegacy(formValues));
+			setStatus(current => (current.kind === 'idle' ? current : { kind: 'idle' }));
 		});
 		return () => subscription.unsubscribe();
 	}, [form, onChange]);
 
-	const handleSubmit = (values: FormValues) => {
-		setMessage(null);
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
+	const handleSubmit = form.handleSubmit(values => {
+		setStatus({ kind: 'saving' });
 		const payload = normalizeLegacy(values);
 		startTransition(async () => {
 			const result = await updateAboutLegacy(pageSlug, payload);
 			if (!result.ok) {
-				setMessage('Save failed');
+				setStatus({ kind: 'error', message: 'Save failed' });
 				return;
 			}
-			setMessage('Saved');
+			setStatus({ kind: 'success', message: 'Saved' });
 		});
-	};
+	});
 
 	const iconOptions = useMemo(
 		() => Array.from(new Set(SUPPORTED_ICON_NAMES)),
 		[]
 	);
 
+	const titleError = form.formState.errors.title?.message;
+
 	return (
-		<Form {...form}>
-			<form
-				className='space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm max-h-[70vh] overflow-y-auto overflow-x-hidden'
-				onSubmit={form.handleSubmit(handleSubmit)}>
-				<div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
-					<div>
-						<h3 className='text-lg font-semibold text-slate-900'>Legacy</h3>
-						<p className='text-sm text-slate-500'>
-							Manage the story content and highlight cards displayed on the About page.
-						</p>
-					</div>
-					<div className='flex items-center gap-2'>
-						{message && (
-							<span className='rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700'>
-								{message}
-							</span>
-						)}
-						<Button type='submit' disabled={isPending}>
-							{isPending ? 'Saving...' : 'Save changes'}
-						</Button>
-					</div>
-				</div>
+		<AdminForm onSubmit={handleSubmit}>
+			<AdminFormSection
+				title='Legacy'
+				description='Story content and highlight cards shown on the About page.'>
+				<AdminField
+					label='Section title'
+					htmlFor='about-legacy-title'
+					error={titleError}>
+					<Input
+						id='about-legacy-title'
+						placeholder='Our Legacy'
+						{...form.register('title', { required: 'Title is required' })}
+					/>
+				</AdminField>
+			</AdminFormSection>
 
-				<FormField
-					control={form.control}
-					name='title'
-					rules={{ required: 'Title is required' }}
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Section title</FormLabel>
-							<FormControl>
-								<Input placeholder='Our Legacy' {...field} />
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+			<AdminFormSection title='Paragraphs'>
+				<AdminItemList>
+					{paragraphsArray.fields.map((field, index) => (
+						<AdminItemCard
+							key={field.id}
+							index={index}
+							total={paragraphsArray.fields.length}
+							title={`Paragraph ${index + 1}`}
+							onMove={dir =>
+								paragraphsArray.move(index, index + dir)
+							}
+							onRemove={() => paragraphsArray.remove(index)}>
+							<AdminField label={`Paragraph ${index + 1}`} className='[&_label]:sr-only'>
+								<Textarea
+									rows={4}
+									placeholder='Write a paragraph about BPIT legacy…'
+									{...form.register(`paragraphs.${index}.value` as const, {
+										required: 'Paragraph cannot be empty'
+									})}
+								/>
+								{form.formState.errors.paragraphs?.[index]?.value?.message && (
+									<p className='mt-1 text-xs text-rose-600'>
+										{form.formState.errors.paragraphs[index]?.value?.message as string}
+									</p>
+								)}
+							</AdminField>
+						</AdminItemCard>
+					))}
+				</AdminItemList>
+				{paragraphsArray.fields.length === 0 && (
+					<AdminEmptyState
+						title='No paragraphs yet'
+						description='Add at least one paragraph to describe BPIT legacy.'
+					/>
+				)}
+				<AddRowButton onClick={() => paragraphsArray.append(createParagraph())}>
+					Add paragraph
+				</AddRowButton>
+			</AdminFormSection>
 
-				<div className='space-y-3'>
-					<div className='flex items-center justify-between'>
-						<h4 className='text-sm font-semibold text-slate-700'>
-							Paragraphs
-						</h4>
-						<Button
-							type='button'
-							variant='outline'
-							size='sm'
-							onClick={() => paragraphsArray.append(createParagraph())}>
-							Add paragraph
-						</Button>
-					</div>
-					<div className='space-y-4'>
-						{paragraphsArray.fields.map((field, index) => (
-							<div
-								key={field.id}
-								className='rounded-lg border border-slate-200 bg-slate-50/50 p-4 space-y-3'>
-								<div className='flex items-center justify-between'>
-									<span className='text-sm font-medium text-slate-700'>
-										Paragraph {index + 1}
-									</span>
-									<Button
-										type='button'
-										variant='ghost'
-										size='sm'
-										onClick={() =>
-											paragraphsArray.remove(index < 0 ? 0 : index)
+			<AdminFormSection title='Features'>
+				<AdminItemList>
+					{featuresArray.fields.map((field, index) => (
+						<AdminItemCard
+							key={field.id}
+							index={index}
+							total={featuresArray.fields.length}
+							title={`Feature ${index + 1}`}
+							onMove={dir => featuresArray.move(index, index + dir)}
+							onRemove={() => featuresArray.remove(index)}>
+							<AdminFieldGrid>
+								<AdminField label='Title'>
+									<Input
+										placeholder='Academic Excellence'
+										{...form.register(`features.${index}.title` as const, {
+											required: 'Title is required'
+										})}
+									/>
+								</AdminField>
+								<AdminField label='Icon'>
+									<Select
+										value={form.watch(`features.${index}.icon`) || DEFAULT_ICON}
+										onValueChange={value =>
+											form.setValue(`features.${index}.icon`, value, {
+												shouldDirty: true
+											})
 										}>
-										Remove
-									</Button>
-								</div>
-								<FormField
-									control={form.control}
-									name={`paragraphs.${index}.value`}
-									rules={{ required: 'Paragraph cannot be empty' }}
-									render={({ field: paragraphField }) => (
-										<FormItem>
-											<FormLabel className='sr-only'>{`Paragraph ${index + 1}`}</FormLabel>
-											<FormControl>
-												<Textarea
-													rows={4}
-													placeholder='Write a paragraph about BPIT legacy...'
-													{...paragraphField}
-												/>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
+										<SelectTrigger>
+											<SelectValue placeholder='Select icon' />
+										</SelectTrigger>
+										<SelectContent>
+											{iconOptions.map(option => (
+												<SelectItem key={option} value={option}>
+													{option}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								</AdminField>
+								<AdminField label='Color'>
+									<Select
+										value={form.watch(`features.${index}.color`) || 'blue'}
+										onValueChange={value =>
+											form.setValue(
+												`features.${index}.color`,
+												value as FeatureFormValue['color'],
+												{ shouldDirty: true }
+											)
+										}>
+										<SelectTrigger>
+											<SelectValue placeholder='Select color' />
+										</SelectTrigger>
+										<SelectContent>
+											{COLOR_OPTIONS.map(color => (
+												<SelectItem key={color} value={color}>
+													{color.charAt(0).toUpperCase() + color.slice(1)}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								</AdminField>
+							</AdminFieldGrid>
+							<AdminField label='Description'>
+								<Textarea
+									rows={3}
+									placeholder='Describe the highlight…'
+									{...form.register(
+										`features.${index}.description` as const,
+										{ required: 'Description is required' }
 									)}
 								/>
-							</div>
-						))}
-						{paragraphsArray.fields.length === 0 ? (
-							<div className='rounded-lg border border-dashed border-slate-300 p-4 text-sm text-slate-500'>
-								Add at least one paragraph to describe BPIT legacy.
-							</div>
-						) : null}
-					</div>
-				</div>
+							</AdminField>
+						</AdminItemCard>
+					))}
+				</AdminItemList>
+				{featuresArray.fields.length === 0 && (
+					<AdminEmptyState
+						title='No features yet'
+						description='Add feature cards to showcase BPIT strengths.'
+					/>
+				)}
+				<AddRowButton onClick={() => featuresArray.append(createFeature())}>
+					Add feature
+				</AddRowButton>
+			</AdminFormSection>
 
-				<div className='space-y-3'>
-					<div className='flex items-center justify-between'>
-						<h4 className='text-sm font-semibold text-slate-700'>
-							Features
-						</h4>
-						<Button
-							type='button'
-							variant='outline'
-							size='sm'
-							onClick={() => featuresArray.append(createFeature())}>
-							Add feature
-						</Button>
-					</div>
-					<div className='space-y-4'>
-						{featuresArray.fields.map((field, index) => (
-							<div
-								key={field.id}
-								className='rounded-lg border border-slate-200 bg-slate-50/50 p-4 space-y-4'>
-								<div className='flex items-center justify-between'>
-									<span className='text-sm font-medium text-slate-700'>
-										Feature {index + 1}
-									</span>
-									<Button
-										type='button'
-										variant='ghost'
-										size='sm'
-										onClick={() =>
-											featuresArray.remove(index < 0 ? 0 : index)
-										}>
-										Remove
-									</Button>
-								</div>
-								<div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-									<FormField
-										control={form.control}
-										name={`features.${index}.title`}
-										rules={{ required: 'Title is required' }}
-										render={({ field: titleField }) => (
-											<FormItem>
-												<FormLabel>Title</FormLabel>
-												<FormControl>
-													<Input
-														placeholder='Academic Excellence'
-														{...titleField}
-													/>
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-									<FormField
-										control={form.control}
-										name={`features.${index}.icon`}
-										render={({ field: iconField }) => (
-											<FormItem>
-												<FormLabel>Icon</FormLabel>
-												<FormControl>
-													<Select
-														onValueChange={iconField.onChange}
-														value={iconField.value}>
-														<SelectTrigger>
-															<SelectValue placeholder='Select icon' />
-														</SelectTrigger>
-														<SelectContent>
-															{iconOptions.map(option => (
-																<SelectItem key={option} value={option}>
-																	{option}
-																</SelectItem>
-															))}
-														</SelectContent>
-													</Select>
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-									<FormField
-										control={form.control}
-										name={`features.${index}.color`}
-										render={({ field: colorField }) => (
-											<FormItem>
-												<FormLabel>Color</FormLabel>
-												<FormControl>
-													<Select
-														onValueChange={colorField.onChange}
-														value={colorField.value}>
-														<SelectTrigger>
-															<SelectValue placeholder='Select color' />
-														</SelectTrigger>
-														<SelectContent>
-															{COLOR_OPTIONS.map(color => (
-																<SelectItem key={color} value={color}>
-																	{color.charAt(0).toUpperCase() +
-																		color.slice(1)}
-																</SelectItem>
-															))}
-														</SelectContent>
-													</Select>
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-								</div>
-								<FormField
-									control={form.control}
-									name={`features.${index}.description`}
-									rules={{ required: 'Description is required' }}
-									render={({ field: descriptionField }) => (
-										<FormItem>
-											<FormLabel>Description</FormLabel>
-											<FormControl>
-												<Textarea
-													rows={3}
-													placeholder='Describe the highlight...'
-													{...descriptionField}
-												/>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							</div>
-						))}
-						{featuresArray.fields.length === 0 ? (
-							<div className='rounded-lg border border-dashed border-slate-300 p-4 text-sm text-slate-500'>
-								Add feature cards to showcase BPIT strengths.
-							</div>
-						) : null}
-					</div>
-				</div>
-			</form>
-		</Form>
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }

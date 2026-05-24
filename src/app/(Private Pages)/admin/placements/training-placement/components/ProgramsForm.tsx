@@ -1,15 +1,33 @@
 'use client';
 
-import React, { useState, useTransition, useEffect } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
-import { Plus, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue
+} from '@/components/ui/select';
 import { SUPPORTED_ICON_NAMES } from '@/components/about/icons';
-import { updateTrainingPlacement, type TrainingPlacementData } from '@/app/(Private Pages)/actions/training-placement';
+import {
+	updateTrainingPlacement,
+	type TrainingPlacementData
+} from '@/app/(Private Pages)/actions/training-placement';
+import {
+	AddRowButton,
+	AdminEmptyState,
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	AdminItemCard,
+	AdminItemList,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 const COLOR_OPTIONS = ['blue', 'green', 'purple', 'orange'];
 
@@ -19,9 +37,12 @@ interface ProgramsFormProps {
 	onChange?: (data: TrainingPlacementData) => void;
 }
 
-export default function ProgramsForm({ initialData, pageSlug, onChange }: ProgramsFormProps) {
+export default function ProgramsForm({
+	initialData,
+	onChange
+}: ProgramsFormProps) {
 	const [isPending, startTransition] = useTransition();
-	const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 
 	const form = useForm({
 		defaultValues: {
@@ -31,29 +52,36 @@ export default function ProgramsForm({ initialData, pageSlug, onChange }: Progra
 		}
 	});
 
-	const { fields, append, remove } = useFieldArray({
+	const { fields, append, remove, move } = useFieldArray({
 		control: form.control,
 		name: 'trainingPrograms'
 	});
 
-	// Watch for changes and update preview in real-time
 	useEffect(() => {
-		const subscription = form.watch((values) => {
+		const sub = form.watch(values => {
 			if (onChange) {
-				const updatedData: TrainingPlacementData = {
+				onChange({
 					...initialData,
 					trainingTitle: values.trainingTitle || '',
 					trainingDescription: values.trainingDescription || '',
-					trainingPrograms: (values.trainingPrograms || []).filter(Boolean) as any
-				};
-				onChange(updatedData);
+					trainingPrograms: (values.trainingPrograms || []).filter(
+						Boolean
+					) as TrainingPlacementData['trainingPrograms']
+				});
+				setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 			}
 		});
-		return () => subscription.unsubscribe();
+		return () => sub.unsubscribe();
 	}, [form, onChange, initialData]);
 
-	const onSubmit = async (values: any) => {
-		setSaveStatus('saving');
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
+	const onSubmit = form.handleSubmit(values => {
+		setStatus({ kind: 'saving' });
 		startTransition(async () => {
 			try {
 				const updatedData: TrainingPlacementData = {
@@ -62,203 +90,154 @@ export default function ProgramsForm({ initialData, pageSlug, onChange }: Progra
 					trainingDescription: values.trainingDescription,
 					trainingPrograms: values.trainingPrograms
 				};
-
 				await updateTrainingPlacement(updatedData);
-				
-				if (onChange) {
-					onChange(updatedData);
-				}
-
-				setSaveStatus('saved');
-				setTimeout(() => setSaveStatus('idle'), 2000);
+				onChange?.(updatedData);
+				setStatus({ kind: 'success', message: 'Saved' });
 			} catch (error) {
 				console.error('Failed to save:', error);
-				setSaveStatus('error');
+				setStatus({ kind: 'error', message: 'Save failed' });
 			}
 		});
-	};
+	});
 
 	return (
-		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
-				<div className='grid grid-cols-1 gap-4'>
-					<FormField
-						control={form.control}
-						name='trainingTitle'
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Section Title</FormLabel>
-								<FormControl>
-									<Input {...field} placeholder='Training Programs' />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
+		<AdminForm onSubmit={onSubmit}>
+			<AdminFormSection
+				title='Section heading'
+				description='Copy shown above the programs grid.'>
+				<AdminField label='Section title' htmlFor='tp-prog-title'>
+					<Input
+						id='tp-prog-title'
+						placeholder='Training Programs'
+						{...form.register('trainingTitle')}
 					/>
-
-					<FormField
-						control={form.control}
-						name='trainingDescription'
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Section Description</FormLabel>
-								<FormControl>
-									<Textarea {...field} rows={3} placeholder='Description...' />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
+				</AdminField>
+				<AdminField label='Section description' htmlFor='tp-prog-desc'>
+					<Textarea
+						id='tp-prog-desc'
+						rows={3}
+						placeholder='Description…'
+						{...form.register('trainingDescription')}
 					/>
-				</div>
+				</AdminField>
+			</AdminFormSection>
 
-				<div className='space-y-4'>
-					<div className='flex items-center justify-between'>
-						<h3 className='text-lg font-semibold'>Programs</h3>
-						<Button
-							type='button'
-							onClick={() => append({ id: Date.now().toString(), title: '', description: '', duration: '', participants: '', icon: 'Users', color: 'blue' })}
-							size='sm'>
-							<Plus className='w-4 h-4 mr-2' />
-							Add Program
-						</Button>
-					</div>
-
+			<AdminFormSection title='Programs'>
+				<AdminItemList>
 					{fields.map((field, index) => (
-						<div key={field.id} className='p-4 border rounded-lg space-y-4'>
-							<div className='flex items-center justify-between mb-2'>
-								<h4 className='font-semibold'>Program {index + 1}</h4>
-								<Button
-									type='button'
-									variant='destructive'
-									size='sm'
-									onClick={() => remove(index)}>
-									<Trash2 className='w-4 h-4' />
-								</Button>
-							</div>
-
-							<div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-								<FormField
-									control={form.control}
-									name={`trainingPrograms.${index}.title`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Title</FormLabel>
-											<FormControl>
-												<Input {...field} placeholder='Aptitude Training' />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
+						<AdminItemCard
+							key={field.id}
+							index={index}
+							total={fields.length}
+							title={
+								form.watch(`trainingPrograms.${index}.title`) ||
+								`Program ${index + 1}`
+							}
+							subtitle={
+								form.watch(`trainingPrograms.${index}.duration`) || undefined
+							}
+							onMove={d => move(index, index + d)}
+							onRemove={() => remove(index)}>
+							<AdminFieldGrid>
+								<AdminField label='Title'>
+									<Input
+										placeholder='Aptitude Training'
+										{...form.register(
+											`trainingPrograms.${index}.title` as const
+										)}
+									/>
+								</AdminField>
+								<AdminField label='Duration'>
+									<Input
+										placeholder='3 months'
+										{...form.register(
+											`trainingPrograms.${index}.duration` as const
+										)}
+									/>
+								</AdminField>
+								<AdminField label='Participants'>
+									<Input
+										placeholder='500+ students'
+										{...form.register(
+											`trainingPrograms.${index}.participants` as const
+										)}
+									/>
+								</AdminField>
+								<AdminField label='Icon'>
+									<Select
+										value={
+											form.watch(`trainingPrograms.${index}.icon`) || 'Users'
+										}
+										onValueChange={v =>
+											form.setValue(`trainingPrograms.${index}.icon`, v, {
+												shouldDirty: true
+											})
+										}>
+										<SelectTrigger>
+											<SelectValue />
+										</SelectTrigger>
+										<SelectContent>
+											{SUPPORTED_ICON_NAMES.slice(0, 20).map(icon => (
+												<SelectItem key={icon} value={icon}>
+													{icon}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								</AdminField>
+								<AdminField label='Color'>
+									<Select
+										value={
+											form.watch(`trainingPrograms.${index}.color`) || 'blue'
+										}
+										onValueChange={v =>
+											form.setValue(`trainingPrograms.${index}.color`, v, {
+												shouldDirty: true
+											})
+										}>
+										<SelectTrigger>
+											<SelectValue />
+										</SelectTrigger>
+										<SelectContent>
+											{COLOR_OPTIONS.map(color => (
+												<SelectItem key={color} value={color}>
+													{color}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								</AdminField>
+							</AdminFieldGrid>
+							<AdminField label='Description'>
+								<Textarea
+									rows={3}
+									placeholder='Program description…'
+									{...form.register(
+										`trainingPrograms.${index}.description` as const
 									)}
 								/>
-
-								<FormField
-									control={form.control}
-									name={`trainingPrograms.${index}.duration`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Duration</FormLabel>
-											<FormControl>
-												<Input {...field} placeholder='3 months' />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`trainingPrograms.${index}.participants`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Participants</FormLabel>
-											<FormControl>
-												<Input {...field} placeholder='500+ students' />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`trainingPrograms.${index}.icon`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Icon</FormLabel>
-											<Select onValueChange={field.onChange} value={field.value}>
-												<FormControl>
-													<SelectTrigger>
-														<SelectValue />
-													</SelectTrigger>
-												</FormControl>
-												<SelectContent>
-													{SUPPORTED_ICON_NAMES.slice(0, 20).map(icon => (
-														<SelectItem key={icon} value={icon}>
-															{icon}
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`trainingPrograms.${index}.color`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Color</FormLabel>
-											<Select onValueChange={field.onChange} value={field.value}>
-												<FormControl>
-													<SelectTrigger>
-														<SelectValue />
-													</SelectTrigger>
-												</FormControl>
-												<SelectContent>
-													{COLOR_OPTIONS.map(color => (
-														<SelectItem key={color} value={color}>
-															{color}
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`trainingPrograms.${index}.description`}
-									render={({ field }) => (
-										<FormItem className='md:col-span-2'>
-											<FormLabel>Description</FormLabel>
-											<FormControl>
-												<Textarea {...field} rows={3} placeholder='Program description...' />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							</div>
-						</div>
+							</AdminField>
+						</AdminItemCard>
 					))}
-				</div>
+				</AdminItemList>
+				{fields.length === 0 && <AdminEmptyState title='No programs yet' />}
+				<AddRowButton
+					onClick={() =>
+						append({
+							id: Date.now().toString(),
+							title: '',
+							description: '',
+							duration: '',
+							participants: '',
+							icon: 'Users',
+							color: 'blue'
+						})
+					}>
+					Add program
+				</AddRowButton>
+			</AdminFormSection>
 
-				<div className='flex items-center gap-3'>
-					<Button type='submit' disabled={isPending}>
-						{isPending ? 'Saving...' : 'Save Changes'}
-					</Button>
-					{saveStatus === 'saved' && (
-						<span className='text-sm text-green-600'>✓ Saved successfully</span>
-					)}
-					{saveStatus === 'error' && (
-						<span className='text-sm text-red-600'>Failed to save</span>
-					)}
-				</div>
-			</form>
-		</Form>
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }

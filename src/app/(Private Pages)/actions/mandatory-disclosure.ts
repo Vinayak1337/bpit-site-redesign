@@ -14,43 +14,24 @@ export async function getMandatoryDisclosure(
 ): Promise<DisclosureData> {
 	return unstable_cache(
 		async () => {
-			try {
-				const page = await prisma.page.findUnique({
-					where: { slug },
-					include: { components: true }
-				});
+			const page = await prisma.page.findUnique({
+				where: { slug },
+				include: { components: true }
+			});
 
-				if (!page) return getDefaultDisclosureData();
-
-				const component = page.components.find(
-					c => c.key === 'MANDATORY_DISCLOSURE_DATA'
-				);
-
-				if (!component) return getDefaultDisclosureData();
-
-				// Parse data to apply defaults (specifically for hero which might be missing in old data)
-				const parsed = disclosureDataSchema.safeParse(component.data);
-
-				if (parsed.success) {
-					return parsed.data;
-				}
-
-				// If validation fails (e.g. old data structure), try to salvage items or return default with items
-				console.warn(
-					'Mandatory disclosure data schema mismatch, falling back to partial data or defaults'
-				);
-				const rawData = component.data as any;
-
-				return {
-					hero: getDefaultDisclosureData().hero,
-					items: Array.isArray(rawData?.items)
-						? rawData.items
-						: getDefaultDisclosureData().items
-				};
-			} catch (error) {
-				console.error('Error fetching mandatory disclosure data:', error);
-				return getDefaultDisclosureData();
+			if (!page) {
+				throw new Error('MANDATORY_DISCLOSURE not seeded — run `npm run seed mandatory-disclosure`');
 			}
+
+			const component = page.components.find(
+				c => c.key === 'MANDATORY_DISCLOSURE_DATA'
+			);
+
+			if (!component) {
+				throw new Error('MANDATORY_DISCLOSURE component missing — run `npm run seed mandatory-disclosure`');
+			}
+
+			return disclosureDataSchema.parse(component.data);
 		},
 		[`mandatory-disclosure-${slug}`],
 		{ tags: [`mandatory-disclosure-${slug}`], revalidate: 3600 }
@@ -96,34 +77,4 @@ export async function updateMandatoryDisclosure(
 	}
 }
 
-// --- Default Data ---
 
-function getDefaultDisclosureData(): DisclosureData {
-	return {
-		hero: {
-			title: 'Mandatory Disclosure',
-			description:
-				'Important documents and disclosures in compliance with regulatory bodies.'
-		},
-		items: [
-			{
-				id: '1',
-				title: 'Mandatory Disclosure',
-				url: '#',
-				category: 'General'
-			},
-			{
-				id: '2',
-				title: 'AICTE Approval Letter 2023-24',
-				url: '#',
-				category: 'Approvals'
-			},
-			{
-				id: '3',
-				title: 'Fee Structure',
-				url: '#',
-				category: 'Admissions'
-			}
-		]
-	};
-}

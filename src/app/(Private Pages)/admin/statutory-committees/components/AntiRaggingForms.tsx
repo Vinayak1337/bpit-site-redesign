@@ -3,19 +3,25 @@
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Trash2, Plus, Save, Loader2 } from 'lucide-react';
 import {
 	updateAntiRagging,
 	type AntiRaggingData
 } from '@/app/(Private Pages)/actions/statutory-committees';
 import { useTransition, useEffect, useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-
-// --- Schemas ---
+import {
+	AddRowButton,
+	AdminEmptyState,
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	AdminItemCard,
+	AdminItemList,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 const heroSchema = z.object({
 	title: z.string().min(1),
@@ -23,7 +29,6 @@ const heroSchema = z.object({
 	gradient: z.string().optional(),
 	icon: z.string().optional()
 });
-
 const memberSchema = z.object({
 	name: z.string().min(1),
 	designation: z.string().min(1),
@@ -31,14 +36,12 @@ const memberSchema = z.object({
 	phone: z.string().optional(),
 	email: z.string().optional()
 });
-
 const measureSchema = z.object({
 	title: z.string().min(1),
 	description: z.string().min(1),
 	icon: z.string().min(1),
 	iconColor: z.string().min(1)
 });
-
 const contactSchema = z.object({
 	title: z.string().min(1),
 	contact: z.string().min(1),
@@ -54,47 +57,27 @@ type BaseProps = {
 	onChange?: (data: AntiRaggingData) => void;
 };
 
-// --- Generic Form Wrapper ---
-
-function FormWrapper({
-	onSubmit,
-	isPending,
-	children
-}: {
-	onSubmit: () => void;
-	isPending: boolean;
-	children: React.ReactNode;
-}) {
-	return (
-		<form
-			onSubmit={e => {
-				e.preventDefault();
-				onSubmit();
-			}}
-			className='space-y-6'>
-			{children}
-			<div className='flex justify-end'>
-				<Button type='submit' disabled={isPending}>
-					{isPending ? (
-						<Loader2 className='mr-2 h-4 w-4 animate-spin' />
-					) : (
-						<Save className='mr-2 h-4 w-4' />
-					)}
-					Save Changes
-				</Button>
-			</div>
-		</form>
-	);
+function useStatusFlow() {
+	const [isPending, startTransition] = useTransition();
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+	return { isPending, startTransition, status, setStatus };
 }
 
-// --- Forms ---
+// ---------------------------------------------------------------------------
+// Hero
+// ---------------------------------------------------------------------------
 
 export function AntiRaggingHeroForm({
 	initialData,
 	pageSlug,
 	onChange
 }: BaseProps) {
-	const [isPending, startTransition] = useTransition();
+	const { isPending, startTransition, status, setStatus } = useStatusFlow();
 	const { register, handleSubmit, watch } = useForm({
 		resolver: zodResolver(z.object({ hero: heroSchema })),
 		defaultValues: { hero: initialData.hero }
@@ -102,62 +85,67 @@ export function AntiRaggingHeroForm({
 
 	const watchedData = watch();
 	useEffect(() => {
-		if (onChange)
-			onChange({
-				...initialData,
-				hero: watchedData.hero as AntiRaggingData['hero']
-			});
+		onChange?.({
+			...initialData,
+			hero: watchedData.hero as AntiRaggingData['hero']
+		});
+		setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 	}, [watchedData, onChange, initialData]);
 
-	const onSubmit = (data: { hero: AntiRaggingData['hero'] }) => {
+	const onSubmit = handleSubmit(data => {
+		setStatus({ kind: 'saving' });
 		startTransition(async () => {
 			try {
 				await updateAntiRagging({ ...initialData, hero: data.hero }, pageSlug);
+				setStatus({ kind: 'success', message: 'Saved' });
 			} catch (error) {
 				console.error(error);
+				setStatus({ kind: 'error', message: 'Save failed' });
 			}
 		});
-	};
+	});
 
 	return (
-		<FormWrapper onSubmit={handleSubmit(onSubmit)} isPending={isPending}>
-			<div className='space-y-4'>
-				<div>
-					<Label>Title</Label>
+		<AdminForm onSubmit={onSubmit}>
+			<AdminFormSection
+				title='Hero'
+				description='Header copy for the anti-ragging page.'>
+				<AdminField label='Title'>
 					<Input {...register('hero.title')} />
-				</div>
-				<div>
-					<Label>Description</Label>
-					<Textarea {...register('hero.description')} rows={3} />
-				</div>
-				<div className='grid grid-cols-2 gap-4'>
-					<div>
-						<Label>Gradient</Label>
+				</AdminField>
+				<AdminField label='Description'>
+					<Textarea rows={3} {...register('hero.description')} />
+				</AdminField>
+				<AdminFieldGrid>
+					<AdminField label='Gradient'>
 						<Input
+							placeholder='from-red-600…'
 							{...register('hero.gradient')}
-							placeholder='from-red-600...'
 						/>
-					</div>
-					<div>
-						<Label>Icon</Label>
-						<Input {...register('hero.icon')} placeholder='Shield' />
-					</div>
-				</div>
-			</div>
-		</FormWrapper>
+					</AdminField>
+					<AdminField label='Icon'>
+						<Input placeholder='Shield' {...register('hero.icon')} />
+					</AdminField>
+				</AdminFieldGrid>
+			</AdminFormSection>
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }
+
+// ---------------------------------------------------------------------------
+// Definition
+// ---------------------------------------------------------------------------
 
 export function AntiRaggingDefinitionForm({
 	initialData,
 	pageSlug,
 	onChange
 }: BaseProps) {
-	const [isPending, startTransition] = useTransition();
+	const { isPending, startTransition, status, setStatus } = useStatusFlow();
 	const [includes, setIncludes] = useState<string[]>(
 		initialData.definition?.includes || ['']
 	);
-
 	const { register, handleSubmit, watch } = useForm({
 		defaultValues: {
 			title: initialData.definition?.title || '',
@@ -166,21 +154,20 @@ export function AntiRaggingDefinitionForm({
 	});
 
 	const watchedData = watch();
-
 	useEffect(() => {
-		if (onChange) {
-			onChange({
-				...initialData,
-				definition: {
-					title: watchedData.title || '',
-					content: watchedData.content || '',
-					includes: includes.filter(i => i.trim().length > 0)
-				}
-			});
-		}
+		onChange?.({
+			...initialData,
+			definition: {
+				title: watchedData.title || '',
+				content: watchedData.content || '',
+				includes: includes.filter(i => i.trim().length > 0)
+			}
+		});
+		setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 	}, [watchedData, includes, onChange, initialData]);
 
-	const handleSubmitForm = (data: { title: string; content: string }) => {
+	const onSubmit = handleSubmit(data => {
+		setStatus({ kind: 'saving' });
 		startTransition(async () => {
 			try {
 				await updateAntiRagging(
@@ -194,294 +181,313 @@ export function AntiRaggingDefinitionForm({
 					},
 					pageSlug
 				);
+				setStatus({ kind: 'success', message: 'Saved' });
 			} catch (error) {
 				console.error(error);
+				setStatus({ kind: 'error', message: 'Save failed' });
 			}
 		});
-	};
-
-	const addInclude = () => setIncludes([...includes, '']);
-	const removeInclude = (index: number) =>
-		setIncludes(includes.filter((_, i) => i !== index));
-	const updateInclude = (index: number, value: string) => {
-		const updated = [...includes];
-		updated[index] = value;
-		setIncludes(updated);
-	};
+	});
 
 	return (
-		<FormWrapper
-			onSubmit={handleSubmit(handleSubmitForm)}
-			isPending={isPending}>
-			<div className='space-y-4'>
-				<div>
-					<Label>Title</Label>
+		<AdminForm onSubmit={onSubmit}>
+			<AdminFormSection
+				title='Definition'
+				description='What constitutes ragging and what falls under the policy.'>
+				<AdminField label='Title'>
 					<Input {...register('title')} />
+				</AdminField>
+				<AdminField label='Content'>
+					<Textarea rows={5} {...register('content')} />
+				</AdminField>
+				<div className='flex flex-col gap-3'>
+					<p className='text-sm font-medium text-slate-700'>Includes points</p>
+					<AdminItemList>
+						{includes.map((item, index) => (
+							<AdminItemCard
+								key={index}
+								index={index}
+								total={includes.length}
+								title={`Point ${index + 1}`}
+								onMove={d => {
+									const j = index + d;
+									if (j < 0 || j >= includes.length) return;
+									const next = [...includes];
+									[next[index], next[j]] = [next[j], next[index]];
+									setIncludes(next);
+								}}
+								onRemove={() =>
+									setIncludes(includes.filter((_, i) => i !== index))
+								}>
+								<AdminField
+									label={`Point ${index + 1}`}
+									className='[&_label]:sr-only'>
+									<Input
+										value={item}
+										onChange={e => {
+											const next = [...includes];
+											next[index] = e.target.value;
+											setIncludes(next);
+										}}
+									/>
+								</AdminField>
+							</AdminItemCard>
+						))}
+					</AdminItemList>
+					{includes.length === 0 && <AdminEmptyState title='No points yet' />}
+					<AddRowButton onClick={() => setIncludes([...includes, ''])}>
+						Add point
+					</AddRowButton>
 				</div>
-				<div>
-					<Label>Content</Label>
-					<Textarea {...register('content')} rows={5} />
-				</div>
-
-				<div className='space-y-2'>
-					<div className='flex justify-between items-center'>
-						<Label>Includes Points</Label>
-						<Button
-							type='button'
-							size='sm'
-							variant='outline'
-							onClick={addInclude}>
-							<Plus className='w-4 h-4 mr-2' /> Add Point
-						</Button>
-					</div>
-					{includes.map((item, index) => (
-						<div key={index} className='flex gap-2'>
-							<Input
-								value={item}
-								onChange={e => updateInclude(index, e.target.value)}
-							/>
-							<Button
-								type='button'
-								size='icon'
-								variant='ghost'
-								className='text-red-500'
-								onClick={() => removeInclude(index)}>
-								<Trash2 className='w-4 h-4' />
-							</Button>
-						</div>
-					))}
-				</div>
-			</div>
-		</FormWrapper>
+			</AdminFormSection>
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }
+
+// ---------------------------------------------------------------------------
+// Members
+// ---------------------------------------------------------------------------
 
 export function AntiRaggingMembersForm({
 	initialData,
 	pageSlug,
 	onChange
 }: BaseProps) {
-	const [isPending, startTransition] = useTransition();
+	const { isPending, startTransition, status, setStatus } = useStatusFlow();
 	const { register, control, handleSubmit, watch } = useForm({
 		resolver: zodResolver(
 			z.object({ committeeMembers: z.array(memberSchema) })
 		),
 		defaultValues: { committeeMembers: initialData.committeeMembers }
 	});
-
-	const membersFields = useFieldArray({ control, name: 'committeeMembers' });
+	const members = useFieldArray({ control, name: 'committeeMembers' });
 
 	const watchedData = watch();
 	useEffect(() => {
-		if (onChange)
-			onChange({
-				...initialData,
-				committeeMembers:
-					watchedData.committeeMembers as AntiRaggingData['committeeMembers']
-			});
+		onChange?.({
+			...initialData,
+			committeeMembers:
+				watchedData.committeeMembers as AntiRaggingData['committeeMembers']
+		});
+		setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 	}, [watchedData, onChange, initialData]);
 
-	const onSubmit = (data: {
-		committeeMembers: AntiRaggingData['committeeMembers'];
-	}) => {
+	const onSubmit = handleSubmit(data => {
+		setStatus({ kind: 'saving' });
 		startTransition(async () => {
 			try {
 				await updateAntiRagging(
 					{ ...initialData, committeeMembers: data.committeeMembers },
 					pageSlug
 				);
+				setStatus({ kind: 'success', message: 'Saved' });
 			} catch (error) {
 				console.error(error);
+				setStatus({ kind: 'error', message: 'Save failed' });
 			}
 		});
-	};
+	});
 
 	return (
-		<FormWrapper onSubmit={handleSubmit(onSubmit)} isPending={isPending}>
-			<div className='space-y-4'>
-				<div className='flex justify-between items-center'>
-					<Label>Members</Label>
-					<Button
-						type='button'
-						size='sm'
-						variant='outline'
-						onClick={() =>
-							membersFields.append({
-								name: '',
-								designation: '',
-								department: ''
-							})
-						}>
-						<Plus className='w-4 h-4 mr-2' /> Add Member
-					</Button>
-				</div>
-				{membersFields.fields.map((field, index) => (
-					<Card key={field.id} className='relative'>
-						<div className='absolute top-2 right-2'>
-							<Button
-								type='button'
-								size='icon'
-								variant='ghost'
-								className='h-8 w-8 text-red-500'
-								onClick={() => membersFields.remove(index)}>
-								<Trash2 className='w-4 h-4' />
-							</Button>
-						</div>
-						<CardContent className='pt-6 space-y-3'>
-							<div>
-								<Label>Name</Label>
-								<Input {...register(`committeeMembers.${index}.name`)} />
-							</div>
-							<div>
-								<Label>Designation</Label>
-								<Input {...register(`committeeMembers.${index}.designation`)} />
-							</div>
-							<div>
-								<Label>Department</Label>
-								<Input {...register(`committeeMembers.${index}.department`)} />
-							</div>
-							<div className='grid grid-cols-2 gap-2'>
-								<div>
-									<Label>Phone</Label>
-									<Input {...register(`committeeMembers.${index}.phone`)} />
-								</div>
-								<div>
-									<Label>Email</Label>
-									<Input {...register(`committeeMembers.${index}.email`)} />
-								</div>
-							</div>
-						</CardContent>
-					</Card>
-				))}
-			</div>
-		</FormWrapper>
+		<AdminForm onSubmit={onSubmit}>
+			<AdminFormSection title='Committee members'>
+				<AdminItemList>
+					{members.fields.map((field, index) => (
+						<AdminItemCard
+							key={field.id}
+							index={index}
+							total={members.fields.length}
+							title={
+								watch(`committeeMembers.${index}.name`) || `Member ${index + 1}`
+							}
+							onMove={d => members.move(index, index + d)}
+							onRemove={() => members.remove(index)}>
+							<AdminFieldGrid>
+								<AdminField label='Name'>
+									<Input
+										{...register(`committeeMembers.${index}.name` as const)}
+									/>
+								</AdminField>
+								<AdminField label='Designation'>
+									<Input
+										{...register(
+											`committeeMembers.${index}.designation` as const
+										)}
+									/>
+								</AdminField>
+								<AdminField label='Department'>
+									<Input
+										{...register(
+											`committeeMembers.${index}.department` as const
+										)}
+									/>
+								</AdminField>
+							</AdminFieldGrid>
+							<AdminFieldGrid>
+								<AdminField label='Phone'>
+									<Input
+										{...register(`committeeMembers.${index}.phone` as const)}
+									/>
+								</AdminField>
+								<AdminField label='Email'>
+									<Input
+										{...register(`committeeMembers.${index}.email` as const)}
+									/>
+								</AdminField>
+							</AdminFieldGrid>
+						</AdminItemCard>
+					))}
+				</AdminItemList>
+				{members.fields.length === 0 && (
+					<AdminEmptyState title='No members yet' />
+				)}
+				<AddRowButton
+					onClick={() =>
+						members.append({ name: '', designation: '', department: '' })
+					}>
+					Add member
+				</AddRowButton>
+			</AdminFormSection>
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }
+
+// ---------------------------------------------------------------------------
+// Measures
+// ---------------------------------------------------------------------------
 
 export function AntiRaggingMeasuresForm({
 	initialData,
 	pageSlug,
 	onChange
 }: BaseProps) {
-	const [isPending, startTransition] = useTransition();
+	const { isPending, startTransition, status, setStatus } = useStatusFlow();
 	const { register, control, handleSubmit, watch } = useForm({
 		resolver: zodResolver(
 			z.object({ preventiveMeasures: z.array(measureSchema) })
 		),
 		defaultValues: { preventiveMeasures: initialData.preventiveMeasures }
 	});
-
-	const fields = useFieldArray({ control, name: 'preventiveMeasures' });
+	const measures = useFieldArray({ control, name: 'preventiveMeasures' });
 
 	const watchedData = watch();
 	useEffect(() => {
-		if (onChange)
-			onChange({
-				...initialData,
-				preventiveMeasures:
-					watchedData.preventiveMeasures as AntiRaggingData['preventiveMeasures']
-			});
+		onChange?.({
+			...initialData,
+			preventiveMeasures:
+				watchedData.preventiveMeasures as AntiRaggingData['preventiveMeasures']
+		});
+		setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 	}, [watchedData, onChange, initialData]);
 
-	const onSubmit = (data: {
-		preventiveMeasures: AntiRaggingData['preventiveMeasures'];
-	}) => {
+	const onSubmit = handleSubmit(data => {
+		setStatus({ kind: 'saving' });
 		startTransition(async () => {
 			try {
 				await updateAntiRagging(
 					{ ...initialData, preventiveMeasures: data.preventiveMeasures },
 					pageSlug
 				);
+				setStatus({ kind: 'success', message: 'Saved' });
 			} catch (error) {
 				console.error(error);
+				setStatus({ kind: 'error', message: 'Save failed' });
 			}
 		});
-	};
+	});
 
 	return (
-		<FormWrapper onSubmit={handleSubmit(onSubmit)} isPending={isPending}>
-			<div className='space-y-4'>
-				<div className='flex justify-between items-center'>
-					<Label>Measures</Label>
-					<Button
-						type='button'
-						size='sm'
-						variant='outline'
-						onClick={() =>
-							fields.append({
-								title: '',
-								description: '',
-								icon: 'Shield',
-								iconColor: 'text-blue-600'
-							})
-						}>
-						<Plus className='w-4 h-4 mr-2' /> Add Measure
-					</Button>
-				</div>
-				{fields.fields.map((field, index) => (
-					<Card key={field.id} className='relative'>
-						<div className='absolute top-2 right-2'>
-							<Button
-								type='button'
-								size='icon'
-								variant='ghost'
-								className='h-8 w-8 text-red-500'
-								onClick={() => fields.remove(index)}>
-								<Trash2 className='w-4 h-4' />
-							</Button>
-						</div>
-						<CardContent className='pt-6 space-y-3'>
-							<div>
-								<Label>Title</Label>
-								<Input {...register(`preventiveMeasures.${index}.title`)} />
-							</div>
-							<div className='grid grid-cols-2 gap-2'>
-								<div>
-									<Label>Icon</Label>
-									<Input {...register(`preventiveMeasures.${index}.icon`)} />
-								</div>
-								<div>
-									<Label>Color</Label>
-									<Input
-										{...register(`preventiveMeasures.${index}.iconColor`)}
-									/>
-								</div>
-							</div>
-							<div>
-								<Label>Description</Label>
-								<Textarea
-									{...register(`preventiveMeasures.${index}.description`)}
-									rows={2}
+		<AdminForm onSubmit={onSubmit}>
+			<AdminFormSection title='Preventive measures'>
+				<AdminItemList>
+					{measures.fields.map((field, index) => (
+						<AdminItemCard
+							key={field.id}
+							index={index}
+							total={measures.fields.length}
+							title={
+								watch(`preventiveMeasures.${index}.title`) ||
+								`Measure ${index + 1}`
+							}
+							onMove={d => measures.move(index, index + d)}
+							onRemove={() => measures.remove(index)}>
+							<AdminField label='Title'>
+								<Input
+									{...register(`preventiveMeasures.${index}.title` as const)}
 								/>
-							</div>
-						</CardContent>
-					</Card>
-				))}
-			</div>
-		</FormWrapper>
+							</AdminField>
+							<AdminFieldGrid>
+								<AdminField label='Icon'>
+									<Input
+										{...register(`preventiveMeasures.${index}.icon` as const)}
+									/>
+								</AdminField>
+								<AdminField label='Color'>
+									<Input
+										{...register(
+											`preventiveMeasures.${index}.iconColor` as const
+										)}
+									/>
+								</AdminField>
+							</AdminFieldGrid>
+							<AdminField label='Description'>
+								<Textarea
+									rows={2}
+									{...register(
+										`preventiveMeasures.${index}.description` as const
+									)}
+								/>
+							</AdminField>
+						</AdminItemCard>
+					))}
+				</AdminItemList>
+				{measures.fields.length === 0 && (
+					<AdminEmptyState title='No measures yet' />
+				)}
+				<AddRowButton
+					onClick={() =>
+						measures.append({
+							title: '',
+							description: '',
+							icon: 'Shield',
+							iconColor: 'text-blue-600'
+						})
+					}>
+					Add measure
+				</AddRowButton>
+			</AdminFormSection>
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }
+
+// ---------------------------------------------------------------------------
+// Punishments
+// ---------------------------------------------------------------------------
 
 export function AntiRaggingPunishmentsForm({
 	initialData,
 	pageSlug,
 	onChange
 }: BaseProps) {
-	const [isPending, startTransition] = useTransition();
+	const { isPending, startTransition, status, setStatus } = useStatusFlow();
 	const [punishments, setPunishments] = useState<string[]>(
 		initialData.punishments || ['']
 	);
 
 	useEffect(() => {
-		if (onChange) {
-			onChange({
-				...initialData,
-				punishments: punishments.filter(p => p.trim().length > 0)
-			});
-		}
+		onChange?.({
+			...initialData,
+			punishments: punishments.filter(p => p.trim().length > 0)
+		});
+		setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 	}, [punishments, onChange, initialData]);
 
-	const handleSubmitForm = () => {
+	const handleSubmitForm = (e: React.FormEvent) => {
+		e.preventDefault();
+		setStatus({ kind: 'saving' });
 		startTransition(async () => {
 			try {
 				await updateAntiRagging(
@@ -491,151 +497,161 @@ export function AntiRaggingPunishmentsForm({
 					},
 					pageSlug
 				);
+				setStatus({ kind: 'success', message: 'Saved' });
 			} catch (error) {
 				console.error(error);
+				setStatus({ kind: 'error', message: 'Save failed' });
 			}
 		});
 	};
 
-	const addPunishment = () => setPunishments([...punishments, '']);
-	const removePunishment = (index: number) =>
-		setPunishments(punishments.filter((_, i) => i !== index));
-	const updatePunishment = (index: number, value: string) => {
-		const updated = [...punishments];
-		updated[index] = value;
-		setPunishments(updated);
-	};
-
 	return (
-		<FormWrapper onSubmit={handleSubmitForm} isPending={isPending}>
-			<div className='space-y-4'>
-				<div className='flex justify-between items-center'>
-					<Label>Punishments</Label>
-					<Button
-						type='button'
-						size='sm'
-						variant='outline'
-						onClick={addPunishment}>
-						<Plus className='w-4 h-4 mr-2' /> Add Item
-					</Button>
-				</div>
-				{punishments.map((item, index) => (
-					<div key={index} className='flex gap-2 items-center'>
-						<span className='text-sm font-mono text-gray-500 w-6'>
-							{index + 1}.
-						</span>
-						<Input
-							value={item}
-							onChange={e => updatePunishment(index, e.target.value)}
-						/>
-						<Button
-							type='button'
-							size='icon'
-							variant='ghost'
-							className='text-red-500'
-							onClick={() => removePunishment(index)}>
-							<Trash2 className='w-4 h-4' />
-						</Button>
-					</div>
-				))}
-			</div>
-		</FormWrapper>
+		<AdminForm onSubmit={handleSubmitForm}>
+			<AdminFormSection title='Punishments'>
+				<AdminItemList>
+					{punishments.map((item, index) => (
+						<AdminItemCard
+							key={index}
+							index={index}
+							total={punishments.length}
+							title={`Item ${index + 1}`}
+							onMove={d => {
+								const j = index + d;
+								if (j < 0 || j >= punishments.length) return;
+								const next = [...punishments];
+								[next[index], next[j]] = [next[j], next[index]];
+								setPunishments(next);
+							}}
+							onRemove={() =>
+								setPunishments(punishments.filter((_, i) => i !== index))
+							}>
+							<AdminField
+								label={`Item ${index + 1}`}
+								className='[&_label]:sr-only'>
+								<Input
+									value={item}
+									onChange={e => {
+										const next = [...punishments];
+										next[index] = e.target.value;
+										setPunishments(next);
+									}}
+								/>
+							</AdminField>
+						</AdminItemCard>
+					))}
+				</AdminItemList>
+				{punishments.length === 0 && (
+					<AdminEmptyState title='No punishments yet' />
+				)}
+				<AddRowButton onClick={() => setPunishments([...punishments, ''])}>
+					Add item
+				</AddRowButton>
+			</AdminFormSection>
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }
+
+// ---------------------------------------------------------------------------
+// Contacts
+// ---------------------------------------------------------------------------
 
 export function AntiRaggingContactsForm({
 	initialData,
 	pageSlug,
 	onChange
 }: BaseProps) {
-	const [isPending, startTransition] = useTransition();
+	const { isPending, startTransition, status, setStatus } = useStatusFlow();
 	const { register, control, handleSubmit, watch } = useForm({
 		resolver: zodResolver(
 			z.object({ emergencyContacts: z.array(contactSchema) })
 		),
 		defaultValues: { emergencyContacts: initialData.emergencyContacts }
 	});
-
-	const fields = useFieldArray({ control, name: 'emergencyContacts' });
+	const contacts = useFieldArray({ control, name: 'emergencyContacts' });
 
 	const watchedData = watch();
 	useEffect(() => {
-		if (onChange)
-			onChange({
-				...initialData,
-				emergencyContacts:
-					watchedData.emergencyContacts as AntiRaggingData['emergencyContacts']
-			});
+		onChange?.({
+			...initialData,
+			emergencyContacts:
+				watchedData.emergencyContacts as AntiRaggingData['emergencyContacts']
+		});
+		setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 	}, [watchedData, onChange, initialData]);
 
-	const onSubmit = (data: {
-		emergencyContacts: AntiRaggingData['emergencyContacts'];
-	}) => {
+	const onSubmit = handleSubmit(data => {
+		setStatus({ kind: 'saving' });
 		startTransition(async () => {
 			try {
 				await updateAntiRagging(
 					{ ...initialData, emergencyContacts: data.emergencyContacts },
 					pageSlug
 				);
+				setStatus({ kind: 'success', message: 'Saved' });
 			} catch (error) {
 				console.error(error);
+				setStatus({ kind: 'error', message: 'Save failed' });
 			}
 		});
-	};
+	});
 
 	return (
-		<FormWrapper onSubmit={handleSubmit(onSubmit)} isPending={isPending}>
-			<div className='space-y-4'>
-				<div className='flex justify-between items-center'>
-					<Label>Contacts</Label>
-					<Button
-						type='button'
-						size='sm'
-						variant='outline'
-						onClick={() =>
-							fields.append({
-								title: '',
-								contact: '',
-								description: '',
-								icon: 'Phone',
-								iconColor: 'text-red-600',
-								bgColor: 'bg-red-100'
-							})
-						}>
-						<Plus className='w-4 h-4 mr-2' /> Add Contact
-					</Button>
-				</div>
-				{fields.fields.map((field, index) => (
-					<Card key={field.id} className='relative'>
-						<div className='absolute top-2 right-2'>
-							<Button
-								type='button'
-								size='icon'
-								variant='ghost'
-								className='h-8 w-8 text-red-500'
-								onClick={() => fields.remove(index)}>
-								<Trash2 className='w-4 h-4' />
-							</Button>
-						</div>
-						<CardContent className='pt-6 space-y-3'>
-							<div>
-								<Label>Title</Label>
-								<Input {...register(`emergencyContacts.${index}.title`)} />
-							</div>
-							<div>
-								<Label>Contact</Label>
-								<Input {...register(`emergencyContacts.${index}.contact`)} />
-							</div>
-							<div>
-								<Label>Description</Label>
+		<AdminForm onSubmit={onSubmit}>
+			<AdminFormSection title='Emergency contacts'>
+				<AdminItemList>
+					{contacts.fields.map((field, index) => (
+						<AdminItemCard
+							key={field.id}
+							index={index}
+							total={contacts.fields.length}
+							title={
+								watch(`emergencyContacts.${index}.title`) ||
+								`Contact ${index + 1}`
+							}
+							subtitle={
+								watch(`emergencyContacts.${index}.contact`) || undefined
+							}
+							onMove={d => contacts.move(index, index + d)}
+							onRemove={() => contacts.remove(index)}>
+							<AdminField label='Title'>
 								<Input
-									{...register(`emergencyContacts.${index}.description`)}
+									{...register(`emergencyContacts.${index}.title` as const)}
 								/>
-							</div>
-						</CardContent>
-					</Card>
-				))}
-			</div>
-		</FormWrapper>
+							</AdminField>
+							<AdminField label='Contact'>
+								<Input
+									{...register(`emergencyContacts.${index}.contact` as const)}
+								/>
+							</AdminField>
+							<AdminField label='Description'>
+								<Input
+									{...register(
+										`emergencyContacts.${index}.description` as const
+									)}
+								/>
+							</AdminField>
+						</AdminItemCard>
+					))}
+				</AdminItemList>
+				{contacts.fields.length === 0 && (
+					<AdminEmptyState title='No contacts yet' />
+				)}
+				<AddRowButton
+					onClick={() =>
+						contacts.append({
+							title: '',
+							contact: '',
+							description: '',
+							icon: 'Phone',
+							iconColor: 'text-red-600',
+							bgColor: 'bg-red-100'
+						})
+					}>
+					Add contact
+				</AddRowButton>
+			</AdminFormSection>
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }

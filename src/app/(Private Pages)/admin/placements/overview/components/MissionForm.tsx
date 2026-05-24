@@ -2,20 +2,21 @@
 
 import { useEffect, useState, useTransition } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage
-} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
 import type { PlacementOverviewData } from '@/app/(Private Pages)/actions/placement-overview';
 import { updatePlacementOverview } from '@/app/(Private Pages)/actions/placement-overview';
-import { Plus, Trash2 } from 'lucide-react';
+import {
+	AddRowButton,
+	AdminEmptyState,
+	AdminField,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	AdminItemCard,
+	AdminItemList,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 type FormValues = {
 	missionTitle: string;
@@ -36,7 +37,7 @@ type Props = {
 
 export default function MissionForm({ initialData, pageSlug, onChange }: Props) {
 	const [isPending, startTransition] = useTransition();
-	const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 
 	const form = useForm<FormValues>({
 		defaultValues: {
@@ -45,26 +46,29 @@ export default function MissionForm({ initialData, pageSlug, onChange }: Props) 
 			missionContent: {
 				paragraph1: initialData.missionContent?.paragraph1 || '',
 				paragraph2: initialData.missionContent?.paragraph2 || '',
-				features: (initialData.missionContent?.features || ['']).map(f => ({ value: f })),
-				objectives: (initialData.missionContent?.objectives || ['']).map(o => ({ value: o }))
+				features: (initialData.missionContent?.features || ['']).map(f => ({
+					value: f
+				})),
+				objectives: (initialData.missionContent?.objectives || ['']).map(o => ({
+					value: o
+				}))
 			}
 		}
 	});
 
-	const featuresArray = useFieldArray({
+	const features = useFieldArray({
 		control: form.control,
 		name: 'missionContent.features'
 	});
-
-	const objectivesArray = useFieldArray({
+	const objectives = useFieldArray({
 		control: form.control,
 		name: 'missionContent.objectives'
 	});
 
 	useEffect(() => {
-		const subscription = form.watch((values) => {
+		const sub = form.watch(values => {
 			if (onChange) {
-				const updatedData: PlacementOverviewData = {
+				onChange({
 					...initialData,
 					missionTitle: values.missionTitle || '',
 					missionDescription: values.missionDescription || '',
@@ -78,15 +82,21 @@ export default function MissionForm({ initialData, pageSlug, onChange }: Props) 
 							.map(o => o?.value || '')
 							.filter(o => o.trim().length > 0)
 					}
-				};
-				onChange(updatedData);
+				});
+				setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 			}
 		});
-		return () => subscription.unsubscribe();
+		return () => sub.unsubscribe();
 	}, [form, onChange, initialData]);
 
-	const onSubmit = async (values: FormValues) => {
-		setSaveStatus('saving');
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
+	const onSubmit = form.handleSubmit(values => {
+		setStatus({ kind: 'saving' });
 		startTransition(async () => {
 			try {
 				const updatedData: PlacementOverviewData = {
@@ -96,195 +106,120 @@ export default function MissionForm({ initialData, pageSlug, onChange }: Props) 
 					missionContent: {
 						paragraph1: values.missionContent.paragraph1,
 						paragraph2: values.missionContent.paragraph2,
-						features: values.missionContent.features.map(f => f.value).filter(f => f.trim().length > 0),
-						objectives: values.missionContent.objectives.map(o => o.value).filter(o => o.trim().length > 0)
+						features: values.missionContent.features
+							.map(f => f.value)
+							.filter(f => f.trim().length > 0),
+						objectives: values.missionContent.objectives
+							.map(o => o.value)
+							.filter(o => o.trim().length > 0)
 					}
 				};
-
 				await updatePlacementOverview(pageSlug, updatedData);
-				setSaveStatus('saved');
-				setTimeout(() => setSaveStatus('idle'), 2000);
+				setStatus({ kind: 'success', message: 'Saved' });
 			} catch (error) {
 				console.error('Failed to save:', error);
-				setSaveStatus('error');
-				setTimeout(() => setSaveStatus('idle'), 3000);
+				setStatus({ kind: 'error', message: 'Save failed' });
 			}
 		});
-	};
+	});
 
 	return (
-		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-				<div className="space-y-4">
-					<h3 className="text-lg font-semibold text-slate-900">Mission Section</h3>
-					
-					<FormField
-						control={form.control}
-						name="missionTitle"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Mission Title</FormLabel>
-								<FormControl>
-									<Input placeholder="Our Mission" {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
+		<AdminForm onSubmit={onSubmit}>
+			<AdminFormSection
+				title='Mission section'
+				description='Headline copy and the two mission paragraphs.'>
+				<AdminField label='Mission title' htmlFor='mi-title'>
+					<Input
+						id='mi-title'
+						placeholder='Our Mission'
+						{...form.register('missionTitle')}
 					/>
-
-					<FormField
-						control={form.control}
-						name="missionDescription"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Mission Description</FormLabel>
-								<FormControl>
-									<Textarea 
-										placeholder="Brief description of the mission"
-										rows={3}
-										{...field} 
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
+				</AdminField>
+				<AdminField label='Mission description' htmlFor='mi-desc'>
+					<Textarea
+						id='mi-desc'
+						rows={3}
+						placeholder='Brief description of the mission'
+						{...form.register('missionDescription')}
 					/>
-
-					<FormField
-						control={form.control}
-						name="missionContent.paragraph1"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Paragraph 1</FormLabel>
-								<FormControl>
-									<Textarea 
-										placeholder="First paragraph of mission content"
-										rows={4}
-										{...field} 
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
+				</AdminField>
+				<AdminField label='Paragraph 1' htmlFor='mi-p1'>
+					<Textarea
+						id='mi-p1'
+						rows={4}
+						{...form.register('missionContent.paragraph1')}
 					/>
-
-					<FormField
-						control={form.control}
-						name="missionContent.paragraph2"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Paragraph 2</FormLabel>
-								<FormControl>
-									<Textarea 
-										placeholder="Second paragraph of mission content"
-										rows={4}
-										{...field} 
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
+				</AdminField>
+				<AdminField label='Paragraph 2' htmlFor='mi-p2'>
+					<Textarea
+						id='mi-p2'
+						rows={4}
+						{...form.register('missionContent.paragraph2')}
 					/>
-				</div>
+				</AdminField>
+			</AdminFormSection>
 
-				{/* Features */}
-				<div className="space-y-4">
-					<div className="flex items-center justify-between">
-						<h3 className="text-lg font-semibold text-slate-900">Features</h3>
-						<Button
-							type="button"
-							variant="outline"
-							size="sm"
-							onClick={() => featuresArray.append({ value: '' })}
-						>
-							<Plus className="w-4 h-4 mr-2" />
-							Add Feature
-						</Button>
-					</div>
-					<div className="space-y-2">
-						{featuresArray.fields.map((field, index) => (
-							<div key={field.id} className="flex items-center gap-2">
-								<FormField
-									control={form.control}
-									name={`missionContent.features.${index}.value`}
-									render={({ field: featureField }) => (
-										<FormItem className="flex-1">
-											<FormControl>
-												<Input placeholder="Feature text" {...featureField} />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
+			<AdminFormSection title='Features'>
+				<AdminItemList>
+					{features.fields.map((field, index) => (
+						<AdminItemCard
+							key={field.id}
+							index={index}
+							total={features.fields.length}
+							title={`Feature ${index + 1}`}
+							onMove={d => features.move(index, index + d)}
+							onRemove={() => features.remove(index)}>
+							<AdminField label={`Feature ${index + 1}`} className='[&_label]:sr-only'>
+								<Input
+									placeholder='Feature text'
+									{...form.register(
+										`missionContent.features.${index}.value` as const
 									)}
 								/>
-								<Button
-									type="button"
-									variant="ghost"
-									size="sm"
-									onClick={() => featuresArray.remove(index)}
-								>
-									<Trash2 className="w-4 h-4" />
-								</Button>
-							</div>
-						))}
-					</div>
-				</div>
+							</AdminField>
+						</AdminItemCard>
+					))}
+				</AdminItemList>
+				{features.fields.length === 0 && (
+					<AdminEmptyState title='No features yet' />
+				)}
+				<AddRowButton onClick={() => features.append({ value: '' })}>
+					Add feature
+				</AddRowButton>
+			</AdminFormSection>
 
-				{/* Objectives */}
-				<div className="space-y-4">
-					<div className="flex items-center justify-between">
-						<h3 className="text-lg font-semibold text-slate-900">Key Objectives</h3>
-						<Button
-							type="button"
-							variant="outline"
-							size="sm"
-							onClick={() => objectivesArray.append({ value: '' })}
-						>
-							<Plus className="w-4 h-4 mr-2" />
-							Add Objective
-						</Button>
-					</div>
-					<div className="space-y-2">
-						{objectivesArray.fields.map((field, index) => (
-							<div key={field.id} className="flex items-center gap-2">
-								<FormField
-									control={form.control}
-									name={`missionContent.objectives.${index}.value`}
-									render={({ field: objectiveField }) => (
-										<FormItem className="flex-1">
-											<FormControl>
-												<Input placeholder="Objective text" {...objectiveField} />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
+			<AdminFormSection title='Key objectives'>
+				<AdminItemList>
+					{objectives.fields.map((field, index) => (
+						<AdminItemCard
+							key={field.id}
+							index={index}
+							total={objectives.fields.length}
+							title={`Objective ${index + 1}`}
+							onMove={d => objectives.move(index, index + d)}
+							onRemove={() => objectives.remove(index)}>
+							<AdminField
+								label={`Objective ${index + 1}`}
+								className='[&_label]:sr-only'>
+								<Input
+									placeholder='Objective text'
+									{...form.register(
+										`missionContent.objectives.${index}.value` as const
 									)}
 								/>
-								<Button
-									type="button"
-									variant="ghost"
-									size="sm"
-									onClick={() => objectivesArray.remove(index)}
-								>
-									<Trash2 className="w-4 h-4" />
-								</Button>
-							</div>
-						))}
-					</div>
-				</div>
+							</AdminField>
+						</AdminItemCard>
+					))}
+				</AdminItemList>
+				{objectives.fields.length === 0 && (
+					<AdminEmptyState title='No objectives yet' />
+				)}
+				<AddRowButton onClick={() => objectives.append({ value: '' })}>
+					Add objective
+				</AddRowButton>
+			</AdminFormSection>
 
-				<div className="flex items-center justify-between pt-6 border-t">
-					<div>
-						{saveStatus === 'saved' && (
-							<p className="text-sm text-green-600">Changes saved successfully!</p>
-						)}
-						{saveStatus === 'error' && (
-							<p className="text-sm text-red-600">Failed to save changes.</p>
-						)}
-					</div>
-					<Button type="submit" disabled={isPending || saveStatus === 'saving'}>
-						{saveStatus === 'saving' ? 'Saving...' : 'Save Changes'}
-					</Button>
-				</div>
-			</form>
-		</Form>
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }

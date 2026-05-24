@@ -2,14 +2,6 @@
 
 import { useEffect, useState, useTransition } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage
-} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -23,7 +15,19 @@ import {
 import type { PlacementOverviewData } from '@/app/(Private Pages)/actions/placement-overview';
 import { updatePlacementOverview } from '@/app/(Private Pages)/actions/placement-overview';
 import { SUPPORTED_ICON_NAMES } from '@/components/about/icons';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
+import {
+	AddRowButton,
+	AdminEmptyState,
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	AdminItemCard,
+	AdminItemList,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 type TrainingAreaFormValue = {
 	id: string;
@@ -63,9 +67,7 @@ export default function TrainingAreasForm({
 	onChange
 }: Props) {
 	const [isPending, startTransition] = useTransition();
-	const [saveStatus, setSaveStatus] = useState<
-		'idle' | 'saving' | 'saved' | 'error'
-	>('idle');
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 
 	const form = useForm<FormValues>({
 		defaultValues: {
@@ -78,17 +80,15 @@ export default function TrainingAreasForm({
 		}
 	});
 
-	const trainingAreasArray = useFieldArray({
+	const trainingAreas = useFieldArray({
 		control: form.control,
 		name: 'trainingAreas'
 	});
 
-	const iconOptions = SUPPORTED_ICON_NAMES;
-
 	useEffect(() => {
-		const subscription = form.watch(values => {
+		const sub = form.watch(values => {
 			if (onChange) {
-				const updatedData: PlacementOverviewData = {
+				onChange({
 					...initialData,
 					trainingTitle: values.trainingTitle || '',
 					trainingDescription: values.trainingDescription || '',
@@ -107,15 +107,21 @@ export default function TrainingAreasForm({
 							textColor: area?.textColor ?? 'black'
 						}))
 						.filter(area => area.title.length > 0 && area.skills.length > 0)
-				};
-				onChange(updatedData);
+				});
+				setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 			}
 		});
-		return () => subscription.unsubscribe();
+		return () => sub.unsubscribe();
 	}, [form, onChange, initialData]);
 
-	const onSubmit = async (values: FormValues) => {
-		setSaveStatus('saving');
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
+	const onSubmit = form.handleSubmit(values => {
+		setStatus({ kind: 'saving' });
 		startTransition(async () => {
 			try {
 				const updatedData: PlacementOverviewData = {
@@ -135,238 +141,156 @@ export default function TrainingAreasForm({
 						}))
 						.filter(area => area.title.length > 0 && area.skills.length > 0)
 				};
-
 				await updatePlacementOverview(pageSlug, updatedData);
-				setSaveStatus('saved');
-				setTimeout(() => setSaveStatus('idle'), 2000);
+				setStatus({ kind: 'success', message: 'Saved' });
 			} catch (error) {
 				console.error('Failed to save:', error);
-				setSaveStatus('error');
-				setTimeout(() => setSaveStatus('idle'), 3000);
+				setStatus({ kind: 'error', message: 'Save failed' });
 			}
 		});
-	};
+	});
 
 	return (
-		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
-				{/* Training Section Headers */}
-				<div className='space-y-4'>
-					<h3 className='text-lg font-semibold text-slate-900'>
-						Training Section
-					</h3>
-
-					<FormField
-						control={form.control}
-						name='trainingTitle'
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Training Title</FormLabel>
-								<FormControl>
-									<Input placeholder='Technical Training Areas' {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
+		<AdminForm onSubmit={onSubmit}>
+			<AdminFormSection
+				title='Training section'
+				description='Headline copy shown above the training areas grid.'>
+				<AdminField label='Training title' htmlFor='ta-title'>
+					<Input
+						id='ta-title'
+						placeholder='Technical Training Areas'
+						{...form.register('trainingTitle')}
 					/>
-
-					<FormField
-						control={form.control}
-						name='trainingDescription'
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Training Description</FormLabel>
-								<FormControl>
-									<Textarea
-										placeholder='Brief description of training programs'
-										rows={3}
-										{...field}
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
+				</AdminField>
+				<AdminField label='Training description' htmlFor='ta-desc'>
+					<Textarea
+						id='ta-desc'
+						rows={3}
+						placeholder='Brief description of training programs'
+						{...form.register('trainingDescription')}
 					/>
-				</div>
+				</AdminField>
+			</AdminFormSection>
 
-				{/* Training Areas */}
-				<div className='space-y-4'>
-					<div className='flex items-center justify-between'>
-						<h3 className='text-lg font-semibold text-slate-900'>
-							Training Areas
-						</h3>
-						<Button
-							type='button'
-							variant='outline'
-							size='sm'
-							onClick={() =>
-								trainingAreasArray.append(createEmptyTrainingArea())
-							}>
-							<Plus className='w-4 h-4 mr-2' />
-							Add Training Area
-						</Button>
-					</div>
-					<div className='space-y-4'>
-						{trainingAreasArray.fields.map((field, index) => (
-							<div
+			<AdminFormSection title='Training areas'>
+				<AdminItemList>
+					{trainingAreas.fields.map((field, index) => {
+						const skills = form.watch(`trainingAreas.${index}.skills`) || [''];
+						return (
+							<AdminItemCard
 								key={field.id}
-								className='rounded-lg border border-slate-200 p-4 space-y-4 bg-slate-50/50'>
-								<div className='flex items-center justify-between'>
-									<span className='text-sm font-medium text-slate-700'>
-										Training Area {index + 1}
-									</span>
+								index={index}
+								total={trainingAreas.fields.length}
+								title={
+									form.watch(`trainingAreas.${index}.title`) ||
+									`Training area ${index + 1}`
+								}
+								onMove={d => trainingAreas.move(index, index + d)}
+								onRemove={() => trainingAreas.remove(index)}>
+								<AdminField label='Title'>
+									<Input
+										placeholder='e.g. Core Technologies'
+										{...form.register(
+											`trainingAreas.${index}.title` as const,
+											{ required: true }
+										)}
+									/>
+								</AdminField>
+								<AdminFieldGrid>
+									<AdminField label='Icon'>
+										<Select
+											value={
+												form.watch(`trainingAreas.${index}.icon`) ||
+												FALLBACK_ICON
+											}
+											onValueChange={v =>
+												form.setValue(`trainingAreas.${index}.icon`, v, {
+													shouldDirty: true
+												})
+											}>
+											<SelectTrigger>
+												<SelectValue placeholder='Select icon' />
+											</SelectTrigger>
+											<SelectContent>
+												{SUPPORTED_ICON_NAMES.map(option => (
+													<SelectItem key={option} value={option}>
+														{option}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+									</AdminField>
+									<AdminField label='Icon color'>
+										<Input
+											placeholder='from-blue-500 to-blue-700'
+											{...form.register(
+												`trainingAreas.${index}.iconColor` as const
+											)}
+										/>
+									</AdminField>
+								</AdminFieldGrid>
+								<AdminField label='Skills'>
+									<div className='flex flex-col gap-2'>
+										{skills.map((_, skillIndex) => (
+											<div key={skillIndex} className='flex gap-2'>
+												<Input
+													placeholder='Skill name'
+													{...form.register(
+														`trainingAreas.${index}.skills.${skillIndex}` as const
+													)}
+												/>
+												<Button
+													type='button'
+													variant='ghost'
+													size='icon'
+													onClick={() => {
+														const current =
+															form.getValues(
+																`trainingAreas.${index}.skills`
+															) || [];
+														form.setValue(
+															`trainingAreas.${index}.skills`,
+															current.filter((_, i) => i !== skillIndex),
+															{ shouldDirty: true }
+														);
+													}}
+													className='text-slate-500 hover:bg-rose-50 hover:text-rose-600'
+													aria-label='Remove skill'>
+													<X className='h-4 w-4' />
+												</Button>
+											</div>
+										))}
+									</div>
 									<Button
 										type='button'
-										variant='ghost'
-										size='sm'
-										onClick={() => trainingAreasArray.remove(index)}>
-										<Trash2 className='w-4 h-4' />
+										variant='outline'
+										onClick={() => {
+											const current =
+												form.getValues(`trainingAreas.${index}.skills`) || [];
+											form.setValue(`trainingAreas.${index}.skills`, [
+												...current,
+												''
+											], { shouldDirty: true });
+										}}
+										className='mt-2'>
+										<Plus className='mr-2 h-4 w-4' />
+										Add skill
 									</Button>
-								</div>
-								<div className='grid grid-cols-1 gap-4'>
-									<FormField
-										control={form.control}
-										name={`trainingAreas.${index}.title`}
-										rules={{ required: 'Title is required' }}
-										render={({ field: titleField }) => (
-											<FormItem>
-												<FormLabel>Title</FormLabel>
-												<FormControl>
-													<Input
-														placeholder='e.g., Core Technologies'
-														{...titleField}
-													/>
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-									<FormField
-										control={form.control}
-										name={`trainingAreas.${index}.icon`}
-										render={({ field: iconField }) => (
-											<FormItem>
-												<FormLabel>Icon</FormLabel>
-												<FormControl>
-													<Select
-														onValueChange={iconField.onChange}
-														value={iconField.value}>
-														<SelectTrigger>
-															<SelectValue placeholder='Select icon' />
-														</SelectTrigger>
-														<SelectContent>
-															{iconOptions.map(option => (
-																<SelectItem key={option} value={option}>
-																	{option}
-																</SelectItem>
-															))}
-														</SelectContent>
-													</Select>
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-									<FormField
-										control={form.control}
-										name={`trainingAreas.${index}.iconColor`}
-										render={({ field: colorField }) => (
-											<FormItem>
-												<FormLabel>Icon Color</FormLabel>
-												<FormControl>
-													<Input
-														placeholder='from-blue-500 to-blue-700'
-														{...colorField}
-													/>
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
+								</AdminField>
+							</AdminItemCard>
+						);
+					})}
+				</AdminItemList>
+				{trainingAreas.fields.length === 0 && (
+					<AdminEmptyState title='No training areas yet' />
+				)}
+				<AddRowButton
+					onClick={() => trainingAreas.append(createEmptyTrainingArea())}>
+					Add training area
+				</AddRowButton>
+			</AdminFormSection>
 
-									{/* Skills */}
-									<div className='space-y-2'>
-										<div className='flex items-center justify-between'>
-											<FormLabel>Skills</FormLabel>
-											<Button
-												type='button'
-												variant='outline'
-												size='sm'
-												onClick={() => {
-													const currentSkills =
-														form.getValues(`trainingAreas.${index}.skills`) ||
-														[];
-													form.setValue(`trainingAreas.${index}.skills`, [
-														...currentSkills,
-														''
-													]);
-												}}>
-												<Plus className='w-4 h-4 mr-2' />
-												Add Skill
-											</Button>
-										</div>
-										{(form.watch(`trainingAreas.${index}.skills`) || ['']).map(
-											(_, skillIndex) => (
-												<div
-													key={skillIndex}
-													className='flex items-center gap-2'>
-													<FormField
-														control={form.control}
-														name={`trainingAreas.${index}.skills.${skillIndex}`}
-														render={({ field: skillField }) => (
-															<FormItem className='flex-1'>
-																<FormControl>
-																	<Input
-																		placeholder='Skill name'
-																		{...skillField}
-																	/>
-																</FormControl>
-																<FormMessage />
-															</FormItem>
-														)}
-													/>
-													<Button
-														type='button'
-														variant='ghost'
-														size='sm'
-														onClick={() => {
-															const currentSkills =
-																form.getValues(
-																	`trainingAreas.${index}.skills`
-																) || [];
-															form.setValue(
-																`trainingAreas.${index}.skills`,
-																currentSkills.filter((_, i) => i !== skillIndex)
-															);
-														}}>
-														<Trash2 className='w-4 h-4' />
-													</Button>
-												</div>
-											)
-										)}
-									</div>
-								</div>
-							</div>
-						))}
-					</div>
-				</div>
-
-				<div className='flex items-center justify-between pt-6 border-t'>
-					<div>
-						{saveStatus === 'saved' && (
-							<p className='text-sm text-green-600'>
-								Changes saved successfully!
-							</p>
-						)}
-						{saveStatus === 'error' && (
-							<p className='text-sm text-red-600'>Failed to save changes.</p>
-						)}
-					</div>
-					<Button type='submit' disabled={isPending || saveStatus === 'saving'}>
-						{saveStatus === 'saving' ? 'Saving...' : 'Save Changes'}
-					</Button>
-				</div>
-			</form>
-		</Form>
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }
