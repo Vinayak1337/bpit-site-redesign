@@ -2,14 +2,6 @@
 
 import { useEffect, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage
-} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -18,8 +10,13 @@ import {
 	updateStudentLifeHero,
 	type StudentLifeHeroData
 } from '@/app/(Private Pages)/actions/student-life';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Loader2, Save } from 'lucide-react';
+import {
+	AdminField,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 type FormValues = {
 	title: string;
@@ -34,17 +31,15 @@ type Props = {
 	onChange?: (data: StudentLifeHeroData) => void;
 };
 
-const normalizeHero = (values: Partial<FormValues>): StudentLifeHeroData => {
-	return {
-		title: (values.title ?? '').trim(),
-		subtitle: (values.subtitle ?? '').trim(),
-		gradient: (values.gradient ?? '').trim() || 'from-blue-600 to-purple-600',
-		backgroundImage:
-			(values.backgroundImage ?? '').trim().length > 0
-				? (values.backgroundImage ?? '').trim()
-				: null
-	};
-};
+const normalizeHero = (values: Partial<FormValues>): StudentLifeHeroData => ({
+	title: (values.title ?? '').trim(),
+	subtitle: (values.subtitle ?? '').trim(),
+	gradient: (values.gradient ?? '').trim() || 'from-blue-600 to-purple-600',
+	backgroundImage:
+		(values.backgroundImage ?? '').trim().length > 0
+			? (values.backgroundImage ?? '').trim()
+			: null
+});
 
 export default function StudentLifeHeroForm({
 	initialData,
@@ -52,7 +47,7 @@ export default function StudentLifeHeroForm({
 	onChange
 }: Props) {
 	const [isPending, startTransition] = useTransition();
-	const [message, setMessage] = useState<string | null>(null);
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 	const form = useForm<FormValues>({
 		defaultValues: {
 			title: initialData.title,
@@ -64,169 +59,111 @@ export default function StudentLifeHeroForm({
 
 	useEffect(() => {
 		onChange?.(normalizeHero(form.getValues()));
-		const subscription = form.watch(values => {
+		const sub = form.watch(values => {
 			onChange?.(normalizeHero(values));
+			setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 		});
-		return () => subscription.unsubscribe();
+		return () => sub.unsubscribe();
 	}, [form, onChange]);
 
-	const handleSubmit = (values: FormValues) => {
-		setMessage(null);
-		const payload = normalizeHero(values);
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
+	const handleSubmit = form.handleSubmit(values => {
+		setStatus({ kind: 'saving' });
 		startTransition(async () => {
-			const result = await updateStudentLifeHero(pageSlug, payload);
-			if (!result.ok) {
-				setMessage(result.error ?? 'Save failed');
-				return;
-			}
-			setMessage('Saved successfully');
+			const result = await updateStudentLifeHero(pageSlug, normalizeHero(values));
+			setStatus(
+				result.ok
+					? { kind: 'success', message: 'Saved' }
+					: { kind: 'error', message: result.error ?? 'Save failed' }
+			);
 		});
-	};
+	});
+
+	const backgroundImage = form.watch('backgroundImage');
 
 	return (
-		<Form {...form}>
-			<form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-6'>
-				<div className='flex items-center justify-between'>
-					<h3 className='text-lg font-semibold text-gray-900'>Student Life Hero</h3>
-					<div className='flex items-center gap-3'>
-						{message ? (
-							<span
-								className={`text-sm font-medium ${
-									message.toLowerCase().includes('fail')
-										? 'text-red-600'
-										: 'text-emerald-600'
-								}`}>
-								{message}
-							</span>
-						) : null}
-						<Button type='submit' disabled={isPending}>
-							{isPending ? (
-								<>
-									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-									Saving...
-								</>
-							) : (
-								<>
-									<Save className="mr-2 h-4 w-4" />
-									Save Changes
-								</>
-							)}
+		<AdminForm onSubmit={handleSubmit}>
+			<AdminFormSection
+				title='Student life hero'
+				description='Headline, description, gradient, and background image for the section.'>
+				<AdminField
+					label='Title'
+					htmlFor='sl-hero-title'
+					error={form.formState.errors.title?.message}>
+					<Input
+						id='sl-hero-title'
+						placeholder='Student Life'
+						{...form.register('title', { required: 'Title is required' })}
+					/>
+				</AdminField>
+				<AdminField
+					label='Subtitle'
+					htmlFor='sl-hero-sub'
+					error={form.formState.errors.subtitle?.message}>
+					<Textarea
+						id='sl-hero-sub'
+						rows={3}
+						placeholder='Experience a vibrant campus life…'
+						{...form.register('subtitle', { required: 'Subtitle is required' })}
+					/>
+				</AdminField>
+				<AdminField
+					label='Gradient (Tailwind classes)'
+					htmlFor='sl-hero-grad'>
+					<Input
+						id='sl-hero-grad'
+						placeholder='from-blue-600 to-purple-600'
+						{...form.register('gradient')}
+					/>
+				</AdminField>
+				<AdminField label='Background image' htmlFor='sl-hero-bg'>
+					<Input
+						id='sl-hero-bg'
+						placeholder='https://…'
+						{...form.register('backgroundImage')}
+					/>
+					<div className='mt-2 flex flex-wrap gap-2'>
+						<CloudinaryUploadButton
+							buttonText='Upload image'
+							onUpload={url =>
+								form.setValue('backgroundImage', url, {
+									shouldDirty: true,
+									shouldTouch: true
+								})
+							}
+							onError={message => setStatus({ kind: 'error', message })}
+						/>
+						<Button
+							type='button'
+							variant='outline'
+							onClick={() =>
+								form.setValue('backgroundImage', '', {
+									shouldDirty: true,
+									shouldTouch: true
+								})
+							}>
+							Clear
 						</Button>
 					</div>
-				</div>
+					{backgroundImage && (
+						<div className='mt-3 h-40 w-full overflow-hidden rounded-md border border-slate-200'>
+							{/* eslint-disable-next-line @next/next/no-img-element */}
+							<img
+								src={backgroundImage}
+								alt='Background preview'
+								className='h-full w-full object-cover'
+							/>
+						</div>
+					)}
+				</AdminField>
+			</AdminFormSection>
 
-				<Card>
-					<CardHeader>
-						<CardTitle>Hero Content</CardTitle>
-						<CardDescription>
-							Update the main headline, description, gradient, and background image for the Student Life section.
-						</CardDescription>
-					</CardHeader>
-					<CardContent className='space-y-4'>
-						<FormField
-							control={form.control}
-							name='title'
-							rules={{ required: 'Title is required' }}
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Title</FormLabel>
-									<FormControl>
-										<Input placeholder='Student Life' {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-
-						<FormField
-							control={form.control}
-							name='subtitle'
-							rules={{ required: 'Subtitle is required' }}
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Subtitle</FormLabel>
-									<FormControl>
-										<Textarea
-											rows={3}
-											placeholder='Experience a vibrant campus life...'
-											{...field}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-
-						<FormField
-							control={form.control}
-							name='gradient'
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Gradient (Tailwind Classes)</FormLabel>
-									<FormControl>
-										<Input placeholder='from-blue-600 to-purple-600' {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-
-						<FormField
-							control={form.control}
-							name='backgroundImage'
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Background Image</FormLabel>
-									<FormControl>
-										<Input placeholder='https://...' {...field} />
-									</FormControl>
-									<div className='flex gap-2 pt-2'>
-										<CloudinaryUploadButton
-											buttonText='Upload Image'
-											onUpload={url =>
-												form.setValue('backgroundImage', url, {
-													shouldDirty: true,
-													shouldTouch: true
-												})
-											}
-											onError={message => setMessage(message)}
-										/>
-										<Button
-											type='button'
-											variant='outline'
-											onClick={() =>
-												form.setValue('backgroundImage', '', {
-													shouldDirty: true,
-													shouldTouch: true
-												})
-											}>
-											Clear
-										</Button>
-									</div>
-									{field.value && (
-										<div className="mt-4 rounded-lg overflow-hidden border h-40 w-full relative">
-											<img 
-												src={field.value} 
-												alt="Background preview" 
-												className="w-full h-full object-cover"
-											/>
-										</div>
-									)}
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-					</CardContent>
-				</Card>
-			</form>
-		</Form>
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }
-
-
-
-
-
-
-
-

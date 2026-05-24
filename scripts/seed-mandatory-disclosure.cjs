@@ -2,6 +2,11 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 const disclosureData = {
+	hero: {
+		title: 'Mandatory Disclosure',
+		description:
+			'Important documents and disclosures in compliance with regulatory bodies including AICTE, GGSIPU, and other accreditation authorities.'
+	},
 	items: [
 		{
 			id: 'md-1',

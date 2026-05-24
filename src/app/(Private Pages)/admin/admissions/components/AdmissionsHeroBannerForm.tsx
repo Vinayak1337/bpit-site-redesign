@@ -2,14 +2,6 @@
 
 import { useEffect, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage
-} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -18,6 +10,13 @@ import {
 	type AdmissionsHeroData,
 	updateAdmissionsHero
 } from '@/app/(Private Pages)/actions/admissions';
+import {
+	AdminField,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 type FormValues = {
 	title: string;
@@ -46,7 +45,7 @@ export default function AdmissionsHeroBannerForm({
 	onChange
 }: Props) {
 	const [isPending, startTransition] = useTransition();
-	const [message, setMessage] = useState<string | null>(null);
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 	const form = useForm<FormValues>({
 		defaultValues: {
 			title: initialData.title,
@@ -59,115 +58,104 @@ export default function AdmissionsHeroBannerForm({
 		onChange?.(normalizeHero(form.getValues()));
 		const subscription = form.watch(values => {
 			onChange?.(normalizeHero(values));
+			setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 		});
 		return () => subscription.unsubscribe();
 	}, [form, onChange]);
 
-	const handleSubmit = (values: FormValues) => {
-		setMessage(null);
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
+	const handleSubmit = form.handleSubmit(values => {
+		setStatus({ kind: 'saving' });
 		startTransition(async () => {
 			const result = await updateAdmissionsHero(pageSlug, normalizeHero(values));
-			setMessage(result.ok ? 'Saved' : 'Save failed');
+			setStatus(
+				result.ok
+					? { kind: 'success', message: 'Saved' }
+					: { kind: 'error', message: 'Save failed' }
+			);
 		});
-	};
+	});
+
+	const backgroundImage = form.watch('backgroundImage');
 
 	return (
-		<Form {...form}>
-			<form
-				className='space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm max-h-[70vh] overflow-y-auto'
-				onSubmit={form.handleSubmit(handleSubmit)}>
-				<div className='flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between'>
-					<div>
-						<h3 className='text-lg font-semibold text-slate-900'>Admissions Page Hero</h3>
-						<p className='text-sm text-slate-500'>
-							Edit the shared banner shown above this admissions page.
-						</p>
-					</div>
-					<div className='flex items-center gap-2'>
-						{message ? (
-							<span className='rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700'>
-								{message}
-							</span>
-						) : null}
-						<Button type='submit' disabled={isPending}>
-							{isPending ? 'Saving...' : 'Save changes'}
+		<AdminForm onSubmit={handleSubmit}>
+			<AdminFormSection
+				title='Admissions page hero'
+				description='Shared banner shown above this admissions page.'>
+				<AdminField
+					label='Title'
+					htmlFor='adm-hero-title'
+					error={form.formState.errors.title?.message}>
+					<Input
+						id='adm-hero-title'
+						placeholder='Admissions'
+						{...form.register('title', { required: 'Title is required' })}
+					/>
+				</AdminField>
+
+				<AdminField
+					label='Subtitle'
+					htmlFor='adm-hero-subtitle'
+					error={form.formState.errors.subtitle?.message}>
+					<Textarea
+						id='adm-hero-subtitle'
+						rows={4}
+						placeholder='Join BPIT to begin your academic journey.'
+						className='resize-none'
+						{...form.register('subtitle', { required: 'Subtitle is required' })}
+					/>
+				</AdminField>
+
+				<AdminField label='Background image' htmlFor='adm-hero-bg'>
+					<Input
+						id='adm-hero-bg'
+						placeholder='https://…'
+						{...form.register('backgroundImage')}
+					/>
+					<div className='mt-2 flex flex-wrap gap-2'>
+						<CloudinaryUploadButton
+							buttonText='Upload image'
+							folder='admissions'
+							onUpload={url =>
+								form.setValue('backgroundImage', url, {
+									shouldDirty: true,
+									shouldTouch: true
+								})
+							}
+							onError={message => setStatus({ kind: 'error', message })}
+						/>
+						<Button
+							type='button'
+							variant='outline'
+							onClick={() =>
+								form.setValue('backgroundImage', '', {
+									shouldDirty: true,
+									shouldTouch: true
+								})
+							}>
+							Clear
 						</Button>
 					</div>
-				</div>
-
-				<FormField
-					control={form.control}
-					name='title'
-					rules={{ required: 'Title is required' }}
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Title</FormLabel>
-							<FormControl>
-								<Input placeholder='Admissions' {...field} />
-							</FormControl>
-							<FormMessage />
-						</FormItem>
+					{backgroundImage && (
+						<div className='mt-3 h-32 w-full overflow-hidden rounded-md border border-slate-200'>
+							{/* eslint-disable-next-line @next/next/no-img-element */}
+							<img
+								src={backgroundImage}
+								alt='Background preview'
+								className='h-full w-full object-cover'
+							/>
+						</div>
 					)}
-				/>
+				</AdminField>
+			</AdminFormSection>
 
-				<FormField
-					control={form.control}
-					name='subtitle'
-					rules={{ required: 'Subtitle is required' }}
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Subtitle</FormLabel>
-							<FormControl>
-								<Textarea
-									rows={4}
-									placeholder='Join BPIT to begin your academic journey.'
-									className='resize-none'
-									{...field}
-								/>
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-
-				<FormField
-					control={form.control}
-					name='backgroundImage'
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Background image</FormLabel>
-							<FormControl>
-								<Input placeholder='https://...' {...field} />
-							</FormControl>
-							<div className='flex flex-wrap gap-2 pt-2'>
-								<CloudinaryUploadButton
-									buttonText='Upload image'
-									folder='admissions'
-									onUpload={url =>
-										form.setValue('backgroundImage', url, {
-											shouldDirty: true,
-											shouldTouch: true
-										})
-									}
-									onError={setMessage}
-								/>
-								<Button
-									type='button'
-									variant='outline'
-									onClick={() =>
-										form.setValue('backgroundImage', '', {
-											shouldDirty: true,
-											shouldTouch: true
-										})
-									}>
-									Clear
-								</Button>
-							</div>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-			</form>
-		</Form>
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }

@@ -1,28 +1,30 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useForm, useFieldArray } from 'react-hook-form';
+import React, { useEffect, useState } from 'react';
+import { useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'react-toastify';
-import {
-	Loader2,
-	Plus,
-	Trash2,
-	Save,
-	FileText,
-	GripVertical
-} from 'lucide-react';
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
+import { GripVertical, Trash2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 
 import { updateMandatoryDisclosure } from '@/app/(Private Pages)/actions/mandatory-disclosure';
 import {
 	DisclosureData,
 	disclosureDataSchema
 } from '@/lib/schemas/mandatory-disclosure';
+import {
+	AddRowButton,
+	AdminEmptyState,
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 interface DisclosureItemsFormProps {
 	initialData: DisclosureData;
@@ -34,6 +36,7 @@ export default function DisclosureItemsForm({
 	onChange
 }: DisclosureItemsFormProps) {
 	const [isSaving, setIsSaving] = useState(false);
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 	const [isMounted, setIsMounted] = useState(false);
 
 	useEffect(() => {
@@ -46,149 +49,126 @@ export default function DisclosureItemsForm({
 	});
 
 	const { control, register, watch } = form;
-
 	const { fields, append, remove, move } = useFieldArray({
 		control,
 		name: 'items'
 	});
 
-	// Extract unique categories for suggestions
 	const items = watch('items');
 
-	// Watch for changes to update preview
 	useEffect(() => {
-		const subscription = watch(value => {
+		const sub = watch(value => {
 			if (onChange) {
-				// Ensure we merge with existing hero data if not present in form (it is present in initialData)
-				// But useForm defaultValues should include hero.
-				// However, this form only edits items.
-				// We should make sure we pass the full object back.
-				const updatedData = {
+				onChange({
 					...initialData,
 					...value,
-					items: value.items as any // Cast because partial
-				} as DisclosureData;
-				onChange(updatedData);
+					items: value.items as DisclosureData['items']
+				} as DisclosureData);
 			}
+			setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 		});
-		return () => subscription.unsubscribe();
+		return () => sub.unsubscribe();
 	}, [watch, onChange, initialData]);
+
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
 
 	const existingCategories = Array.from(
 		new Set(items?.map(item => item?.category).filter(Boolean))
 	) as string[];
 
-	async function onSubmit(data: DisclosureData) {
+	const handleSubmit = form.handleSubmit(async data => {
 		setIsSaving(true);
+		setStatus({ kind: 'saving' });
 		try {
-			// Ensure we include hero data from initialData if it's missing (though it shouldn't be if we use defaultValues)
-			const dataToSave = {
-				...initialData,
-				...data
-			};
-			await updateMandatoryDisclosure(dataToSave);
+			await updateMandatoryDisclosure({ ...initialData, ...data });
+			setStatus({ kind: 'success', message: 'Saved' });
 			toast.success('Mandatory Disclosure updated successfully');
 		} catch (error) {
 			console.error(error);
+			setStatus({ kind: 'error', message: 'Save failed' });
 			toast.error('Failed to update mandatory disclosure');
 		} finally {
 			setIsSaving(false);
 		}
-	}
+	});
 
-	const handleDragEnd = (result: any) => {
+	const handleDragEnd = (result: { destination?: { index: number } | null; source: { index: number } }) => {
 		if (!result.destination) return;
 		move(result.source.index, result.destination.index);
 	};
 
-	if (!isMounted) {
-		return null;
-	}
+	if (!isMounted) return null;
 
 	return (
-		<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
-			<div className='flex justify-end space-x-4'>
-				<Button type='submit' disabled={isSaving}>
-					{isSaving && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
-					<Save className='mr-2 h-4 w-4' />
-					Save Changes
-				</Button>
-			</div>
-
-			<div className='space-y-6'>
+		<AdminForm onSubmit={handleSubmit}>
+			<AdminFormSection
+				title='Disclosure documents'
+				description='Each document appears on the public disclosure index. Drag the grip handle to reorder.'>
 				<DragDropContext onDragEnd={handleDragEnd}>
 					<Droppable droppableId='disclosure-items'>
 						{provided => (
 							<div
 								{...provided.droppableProps}
 								ref={provided.innerRef}
-								className='space-y-4'>
+								className='flex flex-col gap-3'>
 								{fields.map((field, index) => (
 									<Draggable
 										key={field.id}
 										draggableId={field.id}
 										index={index}>
-										{provided => (
+										{dragProvided => (
 											<div
-												ref={provided.innerRef}
-												{...provided.draggableProps}
-												className='bg-white border rounded-lg shadow-sm'>
-												<div className='flex items-center p-4 gap-4'>
-													<div
-														{...provided.dragHandleProps}
-														className='cursor-move text-gray-400 hover:text-gray-600'>
-														<GripVertical className='h-5 w-5' />
-													</div>
-
-													<div className='flex-1 grid gap-4 md:grid-cols-3'>
-														<div className='space-y-2'>
-															<Label>Title</Label>
+												ref={dragProvided.innerRef}
+												{...dragProvided.draggableProps}
+												className='flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50/60 p-4 transition hover:bg-slate-50'>
+												<button
+													type='button'
+													{...dragProvided.dragHandleProps}
+													className='mt-2 cursor-grab text-slate-400 hover:text-slate-600 active:cursor-grabbing'
+													aria-label='Drag to reorder'>
+													<GripVertical className='h-4 w-4' />
+												</button>
+												<div className='flex-1'>
+													<AdminFieldGrid cols={3}>
+														<AdminField label='Title'>
 															<Input
-																{...register(`items.${index}.title`)}
 																placeholder='Document Title'
-																className='h-9'
+																{...register(`items.${index}.title`)}
 															/>
-														</div>
-
-														<div className='space-y-2'>
-															<Label>URL / Link</Label>
-															<div className='flex gap-2'>
-																<FileText className='w-4 h-4 text-gray-400 mt-2.5' />
-																<Input
-																	{...register(`items.${index}.url`)}
-																	placeholder='https://...'
-																	className='h-9'
-																/>
-															</div>
-														</div>
-
-														<div className='space-y-2'>
-															<Label>Category</Label>
-															<div className='relative'>
-																<Input
-																	{...register(`items.${index}.category`)}
-																	placeholder='e.g. Approvals'
-																	className='h-9'
-																	list={`categories-${index}`}
-																/>
-																<datalist id={`categories-${index}`}>
-																	{existingCategories.map(cat => (
-																		<option key={cat} value={cat} />
-																	))}
-																</datalist>
-															</div>
-														</div>
-													</div>
-
-													<Button
-														type='button'
-														variant='ghost'
-														size='icon'
-														onClick={() => remove(index)}
-														className='text-red-500 hover:text-red-700 hover:bg-red-50 self-start mt-6'>
-														<Trash2 className='h-4 w-4' />
-													</Button>
+														</AdminField>
+														<AdminField label='URL / Link'>
+															<Input
+																placeholder='https://…'
+																{...register(`items.${index}.url`)}
+															/>
+														</AdminField>
+														<AdminField label='Category'>
+															<Input
+																placeholder='e.g. Approvals'
+																list={`categories-${index}`}
+																{...register(`items.${index}.category`)}
+															/>
+															<datalist id={`categories-${index}`}>
+																{existingCategories.map(cat => (
+																	<option key={cat} value={cat} />
+																))}
+															</datalist>
+														</AdminField>
+													</AdminFieldGrid>
 												</div>
+												<Button
+													type='button'
+													variant='ghost'
+													size='icon'
+													className='mt-1 h-8 w-8 text-slate-500 hover:bg-rose-50 hover:text-rose-600'
+													onClick={() => remove(index)}
+													aria-label='Remove document'>
+													<Trash2 className='h-4 w-4' />
+												</Button>
 											</div>
 										)}
 									</Draggable>
@@ -198,10 +178,10 @@ export default function DisclosureItemsForm({
 						)}
 					</Droppable>
 				</DragDropContext>
-
-				<Button
-					type='button'
-					variant='outline'
+				{fields.length === 0 && (
+					<AdminEmptyState title='No documents yet' />
+				)}
+				<AddRowButton
 					onClick={() =>
 						append({
 							id: `new-${Date.now()}`,
@@ -209,12 +189,12 @@ export default function DisclosureItemsForm({
 							url: '',
 							category: 'General'
 						})
-					}
-					className='w-full border-dashed'>
-					<Plus className='mr-2 h-4 w-4' />
-					Add Document
-				</Button>
-			</div>
-		</form>
+					}>
+					Add document
+				</AddRowButton>
+			</AdminFormSection>
+
+			<AdminFormFooter status={status} saving={isSaving} />
+		</AdminForm>
 	);
 }

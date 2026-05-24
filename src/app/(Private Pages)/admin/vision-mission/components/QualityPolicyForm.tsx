@@ -22,14 +22,19 @@ import {
 	SelectValue
 } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus, Trash2, Check, AlertCircle } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Plus, Trash2 } from 'lucide-react';
 import {
 	QualityPolicyData,
 	updateQualityPolicy
 } from '@/app/(Private Pages)/actions/vision-mission';
 import { SUPPORTED_ICON_NAMES } from '@/components/about/icons';
 import { z } from 'zod';
+import {
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 // Available color options for styling
 const COLOR_OPTIONS = ['blue', 'green', 'purple', 'orange', 'red', 'indigo'];
@@ -201,57 +206,21 @@ export default function QualityPolicyForm({
 		section: 'hero' | 'policyStatement' | 'commitments' | 'framework' | 'assuranceBodies'
 	) => !visibleSections || visibleSections.includes(section);
 
+	const status: AdminFormStatus = isSaving
+		? { kind: 'saving' }
+		: message?.type === 'success'
+			? { kind: 'success', message: message.text }
+			: message?.type === 'error'
+				? { kind: 'error', message: message.text }
+				: { kind: 'idle' };
+
 	return (
-		<div className="space-y-6">
-			{/* Header Section */}
-			<div className="flex flex-col space-y-4 pb-6 border-b border-gray-200">
-				<div>
-					<h2 className="text-2xl font-bold text-gray-900">Edit Quality Policy</h2>
-					<p className="text-sm text-gray-600 mt-1">
-						Update quality policy content including hero section, policy statement, commitments, framework, and assurance bodies
-					</p>
-				</div>
-				
-				<div className="flex items-center space-x-4">
-					<Button
-						onClick={form.handleSubmit(onSubmit)}
-						disabled={isSaving}
-						className="bg-blue-600 hover:bg-blue-700"
-					>
-						{isSaving ? (
-							<>
-								<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-								Saving...
-							</>
-						) : (
-							<>
-								<Check className="w-4 h-4 mr-2" />
-								Save Changes
-							</>
-						)}
-					</Button>
-
-					{message && (
-						<Alert className={`max-w-md ${message.type === 'success' ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}`}>
-							<AlertCircle className={`h-4 w-4 ${message.type === 'success' ? 'text-green-600' : 'text-red-600'}`} />
-							<AlertDescription className={message.type === 'success' ? 'text-green-800' : 'text-red-800'}>
-								{message.text}
-							</AlertDescription>
-						</Alert>
-					)}
-				</div>
-			</div>
-
-			<Form {...form}>
-				<form className="space-y-6">
-					<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+		<Form {...form}>
+			<AdminForm onSubmit={form.handleSubmit(onSubmit)}>
+				<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 						{/* Hero Section */}
 						{showSection('hero') ? (
-						<Card>
-							<CardHeader>
-								<CardTitle>Hero Section</CardTitle>
-							</CardHeader>
-							<CardContent className="space-y-4">
+						<AdminFormSection title='Hero section'>
 								<FormField
 									control={form.control}
 									name="hero.title"
@@ -374,17 +343,12 @@ export default function QualityPolicyForm({
 										</FormItem>
 									)}
 								/>
-							</CardContent>
-						</Card>
+							</AdminFormSection>
 						) : null}
 
 						{/* Policy Statement */}
 						{showSection('policyStatement') ? (
-						<Card>
-							<CardHeader>
-								<CardTitle>Policy Statement</CardTitle>
-							</CardHeader>
-							<CardContent className="space-y-4">
+						<AdminFormSection title='Policy statement'>
 								<FormField
 									control={form.control}
 									name="policyStatement.title"
@@ -415,37 +379,34 @@ export default function QualityPolicyForm({
 										</FormItem>
 									)}
 								/>
-							</CardContent>
-						</Card>
+							</AdminFormSection>
 						) : null}
 					</div>
 
 					{/* Commitments Section */}
 					{showSection('commitments') ? (
-					<Card>
-						<CardHeader>
-							<CardTitle className="flex items-center justify-between">
-								Commitments
-								<Button
-									type="button"
-									variant="outline"
-									size="sm"
-									onClick={() => appendCommitment({
+					<AdminFormSection
+						title='Commitments'
+						action={
+							<Button
+								type='button'
+								variant='outline'
+								size='sm'
+								onClick={() =>
+									appendCommitment({
 										icon: 'Star',
 										title: 'New Commitment',
 										description: ['New commitment description'],
 										iconColor: 'text-blue-600',
 										bgColor: 'bg-blue-100'
-									})}
-								>
-									<Plus className="w-4 h-4 mr-1" />
-									Add Commitment
-								</Button>
-							</CardTitle>
-						</CardHeader>
-						<CardContent className="space-y-4">
+									})
+								}>
+								<Plus className='w-4 h-4 mr-1' />
+								Add commitment
+							</Button>
+						}>
 							{commitmentFields.map((field, index) => (
-								<Card key={field.id} className="border-gray-200">
+								<Card key={field.id} className="border-slate-200 bg-slate-50/60 shadow-none">
 									<CardHeader className="pb-3">
 										<CardTitle className="text-lg flex items-center justify-between">
 											Commitment {index + 1}
@@ -590,34 +551,31 @@ export default function QualityPolicyForm({
 									</CardContent>
 								</Card>
 							))}
-						</CardContent>
-					</Card>
+						</AdminFormSection>
 					) : null}
 
 					{/* Framework Section */}
 					{showSection('framework') ? (
-					<Card>
-						<CardHeader>
-							<CardTitle className="flex items-center justify-between">
-								Framework
-								<Button
-									type="button"
-									variant="outline"
-									size="sm"
-									onClick={() => appendStep({
+					<AdminFormSection
+						title='Framework'
+						action={
+							<Button
+								type='button'
+								variant='outline'
+								size='sm'
+								onClick={() =>
+									appendStep({
 										icon: 'Target',
 										title: 'New Step',
 										description: 'New step description',
 										iconColor: 'text-blue-600',
 										bgColor: 'bg-blue-50'
-									})}
-								>
-									<Plus className="w-4 h-4 mr-1" />
-									Add Step
-								</Button>
-							</CardTitle>
-						</CardHeader>
-						<CardContent className="space-y-4">
+									})
+								}>
+								<Plus className='w-4 h-4 mr-1' />
+								Add step
+							</Button>
+						}>
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 								<FormField
 									control={form.control}
@@ -659,7 +617,7 @@ export default function QualityPolicyForm({
 							</div>
 							
 							{stepFields.map((field, index) => (
-								<Card key={field.id} className="border-gray-200">
+								<Card key={field.id} className="border-slate-200 bg-slate-50/60 shadow-none">
 									<CardHeader className="pb-3">
 										<CardTitle className="text-lg flex items-center justify-between">
 											Step {index + 1}
@@ -779,34 +737,31 @@ export default function QualityPolicyForm({
 									</CardContent>
 								</Card>
 							))}
-						</CardContent>
-					</Card>
+						</AdminFormSection>
 					) : null}
 
 					{/* Assurance Bodies Section */}
 					{showSection('assuranceBodies') ? (
-					<Card>
-						<CardHeader>
-							<CardTitle className="flex items-center justify-between">
-								Assurance Bodies
-								<Button
-									type="button"
-									variant="outline"
-									size="sm"
-									onClick={() => appendAssuranceBody({
+					<AdminFormSection
+						title='Assurance bodies'
+						action={
+							<Button
+								type='button'
+								variant='outline'
+								size='sm'
+								onClick={() =>
+									appendAssuranceBody({
 										icon: 'Award',
 										title: 'New Body',
 										description: 'New assurance body description',
 										iconBg: 'bg-blue-600',
 										gradient: 'from-blue-50 to-blue-100'
-									})}
-								>
-									<Plus className="w-4 h-4 mr-1" />
-									Add Body
-								</Button>
-							</CardTitle>
-						</CardHeader>
-						<CardContent className="space-y-4">
+									})
+								}>
+								<Plus className='w-4 h-4 mr-1' />
+								Add body
+							</Button>
+						}>
 							<FormField
 								control={form.control}
 								name="assuranceBodies.title"
@@ -822,7 +777,7 @@ export default function QualityPolicyForm({
 							/>
 							
 							{assuranceBodyFields.map((field, index) => (
-								<Card key={field.id} className="border-gray-200">
+								<Card key={field.id} className="border-slate-200 bg-slate-50/60 shadow-none">
 									<CardHeader className="pb-3">
 										<CardTitle className="text-lg flex items-center justify-between">
 											Body {index + 1}
@@ -942,11 +897,10 @@ export default function QualityPolicyForm({
 									</CardContent>
 								</Card>
 							))}
-						</CardContent>
-					</Card>
-					) : null}
-				</form>
-			</Form>
-		</div>
+					</AdminFormSection>
+				) : null}
+				<AdminFormFooter status={status} saving={isSaving} />
+			</AdminForm>
+		</Form>
 	);
 }

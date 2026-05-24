@@ -135,22 +135,21 @@ export type CodeOfConductData = z.infer<typeof codeOfConductSchema>;
 
 // --- Generic Get/Update Functions ---
 
-async function getComponentData<T>(slug: string, key: string, defaultData: T): Promise<T> {
+async function getComponentData<T>(slug: string, key: string): Promise<T> {
     return unstable_cache(
         async () => {
-            try {
-                const page = await prisma.page.findUnique({
-                    where: { slug },
-                    include: { components: true }
-                });
-                if (!page) return defaultData;
-                const component = page.components.find(c => c.key === key);
-                if (!component) return defaultData;
-                return component.data as unknown as T;
-            } catch (error) {
-                console.error(`Error fetching ${key} for ${slug}:`, error);
-                return defaultData;
+            const page = await prisma.page.findUnique({
+                where: { slug },
+                include: { components: true }
+            });
+            if (!page) {
+                throw new Error(`${key} not seeded for ${slug} — run \`npm run seed student-life\``);
             }
+            const component = page.components.find(c => c.key === key);
+            if (!component) {
+                throw new Error(`${key} component missing for ${slug} — run \`npm run seed student-life\``);
+            }
+            return component.data as unknown as T;
         },
         [`${slug}-${key}`],
         { tags: [`${slug}-${key}`], revalidate: 3600 }
@@ -199,7 +198,7 @@ function getOrderForKey(key: string): number {
 
 // Hero
 export async function getStudentLifeHero(slug = 'student-life') {
-    return getComponentData(slug, 'HERO', getDefaultHeroData());
+    return getComponentData<StudentLifeHeroData>(slug, 'HERO');
 }
 export async function updateStudentLifeHero(slug: string, data: StudentLifeHeroData) {
     return updateComponentData(slug, 'HERO', data, heroSchema);
@@ -207,7 +206,7 @@ export async function updateStudentLifeHero(slug: string, data: StudentLifeHeroD
 
 // Overview
 export async function getStudentLifeOverview(slug = 'student-life') {
-    return getComponentData(slug, 'OVERVIEW', getDefaultOverviewData());
+    return getComponentData<StudentLifeOverviewData>(slug, 'OVERVIEW');
 }
 export async function updateStudentLifeOverview(slug: string, data: StudentLifeOverviewData) {
     return updateComponentData(slug, 'OVERVIEW', data, overviewSchema);
@@ -215,7 +214,7 @@ export async function updateStudentLifeOverview(slug: string, data: StudentLifeO
 
 // Facilities
 export async function getCampusFacilities(slug = 'student-life-campus-facilities') {
-    return getComponentData(slug, 'FACILITIES', getDefaultFacilitiesData());
+    return getComponentData<CampusFacilitiesData>(slug, 'FACILITIES');
 }
 export async function updateCampusFacilities(slug: string, data: CampusFacilitiesData) {
     return updateComponentData(slug, 'FACILITIES', data, campusFacilitiesSchema);
@@ -223,7 +222,7 @@ export async function updateCampusFacilities(slug: string, data: CampusFacilitie
 
 // Clubs
 export async function getClubsSocieties(slug = 'student-life-clubs-and-societies') {
-    return getComponentData(slug, 'CLUBS', getDefaultClubsData());
+    return getComponentData<ClubsSocietiesData>(slug, 'CLUBS');
 }
 export async function updateClubsSocieties(slug: string, data: ClubsSocietiesData) {
     return updateComponentData(slug, 'CLUBS', data, clubsSocietiesSchema);
@@ -231,7 +230,7 @@ export async function updateClubsSocieties(slug: string, data: ClubsSocietiesDat
 
 // Events
 export async function getEventsFestivals(slug = 'student-life-events-and-festivals') {
-    return getComponentData(slug, 'EVENTS', getDefaultEventsData());
+    return getComponentData<EventsFestivalsData>(slug, 'EVENTS');
 }
 export async function updateEventsFestivals(slug: string, data: EventsFestivalsData) {
     return updateComponentData(slug, 'EVENTS', data, eventsFestivalsSchema);
@@ -239,7 +238,7 @@ export async function updateEventsFestivals(slug: string, data: EventsFestivalsD
 
 // Grievance
 export async function getGrievanceCell(slug = 'student-life-student-grievance-cell') {
-    return getComponentData(slug, 'GRIEVANCE', getDefaultGrievanceData());
+    return getComponentData<GrievanceCellData>(slug, 'GRIEVANCE');
 }
 export async function updateGrievanceCell(slug: string, data: GrievanceCellData) {
     return updateComponentData(slug, 'GRIEVANCE', data, grievanceCellSchema);
@@ -247,69 +246,17 @@ export async function updateGrievanceCell(slug: string, data: GrievanceCellData)
 
 // Code of Conduct
 export async function getCodeOfConduct(slug = 'student-life-code-of-conduct') {
-    return getComponentData(slug, 'CONDUCT', getDefaultConductData());
+    return getComponentData<CodeOfConductData>(slug, 'CONDUCT');
 }
 export async function updateCodeOfConduct(slug: string, data: CodeOfConductData) {
     return updateComponentData(slug, 'CONDUCT', data, codeOfConductSchema);
 }
 
 
-// --- Default Data Generators ---
 
-function getDefaultHeroData(): StudentLifeHeroData {
-	return {
-		title: 'Student Life',
-		subtitle: 'Experience a vibrant campus life with endless opportunities for growth.',
-		backgroundImage: null,
-		gradient: 'from-blue-600 to-purple-600'
-	};
-}
 
-function getDefaultOverviewData(): StudentLifeOverviewData {
-    return {
-        title: 'Experience Life at BPIT',
-        description: 'At Bhagwan Parshuram Institute of Technology, education goes beyond the classroom. We foster an environment where innovation meets creativity.',
-        highlights: []
-    };
-}
 
-function getDefaultFacilitiesData(): CampusFacilitiesData {
-    return {
-        title: 'Campus Facilities',
-        description: 'BPIT offers a conducive environment for learning and personal growth with its modern infrastructure.',
-        sections: []
-    };
-}
 
-function getDefaultClubsData(): ClubsSocietiesData {
-    return {
-        title: 'Clubs & Societies',
-        description: 'Student life at BPIT is vibrant and diverse. Join our clubs to pursue your hobbies.',
-        categories: []
-    };
-}
 
-function getDefaultEventsData(): EventsFestivalsData {
-    return {
-        title: 'Events & Festivals',
-        description: 'BPIT\'s calendar is packed with events that provide platforms for showcasing talent.',
-        events: []
-    };
-}
 
-function getDefaultGrievanceData(): GrievanceCellData {
-    return {
-        title: 'Student Grievance Cell',
-        description: 'BPIT is committed to providing a safe, fair, and harmonious learning environment.',
-        processSteps: [],
-        contactInfo: []
-    };
-}
 
-function getDefaultConductData(): CodeOfConductData {
-    return {
-        title: 'Code of Conduct',
-        description: 'To ensure a disciplined and conducive learning environment, all students are required to abide by the following code of conduct.',
-        sections: []
-    };
-}

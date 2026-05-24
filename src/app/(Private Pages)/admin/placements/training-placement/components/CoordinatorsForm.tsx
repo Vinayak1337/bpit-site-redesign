@@ -1,13 +1,25 @@
 'use client';
 
-import React, { useState, useTransition, useEffect } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
-import { Plus, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { updateTrainingPlacement, type TrainingPlacementData } from '@/app/(Private Pages)/actions/training-placement';
+import {
+	updateTrainingPlacement,
+	type TrainingPlacementData
+} from '@/app/(Private Pages)/actions/training-placement';
+import {
+	AddRowButton,
+	AdminEmptyState,
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	AdminItemCard,
+	AdminItemList,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 interface CoordinatorsFormProps {
 	initialData: TrainingPlacementData;
@@ -15,9 +27,12 @@ interface CoordinatorsFormProps {
 	onChange?: (data: TrainingPlacementData) => void;
 }
 
-export default function CoordinatorsForm({ initialData, pageSlug, onChange }: CoordinatorsFormProps) {
+export default function CoordinatorsForm({
+	initialData,
+	onChange
+}: CoordinatorsFormProps) {
 	const [isPending, startTransition] = useTransition();
-	const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 
 	const form = useForm({
 		defaultValues: {
@@ -27,29 +42,36 @@ export default function CoordinatorsForm({ initialData, pageSlug, onChange }: Co
 		}
 	});
 
-	const { fields, append, remove } = useFieldArray({
+	const { fields, append, remove, move } = useFieldArray({
 		control: form.control,
 		name: 'departments'
 	});
 
-	// Watch for changes and update preview in real-time
 	useEffect(() => {
-		const subscription = form.watch((values) => {
+		const sub = form.watch(values => {
 			if (onChange) {
-				const updatedData: TrainingPlacementData = {
+				onChange({
 					...initialData,
 					departmentsTitle: values.departmentsTitle || '',
 					departmentsDescription: values.departmentsDescription || '',
-					departments: (values.departments || []).filter(Boolean) as any
-				};
-				onChange(updatedData);
+					departments: (values.departments || []).filter(
+						Boolean
+					) as TrainingPlacementData['departments']
+				});
+				setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 			}
 		});
-		return () => subscription.unsubscribe();
+		return () => sub.unsubscribe();
 	}, [form, onChange, initialData]);
 
-	const onSubmit = async (values: any) => {
-		setSaveStatus('saving');
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
+	const onSubmit = form.handleSubmit(values => {
+		setStatus({ kind: 'saving' });
 		startTransition(async () => {
 			try {
 				const updatedData: TrainingPlacementData = {
@@ -58,181 +80,111 @@ export default function CoordinatorsForm({ initialData, pageSlug, onChange }: Co
 					departmentsDescription: values.departmentsDescription,
 					departments: values.departments
 				};
-
 				await updateTrainingPlacement(updatedData);
-				
-				if (onChange) {
-					onChange(updatedData);
-				}
-
-				setSaveStatus('saved');
-				setTimeout(() => setSaveStatus('idle'), 2000);
+				onChange?.(updatedData);
+				setStatus({ kind: 'success', message: 'Saved' });
 			} catch (error) {
 				console.error('Failed to save:', error);
-				setSaveStatus('error');
+				setStatus({ kind: 'error', message: 'Save failed' });
 			}
 		});
-	};
+	});
 
 	return (
-		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
-				<div className='grid grid-cols-1 gap-4'>
-					<FormField
-						control={form.control}
-						name='departmentsTitle'
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Section Title</FormLabel>
-								<FormControl>
-									<Input {...field} placeholder='Department-wise Placement Coordinators' />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
+		<AdminForm onSubmit={onSubmit}>
+			<AdminFormSection
+				title='Section heading'
+				description='Copy shown above the department coordinator list.'>
+				<AdminField label='Section title' htmlFor='dep-title'>
+					<Input
+						id='dep-title'
+						placeholder='Department-wise Placement Coordinators'
+						{...form.register('departmentsTitle')}
 					/>
-
-					<FormField
-						control={form.control}
-						name='departmentsDescription'
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Section Description</FormLabel>
-								<FormControl>
-									<Textarea {...field} rows={3} placeholder='Description...' />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
+				</AdminField>
+				<AdminField label='Section description' htmlFor='dep-desc'>
+					<Textarea
+						id='dep-desc'
+						rows={3}
+						placeholder='Description…'
+						{...form.register('departmentsDescription')}
 					/>
-				</div>
+				</AdminField>
+			</AdminFormSection>
 
-				<div className='space-y-4'>
-					<div className='flex items-center justify-between'>
-						<h3 className='text-lg font-semibold'>Departments</h3>
-						<Button
-							type='button'
-							onClick={() => append({ id: Date.now().toString(), name: '', code: '', coordinator: '', companies: '', avgPackage: '', placementRate: '' })}
-							size='sm'>
-							<Plus className='w-4 h-4 mr-2' />
-							Add Department
-						</Button>
-					</div>
-
+			<AdminFormSection title='Departments'>
+				<AdminItemList>
 					{fields.map((field, index) => (
-						<div key={field.id} className='p-4 border rounded-lg space-y-4'>
-							<div className='flex items-center justify-between mb-2'>
-								<h4 className='font-semibold'>Department {index + 1}</h4>
-								<Button
-									type='button'
-									variant='destructive'
-									size='sm'
-									onClick={() => remove(index)}>
-									<Trash2 className='w-4 h-4' />
-								</Button>
-							</div>
-
-							<div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-								<FormField
-									control={form.control}
-									name={`departments.${index}.name`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Department Name</FormLabel>
-											<FormControl>
-												<Input {...field} placeholder='Computer Science' />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`departments.${index}.code`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Code</FormLabel>
-											<FormControl>
-												<Input {...field} placeholder='CSE' />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`departments.${index}.coordinator`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Coordinator</FormLabel>
-											<FormControl>
-												<Input {...field} placeholder='Dr. John Doe' />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`departments.${index}.companies`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Companies</FormLabel>
-											<FormControl>
-												<Input {...field} placeholder='150+' />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`departments.${index}.avgPackage`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Avg Package</FormLabel>
-											<FormControl>
-												<Input {...field} placeholder='8.5 LPA' />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-
-								<FormField
-									control={form.control}
-									name={`departments.${index}.placementRate`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Placement Rate</FormLabel>
-											<FormControl>
-												<Input {...field} placeholder='95%' />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							</div>
-						</div>
+						<AdminItemCard
+							key={field.id}
+							index={index}
+							total={fields.length}
+							title={
+								form.watch(`departments.${index}.name`) ||
+								`Department ${index + 1}`
+							}
+							subtitle={form.watch(`departments.${index}.code`) || undefined}
+							onMove={d => move(index, index + d)}
+							onRemove={() => remove(index)}>
+							<AdminFieldGrid>
+								<AdminField label='Department name'>
+									<Input
+										placeholder='Computer Science'
+										{...form.register(`departments.${index}.name` as const)}
+									/>
+								</AdminField>
+								<AdminField label='Code'>
+									<Input
+										placeholder='CSE'
+										{...form.register(`departments.${index}.code` as const)}
+									/>
+								</AdminField>
+								<AdminField label='Coordinator'>
+									<Input
+										placeholder='Dr. John Doe'
+										{...form.register(`departments.${index}.coordinator` as const)}
+									/>
+								</AdminField>
+								<AdminField label='Companies'>
+									<Input
+										placeholder='150+'
+										{...form.register(`departments.${index}.companies` as const)}
+									/>
+								</AdminField>
+								<AdminField label='Avg package'>
+									<Input
+										placeholder='8.5 LPA'
+										{...form.register(`departments.${index}.avgPackage` as const)}
+									/>
+								</AdminField>
+								<AdminField label='Placement rate'>
+									<Input
+										placeholder='95%'
+										{...form.register(`departments.${index}.placementRate` as const)}
+									/>
+								</AdminField>
+							</AdminFieldGrid>
+						</AdminItemCard>
 					))}
-				</div>
+				</AdminItemList>
+				{fields.length === 0 && <AdminEmptyState title='No departments yet' />}
+				<AddRowButton
+					onClick={() =>
+						append({
+							id: Date.now().toString(),
+							name: '',
+							code: '',
+							coordinator: '',
+							companies: '',
+							avgPackage: '',
+							placementRate: ''
+						})
+					}>
+					Add department
+				</AddRowButton>
+			</AdminFormSection>
 
-				<div className='flex items-center gap-3'>
-					<Button type='submit' disabled={isPending}>
-						{isPending ? 'Saving...' : 'Save Changes'}
-					</Button>
-					{saveStatus === 'saved' && (
-						<span className='text-sm text-green-600'>✓ Saved successfully</span>
-					)}
-					{saveStatus === 'error' && (
-						<span className='text-sm text-red-600'>Failed to save</span>
-					)}
-				</div>
-			</form>
-		</Form>
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }

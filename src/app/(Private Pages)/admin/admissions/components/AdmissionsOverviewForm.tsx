@@ -2,20 +2,10 @@
 
 import { useEffect, useMemo, useState, useTransition } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage
-} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
 import {
 	type AdmissionsOverviewPageData,
-	type AdmissionsOverviewStatsSection,
 	updateAdmissionsOverviewDepartments,
 	updateAdmissionsOverviewHero,
 	updateAdmissionsOverviewLinks,
@@ -31,6 +21,18 @@ import {
 	SelectValue
 } from '@/components/ui/select';
 import { createClientId } from '@/lib/utils';
+import {
+	AddRowButton,
+	AdminEmptyState,
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	AdminItemCard,
+	AdminItemList,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 type Props = {
 	initialData: AdmissionsOverviewPageData;
@@ -61,7 +63,12 @@ type FormValues = {
 	notes: Array<{ id: string; value: string }>;
 };
 
-const createStat = () => ({ id: createClientId('admissions-overview-stat'), value: '', label: '', icon: 'Building2' });
+const createStat = () => ({
+	id: createClientId('admissions-overview-stat'),
+	value: '',
+	label: '',
+	icon: 'Building2'
+});
 const createLink = () => ({
 	id: createClientId('admissions-overview-link'),
 	title: '',
@@ -69,8 +76,14 @@ const createLink = () => ({
 	href: '',
 	icon: 'FileText'
 });
-const createDepartment = () => ({ id: createClientId('admissions-overview-department'), name: '' });
-const createNote = () => ({ id: createClientId('admissions-overview-note'), value: '' });
+const createDepartment = () => ({
+	id: createClientId('admissions-overview-department'),
+	name: ''
+});
+const createNote = () => ({
+	id: createClientId('admissions-overview-note'),
+	value: ''
+});
 
 const normalizeData = (values: FormValues): AdmissionsOverviewPageData => ({
 	hero: {
@@ -84,39 +97,35 @@ const normalizeData = (values: FormValues): AdmissionsOverviewPageData => ({
 		title: values.statsTitle.trim(),
 		description: values.statsDescription.trim(),
 		items: values.stats
-			.map(item => ({
-				value: item.value.trim(),
-				label: item.label.trim(),
-				icon: item.icon.trim()
-			}))
-			.filter(item => item.value && item.label)
+			.map(i => ({ value: i.value.trim(), label: i.label.trim(), icon: i.icon.trim() }))
+			.filter(i => i.value && i.label)
 	},
 	links: {
 		eyebrow: values.linksEyebrow.trim(),
 		title: values.linksTitle.trim(),
 		description: values.linksDescription.trim(),
 		items: values.links
-			.map(item => ({
-				title: item.title.trim(),
-				description: item.description.trim(),
-				href: item.href.trim(),
-				icon: item.icon.trim()
+			.map(i => ({
+				title: i.title.trim(),
+				description: i.description.trim(),
+				href: i.href.trim(),
+				icon: i.icon.trim()
 			}))
-			.filter(item => item.title && item.description && item.href)
+			.filter(i => i.title && i.description && i.href)
 	},
 	departments: {
 		eyebrow: values.departmentsEyebrow.trim(),
 		title: values.departmentsTitle.trim(),
 		description: values.departmentsDescription.trim(),
 		items: values.departments
-			.map(item => ({ name: item.name.trim() }))
-			.filter(item => item.name)
+			.map(i => ({ name: i.name.trim() }))
+			.filter(i => i.name)
 	},
 	notes: {
 		eyebrow: values.notesEyebrow.trim(),
 		title: values.notesTitle.trim(),
 		description: values.notesDescription.trim(),
-		items: values.notes.map(item => item.value.trim()).filter(Boolean)
+		items: values.notes.map(i => i.value.trim()).filter(Boolean)
 	}
 });
 
@@ -129,7 +138,7 @@ export default function AdmissionsOverviewForm({
 	visibleSections
 }: Props) {
 	const [isPending, startTransition] = useTransition();
-	const [message, setMessage] = useState<string | null>(null);
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 
 	const defaults = useMemo<FormValues>(
 		() => ({
@@ -142,45 +151,45 @@ export default function AdmissionsOverviewForm({
 			statsDescription: initialData.stats.description,
 			stats:
 				initialData.stats.items.length > 0
-					? initialData.stats.items.map((item, index) => ({
-					id: `overview-stat-${index}`,
-					value: item.value,
-					label: item.label,
-					icon: item.icon ?? 'Building2'
-				}))
+					? initialData.stats.items.map((item, idx) => ({
+							id: `overview-stat-${idx}`,
+							value: item.value,
+							label: item.label,
+							icon: item.icon ?? 'Building2'
+						}))
 					: [createStat()],
 			linksEyebrow: initialData.links.eyebrow,
 			linksTitle: initialData.links.title,
 			linksDescription: initialData.links.description,
 			links:
 				initialData.links.items.length > 0
-					? initialData.links.items.map((item, index) => ({
-					id: `overview-link-${index}`,
-					title: item.title,
-					description: item.description,
-					href: item.href,
-					icon: item.icon
-				}))
+					? initialData.links.items.map((item, idx) => ({
+							id: `overview-link-${idx}`,
+							title: item.title,
+							description: item.description,
+							href: item.href,
+							icon: item.icon
+						}))
 					: [createLink()],
 			departmentsEyebrow: initialData.departments.eyebrow,
 			departmentsTitle: initialData.departments.title,
 			departmentsDescription: initialData.departments.description,
 			departments:
 				initialData.departments.items.length > 0
-					? initialData.departments.items.map((item, index) => ({
-					id: `overview-department-${index}`,
-					name: item.name
-				}))
+					? initialData.departments.items.map((item, idx) => ({
+							id: `overview-department-${idx}`,
+							name: item.name
+						}))
 					: [createDepartment()],
 			notesEyebrow: initialData.notes.eyebrow,
 			notesTitle: initialData.notes.title,
 			notesDescription: initialData.notes.description,
 			notes:
 				initialData.notes.items.length > 0
-					? initialData.notes.items.map((item, index) => ({
-					id: `overview-note-${index}`,
-					value: item
-				}))
+					? initialData.notes.items.map((item, idx) => ({
+							id: `overview-note-${idx}`,
+							value: item
+						}))
 					: [createNote()]
 		}),
 		[initialData]
@@ -189,7 +198,10 @@ export default function AdmissionsOverviewForm({
 	const form = useForm<FormValues>({ defaultValues: defaults });
 	const statsArray = useFieldArray({ control: form.control, name: 'stats' });
 	const linksArray = useFieldArray({ control: form.control, name: 'links' });
-	const departmentsArray = useFieldArray({ control: form.control, name: 'departments' });
+	const departmentsArray = useFieldArray({
+		control: form.control,
+		name: 'departments'
+	});
 	const notesArray = useFieldArray({ control: form.control, name: 'notes' });
 
 	useEffect(() => {
@@ -198,257 +210,302 @@ export default function AdmissionsOverviewForm({
 
 	useEffect(() => {
 		onChange?.(normalizeData(form.getValues()));
-		const subscription = form.watch(values => {
-			onChange?.(normalizeData(values as FormValues));
+		const sub = form.watch(v => {
+			onChange?.(normalizeData(v as FormValues));
+			setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 		});
-		return () => subscription.unsubscribe();
+		return () => sub.unsubscribe();
 	}, [form, onChange]);
 
-	const handleSubmit = (values: FormValues) => {
-		setMessage(null);
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
+	const handleSubmit = form.handleSubmit(values => {
+		setStatus({ kind: 'saving' });
 		const payload = normalizeData(values);
 		startTransition(async () => {
-			const tasks = [];
-			if (includes(visibleSections, 'intro')) tasks.push(updateAdmissionsOverviewHero(payload.hero));
-			if (includes(visibleSections, 'stats')) tasks.push(updateAdmissionsOverviewStats(payload.stats));
-			if (includes(visibleSections, 'links')) tasks.push(updateAdmissionsOverviewLinks(payload.links));
+			const tasks: Promise<{ ok: boolean }>[] = [];
+			if (includes(visibleSections, 'intro'))
+				tasks.push(updateAdmissionsOverviewHero(payload.hero));
+			if (includes(visibleSections, 'stats'))
+				tasks.push(updateAdmissionsOverviewStats(payload.stats));
+			if (includes(visibleSections, 'links'))
+				tasks.push(updateAdmissionsOverviewLinks(payload.links));
 			if (includes(visibleSections, 'departments'))
 				tasks.push(updateAdmissionsOverviewDepartments(payload.departments));
-			if (includes(visibleSections, 'notes')) tasks.push(updateAdmissionsOverviewNotes(payload.notes));
+			if (includes(visibleSections, 'notes'))
+				tasks.push(updateAdmissionsOverviewNotes(payload.notes));
 			const results = await Promise.all(tasks);
-			setMessage(results.every(result => result.ok) ? 'Saved' : 'Save failed');
+			setStatus(
+				results.every(r => r.ok)
+					? { kind: 'success', message: 'Saved' }
+					: { kind: 'error', message: 'Save failed' }
+			);
 		});
-	};
+	});
 
 	return (
-		<Form {...form}>
-			<form
-				className='space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm max-h-[70vh] overflow-y-auto'
-				onSubmit={form.handleSubmit(handleSubmit)}>
-				<div className='flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between'>
-					<div>
-						<h3 className='text-lg font-semibold text-slate-900'>Admissions Overview</h3>
-						<p className='text-sm text-slate-500'>
-							Edit the overview sections that introduce the admissions journey.
-						</p>
-					</div>
-					<div className='flex items-center gap-2'>
-						{message ? (
-							<span className='rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700'>
-								{message}
-							</span>
-						) : null}
-						<Button type='submit' disabled={isPending}>
-							{isPending ? 'Saving...' : 'Save changes'}
-						</Button>
-					</div>
-				</div>
-
-				{includes(visibleSections, 'intro') ? (
-					<section className='space-y-4 rounded-xl border border-slate-200 bg-slate-50/60 p-5'>
-						<h4 className='text-sm font-semibold uppercase tracking-[0.16em] text-slate-600'>Intro</h4>
-						<FormField
-							control={form.control}
-							name='heroTitle'
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Title</FormLabel>
-									<FormControl>
-										<Input {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
+		<AdminForm onSubmit={handleSubmit}>
+			{includes(visibleSections, 'intro') && (
+				<AdminFormSection
+					title='Intro'
+					description='Hero copy for the admissions overview page.'>
+					<AdminField label='Title' htmlFor='ovw-title'>
+						<Input id='ovw-title' {...form.register('heroTitle')} />
+					</AdminField>
+					<AdminField label='Eyebrow' htmlFor='ovw-eyebrow'>
+						<Input id='ovw-eyebrow' {...form.register('heroSubtitle')} />
+					</AdminField>
+					<AdminField label='Description' htmlFor='ovw-desc'>
+						<Textarea
+							id='ovw-desc'
+							rows={4}
+							className='resize-none'
+							{...form.register('heroDescription')}
 						/>
-						<FormField
-							control={form.control}
-							name='heroSubtitle'
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Eyebrow</FormLabel>
-									<FormControl>
-										<Input {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
+					</AdminField>
+					<AdminField label='Program count label' htmlFor='ovw-pcl'>
+						<Input
+							id='ovw-pcl'
+							placeholder='Programs available'
+							{...form.register('programCountLabel')}
 						/>
-						<FormField
-							control={form.control}
-							name='heroDescription'
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Description</FormLabel>
-									<FormControl>
-										<Textarea rows={4} className='resize-none' {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
+					</AdminField>
+				</AdminFormSection>
+			)}
+
+			{includes(visibleSections, 'stats') && (
+				<AdminFormSection title='Stats'>
+					<AdminFieldGrid>
+						<AdminField label='Eyebrow'>
+							<Input {...form.register('statsEyebrow')} />
+						</AdminField>
+						<AdminField label='Title'>
+							<Input {...form.register('statsTitle')} />
+						</AdminField>
+					</AdminFieldGrid>
+					<AdminField label='Description'>
+						<Textarea
+							rows={3}
+							className='resize-none'
+							{...form.register('statsDescription')}
 						/>
-						<FormField
-							control={form.control}
-							name='programCountLabel'
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Program count label</FormLabel>
-									<FormControl>
-										<Input placeholder='Programs available' {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
+					</AdminField>
+					<AdminItemList>
+						{statsArray.fields.map((field, index) => (
+							<AdminItemCard
+								key={field.id}
+								index={index}
+								total={statsArray.fields.length}
+								title={form.watch(`stats.${index}.label`) || `Stat ${index + 1}`}
+								onMove={d => statsArray.move(index, index + d)}
+								onRemove={() => statsArray.remove(index)}>
+								<AdminFieldGrid>
+									<AdminField label='Value'>
+										<Input {...form.register(`stats.${index}.value` as const)} />
+									</AdminField>
+									<AdminField label='Label'>
+										<Input {...form.register(`stats.${index}.label` as const)} />
+									</AdminField>
+								</AdminFieldGrid>
+								<AdminField label='Icon'>
+									<Select
+										value={form.watch(`stats.${index}.icon`) || 'Building2'}
+										onValueChange={v =>
+											form.setValue(`stats.${index}.icon`, v, {
+												shouldDirty: true
+											})
+										}>
+										<SelectTrigger>
+											<SelectValue placeholder='Select icon' />
+										</SelectTrigger>
+										<SelectContent>
+											{ADMISSIONS_ICON_NAMES.map(icon => (
+												<SelectItem key={icon} value={icon}>
+													{icon}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								</AdminField>
+							</AdminItemCard>
+						))}
+					</AdminItemList>
+					{statsArray.fields.length === 0 && (
+						<AdminEmptyState title='No stats yet' />
+					)}
+					<AddRowButton onClick={() => statsArray.append(createStat())}>
+						Add stat
+					</AddRowButton>
+				</AdminFormSection>
+			)}
+
+			{includes(visibleSections, 'links') && (
+				<AdminFormSection title='Quick links'>
+					<AdminFieldGrid>
+						<AdminField label='Eyebrow'>
+							<Input {...form.register('linksEyebrow')} />
+						</AdminField>
+						<AdminField label='Title'>
+							<Input {...form.register('linksTitle')} />
+						</AdminField>
+					</AdminFieldGrid>
+					<AdminField label='Description'>
+						<Textarea
+							rows={3}
+							className='resize-none'
+							{...form.register('linksDescription')}
 						/>
-					</section>
-				) : null}
+					</AdminField>
+					<AdminItemList>
+						{linksArray.fields.map((field, index) => (
+							<AdminItemCard
+								key={field.id}
+								index={index}
+								total={linksArray.fields.length}
+								title={form.watch(`links.${index}.title`) || `Link ${index + 1}`}
+								subtitle={form.watch(`links.${index}.href`) || undefined}
+								onMove={d => linksArray.move(index, index + d)}
+								onRemove={() => linksArray.remove(index)}>
+								<AdminFieldGrid>
+									<AdminField label='Title'>
+										<Input {...form.register(`links.${index}.title` as const)} />
+									</AdminField>
+									<AdminField label='Href'>
+										<Input {...form.register(`links.${index}.href` as const)} />
+									</AdminField>
+								</AdminFieldGrid>
+								<AdminField label='Description'>
+									<Textarea
+										rows={3}
+										className='resize-none'
+										{...form.register(`links.${index}.description` as const)}
+									/>
+								</AdminField>
+								<AdminField label='Icon'>
+									<Select
+										value={form.watch(`links.${index}.icon`) || 'FileText'}
+										onValueChange={v =>
+											form.setValue(`links.${index}.icon`, v, {
+												shouldDirty: true
+											})
+										}>
+										<SelectTrigger>
+											<SelectValue placeholder='Select icon' />
+										</SelectTrigger>
+										<SelectContent>
+											{ADMISSIONS_ICON_NAMES.map(icon => (
+												<SelectItem key={icon} value={icon}>
+													{icon}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								</AdminField>
+							</AdminItemCard>
+						))}
+					</AdminItemList>
+					{linksArray.fields.length === 0 && (
+						<AdminEmptyState title='No links yet' />
+					)}
+					<AddRowButton onClick={() => linksArray.append(createLink())}>
+						Add link
+					</AddRowButton>
+				</AdminFormSection>
+			)}
 
-				{includes(visibleSections, 'stats') ? (
-					<section className='space-y-4 rounded-xl border border-slate-200 bg-slate-50/60 p-5'>
-						<h4 className='text-sm font-semibold uppercase tracking-[0.16em] text-slate-600'>Stats</h4>
-						<div className='grid gap-4 sm:grid-cols-2'>
-							<FormField control={form.control} name='statsEyebrow' render={({ field }) => <FormItem><FormLabel>Eyebrow</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-							<FormField control={form.control} name='statsTitle' render={({ field }) => <FormItem><FormLabel>Title</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-						</div>
-						<FormField control={form.control} name='statsDescription' render={({ field }) => <FormItem><FormLabel>Description</FormLabel><FormControl><Textarea rows={3} className='resize-none' {...field} /></FormControl></FormItem>} />
-						<div className='flex items-center justify-between'>
-							<p className='text-sm font-medium text-slate-700'>Stat items</p>
-							<Button type='button' variant='outline' size='sm' onClick={() => statsArray.append(createStat())}>Add stat</Button>
-						</div>
-						<div className='space-y-4'>
-							{statsArray.fields.map((field, index) => (
-								<div key={field.id} className='rounded-xl border border-slate-200 bg-white p-4'>
-									<div className='mb-4 flex items-center justify-between'>
-										<span className='text-sm font-medium text-slate-700'>Stat {index + 1}</span>
-										<Button type='button' variant='ghost' size='sm' onClick={() => statsArray.remove(index)}>
-											Remove
-										</Button>
-									</div>
-									<div className='grid gap-4 sm:grid-cols-2'>
-										<FormField control={form.control} name={`stats.${index}.value`} render={({ field }) => <FormItem><FormLabel>Value</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-										<FormField control={form.control} name={`stats.${index}.label`} render={({ field }) => <FormItem><FormLabel>Label</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-										<FormField
-											control={form.control}
-											name={`stats.${index}.icon`}
-											render={({ field }) => (
-												<FormItem className='sm:col-span-2'>
-													<FormLabel>Icon</FormLabel>
-													<Select onValueChange={field.onChange} value={field.value}>
-														<FormControl>
-															<SelectTrigger>
-																<SelectValue placeholder='Select icon' />
-															</SelectTrigger>
-														</FormControl>
-														<SelectContent>
-															{ADMISSIONS_ICON_NAMES.map(icon => (
-																<SelectItem key={icon} value={icon}>{icon}</SelectItem>
-															))}
-														</SelectContent>
-													</Select>
-												</FormItem>
-											)}
-										/>
-									</div>
-								</div>
-							))}
-						</div>
-					</section>
-				) : null}
+			{includes(visibleSections, 'departments') && (
+				<AdminFormSection title='Departments'>
+					<AdminField label='Eyebrow'>
+						<Input {...form.register('departmentsEyebrow')} />
+					</AdminField>
+					<AdminField label='Title'>
+						<Input {...form.register('departmentsTitle')} />
+					</AdminField>
+					<AdminField label='Description'>
+						<Textarea
+							rows={3}
+							className='resize-none'
+							{...form.register('departmentsDescription')}
+						/>
+					</AdminField>
+					<AdminItemList>
+						{departmentsArray.fields.map((field, index) => (
+							<AdminItemCard
+								key={field.id}
+								index={index}
+								total={departmentsArray.fields.length}
+								title={
+									form.watch(`departments.${index}.name`) ||
+									`Department ${index + 1}`
+								}
+								onMove={d => departmentsArray.move(index, index + d)}
+								onRemove={() => departmentsArray.remove(index)}>
+								<AdminField label='Department name'>
+									<Input
+										{...form.register(`departments.${index}.name` as const)}
+									/>
+								</AdminField>
+							</AdminItemCard>
+						))}
+					</AdminItemList>
+					{departmentsArray.fields.length === 0 && (
+						<AdminEmptyState title='No departments yet' />
+					)}
+					<AddRowButton
+						onClick={() => departmentsArray.append(createDepartment())}>
+						Add department
+					</AddRowButton>
+				</AdminFormSection>
+			)}
 
-				{includes(visibleSections, 'links') ? (
-					<section className='space-y-4 rounded-xl border border-slate-200 bg-slate-50/60 p-5'>
-						<h4 className='text-sm font-semibold uppercase tracking-[0.16em] text-slate-600'>Quick links</h4>
-						<div className='grid gap-4 sm:grid-cols-2'>
-							<FormField control={form.control} name='linksEyebrow' render={({ field }) => <FormItem><FormLabel>Eyebrow</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-							<FormField control={form.control} name='linksTitle' render={({ field }) => <FormItem><FormLabel>Title</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-						</div>
-						<FormField control={form.control} name='linksDescription' render={({ field }) => <FormItem><FormLabel>Description</FormLabel><FormControl><Textarea rows={3} className='resize-none' {...field} /></FormControl></FormItem>} />
-						<div className='flex items-center justify-between'>
-							<p className='text-sm font-medium text-slate-700'>Link cards</p>
-							<Button type='button' variant='outline' size='sm' onClick={() => linksArray.append(createLink())}>Add link</Button>
-						</div>
-						<div className='space-y-4'>
-							{linksArray.fields.map((field, index) => (
-								<div key={field.id} className='rounded-xl border border-slate-200 bg-white p-4'>
-									<div className='mb-4 flex items-center justify-between'>
-										<span className='text-sm font-medium text-slate-700'>Link {index + 1}</span>
-										<Button type='button' variant='ghost' size='sm' onClick={() => linksArray.remove(index)}>
-											Remove
-										</Button>
-									</div>
-									<div className='grid gap-4 sm:grid-cols-2'>
-										<FormField control={form.control} name={`links.${index}.title`} render={({ field }) => <FormItem><FormLabel>Title</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-										<FormField control={form.control} name={`links.${index}.href`} render={({ field }) => <FormItem><FormLabel>Href</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-										<FormField control={form.control} name={`links.${index}.description`} render={({ field }) => <FormItem className='sm:col-span-2'><FormLabel>Description</FormLabel><FormControl><Textarea rows={3} className='resize-none' {...field} /></FormControl></FormItem>} />
-										<FormField
-											control={form.control}
-											name={`links.${index}.icon`}
-											render={({ field }) => (
-												<FormItem className='sm:col-span-2'>
-													<FormLabel>Icon</FormLabel>
-													<Select onValueChange={field.onChange} value={field.value}>
-														<FormControl>
-															<SelectTrigger>
-																<SelectValue placeholder='Select icon' />
-															</SelectTrigger>
-														</FormControl>
-														<SelectContent>
-															{ADMISSIONS_ICON_NAMES.map(icon => (
-																<SelectItem key={icon} value={icon}>{icon}</SelectItem>
-															))}
-														</SelectContent>
-													</Select>
-												</FormItem>
-											)}
-										/>
-									</div>
-								</div>
-							))}
-						</div>
-					</section>
-				) : null}
+			{includes(visibleSections, 'notes') && (
+				<AdminFormSection title='Notes'>
+					<AdminField label='Eyebrow'>
+						<Input {...form.register('notesEyebrow')} />
+					</AdminField>
+					<AdminField label='Title'>
+						<Input {...form.register('notesTitle')} />
+					</AdminField>
+					<AdminField label='Description'>
+						<Textarea
+							rows={3}
+							className='resize-none'
+							{...form.register('notesDescription')}
+						/>
+					</AdminField>
+					<AdminItemList>
+						{notesArray.fields.map((field, index) => (
+							<AdminItemCard
+								key={field.id}
+								index={index}
+								total={notesArray.fields.length}
+								title={`Note ${index + 1}`}
+								onMove={d => notesArray.move(index, index + d)}
+								onRemove={() => notesArray.remove(index)}>
+								<AdminField label='Note'>
+									<Textarea
+										rows={2}
+										className='resize-none'
+										{...form.register(`notes.${index}.value` as const)}
+									/>
+								</AdminField>
+							</AdminItemCard>
+						))}
+					</AdminItemList>
+					{notesArray.fields.length === 0 && (
+						<AdminEmptyState title='No notes yet' />
+					)}
+					<AddRowButton onClick={() => notesArray.append(createNote())}>
+						Add note
+					</AddRowButton>
+				</AdminFormSection>
+			)}
 
-				{includes(visibleSections, 'departments') ? (
-					<section className='space-y-4 rounded-xl border border-slate-200 bg-slate-50/60 p-5'>
-						<h4 className='text-sm font-semibold uppercase tracking-[0.16em] text-slate-600'>Departments</h4>
-						<FormField control={form.control} name='departmentsEyebrow' render={({ field }) => <FormItem><FormLabel>Eyebrow</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-						<FormField control={form.control} name='departmentsTitle' render={({ field }) => <FormItem><FormLabel>Title</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-						<FormField control={form.control} name='departmentsDescription' render={({ field }) => <FormItem><FormLabel>Description</FormLabel><FormControl><Textarea rows={3} className='resize-none' {...field} /></FormControl></FormItem>} />
-						<div className='flex items-center justify-between'>
-							<p className='text-sm font-medium text-slate-700'>Department items</p>
-							<Button type='button' variant='outline' size='sm' onClick={() => departmentsArray.append(createDepartment())}>Add department</Button>
-						</div>
-						<div className='space-y-3'>
-							{departmentsArray.fields.map((field, index) => (
-								<div key={field.id} className='flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4'>
-									<FormField control={form.control} name={`departments.${index}.name`} render={({ field }) => <FormItem className='flex-1'><FormLabel>Department name</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-									<Button type='button' variant='ghost' size='sm' onClick={() => departmentsArray.remove(index)}>Remove</Button>
-								</div>
-							))}
-						</div>
-					</section>
-				) : null}
-
-				{includes(visibleSections, 'notes') ? (
-					<section className='space-y-4 rounded-xl border border-slate-200 bg-slate-50/60 p-5'>
-						<h4 className='text-sm font-semibold uppercase tracking-[0.16em] text-slate-600'>Notes</h4>
-						<FormField control={form.control} name='notesEyebrow' render={({ field }) => <FormItem><FormLabel>Eyebrow</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-						<FormField control={form.control} name='notesTitle' render={({ field }) => <FormItem><FormLabel>Title</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-						<FormField control={form.control} name='notesDescription' render={({ field }) => <FormItem><FormLabel>Description</FormLabel><FormControl><Textarea rows={3} className='resize-none' {...field} /></FormControl></FormItem>} />
-						<div className='flex items-center justify-between'>
-							<p className='text-sm font-medium text-slate-700'>Note items</p>
-							<Button type='button' variant='outline' size='sm' onClick={() => notesArray.append(createNote())}>Add note</Button>
-						</div>
-						<div className='space-y-3'>
-							{notesArray.fields.map((field, index) => (
-								<div key={field.id} className='flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-4'>
-									<FormField control={form.control} name={`notes.${index}.value`} render={({ field }) => <FormItem className='flex-1'><FormLabel>Note</FormLabel><FormControl><Textarea rows={2} className='resize-none' {...field} /></FormControl></FormItem>} />
-									<Button type='button' variant='ghost' size='sm' onClick={() => notesArray.remove(index)}>Remove</Button>
-								</div>
-							))}
-						</div>
-					</section>
-				) : null}
-			</form>
-		</Form>
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }

@@ -7,11 +7,6 @@ import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
 import { createAuditLog } from '@/lib/audit';
 import type { Prisma } from '@prisma/client';
 import { revalidateTag, unstable_cache } from 'next/cache';
-import {
-	aboutHeroData as aboutHeroDefaults,
-	aboutOverviewData as aboutOverviewDefaults,
-	aboutLegacyData as aboutLegacyDefaults
-} from '@/data/about';
 
 const aboutHeroSchema = z.object({
 	title: z.string().min(1),
@@ -126,7 +121,7 @@ export type ChairmanMessageData = z.infer<typeof chairmanMessageSchema>;
 export type PrincipalMessageData = z.infer<typeof principalMessageSchema>;
 export type FounderTributeData = z.infer<typeof founderTributeSchema>;
 
-const HERO_GRADIENT = aboutHeroDefaults.gradient ?? 'from-blue-600 to-blue-700';
+const HERO_GRADIENT = 'from-blue-600 to-blue-700';
 const DEFAULT_STAT_ICON = 'GraduationCap';
 
 const ABOUT_HERO_CACHE_TAG = 'about-hero';
@@ -137,29 +132,15 @@ const PRINCIPAL_MESSAGE_CACHE_TAG = 'principal-message';
 const FOUNDER_TRIBUTE_CACHE_TAG = 'founder-tribute';
 
 function normalizeHero(input: AboutHeroData | null | undefined): AboutHeroData {
-	const base: AboutHeroData = {
-		title: aboutHeroDefaults.title,
-		subtitle: aboutHeroDefaults.subtitle,
-		gradient: HERO_GRADIENT,
-		backgroundImage: aboutHeroDefaults.backgroundImage ?? null
-	};
 	if (!input) {
-		return base;
+		throw new Error('ABOUT_HERO not seeded — run `npm run seed about`');
 	}
-
-	const parsed = aboutHeroSchema.safeParse(input);
-	if (!parsed.success) {
-		return base;
-	}
-
+	const parsed = aboutHeroSchema.parse(input);
 	const backgroundImage =
-		parsed.data.backgroundImage === ''
-			? null
-			: parsed.data.backgroundImage ?? null;
-
+		parsed.backgroundImage === '' ? null : parsed.backgroundImage ?? null;
 	return {
-		...base,
-		...parsed.data,
+		title: parsed.title,
+		subtitle: parsed.subtitle,
 		gradient: HERO_GRADIENT,
 		backgroundImage
 	};
@@ -202,123 +183,56 @@ function normalizeOverview(
 		};
 	};
 
-	const fallback = {
-		header: sanitizeHeader(aboutOverviewDefaults.header),
-		stats: (aboutOverviewDefaults.stats ?? []).map(sanitizeStat)
-	};
-
-	const parsed = aboutOverviewSchema.safeParse(input);
-	if (!parsed.success) {
-		return fallback;
+	if (!input) {
+		throw new Error('ABOUT_OVERVIEW not seeded — run `npm run seed about`');
 	}
-
+	const parsed = aboutOverviewSchema.parse(input);
 	return {
-		header: sanitizeHeader(parsed.data.header),
-		stats: parsed.data.stats.map(sanitizeStat)
+		header: sanitizeHeader(parsed.header),
+		stats: parsed.stats.map(sanitizeStat)
 	};
 }
 
 function normalizeLegacy(
 	input: AboutLegacyData | null | undefined
 ): AboutLegacyData {
-	const parsed = aboutLegacySchema.safeParse(input);
-	if (parsed.success) {
-		return parsed.data;
+	if (!input) {
+		throw new Error('ABOUT_LEGACY not seeded — run `npm run seed about`');
 	}
-
-	return {
-		title: aboutLegacyDefaults.title,
-		paragraphs: aboutLegacyDefaults.paragraphs,
-		features: aboutLegacyDefaults.features
-	};
+	return aboutLegacySchema.parse(input);
 }
 
 function normalizeChairmanMessage(
 	input: ChairmanMessageData | null | undefined
 ): ChairmanMessageData {
-	const chairmanMessageDefaults: ChairmanMessageData = {
-		header: {
-			title: "Chairman's Message",
-			subtitle: 'A Vision for Excellence in Engineering Education'
-		},
-		paragraphs: ['Welcome to Bhagwan Parshuram Institute of Technology...'],
-		quote: '"Dear Students, Faculty, and Stakeholders,"',
-		more: []
-	};
-
-	const parsed = chairmanMessageSchema.safeParse(input);
-	if (parsed.success) {
-		return parsed.data;
+	if (!input) {
+		throw new Error(
+			'CHAIRMAN_MESSAGE not seeded — run `npm run seed about`'
+		);
 	}
-
-	return chairmanMessageDefaults;
+	return chairmanMessageSchema.parse(input);
 }
 
 function normalizePrincipalMessage(
 	input: PrincipalMessageData | null | undefined
 ): PrincipalMessageData {
-	const principalMessageDefaults: PrincipalMessageData = {
-		header: {
-			title: "Principal's Message",
-			subtitle: 'Leading Academic Excellence and Innovation'
-		},
-		paragraphs: [
-			'Welcome to BPIT, where academic excellence meets innovation...'
-		],
-		quote: '"Dear Students and Academic Community,"',
-		more: [],
-		cards: {
-			academicLeadership: {
-				title: 'Academic Leadership',
-				description:
-					'Guiding curriculum development and maintaining academic standards.'
-			},
-			strategicVision: {
-				title: 'Strategic Vision',
-				description:
-					'Developing long-term strategies for institutional growth and excellence.'
-			},
-			studentMentorship: {
-				title: 'Student Mentorship',
-				description: 'Fostering student development and career guidance.'
-			}
-		}
-	};
-
-	const parsed = principalMessageSchema.safeParse(input);
-	if (parsed.success) {
-		return parsed.data;
+	if (!input) {
+		throw new Error(
+			'PRINCIPAL_MESSAGE not seeded — run `npm run seed about`'
+		);
 	}
-
-	return principalMessageDefaults;
+	return principalMessageSchema.parse(input);
 }
 
 function normalizeFounderTribute(
 	input: FounderTributeData | null | undefined
 ): FounderTributeData {
-	const founderTributeDefaults: FounderTributeData = {
-		header: {
-			title: 'In Memory of Our Visionary Founder',
-			subtitle: 'Bhagwan Parshuram - The Divine Inspiration'
-		},
-		paragraphs: [
-			'Our institution draws its name and inspiration from Bhagwan Parshuram...'
-		],
-		quote:
-			'"Education is the most powerful weapon which you can use to change the world."',
-		more: [
-			'The values of discipline, dedication, and excellence continue to guide us...'
-		],
-		coreValues: ['Righteousness and Integrity', 'Excellence in Education'],
-		commitments: ['Holistic Development', 'Ethical Leadership']
-	};
-
-	const parsed = founderTributeSchema.safeParse(input);
-	if (parsed.success) {
-		return parsed.data;
+	if (!input) {
+		throw new Error(
+			'FOUNDER_TRIBUTE not seeded — run `npm run seed about`'
+		);
 	}
-
-	return founderTributeDefaults;
+	return founderTributeSchema.parse(input);
 }
 
 async function getPageId(pageSlug: string): Promise<string | null> {

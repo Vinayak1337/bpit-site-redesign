@@ -2,19 +2,22 @@
 
 import { useEffect, useState, useTransition } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
-import { Button } from '@/components/ui/button';
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage
-} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { updateChairmanMessage } from '@/app/(Private Pages)/actions/about';
 import type { ChairmanMessageData } from '@/app/(Private Pages)/actions/about';
+import {
+	AddRowButton,
+	AdminEmptyState,
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	AdminItemCard,
+	AdminItemList,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 type ParagraphFormValue = { id: string; value: string };
 
@@ -38,25 +41,20 @@ const createParagraph = (value = ''): ParagraphFormValue => ({
 	value
 });
 
-const normalizeChairmanMessage = (values: Partial<FormValues>): ChairmanMessageData => {
-	const paragraphs = (values.paragraphs ?? [])
-		.map(paragraph => (paragraph.value ?? '').trim())
-		.filter(Boolean);
-	
-	const more = (values.more ?? [])
-		.map(paragraph => (paragraph.value ?? '').trim())
-		.filter(Boolean);
-
-	return {
-		header: {
-			title: (values.headerTitle ?? '').trim() || "Chairman's Message",
-			subtitle: (values.headerSubtitle ?? '').trim() || 'A Vision for Excellence'
-		},
-		quote: (values.quote ?? '').trim() || undefined,
-		paragraphs,
-		more
-	};
-};
+const normalize = (values: Partial<FormValues>): ChairmanMessageData => ({
+	header: {
+		title: (values.headerTitle ?? '').trim() || "Chairman's Message",
+		subtitle:
+			(values.headerSubtitle ?? '').trim() || 'A Vision for Excellence'
+	},
+	quote: (values.quote ?? '').trim() || undefined,
+	paragraphs: (values.paragraphs ?? [])
+		.map(p => (p.value ?? '').trim())
+		.filter(Boolean),
+	more: (values.more ?? [])
+		.map(p => (p.value ?? '').trim())
+		.filter(Boolean)
+});
 
 export default function ChairmanMessageForm({
 	initialData,
@@ -65,7 +63,7 @@ export default function ChairmanMessageForm({
 	visibleSections
 }: Props) {
 	const [isPending, startTransition] = useTransition();
-	const [message, setMessage] = useState<string | null>(null);
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 
 	const form = useForm<FormValues>({
 		defaultValues: {
@@ -74,224 +72,146 @@ export default function ChairmanMessageForm({
 			quote: initialData.quote || '',
 			paragraphs:
 				initialData.paragraphs.length > 0
-					? initialData.paragraphs.map(value => createParagraph(value))
+					? initialData.paragraphs.map(v => createParagraph(v))
 					: [createParagraph()],
 			more:
 				initialData.more.length > 0
-					? initialData.more.map(value => createParagraph(value))
+					? initialData.more.map(v => createParagraph(v))
 					: [createParagraph()]
 		}
 	});
 
-	const paragraphsArray = useFieldArray({
-		control: form.control,
-		name: 'paragraphs'
-	});
-
-	const moreArray = useFieldArray({
-		control: form.control,
-		name: 'more'
-	});
+	const paragraphsArray = useFieldArray({ control: form.control, name: 'paragraphs' });
+	const moreArray = useFieldArray({ control: form.control, name: 'more' });
 
 	useEffect(() => {
-		onChange?.(normalizeChairmanMessage(form.getValues()));
-		const subscription = form.watch(values => {
-			const formValues: Partial<FormValues> = {
-				...values,
-				paragraphs: values.paragraphs?.filter(Boolean) as ParagraphFormValue[],
-				more: values.more?.filter(Boolean) as ParagraphFormValue[]
-			};
-			onChange?.(normalizeChairmanMessage(formValues));
+		onChange?.(normalize(form.getValues()));
+		const sub = form.watch(values => {
+			onChange?.(normalize(values as Partial<FormValues>));
+			setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 		});
-		return () => subscription.unsubscribe();
+		return () => sub.unsubscribe();
 	}, [form, onChange]);
 
-	const handleSubmit = (values: FormValues) => {
-		setMessage(null);
-		const payload = normalizeChairmanMessage(values);
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
+	const handleSubmit = form.handleSubmit(values => {
+		setStatus({ kind: 'saving' });
 		startTransition(async () => {
-			const result = await updateChairmanMessage(pageSlug, payload);
-			if (!result.ok) {
-				setMessage('Save failed');
-				return;
-			}
-			setMessage('Saved');
+			const result = await updateChairmanMessage(pageSlug, normalize(values));
+			setStatus(
+				result.ok
+					? { kind: 'success', message: 'Saved' }
+					: { kind: 'error', message: 'Save failed' }
+			);
 		});
-	};
+	});
 
 	const showSection = (section: 'header' | 'content') =>
 		!visibleSections || visibleSections.includes(section);
 
 	return (
-		<Form {...form}>
-			<form
-				className='space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm max-h-[70vh] overflow-y-auto overflow-x-hidden'
-				onSubmit={form.handleSubmit(handleSubmit)}>
-				<div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
-					<div>
-						<h3 className='text-lg font-semibold text-slate-900'>Chairman's Message</h3>
-						<p className='text-sm text-slate-500'>
-							Manage the chairman's message content displayed on the page.
-						</p>
-					</div>
-					<div className='flex items-center gap-2'>
-						{message && (
-							<span className='rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700'>
-								{message}
-							</span>
-						)}
-						<Button type='submit' disabled={isPending}>
-							{isPending ? 'Saving...' : 'Save changes'}
-						</Button>
-					</div>
-				</div>
+		<AdminForm onSubmit={handleSubmit}>
+			{showSection('header') && (
+				<AdminFormSection
+					title="Chairman's message"
+					description="Manage the chairman's message content displayed on the page.">
+					<AdminFieldGrid>
+						<AdminField label='Title' htmlFor='chm-title'>
+							<Input
+								id='chm-title'
+								placeholder="Chairman's Message"
+								{...form.register('headerTitle', { required: 'Title is required' })}
+							/>
+						</AdminField>
+						<AdminField label='Subtitle' htmlFor='chm-sub'>
+							<Input
+								id='chm-sub'
+								placeholder='A Vision for Excellence'
+								{...form.register('headerSubtitle', {
+									required: 'Subtitle is required'
+								})}
+							/>
+						</AdminField>
+					</AdminFieldGrid>
+				</AdminFormSection>
+			)}
 
-				{showSection('header') ? (
-				<div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-					<FormField
-						control={form.control}
-						name='headerTitle'
-						rules={{ required: 'Title is required' }}
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Title</FormLabel>
-								<FormControl>
-									<Input placeholder="Chairman's Message" {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-					<FormField
-						control={form.control}
-						name='headerSubtitle'
-						rules={{ required: 'Subtitle is required' }}
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Subtitle</FormLabel>
-								<FormControl>
-									<Input placeholder='A Vision for Excellence' {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-				</div>
-				) : null}
-
-				{showSection('content') ? (
+			{showSection('content') && (
 				<>
-				<FormField
-					control={form.control}
-					name='quote'
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Quote</FormLabel>
-							<FormControl>
-								<Input placeholder='"Dear Students, Faculty, and Stakeholders,"' {...field} />
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+					<AdminFormSection title='Quote'>
+						<AdminField label='Quote' htmlFor='chm-quote'>
+							<Input
+								id='chm-quote'
+								placeholder='"Dear Students, Faculty, and Stakeholders,"'
+								{...form.register('quote')}
+							/>
+						</AdminField>
+					</AdminFormSection>
 
-				<div className='space-y-3'>
-					<div className='flex items-center justify-between'>
-						<h4 className='text-sm font-semibold text-slate-700'>
-							Message Paragraphs
-						</h4>
-						<Button
-							type='button'
-							variant='outline'
-							size='sm'
-							onClick={() => paragraphsArray.append(createParagraph())}>
+					<AdminFormSection title='Message paragraphs'>
+						<AdminItemList>
+							{paragraphsArray.fields.map((field, index) => (
+								<AdminItemCard
+									key={field.id}
+									index={index}
+									total={paragraphsArray.fields.length}
+									title={`Paragraph ${index + 1}`}
+									onMove={d => paragraphsArray.move(index, index + d)}
+									onRemove={() => paragraphsArray.remove(index)}>
+									<AdminField label={`Paragraph ${index + 1}`} className='[&_label]:sr-only'>
+										<Textarea
+											rows={4}
+											placeholder='Enter paragraph content…'
+											{...form.register(`paragraphs.${index}.value` as const)}
+										/>
+									</AdminField>
+								</AdminItemCard>
+							))}
+						</AdminItemList>
+						{paragraphsArray.fields.length === 0 && (
+							<AdminEmptyState title='No paragraphs yet' />
+						)}
+						<AddRowButton onClick={() => paragraphsArray.append(createParagraph())}>
 							Add paragraph
-						</Button>
-					</div>
-					<div className='space-y-4'>
-						{paragraphsArray.fields.map((field, index) => (
-							<div key={field.id} className='flex gap-3'>
-								<div className='flex-1'>
-									<FormField
-										control={form.control}
-										name={`paragraphs.${index}.value`}
-										render={({ field }) => (
-											<FormItem>
-												<FormControl>
-													<Textarea
-														placeholder='Enter paragraph content...'
-														className='min-h-[100px]'
-														{...field}
-													/>
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-								</div>
-								{paragraphsArray.fields.length > 1 && (
-									<Button
-										type='button'
-										variant='ghost'
-										size='sm'
-										onClick={() => paragraphsArray.remove(index)}
-										className='mt-2 text-red-600 hover:text-red-700'>
-										Remove
-									</Button>
-								)}
-							</div>
-						))}
-					</div>
-				</div>
+						</AddRowButton>
+					</AdminFormSection>
 
-				<div className='space-y-3'>
-					<div className='flex items-center justify-between'>
-						<FormLabel>Additional Content</FormLabel>
-						<Button
-							type='button'
-							variant='outline'
-							size='sm'
-							onClick={() =>
-								moreArray.append(createParagraph())
-							}>
-							Add More Content
-						</Button>
-					</div>
-					<div className='space-y-2'>
-						{moreArray.fields.map((field, index) => (
-							<div key={field.id} className='flex gap-2'>
-								<FormField
-									control={form.control}
-									name={`more.${index}.value`}
-									render={({ field }) => (
-										<FormItem className='flex-1'>
-											<FormControl>
-												<Textarea
-													placeholder='Additional content paragraph...'
-													className='min-h-[80px]'
-													{...field}
-												/>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-								{moreArray.fields.length > 1 && (
-									<Button
-										type='button'
-										variant='outline'
-										size='sm'
-										onClick={() => moreArray.remove(index)}>
-										Remove
-									</Button>
-								)}
-							</div>
-						))}
-					</div>
-				</div>
+					<AdminFormSection title='Additional content'>
+						<AdminItemList>
+							{moreArray.fields.map((field, index) => (
+								<AdminItemCard
+									key={field.id}
+									index={index}
+									total={moreArray.fields.length}
+									title={`Section ${index + 1}`}
+									onMove={d => moreArray.move(index, index + d)}
+									onRemove={() => moreArray.remove(index)}>
+									<AdminField label={`Section ${index + 1}`} className='[&_label]:sr-only'>
+										<Textarea
+											rows={3}
+											placeholder='Additional content paragraph…'
+											{...form.register(`more.${index}.value` as const)}
+										/>
+									</AdminField>
+								</AdminItemCard>
+							))}
+						</AdminItemList>
+						{moreArray.fields.length === 0 && (
+							<AdminEmptyState title='No additional content yet' />
+						)}
+						<AddRowButton onClick={() => moreArray.append(createParagraph())}>
+							Add content
+						</AddRowButton>
+					</AdminFormSection>
 				</>
-				) : null}
-			</form>
-		</Form>
+			)}
+
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }

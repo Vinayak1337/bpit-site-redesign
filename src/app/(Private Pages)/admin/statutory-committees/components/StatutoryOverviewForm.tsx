@@ -3,14 +3,25 @@
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Trash2, Plus, Save, Loader2 } from 'lucide-react';
-import { updateStatutoryOverview, type StatutoryOverviewData } from '@/app/(Private Pages)/actions/statutory-committees';
-import { useTransition, useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+	updateStatutoryOverview,
+	type StatutoryOverviewData
+} from '@/app/(Private Pages)/actions/statutory-committees';
+import { useEffect, useState, useTransition } from 'react';
+import {
+	AddRowButton,
+	AdminEmptyState,
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	AdminItemCard,
+	AdminItemList,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 const schema = z.object({
 	hero: z.object({
@@ -45,74 +56,143 @@ export default function StatutoryOverviewForm({
 	visibleSections
 }: Props) {
 	const [isPending, startTransition] = useTransition();
-	const [message, setMessage] = useState<{
-		type: 'success' | 'error';
-		text: string;
-	} | null>(null);
-	const { register, control, handleSubmit, watch, formState: { errors } } = useForm<FormData>({
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
+
+	const {
+		register,
+		control,
+		handleSubmit,
+		watch,
+		formState: { errors }
+	} = useForm<FormData>({
 		resolver: zodResolver(schema),
 		defaultValues: initialData
 	});
 
-	const { fields, append, remove } = useFieldArray({
+	const { fields, append, remove, move } = useFieldArray({
 		control,
 		name: 'committees'
 	});
 
-	// Watch for changes to update preview
 	const watchedData = watch();
 	useEffect(() => {
-		if (onChange) {
-			onChange(watchedData as StatutoryOverviewData);
-		}
+		onChange?.(watchedData as StatutoryOverviewData);
+		setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 	}, [watchedData, onChange]);
 
-	const onSubmit = (data: FormData) => {
-		setMessage(null);
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
+	const onSubmit = handleSubmit(data => {
+		setStatus({ kind: 'saving' });
 		startTransition(async () => {
 			try {
 				await updateStatutoryOverview(data, pageSlug);
-				setMessage({ type: 'success', text: 'Saved successfully.' });
+				setStatus({ kind: 'success', message: 'Saved' });
 			} catch (error) {
 				console.error(error);
-				setMessage({ type: 'error', text: 'Failed to save statutory overview.' });
+				setStatus({ kind: 'error', message: 'Save failed' });
 			}
 		});
-	};
+	});
 
 	const showSection = (section: 'hero' | 'committees') =>
 		!visibleSections || visibleSections.includes(section);
 
 	return (
-		<form onSubmit={handleSubmit(onSubmit)} className='space-y-8 max-w-4xl mx-auto'>
+		<AdminForm onSubmit={onSubmit}>
 			{showSection('hero') && (
-			<Card>
-				<CardHeader>
-					<CardTitle>Hero Section</CardTitle>
-				</CardHeader>
-				<CardContent className='space-y-4'>
-					<div>
-						<Label>Title</Label>
-						<Input {...register('hero.title')} placeholder="e.g. Statutory Committees" />
-						{errors.hero?.title && <p className='text-red-500 text-sm mt-1'>{errors.hero.title.message}</p>}
-					</div>
-					<div>
-						<Label>Description</Label>
-						<Textarea {...register('hero.description')} placeholder="Enter a brief description..." rows={3} />
-						{errors.hero?.description && <p className='text-red-500 text-sm mt-1'>{errors.hero.description.message}</p>}
-					</div>
-				</CardContent>
-			</Card>
+				<AdminFormSection
+					title='Hero'
+					description='Header copy for the statutory committees landing page.'>
+					<AdminField
+						label='Title'
+						htmlFor='so-title'
+						error={errors.hero?.title?.message}>
+						<Input
+							id='so-title'
+							placeholder='e.g. Statutory Committees'
+							{...register('hero.title')}
+						/>
+					</AdminField>
+					<AdminField
+						label='Description'
+						htmlFor='so-desc'
+						error={errors.hero?.description?.message}>
+						<Textarea
+							id='so-desc'
+							rows={3}
+							placeholder='Enter a brief description…'
+							{...register('hero.description')}
+						/>
+					</AdminField>
+				</AdminFormSection>
 			)}
 
 			{showSection('committees') && (
-			<div className='space-y-4'>
-				<div className='flex items-center justify-between'>
-					<h3 className='text-lg font-semibold text-gray-900'>Committees List</h3>
-					<Button
-						type='button'
-						variant='outline'
-						size='sm'
+				<AdminFormSection title='Committees list'>
+					<AdminItemList>
+						{fields.map((field, index) => (
+							<AdminItemCard
+								key={field.id}
+								index={index}
+								total={fields.length}
+								title={
+									watch(`committees.${index}.title`) ||
+									`Committee ${index + 1}`
+								}
+								subtitle={watch(`committees.${index}.href`) || undefined}
+								onMove={d => move(index, index + d)}
+								onRemove={() => remove(index)}>
+								<AdminFieldGrid>
+									<AdminField
+										label='Title'
+										error={errors.committees?.[index]?.title?.message}>
+										<Input
+											placeholder='e.g. Anti-Ragging Committee'
+											{...register(`committees.${index}.title` as const)}
+										/>
+									</AdminField>
+									<AdminField label='Key (unique ID)'>
+										<Input
+											placeholder='e.g. anti-ragging'
+											{...register(`committees.${index}.key` as const)}
+										/>
+									</AdminField>
+									<AdminField label='Icon name (Lucide)'>
+										<Input
+											placeholder='e.g. UserX'
+											{...register(`committees.${index}.icon` as const)}
+										/>
+									</AdminField>
+									<AdminField label='Icon color class'>
+										<Input
+											placeholder='e.g. text-red-600'
+											{...register(`committees.${index}.iconColor` as const)}
+										/>
+									</AdminField>
+								</AdminFieldGrid>
+								<AdminField label='Link href'>
+									<Input
+										placeholder='e.g. /statutory-committees/anti-ragging'
+										{...register(`committees.${index}.href` as const)}
+									/>
+								</AdminField>
+								<AdminField label='Description'>
+									<Textarea
+										rows={2}
+										placeholder='Brief description of the committee…'
+										{...register(`committees.${index}.description` as const)}
+									/>
+								</AdminField>
+							</AdminItemCard>
+						))}
+					</AdminItemList>
+					{fields.length === 0 && <AdminEmptyState title='No committees yet' />}
+					<AddRowButton
 						onClick={() =>
 							append({
 								title: '',
@@ -123,87 +203,12 @@ export default function StatutoryOverviewForm({
 								key: ''
 							})
 						}>
-						<Plus className='w-4 h-4 mr-2' />
-						Add Committee
-					</Button>
-				</div>
-
-				<div className="grid gap-4">
-					{fields.map((field, index) => (
-						<Card key={field.id} className="relative overflow-hidden">
-							<div className="absolute top-0 right-0 p-2 z-10">
-								<Button
-									type='button'
-									variant='ghost'
-									size='icon'
-									className='text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full'
-									onClick={() => remove(index)}>
-									<Trash2 className='w-4 h-4' />
-								</Button>
-							</div>
-							<CardHeader className="pb-2">
-								<CardTitle className="text-base font-medium">Committee #{index + 1}</CardTitle>
-							</CardHeader>
-							<CardContent className="grid gap-4">
-								<div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-									<div>
-										<Label>Title</Label>
-										<Input {...register(`committees.${index}.title`)} placeholder="e.g. Anti-Ragging Committee" />
-										{errors.committees?.[index]?.title && (
-											<p className='text-red-500 text-sm mt-1'>{errors.committees[index]?.title?.message}</p>
-										)}
-									</div>
-									<div>
-										<Label>Key (Unique ID)</Label>
-										<Input {...register(`committees.${index}.key`)} placeholder="e.g. anti-ragging" />
-									</div>
-									<div>
-										<Label>Icon Name (Lucide)</Label>
-										<Input {...register(`committees.${index}.icon`)} placeholder="e.g. UserX" />
-									</div>
-									<div>
-										<Label>Icon Color Class</Label>
-										<Input {...register(`committees.${index}.iconColor`)} placeholder="e.g. text-red-600" />
-									</div>
-									<div className='md:col-span-2'>
-										<Label>Link Href</Label>
-										<Input {...register(`committees.${index}.href`)} placeholder="e.g. /statutory-committees/anti-ragging" />
-									</div>
-									<div className='md:col-span-2'>
-										<Label>Description</Label>
-										<Textarea {...register(`committees.${index}.description`)} placeholder="Brief description of the committee..." rows={2} />
-									</div>
-								</div>
-							</CardContent>
-						</Card>
-					))}
-				</div>
-			</div>
+						Add committee
+					</AddRowButton>
+				</AdminFormSection>
 			)}
 
-			<div className="sticky bottom-4 bg-white p-4 border rounded-xl shadow-lg flex justify-end z-50">
-				{message ? (
-					<div
-						className={`mr-3 self-center text-sm font-medium ${
-							message.type === 'error' ? 'text-red-600' : 'text-emerald-600'
-						}`}>
-						{message.text}
-					</div>
-				) : null}
-				<Button type='submit' disabled={isPending} className='w-full md:w-auto min-w-[150px]'>
-					{isPending ? (
-						<>
-							<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-							Saving...
-						</>
-					) : (
-						<>
-							<Save className="mr-2 h-4 w-4" />
-							Save Changes
-						</>
-					)}
-				</Button>
-			</div>
-		</form>
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }

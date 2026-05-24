@@ -13,13 +13,18 @@ type ContactDTO = {
 type HeaderProps = {
 	contacts: ContactDTO[];
 	announcementsData: HeaderAnnouncementsData;
+	siteChromeConfig: SiteChromeConfig;
 };
 
-const Header = ({ contacts, announcementsData }: HeaderProps) => (
+const Header = ({
+	contacts,
+	announcementsData,
+	siteChromeConfig
+}: HeaderProps) => (
 	<>
 		<HeaderContactUs contacts={contacts} />
 		<ImportantAnnouncement data={announcementsData} />
-		<Navbar />
+		<Navbar config={siteChromeConfig} />
 	</>
 );
 

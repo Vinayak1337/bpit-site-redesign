@@ -1,13 +1,11 @@
 'use client';
 
-import React, { useState, useTransition, useEffect } from 'react';
-import { useForm, useFieldArray } from 'react-hook-form';
+import React, { useEffect, useState, useTransition } from 'react';
+import type { UseFormReturn } from 'react-hook-form';
+import { useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -17,24 +15,37 @@ import {
 	SelectTrigger,
 	SelectValue
 } from '@/components/ui/select';
-import { Trash2, Plus } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import type { PoliciesProceduresData } from '@/app/(Private Pages)/actions/management';
 import { updatePoliciesProcedures } from '@/app/(Private Pages)/actions/management';
 import { SUPPORTED_ICON_NAMES } from '@/components/about/icons';
+import {
+	AddRowButton,
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	AdminItemCard,
+	AdminItemList,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
-const COLOR_OPTIONS = ['blue', 'green', 'purple', 'orange', 'red', 'indigo', 'gray', 'teal', 'pink'];
-
-const GRADIENT_OPTIONS = [
-	{ value: 'from-blue-50 to-blue-100', label: 'Blue Gradient' },
-	{ value: 'from-green-50 to-green-100', label: 'Green Gradient' },
-	{ value: 'from-purple-50 to-purple-100', label: 'Purple Gradient' },
-	{ value: 'from-orange-50 to-orange-100', label: 'Orange Gradient' },
-	{ value: 'from-red-50 to-red-100', label: 'Red Gradient' },
-	{ value: 'from-indigo-50 to-indigo-100', label: 'Indigo Gradient' },
-	{ value: 'from-gray-50 to-gray-100', label: 'Gray Gradient' },
-	{ value: 'from-teal-50 to-teal-100', label: 'Teal Gradient' },
-	{ value: 'from-pink-50 to-pink-100', label: 'Pink Gradient' }
+const COLOR_OPTIONS = [
+	'blue',
+	'green',
+	'purple',
+	'orange',
+	'red',
+	'indigo',
+	'gray',
+	'teal',
+	'pink'
 ];
+const GRADIENT_OPTIONS = COLOR_OPTIONS.map(c => ({
+	value: `from-${c}-50 to-${c}-100`,
+	label: `${c.charAt(0).toUpperCase()}${c.slice(1)} gradient`
+}));
 
 const formSchema = z.object({
 	hero: z.object({
@@ -45,67 +56,197 @@ const formSchema = z.object({
 		iconColor: z.string().min(1, 'Hero icon color is required'),
 		textColor: z.string().min(1, 'Hero text color is required')
 	}),
-	policyCategories: z.array(z.object({
-		id: z.string().min(1, 'Category ID is required'),
-		title: z.string().min(1, 'Category title is required'),
-		icon: z.string().min(1, 'Category icon is required'),
-		iconColor: z.string().min(1, 'Category icon color is required'),
-		bulletColor: z.string().min(1, 'Category bullet color is required'),
-		policies: z.array(z.string().min(1, 'Policy name is required')).min(1, 'At least one policy is required')
-	})).min(1, 'At least one policy category is required'),
+	policyCategories: z
+		.array(
+			z.object({
+				id: z.string().min(1, 'Category ID is required'),
+				title: z.string().min(1, 'Category title is required'),
+				icon: z.string().min(1, 'Category icon is required'),
+				iconColor: z.string().min(1, 'Category icon color is required'),
+				bulletColor: z.string().min(1, 'Category bullet color is required'),
+				policies: z
+					.array(z.string().min(1, 'Policy name is required'))
+					.min(1, 'At least one policy is required')
+			})
+		)
+		.min(1, 'At least one policy category is required'),
 	implementationFramework: z.object({
 		title: z.string().min(1, 'Framework title is required'),
-		steps: z.array(z.object({
-			id: z.string().min(1, 'Step ID is required'),
-			title: z.string().min(1, 'Step title is required'),
-			description: z.string().min(1, 'Step description is required'),
-			icon: z.string().min(1, 'Step icon is required'),
-			iconColor: z.string().min(1, 'Step icon color is required'),
-			iconTextColor: z.string().min(1, 'Step icon text color is required')
-		})).min(1, 'At least one step is required')
+		steps: z
+			.array(
+				z.object({
+					id: z.string().min(1, 'Step ID is required'),
+					title: z.string().min(1, 'Step title is required'),
+					description: z.string().min(1, 'Step description is required'),
+					icon: z.string().min(1, 'Step icon is required'),
+					iconColor: z.string().min(1, 'Step icon color is required'),
+					iconTextColor: z
+						.string()
+						.min(1, 'Step icon text color is required')
+				})
+			)
+			.min(1, 'At least one step is required')
 	})
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
-// Normalize form values to PoliciesProceduresData
-const normalizePoliciesProcedures = (values: any): PoliciesProceduresData => {
-	return {
-		hero: {
-			title: (values?.hero?.title ?? '').trim(),
-			subtitle: (values?.hero?.subtitle ?? '').trim(),
-			icon: (values?.hero?.icon ?? '').trim(),
-			gradient: (values?.hero?.gradient ?? '').trim(),
-			iconColor: (values?.hero?.iconColor ?? '').trim(),
-			textColor: (values?.hero?.textColor ?? '').trim()
-		},
-		policyCategories: (values?.policyCategories ?? []).map((category: any) => ({
-			id: (category?.id ?? '').trim(),
-			title: (category?.title ?? '').trim(),
-			icon: (category?.icon ?? '').trim(),
-			iconColor: (category?.iconColor ?? '').trim(),
-			bulletColor: (category?.bulletColor ?? '').trim(),
-			policies: (category?.policies ?? []).map((policy: any) => (policy ?? '').trim()).filter(Boolean)
-		})),
-		implementationFramework: {
-			title: (values?.implementationFramework?.title ?? '').trim(),
-			steps: (values?.implementationFramework?.steps ?? []).map((step: any) => ({
-				id: (step?.id ?? '').trim(),
-				title: (step?.title ?? '').trim(),
-				description: (step?.description ?? '').trim(),
-				icon: (step?.icon ?? '').trim(),
-				iconColor: (step?.iconColor ?? '').trim(),
-				iconTextColor: (step?.iconTextColor ?? '').trim()
-			}))
-		}
-	};
-};
+const normalizePoliciesProcedures = (
+	values: FormValues
+): PoliciesProceduresData => ({
+	hero: {
+		title: values.hero.title.trim(),
+		subtitle: values.hero.subtitle.trim(),
+		icon: values.hero.icon.trim(),
+		gradient: values.hero.gradient.trim(),
+		iconColor: values.hero.iconColor.trim(),
+		textColor: values.hero.textColor.trim()
+	},
+	policyCategories: values.policyCategories.map(cat => ({
+		id: cat.id.trim(),
+		title: cat.title.trim(),
+		icon: cat.icon.trim(),
+		iconColor: cat.iconColor.trim(),
+		bulletColor: cat.bulletColor.trim(),
+		policies: cat.policies.map(p => p.trim()).filter(Boolean)
+	})),
+	implementationFramework: {
+		title: values.implementationFramework.title.trim(),
+		steps: values.implementationFramework.steps.map(s => ({
+			id: s.id.trim(),
+			title: s.title.trim(),
+			description: s.description.trim(),
+			icon: s.icon.trim(),
+			iconColor: s.iconColor.trim(),
+			iconTextColor: s.iconTextColor.trim()
+		}))
+	}
+});
 
-interface PoliciesProceduresFormProps {
+interface Props {
 	initialData: PoliciesProceduresData;
 	pageSlug: string;
 	onChange?: (data: PoliciesProceduresData) => void;
 	visibleSections?: Array<'hero' | 'categories' | 'framework'>;
+}
+
+function CategoryFields({
+	form,
+	index
+}: {
+	form: UseFormReturn<FormValues>;
+	index: number;
+}) {
+	const policies = form.watch(`policyCategories.${index}.policies`) ?? [];
+	const setPolicies = (next: string[]) =>
+		form.setValue(`policyCategories.${index}.policies`, next, {
+			shouldDirty: true
+		});
+	return (
+		<>
+			<AdminFieldGrid>
+				<AdminField label='Category ID'>
+					<Input
+						placeholder='academic-policies'
+						{...form.register(`policyCategories.${index}.id`)}
+					/>
+				</AdminField>
+				<AdminField label='Category title'>
+					<Input
+						placeholder='Academic Policies'
+						{...form.register(`policyCategories.${index}.title`)}
+					/>
+				</AdminField>
+				<AdminField label='Icon'>
+					<Select
+						value={form.watch(`policyCategories.${index}.icon`) || ''}
+						onValueChange={v =>
+							form.setValue(`policyCategories.${index}.icon`, v, {
+								shouldDirty: true
+							})
+						}>
+						<SelectTrigger>
+							<SelectValue placeholder='Select icon' />
+						</SelectTrigger>
+						<SelectContent>
+							{SUPPORTED_ICON_NAMES.map(icon => (
+								<SelectItem key={icon} value={icon}>
+									{icon}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				</AdminField>
+				<AdminField label='Icon color'>
+					<Select
+						value={form.watch(`policyCategories.${index}.iconColor`) || ''}
+						onValueChange={v =>
+							form.setValue(`policyCategories.${index}.iconColor`, v, {
+								shouldDirty: true
+							})
+						}>
+						<SelectTrigger>
+							<SelectValue placeholder='Select color' />
+						</SelectTrigger>
+						<SelectContent>
+							{COLOR_OPTIONS.map(c => (
+								<SelectItem key={c} value={`text-${c}-600`}>
+									text-{c}-600
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				</AdminField>
+				<AdminField label='Bullet color'>
+					<Select
+						value={form.watch(`policyCategories.${index}.bulletColor`) || ''}
+						onValueChange={v =>
+							form.setValue(`policyCategories.${index}.bulletColor`, v, {
+								shouldDirty: true
+							})
+						}>
+						<SelectTrigger>
+							<SelectValue placeholder='Select bullet color' />
+						</SelectTrigger>
+						<SelectContent>
+							{COLOR_OPTIONS.map(c => (
+								<SelectItem key={c} value={`bg-${c}-500`}>
+									bg-{c}-500
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				</AdminField>
+			</AdminFieldGrid>
+			<div className='flex flex-col gap-2'>
+				<p className='text-xs font-medium text-slate-500'>Policies</p>
+				{policies.map((_, pi) => (
+					<div key={pi} className='flex items-start gap-2'>
+						<Input
+							placeholder='Policy name'
+							className='flex-1'
+							{...form.register(
+								`policyCategories.${index}.policies.${pi}` as const
+							)}
+						/>
+						{policies.length > 1 && (
+							<Button
+								type='button'
+								variant='ghost'
+								size='icon'
+								className='h-10 w-10 text-slate-500 hover:bg-rose-50 hover:text-rose-600'
+								onClick={() => setPolicies(policies.filter((_, i) => i !== pi))}>
+								<Trash2 className='h-4 w-4' />
+							</Button>
+						)}
+					</div>
+				))}
+				<AddRowButton onClick={() => setPolicies([...policies, 'New policy'])}>
+					Add policy
+				</AddRowButton>
+			</div>
+		</>
+	);
 }
 
 export default function PoliciesProceduresForm({
@@ -113,656 +254,344 @@ export default function PoliciesProceduresForm({
 	pageSlug,
 	onChange,
 	visibleSections
-}: PoliciesProceduresFormProps) {
+}: Props) {
 	const [isPending, startTransition] = useTransition();
-	const [message, setMessage] = useState<{
-		type: 'success' | 'error';
-		text: string;
-	} | null>(null);
-	
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
+
 	const form = useForm<FormValues>({
 		resolver: zodResolver(formSchema),
 		defaultValues: initialData
 	});
 
-	const { fields: categoryFields, append: appendCategory, remove: removeCategory } = useFieldArray({
+	const categoriesArr = useFieldArray({
 		control: form.control,
 		name: 'policyCategories'
 	});
-
-	const { fields: stepFields, append: appendStep, remove: removeStep } = useFieldArray({
+	const stepsArr = useFieldArray({
 		control: form.control,
 		name: 'implementationFramework.steps'
 	});
 
-	const onSubmit = (values: FormValues) => {
-		setMessage(null);
-		const payload = normalizePoliciesProcedures(values);
-		
-		startTransition(async () => {
-				try {
-					await updatePoliciesProcedures(payload, pageSlug);
-					setMessage({
-						type: 'success',
-						text: 'Policies and procedures saved successfully.'
-					});
-					setTimeout(() => setMessage(null), 3000);
-				} catch (error) {
-					console.error('Error updating policies procedures data:', error);
-					setMessage({
-						type: 'error',
-						text: 'Failed to save policies and procedures.'
-					});
-				}
-			});
-		};
-
-	const showSection = (section: 'hero' | 'categories' | 'framework') =>
-		!visibleSections || visibleSections.includes(section);
-
 	useEffect(() => {
-		onChange?.(normalizePoliciesProcedures(form.getValues()));
-		const subscription = form.watch(values => {
-			onChange?.(normalizePoliciesProcedures(values));
+		onChange?.(normalizePoliciesProcedures(form.getValues() as FormValues));
+		const sub = form.watch(values => {
+			onChange?.(normalizePoliciesProcedures(values as FormValues));
+			setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 		});
-		return () => subscription.unsubscribe();
+		return () => sub.unsubscribe();
 	}, [form, onChange]);
 
 	useEffect(() => {
 		form.reset(initialData);
 	}, [initialData, form]);
 
-	return (
-		<div className="p-6 space-y-6 max-h-[80vh] overflow-y-auto">
-			{/* Header with Save Button */}
-			<div className="flex items-center justify-between border-b pb-4">
-				<h3 className="text-lg font-semibold text-gray-800">Edit Policies & Procedures</h3>
-					<div className="flex items-center gap-3">
-						{message && (
-							<Badge variant={message.type === 'success' ? 'default' : 'destructive'}>
-								{message.text}
-							</Badge>
-						)}
-					<Button 
-						onClick={form.handleSubmit(onSubmit)}
-						disabled={isPending}
-						size="sm"
-					>
-						{isPending ? 'Saving...' : 'Save Changes'}
-					</Button>
-				</div>
-			</div>
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
 
-			<Form {...form}>
-				<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
-						{/* Hero Section */}
-						{showSection('hero') && (
-						<Card>
-						<CardHeader>
-							<CardTitle>Hero Section</CardTitle>
-						</CardHeader>
-						<CardContent className="space-y-6 p-6">
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-								<FormField
-									control={form.control}
-									name="hero.title"
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Hero Title</FormLabel>
-											<FormControl>
-												<Input {...field} placeholder="Policies & Procedures" />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-								<FormField
-									control={form.control}
-									name="hero.subtitle"
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Hero Subtitle</FormLabel>
-											<FormControl>
-												<Input {...field} placeholder="Framework for Institutional Excellence" />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							</div>
-
-							{/* Hero Icon and Colors Row */}
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-								<FormField
-									control={form.control}
-									name="hero.icon"
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Hero Icon</FormLabel>
-											<Select onValueChange={field.onChange} defaultValue={field.value}>
-												<FormControl>
-													<SelectTrigger>
-														<SelectValue placeholder="Select icon" />
-													</SelectTrigger>
-												</FormControl>
-												<SelectContent>
-													{SUPPORTED_ICON_NAMES.map((icon) => (
-														<SelectItem key={icon} value={icon}>
-															{icon}
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-								<FormField
-									control={form.control}
-									name="hero.gradient"
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Background Gradient</FormLabel>
-											<Select onValueChange={field.onChange} defaultValue={field.value}>
-												<FormControl>
-													<SelectTrigger>
-														<SelectValue placeholder="Select gradient" />
-													</SelectTrigger>
-												</FormControl>
-												<SelectContent>
-													{GRADIENT_OPTIONS.map((gradient) => (
-														<SelectItem key={gradient.value} value={gradient.value}>
-															{gradient.label}
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							</div>
-
-							{/* Hero Color Options Row */}
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-								<FormField
-									control={form.control}
-									name="hero.iconColor"
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Icon Background Color</FormLabel>
-											<Select onValueChange={field.onChange} defaultValue={field.value}>
-												<FormControl>
-													<SelectTrigger>
-														<SelectValue placeholder="Select color" />
-													</SelectTrigger>
-												</FormControl>
-												<SelectContent>
-													{COLOR_OPTIONS.map((color) => (
-														<SelectItem key={color} value={`bg-${color}-600`}>
-															bg-{color}-600
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-								<FormField
-									control={form.control}
-									name="hero.textColor"
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Text Color</FormLabel>
-											<Select onValueChange={field.onChange} defaultValue={field.value}>
-												<FormControl>
-													<SelectTrigger>
-														<SelectValue placeholder="Select text color" />
-													</SelectTrigger>
-												</FormControl>
-												<SelectContent>
-													{COLOR_OPTIONS.map((color) => (
-														<SelectItem key={color} value={`text-${color}-600`}>
-															text-{color}-600
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							</div>
-						</CardContent>
-						</Card>
-						)}
-
-						{/* Policy Categories */}
-						{showSection('categories') && (
-						<Card>
-						<CardHeader>
-							<CardTitle className="flex items-center justify-between">
-								Policy Categories
-								<Button
-									type="button"
-									variant="outline"
-									size="sm"
-									onClick={() => appendCategory({
-										id: `category-${Date.now()}`,
-										title: 'New Category',
-										icon: 'BookOpen',
-										iconColor: 'text-blue-600',
-										bulletColor: 'bg-blue-600',
-										policies: ['Policy 1', 'Policy 2']
-									})}
-								>
-									<Plus className="w-4 h-4 mr-2" />
-									Add Category
-								</Button>
-							</CardTitle>
-						</CardHeader>
-						<CardContent className="space-y-8 p-6">
-							{categoryFields.map((category, categoryIndex) => (
-								<CategoryFieldGroup 
-									key={category.id} 
-									form={form} 
-									categoryIndex={categoryIndex} 
-									removeCategory={removeCategory}
-									canRemove={categoryFields.length > 1}
-								/>
-							))}
-						</CardContent>
-						</Card>
-						)}
-
-						{/* Implementation Framework */}
-						{showSection('framework') && (
-						<Card>
-						<CardHeader>
-							<CardTitle>Implementation Framework</CardTitle>
-						</CardHeader>
-						<CardContent className="space-y-6 p-6">
-							<FormField
-								control={form.control}
-								name="implementationFramework.title"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Framework Title</FormLabel>
-										<FormControl>
-											<Input {...field} placeholder="Policy Implementation Framework" />
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-
-							<div className="space-y-4">
-								<div className="flex items-center justify-between">
-									<h4 className="text-sm font-medium">Framework Steps</h4>
-									<Button
-										type="button"
-										variant="outline"
-										size="sm"
-										onClick={() => appendStep({
-											id: `step-${Date.now()}`,
-											title: 'New Step',
-											description: 'Step description',
-											icon: 'Eye',
-											iconColor: 'bg-blue-100',
-											iconTextColor: 'text-blue-600'
-										})}
-									>
-										<Plus className="w-4 h-4 mr-2" />
-										Add Step
-									</Button>
-								</div>
-
-								{stepFields.map((step, stepIndex) => (
-									<StepFieldGroup 
-										key={step.id} 
-										form={form} 
-										stepIndex={stepIndex} 
-										removeStep={removeStep}
-										canRemove={stepFields.length > 1}
-									/>
-								))}
-							</div>
-						</CardContent>
-						</Card>
-						)}
-					</form>
-				</Form>
-		</div>
-	);
-}
-
-// Category field group component
-function CategoryFieldGroup({ form, categoryIndex, removeCategory, canRemove }: any) {
-	const { fields: policyFields, append: appendPolicy, remove: removePolicy } = useFieldArray({
-		control: form.control,
-		name: `policyCategories.${categoryIndex}.policies`
+	const onSubmit = form.handleSubmit(values => {
+		setStatus({ kind: 'saving' });
+		startTransition(async () => {
+			try {
+				await updatePoliciesProcedures(
+					normalizePoliciesProcedures(values),
+					pageSlug
+				);
+				setStatus({ kind: 'success', message: 'Saved' });
+			} catch (error) {
+				console.error('Error updating policies procedures data:', error);
+				setStatus({ kind: 'error', message: 'Failed to save' });
+			}
+		});
 	});
 
+	const showSection = (s: 'hero' | 'categories' | 'framework') =>
+		!visibleSections || visibleSections.includes(s);
+
 	return (
-		<Card className="border border-gray-200 shadow-sm">
-			<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-				<CardTitle className="text-base font-medium">
-					Category {categoryIndex + 1}
-				</CardTitle>
-				{canRemove && (
-					<Button
-						type="button"
-						variant="outline"
-						size="sm"
-						onClick={() => removeCategory(categoryIndex)}
-					>
-						<Trash2 className="w-4 h-4" />
-					</Button>
-				)}
-			</CardHeader>
-			<CardContent className="space-y-6 p-6">
-				{/* Category Basic Info */}
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-					<FormField
-						control={form.control}
-						name={`policyCategories.${categoryIndex}.id`}
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Category ID</FormLabel>
-								<FormControl>
-									<Input {...field} placeholder="academic-policies" />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-					<FormField
-						control={form.control}
-						name={`policyCategories.${categoryIndex}.title`}
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Category Title</FormLabel>
-								<FormControl>
-									<Input {...field} placeholder="Academic Policies" />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-				</div>
+		<AdminForm onSubmit={onSubmit}>
+			{showSection('hero') && (
+				<AdminFormSection
+					title='Hero section'
+					description='Headline copy and accent styling for the policies & procedures page.'>
+					<AdminFieldGrid>
+						<AdminField label='Hero title'>
+							<Input
+								placeholder='Policies & Procedures'
+								{...form.register('hero.title')}
+							/>
+						</AdminField>
+						<AdminField label='Hero subtitle'>
+							<Input
+								placeholder='Operational Excellence Framework'
+								{...form.register('hero.subtitle')}
+							/>
+						</AdminField>
+						<AdminField label='Hero icon'>
+							<Select
+								value={form.watch('hero.icon') || ''}
+								onValueChange={v =>
+									form.setValue('hero.icon', v, { shouldDirty: true })
+								}>
+								<SelectTrigger>
+									<SelectValue placeholder='Select icon' />
+								</SelectTrigger>
+								<SelectContent>
+									{SUPPORTED_ICON_NAMES.map(icon => (
+										<SelectItem key={icon} value={icon}>
+											{icon}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+						</AdminField>
+						<AdminField label='Background gradient'>
+							<Select
+								value={form.watch('hero.gradient') || ''}
+								onValueChange={v =>
+									form.setValue('hero.gradient', v, { shouldDirty: true })
+								}>
+								<SelectTrigger>
+									<SelectValue placeholder='Select gradient' />
+								</SelectTrigger>
+								<SelectContent>
+									{GRADIENT_OPTIONS.map(g => (
+										<SelectItem key={g.value} value={g.value}>
+											{g.label}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+						</AdminField>
+						<AdminField label='Icon background color'>
+							<Select
+								value={form.watch('hero.iconColor') || ''}
+								onValueChange={v =>
+									form.setValue('hero.iconColor', v, { shouldDirty: true })
+								}>
+								<SelectTrigger>
+									<SelectValue placeholder='Select color' />
+								</SelectTrigger>
+								<SelectContent>
+									{COLOR_OPTIONS.map(c => (
+										<SelectItem key={c} value={`bg-${c}-600`}>
+											bg-{c}-600
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+						</AdminField>
+						<AdminField label='Text color'>
+							<Select
+								value={form.watch('hero.textColor') || ''}
+								onValueChange={v =>
+									form.setValue('hero.textColor', v, { shouldDirty: true })
+								}>
+								<SelectTrigger>
+									<SelectValue placeholder='Select text color' />
+								</SelectTrigger>
+								<SelectContent>
+									{COLOR_OPTIONS.map(c => (
+										<SelectItem key={c} value={`text-${c}-600`}>
+											text-{c}-600
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+						</AdminField>
+					</AdminFieldGrid>
+				</AdminFormSection>
+			)}
 
-				{/* Category Icon and Colors */}
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-					<FormField
-						control={form.control}
-						name={`policyCategories.${categoryIndex}.icon`}
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Category Icon</FormLabel>
-								<Select onValueChange={field.onChange} defaultValue={field.value}>
-									<FormControl>
-										<SelectTrigger>
-											<SelectValue placeholder="Select icon" />
-										</SelectTrigger>
-									</FormControl>
-									<SelectContent>
-										{SUPPORTED_ICON_NAMES.map((icon) => (
-											<SelectItem key={icon} value={icon}>
-												{icon}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-					<FormField
-						control={form.control}
-						name={`policyCategories.${categoryIndex}.iconColor`}
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Icon Color</FormLabel>
-								<Select onValueChange={field.onChange} defaultValue={field.value}>
-									<FormControl>
-										<SelectTrigger>
-											<SelectValue placeholder="Icon color" />
-										</SelectTrigger>
-									</FormControl>
-									<SelectContent>
-										{COLOR_OPTIONS.map((color) => (
-											<SelectItem key={color} value={`text-${color}-600`}>
-												text-{color}-600
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-				</div>
-				
-				{/* Bullet Color in separate row */}
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-					<FormField
-						control={form.control}
-						name={`policyCategories.${categoryIndex}.bulletColor`}
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Bullet Color</FormLabel>
-								<Select onValueChange={field.onChange} defaultValue={field.value}>
-									<FormControl>
-										<SelectTrigger>
-											<SelectValue placeholder="Bullet color" />
-										</SelectTrigger>
-									</FormControl>
-									<SelectContent>
-										{COLOR_OPTIONS.map((color) => (
-											<SelectItem key={color} value={`bg-${color}-600`}>
-												bg-{color}-600
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-				</div>
-
-				{/* Category Policies */}
-				<div className="space-y-4">
-					<div className="flex items-center justify-between">
-						<h5 className="text-sm font-medium text-gray-700">Policies</h5>
-						<Button
-							type="button"
-							variant="ghost"
-							size="sm"
-							onClick={() => appendPolicy('New policy')}
-						>
-							<Plus className="w-4 h-4 mr-1" />
-							Add Policy
-						</Button>
-					</div>
-
-					<div className="space-y-3">
-						{policyFields.map((policy, policyIndex) => (
-							<div key={policy.id} className="flex items-center gap-3">
-								<FormField
-									control={form.control}
-									name={`policyCategories.${categoryIndex}.policies.${policyIndex}`}
-									render={({ field }) => (
-										<FormItem className="flex-1">
-											<FormControl>
-												<Input {...field} placeholder="Policy name" />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-								{policyFields.length > 1 && (
-									<Button
-										type="button"
-										variant="ghost"
-										size="sm"
-										onClick={() => removePolicy(policyIndex)}
-									>
-										<Trash2 className="w-4 h-4" />
-									</Button>
-								)}
-							</div>
+			{showSection('categories') && (
+				<AdminFormSection title='Policy categories'>
+					<AdminItemList>
+						{categoriesArr.fields.map((cat, index) => (
+							<AdminItemCard
+								key={cat.id}
+								index={index}
+								total={categoriesArr.fields.length}
+								title={
+									form.watch(`policyCategories.${index}.title`) ||
+									`Category ${index + 1}`
+								}
+								onMove={d => categoriesArr.move(index, index + d)}
+								onRemove={
+									categoriesArr.fields.length > 1
+										? () => categoriesArr.remove(index)
+										: undefined
+								}>
+								<CategoryFields form={form} index={index} />
+							</AdminItemCard>
 						))}
-					</div>
-				</div>
-			</CardContent>
-		</Card>
-	);
-}
+					</AdminItemList>
+					<AddRowButton
+						onClick={() =>
+							categoriesArr.append({
+								id: `category-${Date.now()}`,
+								title: 'New Category',
+								icon: 'Building2',
+								iconColor: 'text-blue-600',
+								bulletColor: 'bg-blue-500',
+								policies: ['New policy']
+							})
+						}>
+						Add category
+					</AddRowButton>
+				</AdminFormSection>
+			)}
 
-// Step field group component
-function StepFieldGroup({ form, stepIndex, removeStep, canRemove }: any) {
-	return (
-		<Card className="border border-gray-100">
-			<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-				<CardTitle className="text-sm">Step {stepIndex + 1}</CardTitle>
-				{canRemove && (
-					<Button
-						type="button"
-						variant="ghost"
-						size="sm"
-						onClick={() => removeStep(stepIndex)}
-					>
-						<Trash2 className="w-4 h-4" />
-					</Button>
-				)}
-			</CardHeader>
-			<CardContent className="space-y-4 p-4">
-				{/* Step Basic Info */}
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-					<FormField
-						control={form.control}
-						name={`implementationFramework.steps.${stepIndex}.id`}
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Step ID</FormLabel>
-								<FormControl>
-									<Input {...field} placeholder="review" />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-					<FormField
-						control={form.control}
-						name={`implementationFramework.steps.${stepIndex}.title`}
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Step Title</FormLabel>
-								<FormControl>
-									<Input {...field} placeholder="Review" />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-				</div>
+			{showSection('framework') && (
+				<AdminFormSection title='Implementation framework'>
+					<AdminField label='Framework title'>
+						<Input
+							placeholder='How we implement these policies'
+							{...form.register('implementationFramework.title')}
+						/>
+					</AdminField>
+					<AdminItemList>
+						{stepsArr.fields.map((step, index) => (
+							<AdminItemCard
+								key={step.id}
+								index={index}
+								total={stepsArr.fields.length}
+								title={
+									form.watch(`implementationFramework.steps.${index}.title`) ||
+									`Step ${index + 1}`
+								}
+								onMove={d => stepsArr.move(index, index + d)}
+								onRemove={
+									stepsArr.fields.length > 1
+										? () => stepsArr.remove(index)
+										: undefined
+								}>
+								<AdminFieldGrid>
+									<AdminField label='Step ID'>
+										<Input
+											placeholder='step-1'
+											{...form.register(
+												`implementationFramework.steps.${index}.id`
+											)}
+										/>
+									</AdminField>
+									<AdminField label='Step title'>
+										<Input
+											placeholder='Plan'
+											{...form.register(
+												`implementationFramework.steps.${index}.title`
+											)}
+										/>
+									</AdminField>
+									<AdminField label='Step icon'>
+										<Select
+											value={
+												form.watch(
+													`implementationFramework.steps.${index}.icon`
+												) || ''
+											}
+											onValueChange={v =>
+												form.setValue(
+													`implementationFramework.steps.${index}.icon`,
+													v,
+													{ shouldDirty: true }
+												)
+											}>
+											<SelectTrigger>
+												<SelectValue placeholder='Select icon' />
+											</SelectTrigger>
+											<SelectContent>
+												{SUPPORTED_ICON_NAMES.map(icon => (
+													<SelectItem key={icon} value={icon}>
+														{icon}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+									</AdminField>
+									<AdminField label='Icon background'>
+										<Select
+											value={
+												form.watch(
+													`implementationFramework.steps.${index}.iconColor`
+												) || ''
+											}
+											onValueChange={v =>
+												form.setValue(
+													`implementationFramework.steps.${index}.iconColor`,
+													v,
+													{ shouldDirty: true }
+												)
+											}>
+											<SelectTrigger>
+												<SelectValue placeholder='Select color' />
+											</SelectTrigger>
+											<SelectContent>
+												{COLOR_OPTIONS.map(c => (
+													<SelectItem key={c} value={`bg-${c}-100`}>
+														bg-{c}-100
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+									</AdminField>
+									<AdminField label='Icon text color'>
+										<Select
+											value={
+												form.watch(
+													`implementationFramework.steps.${index}.iconTextColor`
+												) || ''
+											}
+											onValueChange={v =>
+												form.setValue(
+													`implementationFramework.steps.${index}.iconTextColor`,
+													v,
+													{ shouldDirty: true }
+												)
+											}>
+											<SelectTrigger>
+												<SelectValue placeholder='Select color' />
+											</SelectTrigger>
+											<SelectContent>
+												{COLOR_OPTIONS.map(c => (
+													<SelectItem key={c} value={`text-${c}-600`}>
+														text-{c}-600
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+									</AdminField>
+								</AdminFieldGrid>
+								<AdminField label='Description'>
+									<Textarea
+										rows={3}
+										placeholder='Step description'
+										{...form.register(
+											`implementationFramework.steps.${index}.description`
+										)}
+									/>
+								</AdminField>
+							</AdminItemCard>
+						))}
+					</AdminItemList>
+					<AddRowButton
+						onClick={() =>
+							stepsArr.append({
+								id: `step-${Date.now()}`,
+								title: 'New Step',
+								description: 'Step description',
+								icon: 'CheckCircle',
+								iconColor: 'bg-blue-100',
+								iconTextColor: 'text-blue-600'
+							})
+						}>
+						Add step
+					</AddRowButton>
+				</AdminFormSection>
+			)}
 
-				<FormField
-					control={form.control}
-					name={`implementationFramework.steps.${stepIndex}.description`}
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Step Description</FormLabel>
-							<FormControl>
-								<Textarea {...field} placeholder="Step description" rows={2} />
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-
-				{/* Step Icon and Colors */}
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-					<FormField
-						control={form.control}
-						name={`implementationFramework.steps.${stepIndex}.icon`}
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Step Icon</FormLabel>
-								<Select onValueChange={field.onChange} defaultValue={field.value}>
-									<FormControl>
-										<SelectTrigger>
-											<SelectValue placeholder="Select icon" />
-										</SelectTrigger>
-									</FormControl>
-									<SelectContent>
-										{SUPPORTED_ICON_NAMES.map((icon) => (
-											<SelectItem key={icon} value={icon}>
-												{icon}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-					<FormField
-						control={form.control}
-						name={`implementationFramework.steps.${stepIndex}.iconColor`}
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Icon Color</FormLabel>
-								<Select onValueChange={field.onChange} defaultValue={field.value}>
-									<FormControl>
-										<SelectTrigger>
-											<SelectValue placeholder="Icon color" />
-										</SelectTrigger>
-									</FormControl>
-									<SelectContent>
-										{COLOR_OPTIONS.map((color) => (
-											<SelectItem key={color} value={`bg-${color}-100`}>
-												bg-{color}-100
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-				</div>
-				
-				{/* Icon Text Color in separate row */}
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-					<FormField
-						control={form.control}
-						name={`implementationFramework.steps.${stepIndex}.iconTextColor`}
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Icon Text Color</FormLabel>
-								<Select onValueChange={field.onChange} defaultValue={field.value}>
-									<FormControl>
-										<SelectTrigger>
-											<SelectValue placeholder="Text color" />
-										</SelectTrigger>
-									</FormControl>
-									<SelectContent>
-										{COLOR_OPTIONS.map((color) => (
-											<SelectItem key={color} value={`text-${color}-600`}>
-												text-{color}-600
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-				</div>
-			</CardContent>
-		</Card>
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }

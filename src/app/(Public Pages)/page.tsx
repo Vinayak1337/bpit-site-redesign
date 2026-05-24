@@ -6,7 +6,6 @@ import Testimonial from '@/components/carousel/testimonial';
 import TopPlacedStudents from '@/components/placement/top-placed-students';
 import NoticesEventsComparison from '@/components/home/notices-events-comparison';
 
-import { homeHero2Data } from '@/data/home';
 import {
 	getHeroSlides,
 	type HeroSlide
@@ -72,8 +71,10 @@ export default async function Home() {
 		getTestimonials(pageSlug)
 	]);
 
-	const heroData: HeroCarouselData =
-		heroSlides.length > 0 ? mapHeroSlidesToHeroData(heroSlides) : homeHero2Data;
+	if (heroSlides.length === 0) {
+		throw new Error('Hero slides not seeded for page `main` — run `npm run seed home`');
+	}
+	const heroData: HeroCarouselData = mapHeroSlidesToHeroData(heroSlides);
 
 	return (
 		<>

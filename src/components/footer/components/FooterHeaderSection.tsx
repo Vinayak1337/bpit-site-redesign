@@ -30,27 +30,29 @@ const FooterHeaderSection = ({
 			</div>
 		</div>
 
-		<div className='grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mt-8 sm:mt-12'>
-			{achievements.map((achievement, index) => (
-				<motion.div
-					key={achievement.label}
-					initial={{ opacity: 0, scale: 0.8 }}
-					animate={isVisible ? { opacity: 1, scale: 1 } : {}}
-					transition={{ duration: 0.6, delay: 0.1 * index }}
-					className='bg-white/5 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/10 hover:border-white/20 transition-all duration-300 group'
-					whileHover={{ scale: 1.05 }}>
-					<div className='flex items-center justify-center mb-2 sm:mb-3 text-blue-400 group-hover:text-blue-300 transition-colors'>
-						<achievement.icon className='w-6 h-6' />
-					</div>
-					<div className='text-lg sm:text-xl lg:text-2xl font-bold text-white mb-1'>
-						{achievement.number}
-					</div>
-					<div className='text-xs sm:text-sm text-blue-200'>
-						{achievement.label}
-					</div>
-				</motion.div>
-			))}
-		</div>
+		{achievements.length > 0 && (
+			<div className='grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mt-8 sm:mt-12'>
+				{achievements.map((achievement, index) => (
+					<motion.div
+						key={achievement.label}
+						initial={{ opacity: 0, scale: 0.8 }}
+						animate={isVisible ? { opacity: 1, scale: 1 } : {}}
+						transition={{ duration: 0.6, delay: 0.1 * index }}
+						className='bg-white/5 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/10 hover:border-white/20 transition-all duration-300 group'
+						whileHover={{ scale: 1.05 }}>
+						<div className='flex items-center justify-center mb-2 sm:mb-3 text-blue-400 group-hover:text-blue-300 transition-colors'>
+							<achievement.icon className='w-6 h-6' />
+						</div>
+						<div className='text-lg sm:text-xl lg:text-2xl font-bold text-white mb-1'>
+							{achievement.number}
+						</div>
+						<div className='text-xs sm:text-sm text-blue-200'>
+							{achievement.label}
+						</div>
+					</motion.div>
+				))}
+			</div>
+		)}
 	</motion.div>
 );
 

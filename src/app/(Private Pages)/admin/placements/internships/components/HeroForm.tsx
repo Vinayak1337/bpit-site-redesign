@@ -1,10 +1,8 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import {
 	Select,
@@ -14,9 +12,19 @@ import {
 	SelectValue
 } from '@/components/ui/select';
 import { requireAdmin } from '@/app/(Private Pages)/actions/admin-auth';
-import { updateInternshipsData, getInternshipsData } from '@/app/(Private Pages)/actions/internships';
+import {
+	getInternshipsData,
+	updateInternshipsData
+} from '@/app/(Private Pages)/actions/internships';
 import type { InternshipsData } from '@/app/(Private Pages)/actions/internships';
-import { Sparkles } from 'lucide-react';
+import {
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 interface HeroFormProps {
 	initialData: InternshipsData;
@@ -24,7 +32,16 @@ interface HeroFormProps {
 	onChange: (data: InternshipsData) => void;
 }
 
-const ICON_OPTIONS = ['Briefcase', 'GraduationCap', 'Users', 'Target', 'Award', 'TrendingUp', 'Zap', 'Star'];
+const ICON_OPTIONS = [
+	'Briefcase',
+	'GraduationCap',
+	'Users',
+	'Target',
+	'Award',
+	'TrendingUp',
+	'Zap',
+	'Star'
+];
 const GRADIENT_OPTIONS = [
 	{ value: 'from-blue-600 to-blue-800', label: 'Blue' },
 	{ value: 'from-purple-600 to-blue-800', label: 'Purple to Blue' },
@@ -34,8 +51,9 @@ const GRADIENT_OPTIONS = [
 	{ value: 'from-indigo-600 to-blue-800', label: 'Indigo to Blue' }
 ];
 
-export default function HeroForm({ initialData, pageSlug, onChange }: HeroFormProps) {
-	const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+export default function HeroForm({ initialData, onChange }: HeroFormProps) {
+	const [isPending, startTransition] = useTransition();
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 
 	const form = useForm({
 		defaultValues: {
@@ -46,9 +64,8 @@ export default function HeroForm({ initialData, pageSlug, onChange }: HeroFormPr
 		}
 	});
 
-	// Live preview
 	useEffect(() => {
-		const subscription = form.watch(values => {
+		const sub = form.watch(values => {
 			onChange({
 				...initialData,
 				hero: {
@@ -58,131 +75,112 @@ export default function HeroForm({ initialData, pageSlug, onChange }: HeroFormPr
 					gradient: values.gradient || 'from-blue-600 to-blue-800'
 				}
 			});
+			setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 		});
-		return () => subscription.unsubscribe();
+		return () => sub.unsubscribe();
 	}, [form, initialData, onChange]);
 
-	const onSubmit = async (values: any) => {
-		try {
-			setSaveStatus('saving');
-			const admin = await requireAdmin();
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
 
-			const result = await updateInternshipsData({
-				...initialData,
-				hero: {
-					icon: values.icon,
-					title: values.title,
-					subtitle: values.subtitle,
-					gradient: values.gradient
+	const onSubmit = form.handleSubmit(values => {
+		setStatus({ kind: 'saving' });
+		startTransition(async () => {
+			try {
+				const admin = await requireAdmin();
+				const result = await updateInternshipsData(
+					{
+						...initialData,
+						hero: {
+							icon: values.icon,
+							title: values.title,
+							subtitle: values.subtitle,
+							gradient: values.gradient
+						}
+					},
+					admin.id
+				);
+				if (result.success) {
+					const fresh = await getInternshipsData();
+					if (fresh) {
+						form.reset({
+							icon: fresh.hero.icon,
+							title: fresh.hero.title,
+							subtitle: fresh.hero.subtitle,
+							gradient: fresh.hero.gradient
+						});
+					}
+					setStatus({ kind: 'success', message: 'Saved' });
+				} else {
+					setStatus({ kind: 'error', message: 'Save failed' });
 				}
-			}, admin.id);
-
-			if (result.success) {
-				// Fetch fresh data
-				const freshData = await getInternshipsData();
-				if (freshData) {
-					form.reset({
-						icon: freshData.hero.icon,
-						title: freshData.hero.title,
-						subtitle: freshData.hero.subtitle,
-						gradient: freshData.hero.gradient
-					});
-				}
-				setSaveStatus('saved');
-				setTimeout(() => setSaveStatus('idle'), 2000);
-			} else {
-				setSaveStatus('error');
-				setTimeout(() => setSaveStatus('idle'), 3000);
+			} catch (error) {
+				console.error('Failed to save hero:', error);
+				setStatus({ kind: 'error', message: 'Save failed' });
 			}
-		} catch (error) {
-			console.error('Failed to save hero:', error);
-			setSaveStatus('error');
-			setTimeout(() => setSaveStatus('idle'), 3000);
-		}
-	};
+		});
+	});
 
 	return (
-		<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6 p-6'>
-			<div className='flex items-center space-x-3 border-b pb-4'>
-				<Sparkles className='w-6 h-6 text-blue-600' />
-				<h3 className='text-2xl font-bold'>Hero Section</h3>
-			</div>
-
-			<div className='space-y-4'>
-				<div>
-					<Label>Icon</Label>
-					<Select
-						value={form.watch('icon')}
-						onValueChange={value => form.setValue('icon', value)}>
-						<SelectTrigger>
-							<SelectValue />
-						</SelectTrigger>
-						<SelectContent>
-							{ICON_OPTIONS.map(icon => (
-								<SelectItem key={icon} value={icon}>
-									{icon}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
-				</div>
-
-				<div>
-					<Label>Title</Label>
-					<Input {...form.register('title')} placeholder='Internship Opportunities' />
-				</div>
-
-				<div>
-					<Label>Subtitle</Label>
-					<Textarea
-						{...form.register('subtitle')}
-						placeholder='Gain practical experience and kickstart your career'
-						rows={3}
+		<AdminForm onSubmit={onSubmit}>
+			<AdminFormSection
+				title='Hero section'
+				description='Top-of-page banner for the internships page.'>
+				<AdminFieldGrid>
+					<AdminField label='Icon'>
+						<Select
+							value={form.watch('icon')}
+							onValueChange={value => form.setValue('icon', value)}>
+							<SelectTrigger>
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								{ICON_OPTIONS.map(icon => (
+									<SelectItem key={icon} value={icon}>
+										{icon}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					</AdminField>
+					<AdminField label='Background gradient'>
+						<Select
+							value={form.watch('gradient')}
+							onValueChange={value => form.setValue('gradient', value)}>
+							<SelectTrigger>
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								{GRADIENT_OPTIONS.map(option => (
+									<SelectItem key={option.value} value={option.value}>
+										{option.label}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					</AdminField>
+				</AdminFieldGrid>
+				<AdminField label='Title' htmlFor='int-hero-title'>
+					<Input
+						id='int-hero-title'
+						placeholder='Internship Opportunities'
+						{...form.register('title')}
 					/>
-				</div>
+				</AdminField>
+				<AdminField label='Subtitle' htmlFor='int-hero-sub'>
+					<Textarea
+						id='int-hero-sub'
+						rows={3}
+						placeholder='Gain practical experience and kickstart your career'
+						{...form.register('subtitle')}
+					/>
+				</AdminField>
+			</AdminFormSection>
 
-				<div>
-					<Label>Background Gradient</Label>
-					<Select
-						value={form.watch('gradient')}
-						onValueChange={value => form.setValue('gradient', value)}>
-						<SelectTrigger>
-							<SelectValue />
-						</SelectTrigger>
-						<SelectContent>
-							{GRADIENT_OPTIONS.map(option => (
-								<SelectItem key={option.value} value={option.value}>
-									<div className='flex items-center space-x-2'>
-										<div className={`w-8 h-4 rounded bg-gradient-to-r ${option.value}`} />
-										<span>{option.label}</span>
-									</div>
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
-				</div>
-			</div>
-
-			<div className='flex items-center gap-4'>
-				<Button
-					type='submit'
-					className={`w-full ${
-						saveStatus === 'saved'
-							? 'bg-green-600 hover:bg-green-700'
-							: saveStatus === 'error'
-								? 'bg-red-600 hover:bg-red-700'
-								: 'bg-blue-600 hover:bg-blue-700'
-					}`}
-					disabled={saveStatus === 'saving'}>
-					{saveStatus === 'saving' && 'Saving...'}
-					{saveStatus === 'saved' && '✓ Saved Successfully'}
-					{saveStatus === 'error' && 'Error - Try Again'}
-					{saveStatus === 'idle' && 'Save Hero Section'}
-				</Button>
-				{saveStatus === 'saved' && (
-					<span className='text-sm text-green-600 font-medium'>Changes saved!</span>
-				)}
-			</div>
-		</form>
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }

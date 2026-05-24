@@ -2,16 +2,8 @@
 
 import { useEffect, useMemo, useState, useTransition } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel
-} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
 import {
 	type AdmissionsBrochureConfig,
 	type AdmissionsBrochureItem,
@@ -27,6 +19,19 @@ import {
 	SelectValue
 } from '@/components/ui/select';
 import { createClientId } from '@/lib/utils';
+import {
+	AddRowButton,
+	AdminEmptyState,
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	AdminItemCard,
+	AdminItemList,
+	AdminToggle,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 type BrochurePageData = {
 	config: AdmissionsBrochureConfig;
@@ -43,7 +48,7 @@ type FormValues = {
 	heroBadge: string;
 	heroTitle: string;
 	heroSubtitle: string;
-	autoDetectEnabled: 'true' | 'false';
+	autoDetectEnabled: boolean;
 	emptyStateTitle: string;
 	emptyStateDescription: string;
 	items: Array<{
@@ -73,7 +78,7 @@ const normalizeData = (values: FormValues): BrochurePageData => ({
 		heroBadge: values.heroBadge.trim(),
 		heroTitle: values.heroTitle.trim(),
 		heroSubtitle: values.heroSubtitle.trim(),
-		autoDetectEnabled: values.autoDetectEnabled === 'true',
+		autoDetectEnabled: values.autoDetectEnabled,
 		emptyStateTitle: values.emptyStateTitle.trim(),
 		emptyStateDescription: values.emptyStateDescription.trim()
 	},
@@ -95,26 +100,26 @@ export default function AdmissionsBrochureForm({
 	visibleSections
 }: Props) {
 	const [isPending, startTransition] = useTransition();
-	const [message, setMessage] = useState<string | null>(null);
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 
 	const defaults = useMemo<FormValues>(
 		() => ({
 			heroBadge: initialData.config.heroBadge,
 			heroTitle: initialData.config.heroTitle,
 			heroSubtitle: initialData.config.heroSubtitle,
-			autoDetectEnabled: initialData.config.autoDetectEnabled ? 'true' : 'false',
+			autoDetectEnabled: initialData.config.autoDetectEnabled,
 			emptyStateTitle: initialData.config.emptyStateTitle,
 			emptyStateDescription: initialData.config.emptyStateDescription,
 			items:
 				initialData.items.length > 0
-					? initialData.items.map((item, index) => ({
-					id: item.id,
-					title: item.title,
-					description: item.description,
-					icon: item.icon,
-					url: item.url,
-					lastUpdated: item.lastUpdated ?? ''
-				}))
+					? initialData.items.map(item => ({
+							id: item.id,
+							title: item.title,
+							description: item.description,
+							icon: item.icon,
+							url: item.url,
+							lastUpdated: item.lastUpdated ?? ''
+						}))
 					: [createItem()]
 		}),
 		[initialData]
@@ -129,136 +134,153 @@ export default function AdmissionsBrochureForm({
 
 	useEffect(() => {
 		onChange?.(normalizeData(form.getValues()));
-		const subscription = form.watch(values => {
+		const sub = form.watch(values => {
 			onChange?.(normalizeData(values as FormValues));
+			setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 		});
-		return () => subscription.unsubscribe();
+		return () => sub.unsubscribe();
 	}, [form, onChange]);
 
-	const handleSubmit = (values: FormValues) => {
-		setMessage(null);
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
+	const handleSubmit = form.handleSubmit(values => {
+		setStatus({ kind: 'saving' });
 		const payload = normalizeData(values);
 		startTransition(async () => {
-			const tasks = [];
-			if (includes(visibleSections, 'config')) {
+			const tasks: Promise<{ ok: boolean }>[] = [];
+			if (includes(visibleSections, 'config'))
 				tasks.push(updateAdmissionsBrochureConfig(payload.config));
-			}
-			if (includes(visibleSections, 'items')) {
+			if (includes(visibleSections, 'items'))
 				tasks.push(updateAdmissionsBrochureItems(payload.items));
-			}
 			const results = await Promise.all(tasks);
-			setMessage(results.every(result => result.ok) ? 'Saved' : 'Save failed');
+			setStatus(
+				results.every(r => r.ok)
+					? { kind: 'success', message: 'Saved' }
+					: { kind: 'error', message: 'Save failed' }
+			);
 		});
-	};
+	});
+
+	const autoDetect = form.watch('autoDetectEnabled');
 
 	return (
-		<Form {...form}>
-			<form
-				className='space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm max-h-[70vh] overflow-y-auto'
-				onSubmit={form.handleSubmit(handleSubmit)}>
-				<div className='flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between'>
-					<div>
-						<h3 className='text-lg font-semibold text-slate-900'>Brochure Page</h3>
-						<p className='text-sm text-slate-500'>
-							Manage brochure messaging, auto-detect behavior, and brochure links.
-						</p>
-					</div>
-					<div className='flex items-center gap-2'>
-						{message ? (
-							<span className='rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700'>
-								{message}
-							</span>
-						) : null}
-						<Button type='submit' disabled={isPending}>
-							{isPending ? 'Saving...' : 'Save changes'}
-						</Button>
-					</div>
-				</div>
-
-				{includes(visibleSections, 'config') ? (
-					<section className='space-y-4 rounded-xl border border-slate-200 bg-slate-50/60 p-5'>
-						<h4 className='text-sm font-semibold uppercase tracking-[0.16em] text-slate-600'>Page config</h4>
-						<FormField control={form.control} name='heroBadge' render={({ field }) => <FormItem><FormLabel>Hero badge</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-						<FormField control={form.control} name='heroTitle' render={({ field }) => <FormItem><FormLabel>Hero title</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-						<FormField control={form.control} name='heroSubtitle' render={({ field }) => <FormItem><FormLabel>Hero subtitle</FormLabel><FormControl><Textarea rows={3} className='resize-none' {...field} /></FormControl></FormItem>} />
-						<FormField
-							control={form.control}
-							name='autoDetectEnabled'
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Auto-detect brochure links</FormLabel>
-									<Select value={field.value} onValueChange={field.onChange}>
-										<FormControl>
-											<SelectTrigger>
-												<SelectValue placeholder='Select mode' />
-											</SelectTrigger>
-										</FormControl>
-										<SelectContent>
-											<SelectItem value='true'>Enabled</SelectItem>
-											<SelectItem value='false'>Disabled</SelectItem>
-										</SelectContent>
-									</Select>
-								</FormItem>
-							)}
+		<AdminForm onSubmit={handleSubmit}>
+			{includes(visibleSections, 'config') && (
+				<AdminFormSection
+					title='Page config'
+					description='Hero messaging, auto-detect behavior, and empty-state copy.'>
+					<AdminField label='Hero badge' htmlFor='br-badge'>
+						<Input id='br-badge' {...form.register('heroBadge')} />
+					</AdminField>
+					<AdminField label='Hero title' htmlFor='br-title'>
+						<Input id='br-title' {...form.register('heroTitle')} />
+					</AdminField>
+					<AdminField label='Hero subtitle' htmlFor='br-sub'>
+						<Textarea
+							id='br-sub'
+							rows={3}
+							className='resize-none'
+							{...form.register('heroSubtitle')}
 						/>
-						<FormField control={form.control} name='emptyStateTitle' render={({ field }) => <FormItem><FormLabel>Empty state title</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-						<FormField control={form.control} name='emptyStateDescription' render={({ field }) => <FormItem><FormLabel>Empty state description</FormLabel><FormControl><Textarea rows={3} className='resize-none' {...field} /></FormControl></FormItem>} />
-					</section>
-				) : null}
+					</AdminField>
+					<AdminToggle
+						label='Auto-detect brochure links'
+						description='If enabled, brochure links are auto-discovered from public pages.'
+						checked={autoDetect}
+						onChange={v =>
+							form.setValue('autoDetectEnabled', v, { shouldDirty: true })
+						}
+					/>
+					<AdminField label='Empty state title' htmlFor='br-empty-title'>
+						<Input id='br-empty-title' {...form.register('emptyStateTitle')} />
+					</AdminField>
+					<AdminField label='Empty state description' htmlFor='br-empty-desc'>
+						<Textarea
+							id='br-empty-desc'
+							rows={3}
+							className='resize-none'
+							{...form.register('emptyStateDescription')}
+						/>
+					</AdminField>
+				</AdminFormSection>
+			)}
 
-				{includes(visibleSections, 'items') ? (
-					<section className='space-y-4 rounded-xl border border-slate-200 bg-slate-50/60 p-5'>
-						<div className='flex items-center justify-between'>
-							<h4 className='text-sm font-semibold uppercase tracking-[0.16em] text-slate-600'>Brochure items</h4>
-							<Button type='button' variant='outline' size='sm' onClick={() => itemsArray.append(createItem())}>
-								Add item
-							</Button>
-						</div>
-						<div className='space-y-4'>
-							{itemsArray.fields.map((field, index) => (
-								<div key={field.id} className='space-y-4 rounded-xl border border-slate-200 bg-white p-4'>
-									<div className='flex items-center justify-between'>
-										<span className='text-sm font-medium text-slate-700'>Brochure {index + 1}</span>
-										<Button type='button' variant='ghost' size='sm' onClick={() => itemsArray.remove(index)}>
-											Remove
-										</Button>
-									</div>
-									<div className='grid gap-4 sm:grid-cols-2'>
-										<FormField control={form.control} name={`items.${index}.id`} render={({ field }) => <FormItem><FormLabel>Item ID</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-										<FormField
-											control={form.control}
-											name={`items.${index}.icon`}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel>Icon</FormLabel>
-													<Select value={field.value} onValueChange={field.onChange}>
-														<FormControl>
-															<SelectTrigger>
-																<SelectValue placeholder='Select icon' />
-															</SelectTrigger>
-														</FormControl>
-														<SelectContent>
-															{ADMISSIONS_ICON_NAMES.map(icon => (
-																<SelectItem key={icon} value={icon}>
-																	{icon}
-																</SelectItem>
-															))}
-														</SelectContent>
-													</Select>
-												</FormItem>
-											)}
-										/>
-										<FormField control={form.control} name={`items.${index}.title`} render={({ field }) => <FormItem className='sm:col-span-2'><FormLabel>Title</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>} />
-										<FormField control={form.control} name={`items.${index}.description`} render={({ field }) => <FormItem className='sm:col-span-2'><FormLabel>Description</FormLabel><FormControl><Textarea rows={3} className='resize-none' {...field} /></FormControl></FormItem>} />
-										<FormField control={form.control} name={`items.${index}.url`} render={({ field }) => <FormItem className='sm:col-span-2'><FormLabel>Brochure URL</FormLabel><FormControl><Input placeholder='https://...' {...field} /></FormControl></FormItem>} />
-										<FormField control={form.control} name={`items.${index}.lastUpdated`} render={({ field }) => <FormItem className='sm:col-span-2'><FormLabel>Last updated text</FormLabel><FormControl><Input placeholder='Updated January 2026' {...field} /></FormControl></FormItem>} />
-									</div>
-								</div>
-							))}
-						</div>
-					</section>
-				) : null}
-			</form>
-		</Form>
+			{includes(visibleSections, 'items') && (
+				<AdminFormSection title='Brochure items'>
+					<AdminItemList>
+						{itemsArray.fields.map((field, index) => (
+							<AdminItemCard
+								key={field.id}
+								index={index}
+								total={itemsArray.fields.length}
+								title={form.watch(`items.${index}.title`) || `Brochure ${index + 1}`}
+								subtitle={form.watch(`items.${index}.url`) || undefined}
+								onMove={d => itemsArray.move(index, index + d)}
+								onRemove={() => itemsArray.remove(index)}>
+								<AdminFieldGrid>
+									<AdminField label='Item ID'>
+										<Input {...form.register(`items.${index}.id` as const)} />
+									</AdminField>
+									<AdminField label='Icon'>
+										<Select
+											value={form.watch(`items.${index}.icon`) || 'FileText'}
+											onValueChange={v =>
+												form.setValue(`items.${index}.icon`, v, {
+													shouldDirty: true
+												})
+											}>
+											<SelectTrigger>
+												<SelectValue placeholder='Select icon' />
+											</SelectTrigger>
+											<SelectContent>
+												{ADMISSIONS_ICON_NAMES.map(icon => (
+													<SelectItem key={icon} value={icon}>
+														{icon}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+									</AdminField>
+								</AdminFieldGrid>
+								<AdminField label='Title'>
+									<Input {...form.register(`items.${index}.title` as const)} />
+								</AdminField>
+								<AdminField label='Description'>
+									<Textarea
+										rows={3}
+										className='resize-none'
+										{...form.register(`items.${index}.description` as const)}
+									/>
+								</AdminField>
+								<AdminField label='Brochure URL'>
+									<Input
+										placeholder='https://…'
+										{...form.register(`items.${index}.url` as const)}
+									/>
+								</AdminField>
+								<AdminField label='Last updated text'>
+									<Input
+										placeholder='Updated January 2026'
+										{...form.register(`items.${index}.lastUpdated` as const)}
+									/>
+								</AdminField>
+							</AdminItemCard>
+						))}
+					</AdminItemList>
+					{itemsArray.fields.length === 0 && (
+						<AdminEmptyState title='No brochures yet' />
+					)}
+					<AddRowButton onClick={() => itemsArray.append(createItem())}>
+						Add brochure
+					</AddRowButton>
+				</AdminFormSection>
+			)}
+
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }

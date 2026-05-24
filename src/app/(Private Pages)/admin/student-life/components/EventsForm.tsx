@@ -2,24 +2,25 @@
 
 import { useEffect, useState, useTransition } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage
-} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Loader2, Save, Plus, Trash2, Image as ImageIcon } from 'lucide-react';
 import {
 	updateEventsFestivals,
 	type EventsFestivalsData
 } from '@/app/(Private Pages)/actions/student-life';
 import UploadButton from '@/components/cloudinary/upload-button';
+import {
+	AddRowButton,
+	AdminEmptyState,
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	AdminItemCard,
+	AdminItemList,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 interface Props {
 	initialData: EventsFestivalsData;
@@ -33,239 +34,180 @@ export default function EventsForm({
 	visibleSections
 }: Props) {
 	const [isPending, startTransition] = useTransition();
-	const [message, setMessage] = useState<{
-		type: 'success' | 'error';
-		text: string;
-	} | null>(null);
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 
-	const form = useForm<EventsFestivalsData>({
-		defaultValues: initialData
-	});
-
-	const { fields, append, remove } = useFieldArray({
+	const form = useForm<EventsFestivalsData>({ defaultValues: initialData });
+	const { fields, append, remove, move } = useFieldArray({
 		control: form.control,
 		name: 'events'
 	});
 
 	useEffect(() => {
-		const subscription = form.watch((values) => {
+		const sub = form.watch(values => {
 			onChange?.(values as EventsFestivalsData);
+			setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 		});
-		return () => subscription.unsubscribe();
+		return () => sub.unsubscribe();
 	}, [form, onChange]);
 
-	const handleSubmit = (values: EventsFestivalsData) => {
-		setMessage(null);
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
+	const handleSubmit = form.handleSubmit(values => {
+		setStatus({ kind: 'saving' });
 		startTransition(async () => {
-			const result = await updateEventsFestivals('student-life-events-and-festivals', values);
-			if (!result.ok) {
-				setMessage({ type: 'error', text: result.error ?? 'Failed to save events data.' });
-				return;
-			}
-			setMessage({ type: 'success', text: 'Saved successfully.' });
-			setTimeout(() => setMessage(null), 3000);
+			const result = await updateEventsFestivals(
+				'student-life-events-and-festivals',
+				values
+			);
+			setStatus(
+				result.ok
+					? { kind: 'success', message: 'Saved' }
+					: { kind: 'error', message: result.error ?? 'Save failed' }
+			);
 		});
-	};
+	});
 
 	const showSection = (section: 'header' | 'events') =>
 		!visibleSections || visibleSections.includes(section);
 
 	return (
-		<Form {...form}>
-			<form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-				<div className="flex items-center justify-between sticky top-0 bg-white z-10 p-4 border-b -mx-4 -mt-4 mb-4 shadow-sm">
-					<h3 className="font-semibold text-gray-900">Content</h3>
-					<div className="flex items-center gap-4">
-						{message && (
-							<span
-								className={`text-sm font-medium ${
-									message.type === 'error' ? 'text-red-600' : 'text-green-600'
-								}`}>
-								{message.text}
-							</span>
-						)}
-						<Button type="submit" disabled={isPending}>
-							{isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-							Save Changes
-						</Button>
-					</div>
-				</div>
+		<AdminForm onSubmit={handleSubmit}>
+			{showSection('header') && (
+				<AdminFormSection
+					title='Page header'
+					description='Title and intro for the events & festivals page.'>
+					<AdminField label='Page title' htmlFor='ev-title'>
+						<Input id='ev-title' {...form.register('title')} />
+					</AdminField>
+					<AdminField label='Description' htmlFor='ev-desc'>
+						<Textarea id='ev-desc' rows={3} {...form.register('description')} />
+					</AdminField>
+				</AdminFormSection>
+			)}
 
-				{showSection('header') && (
-					<>
-						<FormField
-							control={form.control}
-							name="title"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Page Title</FormLabel>
-									<FormControl><Input {...field} /></FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-
-						<FormField
-							control={form.control}
-							name="description"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Description</FormLabel>
-									<FormControl><Textarea {...field} rows={3} /></FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-					</>
-				)}
-
-				{showSection('events') && (
-				<div className="space-y-4">
-					<div className="flex items-center justify-between">
-						<FormLabel className="text-base">Events</FormLabel>
-						<Button
-							type="button"
-							variant="outline"
-							size="sm"
-							onClick={() => append({ title: 'New Event', type: 'Cultural', description: '', icon: 'Calendar', month: 'January', highlights: [], image: '' })}
-						>
-							<Plus className="w-4 h-4 mr-2" />
-							Add Event
-						</Button>
-					</div>
-
-					<div className="grid gap-4">
-						{fields.map((field, index) => (
-							<Card key={field.id}>
-								<CardContent className="p-4 space-y-4">
-									<div className="flex justify-between items-start">
-										<span className="text-sm font-medium text-gray-500">Event #{index + 1}</span>
-										<Button
-											type="button"
-											variant="ghost"
-											size="sm"
-											className="text-red-500 hover:text-red-700 hover:bg-red-50"
-											onClick={() => remove(index)}
-										>
-											<Trash2 className="w-4 h-4" />
-										</Button>
-									</div>
-
-									<div className="grid grid-cols-2 gap-4">
-										<FormField
-											control={form.control}
-											name={`events.${index}.title`}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel className="text-xs">Title</FormLabel>
-													<FormControl><Input {...field} /></FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
+			{showSection('events') && (
+				<AdminFormSection title='Events'>
+					<AdminItemList>
+						{fields.map((field, index) => {
+							const image = form.watch(`events.${index}.image`);
+							return (
+								<AdminItemCard
+									key={field.id}
+									index={index}
+									total={fields.length}
+									title={
+										form.watch(`events.${index}.title`) || `Event ${index + 1}`
+									}
+									subtitle={form.watch(`events.${index}.month`) || undefined}
+									onMove={d => move(index, index + d)}
+									onRemove={() => remove(index)}>
+									<AdminFieldGrid>
+										<AdminField label='Title'>
+											<Input
+												{...form.register(`events.${index}.title` as const)}
+											/>
+										</AdminField>
+										<AdminField label='Type'>
+											<Input
+												placeholder='Cultural, Technical'
+												{...form.register(`events.${index}.type` as const)}
+											/>
+										</AdminField>
+										<AdminField label='Icon'>
+											<Input
+												placeholder='Calendar, Trophy'
+												{...form.register(`events.${index}.icon` as const)}
+											/>
+										</AdminField>
+										<AdminField label='Month / date'>
+											<Input
+												placeholder='February'
+												{...form.register(`events.${index}.month` as const)}
+											/>
+										</AdminField>
+									</AdminFieldGrid>
+									<AdminField label='Image'>
+										<Input
+											placeholder='Image URL'
+											{...form.register(`events.${index}.image` as const)}
 										/>
-                                        <FormField
-											control={form.control}
-											name={`events.${index}.type`}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel className="text-xs">Type</FormLabel>
-													<FormControl><Input {...field} placeholder="Cultural, Technical" /></FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-                                        <FormField
-											control={form.control}
-											name={`events.${index}.icon`}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel className="text-xs">Icon</FormLabel>
-													<FormControl><Input {...field} placeholder="Calendar, Trophy" /></FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-                                        <FormField
-											control={form.control}
-											name={`events.${index}.month`}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel className="text-xs">Month/Date</FormLabel>
-													<FormControl><Input {...field} placeholder="February" /></FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-                                    </div>
-                                    <FormField
-                                        control={form.control}
-                                        name={`events.${index}.image`}
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel className="text-xs">Image URL</FormLabel>
-                                                <FormControl>
-                                                    <div className="space-y-2">
-														<div className='flex gap-2'>
-															<ImageIcon className="w-4 h-4 mt-3 text-gray-400" />
-															<Input {...field} />
-														</div>
-														<UploadButton
-															onUpload={url => field.onChange(url)}
-															buttonText='Upload Event Image'
-															className='w-full'
-														/>
-														{field.value ? (
-															<div className='h-16 w-16 overflow-hidden rounded border'>
-																<img
-																	src={field.value}
-																	alt='Event preview'
-																	className='h-full w-full object-cover'
-																/>
-															</div>
-														) : null}
-                                                    </div>
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-									<FormField
-										control={form.control}
-										name={`events.${index}.description`}
-										render={({ field }) => (
-											<FormItem>
-												<FormLabel className="text-xs">Description</FormLabel>
-												<FormControl>
-													<Textarea {...field} rows={2} />
-												</FormControl>
-												<FormMessage />
-											</FormItem>
+										<div className='mt-2'>
+											<UploadButton
+												onUpload={url =>
+													form.setValue(`events.${index}.image`, url, {
+														shouldDirty: true
+													})
+												}
+												buttonText='Upload image'
+											/>
+										</div>
+										{image && (
+											<div className='mt-3 h-16 w-16 overflow-hidden rounded border border-slate-200'>
+												{/* eslint-disable-next-line @next/next/no-img-element */}
+												<img
+													src={image}
+													alt='Event preview'
+													className='h-full w-full object-cover'
+												/>
+											</div>
 										)}
-									/>
-                                    <FormField
-                                        control={form.control}
-                                        name={`events.${index}.highlights`}
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel className="text-xs">Highlights (Comma separated)</FormLabel>
-                                                <FormControl>
-                                                    <Input 
-                                                        {...field} 
-                                                        value={field.value?.join(', ') || ''}
-                                                        onChange={(e) => field.onChange(e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-								</CardContent>
-							</Card>
-						))}
-					</div>
-				</div>
-				)}
-			</form>
-		</Form>
+									</AdminField>
+									<AdminField label='Description'>
+										<Textarea
+											rows={2}
+											{...form.register(`events.${index}.description` as const)}
+										/>
+									</AdminField>
+									<AdminField
+										label='Highlights'
+										hint='Comma separated.'>
+										<Input
+											value={
+												(
+													form.watch(`events.${index}.highlights`) as
+														| string[]
+														| undefined
+												)?.join(', ') || ''
+											}
+											onChange={event =>
+												form.setValue(
+													`events.${index}.highlights`,
+													event.target.value
+														.split(',')
+														.map(s => s.trim())
+														.filter(Boolean),
+													{ shouldDirty: true }
+												)
+											}
+										/>
+									</AdminField>
+								</AdminItemCard>
+							);
+						})}
+					</AdminItemList>
+					{fields.length === 0 && <AdminEmptyState title='No events yet' />}
+					<AddRowButton
+						onClick={() =>
+							append({
+								title: 'New Event',
+								type: 'Cultural',
+								description: '',
+								icon: 'Calendar',
+								month: 'January',
+								highlights: [],
+								image: ''
+							})
+						}>
+						Add event
+					</AddRowButton>
+				</AdminFormSection>
+			)}
+
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }

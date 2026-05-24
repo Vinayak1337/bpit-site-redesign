@@ -1,10 +1,9 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 import {
 	Select,
 	SelectContent,
@@ -12,9 +11,27 @@ import {
 	SelectTrigger,
 	SelectValue
 } from '@/components/ui/select';
-import { updatePlacementStatistics, getPlacementStatistics } from '@/app/(Private Pages)/actions/placement-statistics';
-import type { PlacementStatisticsData, SectorWiseData } from '@/app/(Private Pages)/actions/placement-statistics';
-import { Plus, Trash2, PieChart, X } from 'lucide-react';
+import {
+	updatePlacementStatistics,
+	getPlacementStatistics
+} from '@/app/(Private Pages)/actions/placement-statistics';
+import type {
+	PlacementStatisticsData,
+	SectorWiseData
+} from '@/app/(Private Pages)/actions/placement-statistics';
+import { Plus, X } from 'lucide-react';
+import {
+	AddRowButton,
+	AdminEmptyState,
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	AdminItemCard,
+	AdminItemList,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 interface SectorFormProps {
 	initialData: PlacementStatisticsData;
@@ -41,12 +58,9 @@ interface SectorFormData {
 	}[];
 }
 
-export default function SectorForm({
-	initialData,
-	pageSlug,
-	onChange
-}: SectorFormProps) {
-	const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+export default function SectorForm({ initialData, onChange }: SectorFormProps) {
+	const [isPending, startTransition] = useTransition();
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 
 	const form = useForm<SectorFormData>({
 		defaultValues: {
@@ -57,239 +71,206 @@ export default function SectorForm({
 		}
 	});
 
-	const { fields, append, remove } = useFieldArray({
+	const { fields, append, remove, move } = useFieldArray({
 		control: form.control,
 		name: 'sectors'
 	});
 
-	// Live preview
 	useEffect(() => {
-		const subscription = form.watch(values => {
+		const sub = form.watch(values => {
 			if (!values.sectors) return;
-
 			const sectorWiseData: SectorWiseData[] = values.sectors.map(s => ({
 				sector: s?.sector || '',
 				percentage: s?.percentage || 0,
 				companies: (s?.companies || []).filter((c): c is string => !!c),
 				color: s?.color || 'from-blue-500 to-cyan-600'
 			}));
-
-			onChange({
-				...initialData,
-				sectorWiseData
-			});
+			onChange({ ...initialData, sectorWiseData });
+			setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 		});
-
-		return () => subscription.unsubscribe();
+		return () => sub.unsubscribe();
 	}, [form, initialData, onChange]);
 
-	const onSubmit = async (values: SectorFormData) => {
-		try {
-			setSaveStatus('saving');
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
 
-			const sectorWiseData: SectorWiseData[] = values.sectors.map(s => ({
-				sector: s.sector,
-				percentage: s.percentage,
-				companies: (s.companies || []).filter((c): c is string => !!c),
-				color: s.color
-			}));
-
-			const result = await updatePlacementStatistics({
-				...initialData,
-				sectorWiseData
-			});
-
-			if (result.success) {
-				// Fetch fresh data from DB
-				const freshData = await getPlacementStatistics();
-				if (freshData) {
-					form.reset({
-						sectors: (freshData.sectorWiseData || []).map(s => ({
-							...s,
-							companyInput: ''
-						}))
-					});
+	const onSubmit = form.handleSubmit(values => {
+		setStatus({ kind: 'saving' });
+		startTransition(async () => {
+			try {
+				const sectorWiseData: SectorWiseData[] = values.sectors.map(s => ({
+					sector: s.sector,
+					percentage: s.percentage,
+					companies: (s.companies || []).filter((c): c is string => !!c),
+					color: s.color
+				}));
+				const result = await updatePlacementStatistics({
+					...initialData,
+					sectorWiseData
+				});
+				if (result.success) {
+					const freshData = await getPlacementStatistics();
+					if (freshData) {
+						form.reset({
+							sectors: (freshData.sectorWiseData || []).map(s => ({
+								...s,
+								companyInput: ''
+							}))
+						});
+					}
+					setStatus({ kind: 'success', message: 'Saved' });
+				} else {
+					setStatus({ kind: 'error', message: 'Save failed' });
 				}
-				setSaveStatus('saved');
-				setTimeout(() => setSaveStatus('idle'), 2000);
-			} else {
-				setSaveStatus('error');
-				setTimeout(() => setSaveStatus('idle'), 3000);
+			} catch (error) {
+				console.error('Failed to save sector-wise data:', error);
+				setStatus({ kind: 'error', message: 'Save failed' });
 			}
-		} catch (error) {
-			console.error('Failed to save sector-wise data:', error);
-			setSaveStatus('error');
-			setTimeout(() => setSaveStatus('idle'), 3000);
-		}
-	};
+		});
+	});
 
 	const addCompany = (sectorIndex: number) => {
 		const input = form.getValues(`sectors.${sectorIndex}.companyInput`);
 		if (!input.trim()) return;
-
 		const companies = form.getValues(`sectors.${sectorIndex}.companies`) || [];
 		companies.push(input.trim());
-		form.setValue(`sectors.${sectorIndex}.companies`, companies);
+		form.setValue(`sectors.${sectorIndex}.companies`, companies, {
+			shouldDirty: true
+		});
 		form.setValue(`sectors.${sectorIndex}.companyInput`, '');
 	};
 
 	const removeCompany = (sectorIndex: number, companyIndex: number) => {
 		const companies = form.getValues(`sectors.${sectorIndex}.companies`) || [];
 		companies.splice(companyIndex, 1);
-		form.setValue(`sectors.${sectorIndex}.companies`, companies);
+		form.setValue(`sectors.${sectorIndex}.companies`, companies, {
+			shouldDirty: true
+		});
 	};
 
 	return (
-		<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6 p-6'>
-			<div className='flex items-center space-x-3 border-b pb-4'>
-				<PieChart className='w-6 h-6 text-blue-600' />
-				<h3 className='text-2xl font-bold'>Sector-wise Distribution</h3>
-			</div>
-
-			<div className='space-y-6'>
-				{fields.map((field, index) => (
-					<div
-						key={field.id}
-						className='border rounded-lg p-4 space-y-4 bg-gray-50'>
-						<div className='flex items-center justify-between'>
-							<Label className='text-lg font-semibold'>Sector {index + 1}</Label>
-							<Button
-								type='button'
-								variant='destructive'
-								size='sm'
-								onClick={() => remove(index)}>
-								<Trash2 className='w-4 h-4' />
-							</Button>
-						</div>
-
-						<div className='grid grid-cols-2 gap-4'>
-							<div>
-								<Label>Sector Name</Label>
-								<Input
-									{...form.register(`sectors.${index}.sector`)}
-									placeholder='IT Services'
-								/>
-							</div>
-							<div>
-								<Label>Percentage</Label>
-								<Input
-									type='number'
-									step='0.1'
-									{...form.register(`sectors.${index}.percentage`, {
-										valueAsNumber: true
-									})}
-									placeholder='35'
-								/>
-							</div>
-						</div>
-
-						<div>
-							<Label>Gradient Color</Label>
-							<Select
-								value={form.watch(`sectors.${index}.color`)}
-								onValueChange={value =>
-									form.setValue(`sectors.${index}.color`, value)
-								}>
-								<SelectTrigger>
-									<SelectValue />
-								</SelectTrigger>
-								<SelectContent>
-									{GRADIENT_OPTIONS.map(option => (
-										<SelectItem key={option.value} value={option.value}>
-											<div className='flex items-center space-x-2'>
-												<div
-													className={`w-8 h-4 rounded bg-gradient-to-r ${option.value}`}
-												/>
-												<span>{option.label}</span>
-											</div>
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-						</div>
-
-						<div>
-							<Label>Companies</Label>
-							<div className='flex space-x-2 mb-2'>
-								<Input
-									value={form.watch(`sectors.${index}.companyInput`) || ''}
-									onChange={e =>
-										form.setValue(`sectors.${index}.companyInput`, e.target.value)
+		<AdminForm onSubmit={onSubmit}>
+			<AdminFormSection title='Sector-wise distribution'>
+				<AdminItemList>
+					{fields.map((field, index) => (
+						<AdminItemCard
+							key={field.id}
+							index={index}
+							total={fields.length}
+							title={
+								form.watch(`sectors.${index}.sector`) ||
+								`Sector ${index + 1}`
+							}
+							onMove={d => move(index, index + d)}
+							onRemove={() => remove(index)}>
+							<AdminFieldGrid>
+								<AdminField label='Sector name'>
+									<Input
+										placeholder='IT Services'
+										{...form.register(`sectors.${index}.sector` as const)}
+									/>
+								</AdminField>
+								<AdminField label='Percentage'>
+									<Input
+										type='number'
+										step='0.1'
+										placeholder='35'
+										{...form.register(`sectors.${index}.percentage` as const, {
+											valueAsNumber: true
+										})}
+									/>
+								</AdminField>
+							</AdminFieldGrid>
+							<AdminField label='Gradient color'>
+								<Select
+									value={
+										form.watch(`sectors.${index}.color`) ||
+										'from-blue-500 to-cyan-600'
 									}
-									placeholder='Add company name'
-									onKeyPress={e => {
-										if (e.key === 'Enter') {
-											e.preventDefault();
-											addCompany(index);
+									onValueChange={v =>
+										form.setValue(`sectors.${index}.color`, v, {
+											shouldDirty: true
+										})
+									}>
+									<SelectTrigger>
+										<SelectValue />
+									</SelectTrigger>
+									<SelectContent>
+										{GRADIENT_OPTIONS.map(option => (
+											<SelectItem key={option.value} value={option.value}>
+												{option.label}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							</AdminField>
+							<AdminField label='Companies'>
+								<div className='flex gap-2'>
+									<Input
+										value={form.watch(`sectors.${index}.companyInput`) || ''}
+										onChange={e =>
+											form.setValue(
+												`sectors.${index}.companyInput`,
+												e.target.value
+											)
 										}
-									}}
-								/>
-								<Button
-									type='button'
-									onClick={() => addCompany(index)}
-									size='sm'>
-									<Plus className='w-4 h-4' />
-								</Button>
-							</div>
-							<div className='flex flex-wrap gap-2'>
-								{(form.watch(`sectors.${index}.companies`) || []).map(
-									(company, companyIdx) => (
-										<span
-											key={companyIdx}
-											className='px-3 py-1 bg-blue-100 text-blue-700 text-sm rounded-full flex items-center space-x-2'>
-											<span>{company}</span>
-											<button
-												type='button'
-												onClick={() => removeCompany(index, companyIdx)}
-												className='hover:text-red-500'>
-												<X className='w-3 h-3' />
-											</button>
-										</span>
-									)
-								)}
-							</div>
-						</div>
-					</div>
-				))}
-			</div>
+										placeholder='Add company name'
+										onKeyDown={e => {
+											if (e.key === 'Enter') {
+												e.preventDefault();
+												addCompany(index);
+											}
+										}}
+									/>
+									<Button
+										type='button'
+										variant='outline'
+										onClick={() => addCompany(index)}
+										aria-label='Add company'>
+										<Plus className='h-4 w-4' />
+									</Button>
+								</div>
+								<div className='mt-2 flex flex-wrap gap-2'>
+									{(form.watch(`sectors.${index}.companies`) || []).map(
+										(company, companyIdx) => (
+											<span
+												key={companyIdx}
+												className='inline-flex items-center gap-1.5 rounded-md bg-slate-100 px-2 py-1 text-xs text-slate-700'>
+												{company}
+												<button
+													type='button'
+													onClick={() => removeCompany(index, companyIdx)}
+													className='text-slate-400 hover:text-rose-600'
+													aria-label={`Remove ${company}`}>
+													<X className='h-3 w-3' />
+												</button>
+											</span>
+										)
+									)}
+								</div>
+							</AdminField>
+						</AdminItemCard>
+					))}
+				</AdminItemList>
+				{fields.length === 0 && <AdminEmptyState title='No sectors yet' />}
+				<AddRowButton
+					onClick={() =>
+						append({
+							sector: '',
+							percentage: 0,
+							companies: [],
+							color: 'from-blue-500 to-cyan-600',
+							companyInput: ''
+						})
+					}>
+					Add sector
+				</AddRowButton>
+			</AdminFormSection>
 
-			<Button
-				type='button'
-				variant='outline'
-				onClick={() =>
-					append({
-						sector: '',
-						percentage: 0,
-						companies: [],
-						color: 'from-blue-500 to-cyan-600',
-						companyInput: ''
-					})
-				}
-				className='w-full'>
-				<Plus className='w-4 h-4 mr-2' />
-				Add Sector
-			</Button>
-
-			<div className='flex items-center gap-4'>
-				<Button 
-					type='submit' 
-					className={`w-full ${
-						saveStatus === 'saved'
-							? 'bg-green-600 hover:bg-green-700'
-							: saveStatus === 'error'
-								? 'bg-red-600 hover:bg-red-700'
-								: 'bg-blue-600 hover:bg-blue-700'
-					}`}
-					disabled={saveStatus === 'saving'}>
-					{saveStatus === 'saving' && 'Saving...'}
-					{saveStatus === 'saved' && '✓ Saved Successfully'}
-					{saveStatus === 'error' && 'Error - Try Again'}
-					{saveStatus === 'idle' && 'Save Sector-wise Data'}
-				</Button>
-				{saveStatus === 'saved' && (
-					<span className='text-sm text-green-600 font-medium'>Changes saved!</span>
-				)}
-			</div>
-		</form>
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }

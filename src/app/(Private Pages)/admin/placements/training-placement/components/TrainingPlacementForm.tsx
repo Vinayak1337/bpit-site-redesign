@@ -1,18 +1,9 @@
 'use client';
 
-import { useEffect, useState, useMemo, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import type { TrainingPlacementData } from '@/app/(Private Pages)/actions/training-placement';
 import { updateTrainingPlacement } from '@/app/(Private Pages)/actions/training-placement';
-import { Button } from '@/components/ui/button';
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage
-} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -23,6 +14,18 @@ import {
 	SelectValue
 } from '@/components/ui/select';
 import UploadButton from '@/components/cloudinary/upload-button';
+import {
+	AddRowButton,
+	AdminEmptyState,
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	AdminItemCard,
+	AdminItemList,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 interface TrainingPlacementFormProps {
 	initialData: TrainingPlacementData;
@@ -30,7 +33,6 @@ interface TrainingPlacementFormProps {
 	onChange?: (data: TrainingPlacementData) => void;
 }
 
-// Form value types
 interface HeroFormValue {
 	icon: string;
 	title: string;
@@ -39,7 +41,6 @@ interface HeroFormValue {
 	iconColor: string;
 	textColor: string;
 }
-
 interface DirectorMessageFormValue {
 	name: string;
 	position: string;
@@ -49,7 +50,6 @@ interface DirectorMessageFormValue {
 	message2: string;
 	image?: string;
 }
-
 interface TeamMemberFormValue {
 	id: string;
 	name: string;
@@ -58,7 +58,6 @@ interface TeamMemberFormValue {
 	specialization: string;
 	image?: string;
 }
-
 interface DepartmentFormValue {
 	id: string;
 	name: string;
@@ -68,7 +67,6 @@ interface DepartmentFormValue {
 	avgPackage: string;
 	placementRate: string;
 }
-
 interface TrainingProgramFormValue {
 	id: string;
 	title: string;
@@ -78,14 +76,12 @@ interface TrainingProgramFormValue {
 	icon: string;
 	color: string;
 }
-
 interface ObjectiveFormValue {
 	id: string;
 	title: string;
 	description: string;
 	icon: string;
 }
-
 interface StatisticFormValue {
 	id: string;
 	number: string;
@@ -113,7 +109,7 @@ interface FormValues {
 	statistics: StatisticFormValue[];
 }
 
-const SUPPORTED_ICON_NAMES = [
+const ICON_OPTIONS = [
 	'Users',
 	'Target',
 	'Award',
@@ -125,15 +121,7 @@ const SUPPORTED_ICON_NAMES = [
 	'Calendar',
 	'TrendingUp',
 	'Star'
-] as const;
-
-const GRADIENT_OPTIONS = [
-	'from-blue-900 via-blue-800 to-blue-900',
-	'from-purple-900 via-purple-800 to-purple-900',
-	'from-green-900 via-green-800 to-green-900',
-	'from-red-900 via-red-800 to-red-900',
-	'from-orange-900 via-orange-800 to-orange-900'
-] as const;
+];
 
 const COLOR_OPTIONS = [
 	'blue',
@@ -144,24 +132,9 @@ const COLOR_OPTIONS = [
 	'yellow',
 	'pink',
 	'indigo'
-] as const;
+];
 
-const ICON_COLOR_OPTIONS = [
-	'white',
-	'blue',
-	'green',
-	'purple',
-	'orange',
-	'red',
-	'yellow'
-] as const;
-
-const TEXT_COLOR_OPTIONS = ['white', 'black', 'gray'] as const;
-
-const FALLBACK_ICON = 'Users';
-
-// Helper functions to create empty form items
-const createEmptyTeamMember = (): TeamMemberFormValue => ({
+const createTeamMember = (): TeamMemberFormValue => ({
 	id: crypto.randomUUID(),
 	name: '',
 	position: '',
@@ -169,8 +142,7 @@ const createEmptyTeamMember = (): TeamMemberFormValue => ({
 	specialization: '',
 	image: ''
 });
-
-const createEmptyDepartment = (): DepartmentFormValue => ({
+const createDept = (): DepartmentFormValue => ({
 	id: crypto.randomUUID(),
 	name: '',
 	code: '',
@@ -179,8 +151,7 @@ const createEmptyDepartment = (): DepartmentFormValue => ({
 	avgPackage: '',
 	placementRate: ''
 });
-
-const createEmptyTrainingProgram = (): TrainingProgramFormValue => ({
+const createProgram = (): TrainingProgramFormValue => ({
 	id: crypto.randomUUID(),
 	title: '',
 	description: '',
@@ -189,63 +160,34 @@ const createEmptyTrainingProgram = (): TrainingProgramFormValue => ({
 	icon: 'BookOpen',
 	color: 'blue'
 });
-
-const createEmptyObjective = (): ObjectiveFormValue => ({
+const createObjective = (): ObjectiveFormValue => ({
 	id: crypto.randomUUID(),
 	title: '',
 	description: '',
 	icon: 'Target'
 });
-
-const createEmptyStatistic = (): StatisticFormValue => ({
+const createStatistic = (): StatisticFormValue => ({
 	id: crypto.randomUUID(),
 	number: '',
 	label: '',
 	sublabel: ''
 });
 
-// Function to create updated data preserving existing fields
 function createUpdatedData(
 	currentData: TrainingPlacementData,
 	formValues: Partial<FormValues>
 ): TrainingPlacementData {
 	return {
 		...currentData,
-		hero: formValues.hero
-			? {
-					icon: formValues.hero.icon,
-					title: formValues.hero.title,
-					subtitle: formValues.hero.subtitle,
-					gradient: formValues.hero.gradient,
-					iconColor: formValues.hero.iconColor,
-					textColor: formValues.hero.textColor
-			  }
-			: currentData.hero,
-		directorMessage: formValues.directorMessage
-			? {
-					name: formValues.directorMessage.name,
-					position: formValues.directorMessage.position,
-					initials: formValues.directorMessage.initials,
-					gradientColor: formValues.directorMessage.gradientColor,
-					message1: formValues.directorMessage.message1,
-					message2: formValues.directorMessage.message2,
-					image: formValues.directorMessage.image
-			  }
-			: currentData.directorMessage,
+		hero: formValues.hero || currentData.hero,
+		directorMessage: formValues.directorMessage || currentData.directorMessage,
 		teamTitle: formValues.teamTitle ?? currentData.teamTitle,
 		teamDescription: formValues.teamDescription ?? currentData.teamDescription,
 		teamMembers:
 			formValues.teamMembers && formValues.teamMembers.length > 0
 				? formValues.teamMembers
-						.filter(member => member.name && member.position)
-						.map(member => ({
-							id: member.id,
-							name: member.name,
-							position: member.position,
-							qualifications: member.qualifications,
-							specialization: member.specialization,
-							image: member.image
-						}))
+						.filter(m => m.name && m.position)
+						.map(m => ({ ...m }))
 				: currentData.teamMembers,
 		departmentsTitle: formValues.departmentsTitle ?? currentData.departmentsTitle,
 		departmentsDescription:
@@ -253,16 +195,8 @@ function createUpdatedData(
 		departments:
 			formValues.departments && formValues.departments.length > 0
 				? formValues.departments
-						.filter(dept => dept.name && dept.code)
-						.map(dept => ({
-							id: dept.id,
-							name: dept.name,
-							code: dept.code,
-							coordinator: dept.coordinator,
-							companies: dept.companies,
-							avgPackage: dept.avgPackage,
-							placementRate: dept.placementRate
-						}))
+						.filter(d => d.name && d.code)
+						.map(d => ({ ...d }))
 				: currentData.departments,
 		trainingTitle: formValues.trainingTitle ?? currentData.trainingTitle,
 		trainingDescription:
@@ -270,16 +204,8 @@ function createUpdatedData(
 		trainingPrograms:
 			formValues.trainingPrograms && formValues.trainingPrograms.length > 0
 				? formValues.trainingPrograms
-						.filter(program => program.title && program.description)
-						.map(program => ({
-							id: program.id,
-							title: program.title,
-							description: program.description,
-							duration: program.duration,
-							participants: program.participants,
-							icon: program.icon,
-							color: program.color
-						}))
+						.filter(p => p.title && p.description)
+						.map(p => ({ ...p }))
 				: currentData.trainingPrograms,
 		objectivesTitle: formValues.objectivesTitle ?? currentData.objectivesTitle,
 		objectivesDescription:
@@ -287,13 +213,8 @@ function createUpdatedData(
 		objectives:
 			formValues.objectives && formValues.objectives.length > 0
 				? formValues.objectives
-						.filter(obj => obj.title && obj.description)
-						.map(obj => ({
-							id: obj.id,
-							title: obj.title,
-							description: obj.description,
-							icon: obj.icon
-						}))
+						.filter(o => o.title && o.description)
+						.map(o => ({ ...o }))
 				: currentData.objectives,
 		statisticsTitle: formValues.statisticsTitle ?? currentData.statisticsTitle,
 		statisticsDescription:
@@ -301,1240 +222,548 @@ function createUpdatedData(
 		statistics:
 			formValues.statistics && formValues.statistics.length > 0
 				? formValues.statistics
-						.filter(stat => stat.number && stat.label)
-						.map(stat => ({
-							id: stat.id,
-							number: stat.number,
-							label: stat.label,
-							sublabel: stat.sublabel
-						}))
+						.filter(s => s.number && s.label)
+						.map(s => ({ ...s }))
 				: currentData.statistics
 	};
 }
 
 export default function TrainingPlacementForm({
 	initialData,
-	pageSlug,
 	onChange
 }: TrainingPlacementFormProps) {
 	const [isPending, startTransition] = useTransition();
-	const [message, setMessage] = useState<string>('');
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 	const [currentData, setCurrentData] =
 		useState<TrainingPlacementData>(initialData);
 
 	const form = useForm<FormValues>({
 		defaultValues: {
-			hero: {
-				icon: initialData.hero?.icon ?? FALLBACK_ICON,
-				title: initialData.hero?.title ?? 'About Training & Placement',
-				subtitle:
-					initialData.hero?.subtitle ??
-					'Empowering students with industry-ready skills',
-				gradient: initialData.hero?.gradient ?? GRADIENT_OPTIONS[0],
-				iconColor: initialData.hero?.iconColor ?? 'white',
-				textColor: initialData.hero?.textColor ?? 'white'
-			},
-			directorMessage: {
-				name: initialData.directorMessage?.name ?? 'Prof. Achal Kausik',
-				position:
-					initialData.directorMessage?.position ??
-					'Dean of Academics, Head of CSE, Head of T&P',
-				initials: initialData.directorMessage?.initials ?? 'AK',
-				gradientColor:
-					initialData.directorMessage?.gradientColor ??
-					'from-blue-500 to-blue-700',
-				message1:
-					initialData.directorMessage?.message1 ?? 'Message from director',
-				message2: initialData.directorMessage?.message2 ?? 'Additional message',
-				image: initialData.directorMessage?.image ?? ''
-			},
-			teamTitle: initialData.teamTitle ?? 'Our Dedicated Team',
-			teamDescription:
-				initialData.teamDescription ??
-				'Meet the professionals who make career dreams a reality',
-			teamMembers:
-				initialData.teamMembers && initialData.teamMembers.length > 0
-					? initialData.teamMembers.map(member => ({
-							id: member.id || crypto.randomUUID(),
-							name: member.name,
-							position: member.position,
-							qualifications: member.qualifications,
-							specialization: member.specialization,
-							image: member.image ?? ''
-					  }))
-					: [createEmptyTeamMember()],
-			departmentsTitle:
-				initialData.departmentsTitle ??
-				'Department-wise Placement Coordinators',
-			departmentsDescription:
-				initialData.departmentsDescription ??
-				"Specialized support for each department's unique placement needs",
-			departments:
-				initialData.departments && initialData.departments.length > 0
-					? initialData.departments.map(dept => ({
-							id: dept.id || crypto.randomUUID(),
-							name: dept.name,
-							code: dept.code,
-							coordinator: dept.coordinator,
-							companies: dept.companies,
-							avgPackage: dept.avgPackage,
-							placementRate: dept.placementRate
-					  }))
-					: [createEmptyDepartment()],
-			trainingTitle: initialData.trainingTitle ?? 'Training Programs',
-			trainingDescription:
-				initialData.trainingDescription ??
-				'Comprehensive training modules to enhance student employability',
-			trainingPrograms:
-				initialData.trainingPrograms && initialData.trainingPrograms.length > 0
-					? initialData.trainingPrograms.map(program => ({
-							id: program.id || crypto.randomUUID(),
-							title: program.title,
-							description: program.description,
-							duration: program.duration,
-							participants: program.participants,
-							icon: program.icon,
-							color: program.color
-					  }))
-					: [createEmptyTrainingProgram()],
-			objectivesTitle: initialData.objectivesTitle ?? 'T&P Cell Objectives',
-			objectivesDescription:
-				initialData.objectivesDescription ??
-				'Our primary focus areas for student development and placement success',
-			objectives:
-				initialData.objectives && initialData.objectives.length > 0
-					? initialData.objectives.map(obj => ({
-							id: obj.id || crypto.randomUUID(),
-							title: obj.title,
-							description: obj.description,
-							icon: obj.icon
-					  }))
-					: [createEmptyObjective()],
-			statisticsTitle: initialData.statisticsTitle ?? 'Our Success Metrics',
-			statisticsDescription:
-				initialData.statisticsDescription ??
-				'Placement statistics that showcase our commitment to student success',
-			statistics:
-				initialData.statistics && initialData.statistics.length > 0
-					? initialData.statistics.map(stat => ({
-							id: stat.id || crypto.randomUUID(),
-							number: stat.number,
-							label: stat.label,
-							sublabel: stat.sublabel
-					  }))
-					: [createEmptyStatistic()]
+			hero: initialData.hero as HeroFormValue,
+			directorMessage: initialData.directorMessage as DirectorMessageFormValue,
+			teamTitle: initialData.teamTitle || '',
+			teamDescription: initialData.teamDescription || '',
+			teamMembers: (initialData.teamMembers || []) as TeamMemberFormValue[],
+			departmentsTitle: initialData.departmentsTitle || '',
+			departmentsDescription: initialData.departmentsDescription || '',
+			departments: (initialData.departments || []) as DepartmentFormValue[],
+			trainingTitle: initialData.trainingTitle || '',
+			trainingDescription: initialData.trainingDescription || '',
+			trainingPrograms: (initialData.trainingPrograms ||
+				[]) as TrainingProgramFormValue[],
+			objectivesTitle: initialData.objectivesTitle || '',
+			objectivesDescription: initialData.objectivesDescription || '',
+			objectives: (initialData.objectives || []) as ObjectiveFormValue[],
+			statisticsTitle: initialData.statisticsTitle || '',
+			statisticsDescription: initialData.statisticsDescription || '',
+			statistics: (initialData.statistics || []) as StatisticFormValue[]
 		}
 	});
 
-	const teamMembersArray = useFieldArray({
-		control: form.control,
-		name: 'teamMembers'
-	});
-
-	const departmentsArray = useFieldArray({
-		control: form.control,
-		name: 'departments'
-	});
-
-	const trainingProgramsArray = useFieldArray({
+	const teamArr = useFieldArray({ control: form.control, name: 'teamMembers' });
+	const deptArr = useFieldArray({ control: form.control, name: 'departments' });
+	const progArr = useFieldArray({
 		control: form.control,
 		name: 'trainingPrograms'
 	});
-
-	const objectivesArray = useFieldArray({
-		control: form.control,
-		name: 'objectives'
-	});
-
-	const statisticsArray = useFieldArray({
-		control: form.control,
-		name: 'statistics'
-	});
+	const objArr = useFieldArray({ control: form.control, name: 'objectives' });
+	const statArr = useFieldArray({ control: form.control, name: 'statistics' });
 
 	useEffect(() => {
-		const updatedData = createUpdatedData(currentData, form.getValues());
-		onChange?.(updatedData);
-		const subscription = form.watch(values => {
-			const formValues = {
-				...values,
-				teamMembers: values.teamMembers?.filter(Boolean) as TeamMemberFormValue[],
-				departments: values.departments?.filter(Boolean) as DepartmentFormValue[],
-				trainingPrograms: values.trainingPrograms?.filter(
-					Boolean
-				) as TrainingProgramFormValue[],
-				objectives: values.objectives?.filter(Boolean) as ObjectiveFormValue[],
-				statistics: values.statistics?.filter(Boolean) as StatisticFormValue[]
-			} as Partial<FormValues>;
-			const updatedData = createUpdatedData(currentData, formValues);
-			onChange?.(updatedData);
+		const sub = form.watch(values => {
+			const updated = createUpdatedData(
+				currentData,
+				values as Partial<FormValues>
+			);
+			onChange?.(updated);
+			setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 		});
-		return () => subscription.unsubscribe();
+		return () => sub.unsubscribe();
 	}, [form, onChange, currentData]);
 
-	const handleSubmit = (values: FormValues) => {
-		setMessage('');
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
+	const onSubmit = form.handleSubmit(values => {
+		setStatus({ kind: 'saving' });
 		const payload = createUpdatedData(currentData, values);
 		startTransition(async () => {
 			try {
 				await updateTrainingPlacement(payload);
-				setCurrentData(payload); // Update current data after successful save
-				setMessage('Saved');
+				setCurrentData(payload);
+				setStatus({ kind: 'success', message: 'Saved' });
 			} catch (error) {
 				console.error('Save error:', error);
-				setMessage('Save failed');
+				setStatus({ kind: 'error', message: 'Save failed' });
 			}
 		});
-	};
+	});
 
-	const iconOptions = useMemo(() => {
-		const unique = new Set(SUPPORTED_ICON_NAMES);
-		return Array.from(unique);
-	}, []);
+	const iconSelect = (val: string | undefined, set: (v: string) => void) => (
+		<Select value={val || 'Target'} onValueChange={set}>
+			<SelectTrigger>
+				<SelectValue />
+			</SelectTrigger>
+			<SelectContent>
+				{ICON_OPTIONS.map(i => (
+					<SelectItem key={i} value={i}>
+						{i}
+					</SelectItem>
+				))}
+			</SelectContent>
+		</Select>
+	);
+
+	const directorImage = form.watch('directorMessage.image');
 
 	return (
-		<Form {...form}>
-			<form
-				className='space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm max-h-[70vh] overflow-y-auto overflow-x-hidden'
-				onSubmit={form.handleSubmit(handleSubmit)}>
-				<div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
-					<div>
-						<h3 className='text-lg font-semibold text-slate-900'>
-							Training & Placement
-						</h3>
-						<p className='text-sm text-slate-500'>
-							Edit training and placement content and sections.
-						</p>
-					</div>
-					<div className='flex items-center gap-2'>
-						{message && (
-							<span className='rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700'>
-								{message}
-							</span>
+		<AdminForm onSubmit={onSubmit}>
+			<AdminFormSection
+				title='Hero'
+				description='Top banner copy for the T&P cell page.'>
+				<AdminFieldGrid>
+					<AdminField label='Icon'>
+						{iconSelect(form.watch('hero.icon'), v =>
+							form.setValue('hero.icon', v, { shouldDirty: true })
 						)}
-						<Button type='submit' disabled={isPending}>
-							{isPending ? 'Saving...' : 'Save changes'}
-						</Button>
-					</div>
-				</div>
+					</AdminField>
+					<AdminField label='Icon color'>
+						<Input {...form.register('hero.iconColor')} />
+					</AdminField>
+					<AdminField label='Text color'>
+						<Input {...form.register('hero.textColor')} />
+					</AdminField>
+				</AdminFieldGrid>
+				<AdminField label='Title'>
+					<Input {...form.register('hero.title')} />
+				</AdminField>
+				<AdminField label='Subtitle'>
+					<Textarea rows={2} {...form.register('hero.subtitle')} />
+				</AdminField>
+				<AdminField label='Background gradient (Tailwind classes)'>
+					<Input {...form.register('hero.gradient')} />
+				</AdminField>
+			</AdminFormSection>
 
-				{/* Hero Section */}
-				<div className='space-y-4'>
-					<h4 className='text-sm font-semibold text-slate-700'>Hero Section</h4>
-					<div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-						<FormField
-							control={form.control}
-							name='hero.title'
-							rules={{ required: 'Title is required' }}
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Title</FormLabel>
-									<FormControl>
-										<Input placeholder='About Training & Placement' {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name='hero.subtitle'
-							rules={{ required: 'Subtitle is required' }}
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Subtitle</FormLabel>
-									<FormControl>
-										<Textarea placeholder='Subtitle' {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name='hero.icon'
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Icon</FormLabel>
-									<FormControl>
-										<Select
-											onValueChange={field.onChange}
-											value={field.value}>
-											<SelectTrigger>
-												<SelectValue placeholder='Select icon' />
-											</SelectTrigger>
-											<SelectContent>
-												{iconOptions.map(option => (
-													<SelectItem key={option} value={option}>
-														{option}
-													</SelectItem>
-												))}
-											</SelectContent>
-										</Select>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name='hero.gradient'
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Gradient</FormLabel>
-									<FormControl>
-										<Select
-											onValueChange={field.onChange}
-											value={field.value}>
-											<SelectTrigger>
-												<SelectValue placeholder='Select gradient' />
-											</SelectTrigger>
-											<SelectContent>
-												{GRADIENT_OPTIONS.map(option => (
-													<SelectItem key={option} value={option}>
-														{option}
-													</SelectItem>
-												))}
-											</SelectContent>
-										</Select>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
+			<AdminFormSection title="Director's message">
+				<AdminFieldGrid>
+					<AdminField label='Name'>
+						<Input {...form.register('directorMessage.name')} />
+					</AdminField>
+					<AdminField label='Position'>
+						<Input {...form.register('directorMessage.position')} />
+					</AdminField>
+					<AdminField label='Initials'>
+						<Input {...form.register('directorMessage.initials')} />
+					</AdminField>
+					<AdminField label='Gradient color'>
+						<Input {...form.register('directorMessage.gradientColor')} />
+					</AdminField>
+				</AdminFieldGrid>
+				<AdminField label='Image (optional)'>
+					<Input
+						placeholder='Image URL'
+						{...form.register('directorMessage.image')}
+					/>
+					<div className='mt-2'>
+						<UploadButton
+							onUpload={url =>
+								form.setValue('directorMessage.image', url, {
+									shouldDirty: true
+								})
+							}
+							buttonText='Upload image'
 						/>
 					</div>
-				</div>
-
-				{/* Director's Message Section */}
-				<div className='space-y-4'>
-					<h4 className='text-sm font-semibold text-slate-700'>
-						Director's Message
-					</h4>
-					<div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-						<FormField
-							control={form.control}
-							name='directorMessage.name'
-							rules={{ required: 'Name is required' }}
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Name</FormLabel>
-									<FormControl>
-										<Input placeholder='Prof. Achal Kausik' {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name='directorMessage.position'
-							rules={{ required: 'Position is required' }}
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Position</FormLabel>
-									<FormControl>
-										<Input placeholder='Dean of Academics' {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name='directorMessage.initials'
-							rules={{ required: 'Initials are required' }}
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Initials</FormLabel>
-									<FormControl>
-										<Input placeholder='AK' {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name='directorMessage.gradientColor'
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Gradient Color</FormLabel>
-									<FormControl>
-										<Select
-											onValueChange={field.onChange}
-											value={field.value}>
-											<SelectTrigger>
-												<SelectValue placeholder='Select gradient' />
-											</SelectTrigger>
-											<SelectContent>
-												{GRADIENT_OPTIONS.map(option => (
-													<SelectItem key={option} value={option}>
-														{option}
-													</SelectItem>
-												))}
-											</SelectContent>
-										</Select>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name='directorMessage.image'
-							render={({ field }) => (
-								<FormItem className='sm:col-span-2'>
-									<FormLabel>Director Profile Image</FormLabel>
-									<FormControl>
-										<div className='space-y-2'>
-											<Input {...field} placeholder='Image URL (optional)' />
-											<UploadButton
-												onUpload={(url) => field.onChange(url)}
-												buttonText='Upload Director Image'
-												className='sm:w-auto'
-											/>
-											{field.value ? (
-												<div className='mt-2'>
-													<img
-														src={field.value}
-														alt='Director preview'
-														className='w-20 h-20 rounded-full object-cover border-2 border-blue-200'
-													/>
-												</div>
-											) : (
-												<p className='text-sm text-gray-500'>Default avatar will be shown if no image uploaded</p>
-											)}
-										</div>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name='directorMessage.message1'
-							rules={{ required: 'Message 1 is required' }}
-							render={({ field }) => (
-								<FormItem className='sm:col-span-2'>
-									<FormLabel>Message 1</FormLabel>
-									<FormControl>
-										<Textarea
-											placeholder='First message paragraph'
-											{...field}
-											rows={3}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name='directorMessage.message2'
-							rules={{ required: 'Message 2 is required' }}
-							render={({ field }) => (
-								<FormItem className='sm:col-span-2'>
-									<FormLabel>Message 2</FormLabel>
-									<FormControl>
-										<Textarea
-											placeholder='Second message paragraph'
-											{...field}
-											rows={3}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-					</div>
-				</div>
-
-				{/* Team Section */}
-				<div className='space-y-4'>
-					<h4 className='text-sm font-semibold text-slate-700'>Team Section</h4>
-					<div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-						<FormField
-							control={form.control}
-							name='teamTitle'
-							rules={{ required: 'Team title is required' }}
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Team Title</FormLabel>
-									<FormControl>
-										<Input placeholder='Our Dedicated Team' {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name='teamDescription'
-							rules={{ required: 'Team description is required' }}
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Team Description</FormLabel>
-									<FormControl>
-										<Textarea placeholder='Team description' {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-					</div>
-					<div className='space-y-4'>
-						<div className='flex items-center justify-between'>
-							<span className='text-sm text-slate-600'>Manage team members</span>
-							<Button
-								type='button'
-								variant='outline'
-								size='sm'
-								onClick={() => teamMembersArray.append(createEmptyTeamMember())}>
-								Add Team Member
-							</Button>
+					{directorImage && (
+						<div className='mt-3'>
+							{/* eslint-disable-next-line @next/next/no-img-element */}
+							<img
+								src={directorImage}
+								alt='Director preview'
+								className='h-20 w-20 rounded-full border border-slate-200 object-cover'
+							/>
 						</div>
-						<div className='space-y-4'>
-							{teamMembersArray.fields.map((field, index) => (
-								<div
-									key={field.id}
-									className='rounded-lg border border-slate-200 bg-slate-50/50 p-4'>
-									<div className='mb-3 flex items-center justify-between'>
-										<span className='text-sm font-medium text-slate-700'>
-											Team Member {index + 1}
-										</span>
-										<Button
-											type='button'
-											variant='ghost'
-											size='sm'
-											onClick={() => teamMembersArray.remove(index)}
-											className='h-8 w-8 rounded-full p-0 text-slate-400 hover:bg-red-100 hover:text-red-600'>
-											×
-										</Button>
-									</div>
-									<div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-										<FormField
-											control={form.control}
-											name={`teamMembers.${index}.name`}
-											rules={{ required: 'Name is required' }}
-											render={({ field: nameField }) => (
-												<FormItem>
-													<FormLabel>Name</FormLabel>
-													<FormControl>
-														<Input placeholder='Member name' {...nameField} />
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-										<FormField
-											control={form.control}
-											name={`teamMembers.${index}.position`}
-											rules={{ required: 'Position is required' }}
-											render={({ field: posField }) => (
-												<FormItem>
-													<FormLabel>Position</FormLabel>
-													<FormControl>
-														<Input placeholder='Position' {...posField} />
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-										<FormField
-											control={form.control}
-											name={`teamMembers.${index}.qualifications`}
-											rules={{ required: 'Qualifications are required' }}
-											render={({ field: qualField }) => (
-												<FormItem>
-													<FormLabel>Qualifications</FormLabel>
-													<FormControl>
-														<Input placeholder='Qualifications' {...qualField} />
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-										<FormField
-											control={form.control}
-											name={`teamMembers.${index}.specialization`}
-											rules={{ required: 'Specialization is required' }}
-											render={({ field: specField }) => (
-												<FormItem>
-													<FormLabel>Specialization</FormLabel>
-													<FormControl>
-														<Input placeholder='Specialization' {...specField} />
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-										<FormField
-											control={form.control}
-											name={`teamMembers.${index}.image`}
-											render={({ field: imageField }) => (
-												<FormItem className='sm:col-span-2'>
-													<FormLabel>Profile Image</FormLabel>
-													<FormControl>
-														<div className='space-y-2'>
-															<Input placeholder='Image URL (optional)' {...imageField} />
-															<UploadButton
-																onUpload={(url) => {
-																	imageField.onChange(url);
-																	form.setValue(`teamMembers.${index}.image`, url, {
-																		shouldDirty: true
-																	});
-																}}
-																buttonText='Upload Profile Image'
-																className='sm:w-auto'
-															/>
-															{imageField.value ? (
-																<div className='mt-2'>
-																	<img
-																		src={imageField.value}
-																		alt='Profile preview'
-																		className='w-20 h-20 rounded-full object-cover border-2 border-gray-200'
-																	/>
-																</div>
-															) : (
-																<div className='mt-2 text-xs text-gray-500'>
-																	No image uploaded. Initials will be shown as avatar.
-																</div>
-															)}
-														</div>
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-									</div>
-								</div>
-							))}
-							{teamMembersArray.fields.length === 0 ? (
-								<div className='rounded-lg border border-dashed border-slate-300 p-4 text-sm text-slate-500'>
-									Add at least one team member to display in this section.
-								</div>
-							) : null}
-						</div>
-					</div>
-				</div>
+					)}
+				</AdminField>
+				<AdminField label='Message paragraph 1'>
+					<Textarea rows={4} {...form.register('directorMessage.message1')} />
+				</AdminField>
+				<AdminField label='Message paragraph 2'>
+					<Textarea rows={4} {...form.register('directorMessage.message2')} />
+				</AdminField>
+			</AdminFormSection>
 
-				{/* Departments Section */}
-				<div className='space-y-4'>
-					<h4 className='text-sm font-semibold text-slate-700'>
-						Departments Section
-					</h4>
-					<div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-						<FormField
-							control={form.control}
-							name='departmentsTitle'
-							rules={{ required: 'Departments title is required' }}
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Departments Title</FormLabel>
-									<FormControl>
+			<AdminFormSection title='Team — heading'>
+				<AdminField label='Section title'>
+					<Input {...form.register('teamTitle')} />
+				</AdminField>
+				<AdminField label='Section description'>
+					<Textarea rows={3} {...form.register('teamDescription')} />
+				</AdminField>
+			</AdminFormSection>
+
+			<AdminFormSection title='Team members'>
+				<AdminItemList>
+					{teamArr.fields.map((field, index) => {
+						const image = form.watch(`teamMembers.${index}.image`);
+						return (
+							<AdminItemCard
+								key={field.id}
+								index={index}
+								total={teamArr.fields.length}
+								title={
+									form.watch(`teamMembers.${index}.name`) ||
+									`Member ${index + 1}`
+								}
+								subtitle={form.watch(`teamMembers.${index}.position`) || undefined}
+								onMove={d => teamArr.move(index, index + d)}
+								onRemove={() => teamArr.remove(index)}>
+								<AdminFieldGrid>
+									<AdminField label='Name'>
 										<Input
-											placeholder='Department-wise Placement Coordinators'
-											{...field}
+											{...form.register(`teamMembers.${index}.name` as const)}
 										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name='departmentsDescription'
-							rules={{ required: 'Departments description is required' }}
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Departments Description</FormLabel>
-									<FormControl>
-										<Textarea
-											placeholder='Departments description'
-											{...field}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-					</div>
-					<div className='space-y-4'>
-						<div className='flex items-center justify-between'>
-							<span className='text-sm text-slate-600'>Manage departments</span>
-							<Button
-								type='button'
-								variant='outline'
-								size='sm'
-								onClick={() => departmentsArray.append(createEmptyDepartment())}>
-								Add Department
-							</Button>
-						</div>
-						<div className='space-y-4'>
-							{departmentsArray.fields.map((field, index) => (
-								<div
-									key={field.id}
-									className='rounded-lg border border-slate-200 bg-slate-50/50 p-4'>
-									<div className='mb-3 flex items-center justify-between'>
-										<span className='text-sm font-medium text-slate-700'>
-											Department {index + 1}
-										</span>
-										<Button
-											type='button'
-											variant='ghost'
-											size='sm'
-											onClick={() => departmentsArray.remove(index)}
-											className='h-8 w-8 rounded-full p-0 text-slate-400 hover:bg-red-100 hover:text-red-600'>
-											×
-										</Button>
-									</div>
-									<div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-										<FormField
-											control={form.control}
-											name={`departments.${index}.name`}
-											rules={{ required: 'Name is required' }}
-											render={({ field: nameField }) => (
-												<FormItem>
-													<FormLabel>Name</FormLabel>
-													<FormControl>
-														<Input placeholder='Department name' {...nameField} />
-													</FormControl>
-													<FormMessage />
-												</FormItem>
+									</AdminField>
+									<AdminField label='Position'>
+										<Input
+											{...form.register(
+												`teamMembers.${index}.position` as const
 											)}
 										/>
-										<FormField
-											control={form.control}
-											name={`departments.${index}.code`}
-											rules={{ required: 'Code is required' }}
-											render={({ field: codeField }) => (
-												<FormItem>
-													<FormLabel>Code</FormLabel>
-													<FormControl>
-														<Input placeholder='CSE' {...codeField} />
-													</FormControl>
-													<FormMessage />
-												</FormItem>
+									</AdminField>
+									<AdminField label='Qualifications'>
+										<Input
+											{...form.register(
+												`teamMembers.${index}.qualifications` as const
 											)}
 										/>
-										<FormField
-											control={form.control}
-											name={`departments.${index}.coordinator`}
-											rules={{ required: 'Coordinator is required' }}
-											render={({ field: coordField }) => (
-												<FormItem>
-													<FormLabel>Coordinator</FormLabel>
-													<FormControl>
-														<Input placeholder='Coordinator name' {...coordField} />
-													</FormControl>
-													<FormMessage />
-												</FormItem>
+									</AdminField>
+									<AdminField label='Specialization'>
+										<Input
+											{...form.register(
+												`teamMembers.${index}.specialization` as const
 											)}
 										/>
-										<FormField
-											control={form.control}
-											name={`departments.${index}.companies`}
-											rules={{ required: 'Companies are required' }}
-											render={({ field: compField }) => (
-												<FormItem>
-													<FormLabel>Companies</FormLabel>
-													<FormControl>
-														<Input
-															placeholder='Company 1, Company 2'
-															{...compField}
-														/>
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-										<FormField
-											control={form.control}
-											name={`departments.${index}.avgPackage`}
-											rules={{ required: 'Average package is required' }}
-											render={({ field: avgField }) => (
-												<FormItem>
-													<FormLabel>Avg Package</FormLabel>
-													<FormControl>
-														<Input placeholder='₹9.07 LPA' {...avgField} />
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-										<FormField
-											control={form.control}
-											name={`departments.${index}.placementRate`}
-											rules={{ required: 'Placement rate is required' }}
-											render={({ field: rateField }) => (
-												<FormItem>
-													<FormLabel>Placement Rate</FormLabel>
-													<FormControl>
-														<Input placeholder='96%' {...rateField} />
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
+									</AdminField>
+								</AdminFieldGrid>
+								<AdminField label='Image'>
+									<Input
+										placeholder='Image URL'
+										{...form.register(`teamMembers.${index}.image` as const)}
+									/>
+									<div className='mt-2'>
+										<UploadButton
+											onUpload={url =>
+												form.setValue(`teamMembers.${index}.image`, url, {
+													shouldDirty: true
+												})
+											}
+											buttonText='Upload image'
 										/>
 									</div>
-								</div>
-							))}
-							{departmentsArray.fields.length === 0 ? (
-								<div className='rounded-lg border border-dashed border-slate-300 p-4 text-sm text-slate-500'>
-									Add at least one department to display in this section.
-								</div>
-							) : null}
-						</div>
-					</div>
-				</div>
+									{image && (
+										<div className='mt-3'>
+											{/* eslint-disable-next-line @next/next/no-img-element */}
+											<img
+												src={image}
+												alt='Preview'
+												className='h-16 w-16 rounded-full border border-slate-200 object-cover'
+											/>
+										</div>
+									)}
+								</AdminField>
+							</AdminItemCard>
+						);
+					})}
+				</AdminItemList>
+				{teamArr.fields.length === 0 && (
+					<AdminEmptyState title='No team members yet' />
+				)}
+				<AddRowButton onClick={() => teamArr.append(createTeamMember())}>
+					Add member
+				</AddRowButton>
+			</AdminFormSection>
 
-				{/* Training Programs Section */}
-				<div className='space-y-4'>
-					<h4 className='text-sm font-semibold text-slate-700'>
-						Training Programs
-					</h4>
-					<div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-						<FormField
-							control={form.control}
-							name='trainingTitle'
-							rules={{ required: 'Training title is required' }}
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Training Title</FormLabel>
-									<FormControl>
-										<Input placeholder='Training Programs' {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name='trainingDescription'
-							rules={{ required: 'Training description is required' }}
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Training Description</FormLabel>
-									<FormControl>
-										<Textarea placeholder='Training description' {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-					</div>
-					<div className='space-y-4'>
-						<div className='flex items-center justify-between'>
-							<span className='text-sm text-slate-600'>
-								Manage training programs
-							</span>
-							<Button
-								type='button'
-								variant='outline'
-								size='sm'
-								onClick={() =>
-									trainingProgramsArray.append(createEmptyTrainingProgram())
-								}>
-								Add Training Program
-							</Button>
-						</div>
-						<div className='space-y-4'>
-							{trainingProgramsArray.fields.map((field, index) => (
-								<div
-									key={field.id}
-									className='rounded-lg border border-slate-200 bg-slate-50/50 p-4'>
-									<div className='mb-3 flex items-center justify-between'>
-										<span className='text-sm font-medium text-slate-700'>
-											Training Program {index + 1}
-										</span>
-										<Button
-											type='button'
-											variant='ghost'
-											size='sm'
-											onClick={() => trainingProgramsArray.remove(index)}
-											className='h-8 w-8 rounded-full p-0 text-slate-400 hover:bg-red-100 hover:text-red-600'>
-											×
-										</Button>
-									</div>
-									<div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-										<FormField
-											control={form.control}
-											name={`trainingPrograms.${index}.title`}
-											rules={{ required: 'Title is required' }}
-											render={({ field: titleField }) => (
-												<FormItem>
-													<FormLabel>Title</FormLabel>
-													<FormControl>
-														<Input placeholder='Program title' {...titleField} />
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-										<FormField
-											control={form.control}
-											name={`trainingPrograms.${index}.description`}
-											rules={{ required: 'Description is required' }}
-											render={({ field: descField }) => (
-												<FormItem>
-													<FormLabel>Description</FormLabel>
-													<FormControl>
-														<Textarea
-															placeholder='Program description'
-															{...descField}
-														/>
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-										<FormField
-											control={form.control}
-											name={`trainingPrograms.${index}.duration`}
-											rules={{ required: 'Duration is required' }}
-											render={({ field: durField }) => (
-												<FormItem>
-													<FormLabel>Duration</FormLabel>
-													<FormControl>
-														<Input placeholder='2 weeks' {...durField} />
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-										<FormField
-											control={form.control}
-											name={`trainingPrograms.${index}.participants`}
-											rules={{ required: 'Participants are required' }}
-											render={({ field: partField }) => (
-												<FormItem>
-													<FormLabel>Participants</FormLabel>
-													<FormControl>
-														<Input placeholder='500+ students' {...partField} />
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-										<FormField
-											control={form.control}
-											name={`trainingPrograms.${index}.icon`}
-											render={({ field: iconField }) => (
-												<FormItem>
-													<FormLabel>Icon</FormLabel>
-													<FormControl>
-														<Select
-															onValueChange={iconField.onChange}
-															value={iconField.value}>
-															<SelectTrigger>
-																<SelectValue placeholder='Select icon' />
-															</SelectTrigger>
-															<SelectContent>
-																{iconOptions.map(option => (
-																	<SelectItem key={option} value={option}>
-																		{option}
-																	</SelectItem>
-																))}
-															</SelectContent>
-														</Select>
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-										<FormField
-											control={form.control}
-											name={`trainingPrograms.${index}.color`}
-											render={({ field: colorField }) => (
-												<FormItem>
-													<FormLabel>Color</FormLabel>
-													<FormControl>
-														<Select
-															onValueChange={colorField.onChange}
-															value={colorField.value}>
-															<SelectTrigger>
-																<SelectValue placeholder='Select color' />
-															</SelectTrigger>
-															<SelectContent>
-																{COLOR_OPTIONS.map(option => (
-																	<SelectItem key={option} value={option}>
-																		{option}
-																	</SelectItem>
-																))}
-															</SelectContent>
-														</Select>
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-									</div>
-								</div>
-							))}
-							{trainingProgramsArray.fields.length === 0 ? (
-								<div className='rounded-lg border border-dashed border-slate-300 p-4 text-sm text-slate-500'>
-									Add at least one training program to display in this section.
-								</div>
-							) : null}
-						</div>
-					</div>
-				</div>
+			<AdminFormSection title='Departments — heading'>
+				<AdminField label='Section title'>
+					<Input {...form.register('departmentsTitle')} />
+				</AdminField>
+				<AdminField label='Section description'>
+					<Textarea rows={3} {...form.register('departmentsDescription')} />
+				</AdminField>
+			</AdminFormSection>
 
-				{/* Objectives Section */}
-				<div className='space-y-4'>
-					<h4 className='text-sm font-semibold text-slate-700'>
-						Objectives Section
-					</h4>
-					<div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-						<FormField
-							control={form.control}
-							name='objectivesTitle'
-							rules={{ required: 'Objectives title is required' }}
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Objectives Title</FormLabel>
-									<FormControl>
-										<Input placeholder='T&P Cell Objectives' {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name='objectivesDescription'
-							rules={{ required: 'Objectives description is required' }}
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Objectives Description</FormLabel>
-									<FormControl>
-										<Textarea placeholder='Objectives description' {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-					</div>
-					<div className='space-y-4'>
-						<div className='flex items-center justify-between'>
-							<span className='text-sm text-slate-600'>Manage objectives</span>
-							<Button
-								type='button'
-								variant='outline'
-								size='sm'
-								onClick={() => objectivesArray.append(createEmptyObjective())}>
-								Add Objective
-							</Button>
-						</div>
-						<div className='space-y-4'>
-							{objectivesArray.fields.map((field, index) => (
-								<div
-									key={field.id}
-									className='rounded-lg border border-slate-200 bg-slate-50/50 p-4'>
-									<div className='mb-3 flex items-center justify-between'>
-										<span className='text-sm font-medium text-slate-700'>
-											Objective {index + 1}
-										</span>
-										<Button
-											type='button'
-											variant='ghost'
-											size='sm'
-											onClick={() => objectivesArray.remove(index)}
-											className='h-8 w-8 rounded-full p-0 text-slate-400 hover:bg-red-100 hover:text-red-600'>
-											×
-										</Button>
-									</div>
-									<div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-										<FormField
-											control={form.control}
-											name={`objectives.${index}.title`}
-											rules={{ required: 'Title is required' }}
-											render={({ field: titleField }) => (
-												<FormItem>
-													<FormLabel>Title</FormLabel>
-													<FormControl>
-														<Input
-															placeholder='Objective title'
-															{...titleField}
-														/>
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-										<FormField
-											control={form.control}
-											name={`objectives.${index}.description`}
-											rules={{ required: 'Description is required' }}
-											render={({ field: descField }) => (
-												<FormItem>
-													<FormLabel>Description</FormLabel>
-													<FormControl>
-														<Textarea
-															placeholder='Objective description'
-															{...descField}
-														/>
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-										<FormField
-											control={form.control}
-											name={`objectives.${index}.icon`}
-											render={({ field: iconField }) => (
-												<FormItem>
-													<FormLabel>Icon</FormLabel>
-													<FormControl>
-														<Select
-															onValueChange={iconField.onChange}
-															value={iconField.value}>
-															<SelectTrigger>
-																<SelectValue placeholder='Select icon' />
-															</SelectTrigger>
-															<SelectContent>
-																{iconOptions.map(option => (
-																	<SelectItem key={option} value={option}>
-																		{option}
-																	</SelectItem>
-																))}
-															</SelectContent>
-														</Select>
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-									</div>
-								</div>
-							))}
-							{objectivesArray.fields.length === 0 ? (
-								<div className='rounded-lg border border-dashed border-slate-300 p-4 text-sm text-slate-500'>
-									Add at least one objective to display in this section.
-								</div>
-							) : null}
-						</div>
-					</div>
-				</div>
+			<AdminFormSection title='Departments'>
+				<AdminItemList>
+					{deptArr.fields.map((field, index) => (
+						<AdminItemCard
+							key={field.id}
+							index={index}
+							total={deptArr.fields.length}
+							title={
+								form.watch(`departments.${index}.name`) ||
+								`Department ${index + 1}`
+							}
+							subtitle={form.watch(`departments.${index}.code`) || undefined}
+							onMove={d => deptArr.move(index, index + d)}
+							onRemove={() => deptArr.remove(index)}>
+							<AdminFieldGrid>
+								<AdminField label='Name'>
+									<Input
+										{...form.register(`departments.${index}.name` as const)}
+									/>
+								</AdminField>
+								<AdminField label='Code'>
+									<Input
+										{...form.register(`departments.${index}.code` as const)}
+									/>
+								</AdminField>
+								<AdminField label='Coordinator'>
+									<Input
+										{...form.register(
+											`departments.${index}.coordinator` as const
+										)}
+									/>
+								</AdminField>
+								<AdminField label='Companies'>
+									<Input
+										{...form.register(
+											`departments.${index}.companies` as const
+										)}
+									/>
+								</AdminField>
+								<AdminField label='Avg package'>
+									<Input
+										{...form.register(
+											`departments.${index}.avgPackage` as const
+										)}
+									/>
+								</AdminField>
+								<AdminField label='Placement rate'>
+									<Input
+										{...form.register(
+											`departments.${index}.placementRate` as const
+										)}
+									/>
+								</AdminField>
+							</AdminFieldGrid>
+						</AdminItemCard>
+					))}
+				</AdminItemList>
+				{deptArr.fields.length === 0 && (
+					<AdminEmptyState title='No departments yet' />
+				)}
+				<AddRowButton onClick={() => deptArr.append(createDept())}>
+					Add department
+				</AddRowButton>
+			</AdminFormSection>
 
-				{/* Statistics Section */}
-				<div className='space-y-4'>
-					<h4 className='text-sm font-semibold text-slate-700'>
-						Statistics Section
-					</h4>
-					<div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-						<FormField
-							control={form.control}
-							name='statisticsTitle'
-							rules={{ required: 'Statistics title is required' }}
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Statistics Title</FormLabel>
-									<FormControl>
-										<Input placeholder='Our Success Metrics' {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name='statisticsDescription'
-							rules={{ required: 'Statistics description is required' }}
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Statistics Description</FormLabel>
-									<FormControl>
-										<Textarea placeholder='Statistics description' {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-					</div>
-					<div className='space-y-4'>
-						<div className='flex items-center justify-between'>
-							<span className='text-sm text-slate-600'>Manage statistics</span>
-							<Button
-								type='button'
-								variant='outline'
-								size='sm'
-								onClick={() => statisticsArray.append(createEmptyStatistic())}>
-								Add Statistic
-							</Button>
-						</div>
-						<div className='space-y-4'>
-							{statisticsArray.fields.map((field, index) => (
-								<div
-									key={field.id}
-									className='rounded-lg border border-slate-200 bg-slate-50/50 p-4'>
-									<div className='mb-3 flex items-center justify-between'>
-										<span className='text-sm font-medium text-slate-700'>
-											Statistic {index + 1}
-										</span>
-										<Button
-											type='button'
-											variant='ghost'
-											size='sm'
-											onClick={() => statisticsArray.remove(index)}
-											className='h-8 w-8 rounded-full p-0 text-slate-400 hover:bg-red-100 hover:text-red-600'>
-											×
-										</Button>
-									</div>
-									<div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-										<FormField
-											control={form.control}
-											name={`statistics.${index}.number`}
-											rules={{ required: 'Number is required' }}
-											render={({ field: numField }) => (
-												<FormItem>
-													<FormLabel>Number</FormLabel>
-													<FormControl>
-														<Input placeholder='₹9.07' {...numField} />
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-										<FormField
-											control={form.control}
-											name={`statistics.${index}.label`}
-											rules={{ required: 'Label is required' }}
-											render={({ field: labelField }) => (
-												<FormItem>
-													<FormLabel>Label</FormLabel>
-													<FormControl>
-														<Input placeholder='Average Package' {...labelField} />
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-										<FormField
-											control={form.control}
-											name={`statistics.${index}.sublabel`}
-											rules={{ required: 'Sublabel is required' }}
-											render={({ field: subField }) => (
-												<FormItem>
-													<FormLabel>Sublabel</FormLabel>
-													<FormControl>
-														<Input placeholder='LPA for 2022 batch' {...subField} />
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-									</div>
-								</div>
-							))}
-							{statisticsArray.fields.length === 0 ? (
-								<div className='rounded-lg border border-dashed border-slate-300 p-4 text-sm text-slate-500'>
-									Add at least one statistic to display in this section.
-								</div>
-							) : null}
-						</div>
-					</div>
-				</div>
-			</form>
-		</Form>
+			<AdminFormSection title='Training programs — heading'>
+				<AdminField label='Section title'>
+					<Input {...form.register('trainingTitle')} />
+				</AdminField>
+				<AdminField label='Section description'>
+					<Textarea rows={3} {...form.register('trainingDescription')} />
+				</AdminField>
+			</AdminFormSection>
+
+			<AdminFormSection title='Training programs'>
+				<AdminItemList>
+					{progArr.fields.map((field, index) => (
+						<AdminItemCard
+							key={field.id}
+							index={index}
+							total={progArr.fields.length}
+							title={
+								form.watch(`trainingPrograms.${index}.title`) ||
+								`Program ${index + 1}`
+							}
+							onMove={d => progArr.move(index, index + d)}
+							onRemove={() => progArr.remove(index)}>
+							<AdminFieldGrid>
+								<AdminField label='Title'>
+									<Input
+										{...form.register(
+											`trainingPrograms.${index}.title` as const
+										)}
+									/>
+								</AdminField>
+								<AdminField label='Duration'>
+									<Input
+										{...form.register(
+											`trainingPrograms.${index}.duration` as const
+										)}
+									/>
+								</AdminField>
+								<AdminField label='Participants'>
+									<Input
+										{...form.register(
+											`trainingPrograms.${index}.participants` as const
+										)}
+									/>
+								</AdminField>
+								<AdminField label='Icon'>
+									{iconSelect(
+										form.watch(`trainingPrograms.${index}.icon`),
+										v =>
+											form.setValue(`trainingPrograms.${index}.icon`, v, {
+												shouldDirty: true
+											})
+									)}
+								</AdminField>
+								<AdminField label='Color'>
+									<Select
+										value={
+											form.watch(`trainingPrograms.${index}.color`) || 'blue'
+										}
+										onValueChange={v =>
+											form.setValue(`trainingPrograms.${index}.color`, v, {
+												shouldDirty: true
+											})
+										}>
+										<SelectTrigger>
+											<SelectValue />
+										</SelectTrigger>
+										<SelectContent>
+											{COLOR_OPTIONS.map(c => (
+												<SelectItem key={c} value={c}>
+													{c}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								</AdminField>
+							</AdminFieldGrid>
+							<AdminField label='Description'>
+								<Textarea
+									rows={3}
+									{...form.register(
+										`trainingPrograms.${index}.description` as const
+									)}
+								/>
+							</AdminField>
+						</AdminItemCard>
+					))}
+				</AdminItemList>
+				{progArr.fields.length === 0 && (
+					<AdminEmptyState title='No programs yet' />
+				)}
+				<AddRowButton onClick={() => progArr.append(createProgram())}>
+					Add program
+				</AddRowButton>
+			</AdminFormSection>
+
+			<AdminFormSection title='Objectives — heading'>
+				<AdminField label='Section title'>
+					<Input {...form.register('objectivesTitle')} />
+				</AdminField>
+				<AdminField label='Section description'>
+					<Textarea rows={3} {...form.register('objectivesDescription')} />
+				</AdminField>
+			</AdminFormSection>
+
+			<AdminFormSection title='Objectives'>
+				<AdminItemList>
+					{objArr.fields.map((field, index) => (
+						<AdminItemCard
+							key={field.id}
+							index={index}
+							total={objArr.fields.length}
+							title={
+								form.watch(`objectives.${index}.title`) ||
+								`Objective ${index + 1}`
+							}
+							onMove={d => objArr.move(index, index + d)}
+							onRemove={() => objArr.remove(index)}>
+							<AdminFieldGrid>
+								<AdminField label='Title'>
+									<Input
+										{...form.register(`objectives.${index}.title` as const)}
+									/>
+								</AdminField>
+								<AdminField label='Icon'>
+									{iconSelect(form.watch(`objectives.${index}.icon`), v =>
+										form.setValue(`objectives.${index}.icon`, v, {
+											shouldDirty: true
+										})
+									)}
+								</AdminField>
+							</AdminFieldGrid>
+							<AdminField label='Description'>
+								<Textarea
+									rows={3}
+									{...form.register(
+										`objectives.${index}.description` as const
+									)}
+								/>
+							</AdminField>
+						</AdminItemCard>
+					))}
+				</AdminItemList>
+				{objArr.fields.length === 0 && (
+					<AdminEmptyState title='No objectives yet' />
+				)}
+				<AddRowButton onClick={() => objArr.append(createObjective())}>
+					Add objective
+				</AddRowButton>
+			</AdminFormSection>
+
+			<AdminFormSection title='Statistics — heading'>
+				<AdminField label='Section title'>
+					<Input {...form.register('statisticsTitle')} />
+				</AdminField>
+				<AdminField label='Section description'>
+					<Textarea rows={3} {...form.register('statisticsDescription')} />
+				</AdminField>
+			</AdminFormSection>
+
+			<AdminFormSection title='Statistics'>
+				<AdminItemList>
+					{statArr.fields.map((field, index) => (
+						<AdminItemCard
+							key={field.id}
+							index={index}
+							total={statArr.fields.length}
+							title={
+								form.watch(`statistics.${index}.label`) ||
+								`Stat ${index + 1}`
+							}
+							subtitle={form.watch(`statistics.${index}.number`) || undefined}
+							onMove={d => statArr.move(index, index + d)}
+							onRemove={() => statArr.remove(index)}>
+							<AdminFieldGrid cols={3}>
+								<AdminField label='Number'>
+									<Input
+										{...form.register(`statistics.${index}.number` as const)}
+									/>
+								</AdminField>
+								<AdminField label='Label'>
+									<Input
+										{...form.register(`statistics.${index}.label` as const)}
+									/>
+								</AdminField>
+								<AdminField label='Sublabel'>
+									<Input
+										{...form.register(`statistics.${index}.sublabel` as const)}
+									/>
+								</AdminField>
+							</AdminFieldGrid>
+						</AdminItemCard>
+					))}
+				</AdminItemList>
+				{statArr.fields.length === 0 && (
+					<AdminEmptyState title='No statistics yet' />
+				)}
+				<AddRowButton onClick={() => statArr.append(createStatistic())}>
+					Add statistic
+				</AddRowButton>
+			</AdminFormSection>
+
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }

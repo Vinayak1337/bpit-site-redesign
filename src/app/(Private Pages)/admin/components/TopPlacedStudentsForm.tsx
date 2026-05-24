@@ -3,19 +3,22 @@
 import { useEffect, useMemo, useState, useTransition } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage
-} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import CloudinaryUploadButton from '@/components/cloudinary/upload-button';
 import { updateTopPlacedStudents } from '@/app/(Private Pages)/actions/placement';
-import { Plus, Trash2 } from 'lucide-react';
+import {
+	AddRowButton,
+	AdminEmptyState,
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	AdminItemCard,
+	AdminItemList,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 type StudentFormValue = {
 	id: string;
@@ -51,7 +54,6 @@ const createEmptyStudent = (): StudentFormValue => ({
 	image: '',
 	companyLogo: ''
 });
-
 const createEmptyStatistic = (): StatisticFormValue => ({
 	id: crypto.randomUUID(),
 	value: '',
@@ -60,52 +62,34 @@ const createEmptyStatistic = (): StatisticFormValue => ({
 
 const toTopPlacedStudentsData = (
 	values: TopPlacedStudentsFormValues
-): TopPlacedStudentsData => {
-	const students = values.students
-		.map((student, index) => ({
-			id: Number.parseInt(student.id, 10) || index + 1,
-			name: student.name.trim(),
-			company: student.company.trim(),
-			package: student.package.trim(),
-			branch: student.branch.trim(),
-			year: student.year.trim(),
-			image: student.image.trim(),
-			companyLogo: student.companyLogo.trim()
+): TopPlacedStudentsData => ({
+	title: values.title.trim(),
+	subtitle: values.subtitle.trim(),
+	students: values.students
+		.map((s, index) => ({
+			id: Number.parseInt(s.id, 10) || index + 1,
+			name: s.name.trim(),
+			company: s.company.trim(),
+			package: s.package.trim(),
+			branch: s.branch.trim(),
+			year: s.year.trim(),
+			image: s.image.trim(),
+			companyLogo: s.companyLogo.trim()
 		}))
 		.filter(
-			student =>
-				student.name.length > 0 &&
-				student.company.length > 0 &&
-				student.package.length > 0 &&
-				student.image.length > 0 &&
-				student.companyLogo.length > 0
-		);
-	const statistics = values.statistics
-		.map(stat => ({
-			value: stat.value.trim(),
-			label: stat.label.trim()
-		}))
-		.filter(stat => stat.value.length > 0 && stat.label.length > 0);
-	return {
-		title: values.title.trim(),
-		subtitle: values.subtitle.trim(),
-		students,
-		statistics
-	};
-};
-
-const ensureMinimumRows = (
-	values: TopPlacedStudentsFormValues
-): TopPlacedStudentsFormValues => ({
-	title: values.title,
-	subtitle: values.subtitle,
-	students:
-		values.students.length > 0 ? values.students : [createEmptyStudent()],
-	statistics:
-		values.statistics.length > 0 ? values.statistics : [createEmptyStatistic()]
+			s =>
+				s.name.length > 0 &&
+				s.company.length > 0 &&
+				s.package.length > 0 &&
+				s.image.length > 0 &&
+				s.companyLogo.length > 0
+		),
+	statistics: values.statistics
+		.map(s => ({ value: s.value.trim(), label: s.label.trim() }))
+		.filter(s => s.value.length > 0 && s.label.length > 0)
 });
 
-type TopPlacedStudentsFormProps = {
+type Props = {
 	initialValues: TopPlacedStudentsFormValues;
 	pageSlug: string;
 	onChange?: (data: TopPlacedStudentsData) => void;
@@ -115,383 +99,313 @@ export default function TopPlacedStudentsForm({
 	initialValues,
 	pageSlug,
 	onChange
-}: TopPlacedStudentsFormProps) {
-	const defaults = useMemo(
-		() => ensureMinimumRows(initialValues),
+}: Props) {
+	const defaults = useMemo<TopPlacedStudentsFormValues>(
+		() => ({
+			title: initialValues.title,
+			subtitle: initialValues.subtitle,
+			students:
+				initialValues.students.length > 0
+					? initialValues.students
+					: [createEmptyStudent()],
+			statistics:
+				initialValues.statistics.length > 0
+					? initialValues.statistics
+					: [createEmptyStatistic()]
+		}),
 		[initialValues]
 	);
-	const form = useForm<TopPlacedStudentsFormValues>({
-		defaultValues: defaults
-	});
-	const studentsFieldArray = useFieldArray({
+	const form = useForm<TopPlacedStudentsFormValues>({ defaultValues: defaults });
+	const studentsArr = useFieldArray({
 		control: form.control,
 		name: 'students'
 	});
-	const statisticsFieldArray = useFieldArray({
+	const statsArr = useFieldArray({
 		control: form.control,
 		name: 'statistics'
 	});
 	const [isPending, startTransition] = useTransition();
-	const [message, setMessage] = useState<string | null>(null);
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 
 	useEffect(() => {
 		onChange?.(toTopPlacedStudentsData(form.getValues()));
-		const subscription = form.watch(() => {
+		const sub = form.watch(() => {
 			onChange?.(toTopPlacedStudentsData(form.getValues()));
+			setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 		});
-		return () => subscription.unsubscribe();
+		return () => sub.unsubscribe();
 	}, [form, onChange]);
 
-	const handleSubmit = (values: TopPlacedStudentsFormValues) => {
-		setMessage(null);
-		const payload = toTopPlacedStudentsData(values);
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
+	const handleSubmit = form.handleSubmit(values => {
+		setStatus({ kind: 'saving' });
 		startTransition(async () => {
-			const result = await updateTopPlacedStudents(pageSlug, payload);
-			if (!result.ok) {
-				setMessage('Save failed');
-				return;
-			}
-			setMessage('Saved');
+			const result = await updateTopPlacedStudents(
+				pageSlug,
+				toTopPlacedStudentsData(values)
+			);
+			setStatus(
+				result.ok
+					? { kind: 'success', message: 'Saved' }
+					: { kind: 'error', message: 'Save failed' }
+			);
 		});
-	};
+	});
 
 	return (
-		<Form {...form}>
-			<form
-				className='space-y-8 rounded-xl border border-slate-200 bg-white p-6 shadow-sm max-h-[70vh] overflow-y-auto'
-				onSubmit={form.handleSubmit(handleSubmit)}>
-				<div className='flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between'>
-					<div className='space-y-1.5'>
-						<h3 className='text-lg font-semibold text-slate-900'>
-							Top Placed Students
-						</h3>
-						<p className='text-sm text-slate-500'>
-							Manage featured placement stories and supporting statistics.
-						</p>
-					</div>
-					<div className='flex items-center gap-2 sm:shrink-0'>
-						{message && (
-							<span className='rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700'>
-								{message}
-							</span>
-						)}
-						<Button type='submit' disabled={isPending}>
-                        {isPending ? 'Saving...' : 'Save changes'}
-                        </Button>
-					</div>
-				</div>
-
-				<section className='space-y-4 rounded-xl border border-slate-200 bg-slate-50/60 p-4 sm:p-5'>
-					<div className='grid gap-4 sm:grid-cols-2'>
-						<FormField
-							control={form.control}
-							name='title'
-							rules={{ required: 'Title is required' }}
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Section title</FormLabel>
-									<FormControl>
-										<Input placeholder='Our Top Achievers' {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
+		<AdminForm onSubmit={handleSubmit}>
+			<AdminFormSection
+				title='Top placed students'
+				description='Featured placement stories and supporting statistics.'>
+				<AdminFieldGrid>
+					<AdminField
+						label='Section title'
+						error={form.formState.errors.title?.message}>
+						<Input
+							placeholder='Our Top Achievers'
+							{...form.register('title', { required: 'Title is required' })}
 						/>
-						<FormField
-							control={form.control}
-							name='subtitle'
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Subtitle</FormLabel>
-									<FormControl>
-										<Textarea
-											rows={3}
-											placeholder='Success stories from the latest batch'
-											className='resize-none'
-											{...field}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
+					</AdminField>
+					<AdminField label='Subtitle'>
+						<Textarea
+							rows={3}
+							placeholder='Success stories from the latest batch'
+							className='resize-none'
+							{...form.register('subtitle')}
 						/>
-					</div>
-				</section>
+					</AdminField>
+				</AdminFieldGrid>
+			</AdminFormSection>
 
-				<section className='space-y-4'>
-					<div className='flex items-center justify-between gap-3'>
-						<div className='text-sm font-semibold text-slate-700 uppercase tracking-wide'>
-							Students
-						</div>
-						<Button
-							type='button'
-							variant='outline'
-							size='sm'
-							onClick={() => studentsFieldArray.append(createEmptyStudent())}
-							className='gap-1'>
-							<Plus className='h-4 w-4' />
-							Add student
-						</Button>
-					</div>
-
-					<div className='grid gap-4'>
-						{studentsFieldArray.fields.map((field, index) => (
-							<div
-								key={field.id}
-								className='rounded-xl border border-slate-200 bg-slate-50/80 p-4 sm:p-5 shadow-sm transition hover:border-slate-300 hover:shadow'>
-								<div className='flex items-start justify-between gap-4'>
-									<div className='font-semibold text-slate-700'>
-										Student {index + 1}
-									</div>
-									<Button
-										type='button'
-										variant='ghost'
-										size='icon'
-										className='rounded-full border border-slate-200 text-slate-500 hover:border-rose-200 hover:bg-rose-100 hover:text-rose-600'
-										onClick={() => studentsFieldArray.remove(index)}
-										disabled={studentsFieldArray.fields.length === 1}>
-										<Trash2 className='h-4 w-4' />
-									</Button>
-								</div>
-
-								<div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
-									<FormField
-										control={form.control}
-										name={`students.${index}.name` as const}
-										rules={{ required: 'Name is required' }}
-										render={({ field: nameField }) => (
-											<FormItem>
-												<FormLabel>Student name</FormLabel>
-												<FormControl>
-													<Input placeholder='Student name' {...nameField} />
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-
-									<FormField
-										control={form.control}
-										name={`students.${index}.company` as const}
-										rules={{ required: 'Company is required' }}
-										render={({ field: companyField }) => (
-											<FormItem>
-												<FormLabel>Company</FormLabel>
-												<FormControl>
-													<Input placeholder='Company name' {...companyField} />
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-
-									<FormField
-										control={form.control}
-										name={`students.${index}.package` as const}
-										rules={{ required: 'Package is required' }}
-										render={({ field: packageField }) => (
-											<FormItem>
-												<FormLabel>Package</FormLabel>
-												<FormControl>
-													<Input placeholder='₹20 LPA' {...packageField} />
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-								</div>
-
-								<div className='grid gap-4 sm:grid-cols-2'>
-									<FormField
-										control={form.control}
-										name={`students.${index}.branch` as const}
-										rules={{ required: 'Branch is required' }}
-										render={({ field: branchField }) => (
-											<FormItem>
-												<FormLabel>Branch</FormLabel>
-												<FormControl>
-													<Input placeholder='CSE' {...branchField} />
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-
-									<FormField
-										control={form.control}
-										name={`students.${index}.year` as const}
-										rules={{ required: 'Year is required' }}
-										render={({ field: yearField }) => (
-											<FormItem>
-												<FormLabel>Year</FormLabel>
-												<FormControl>
-													<Input placeholder='2024' {...yearField} />
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-								</div>
-
-								<div className='grid gap-4 sm:grid-cols-2'>
-									<FormField
-										control={form.control}
-										name={`students.${index}.image` as const}
-										rules={{ required: 'Profile image is required' }}
-										render={({ field: imageField }) => (
-											<FormItem>
-												<FormLabel>Profile image URL</FormLabel>
-												<FormControl>
-													<Input placeholder='https://...' {...imageField} />
-												</FormControl>
-												<div className='flex flex-wrap gap-2 pt-2'>
-													<CloudinaryUploadButton
-														buttonText='Upload image'
-														onUpload={url =>
-															form.setValue(
-																`students.${index}.image` as const,
-																url,
-																{
-																	shouldDirty: true
-																}
-															)
-														}
-													/>
-													<Button
-														type='button'
-														variant='ghost'
-														size='sm'
-														className='text-slate-500 hover:text-slate-700'
-														onClick={() => imageField.onChange('')}>
-														Clear
-													</Button>
-												</div>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-
-									<FormField
-										control={form.control}
-										name={`students.${index}.companyLogo` as const}
-										rules={{ required: 'Company logo is required' }}
-										render={({ field: companyLogoField }) => (
-											<FormItem>
-												<FormLabel>Company logo URL</FormLabel>
-												<FormControl>
-													<Input
-														placeholder='https://...'
-														{...companyLogoField}
-													/>
-												</FormControl>
-												<div className='flex flex-wrap gap-2 pt-2'>
-													<CloudinaryUploadButton
-														buttonText='Upload logo'
-														onUpload={url =>
-															form.setValue(
-																`students.${index}.companyLogo` as const,
-																url,
-																{
-																	shouldDirty: true
-																}
-															)
-														}
-													/>
-													<Button
-														type='button'
-														variant='ghost'
-														size='sm'
-														className='text-slate-500 hover:text-slate-700'
-														onClick={() => companyLogoField.onChange('')}>
-														Clear
-													</Button>
-												</div>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-								</div>
-							</div>
-						))}
-					</div>
-				</section>
-
-				<section className='space-y-4'>
-					<div className='flex items-center justify-between gap-3'>
-						<div className='text-sm font-semibold text-slate-700 uppercase tracking-wide'>
-							Headline statistics
-						</div>
-						<Button
-							type='button'
-							variant='outline'
-							size='sm'
-							onClick={() =>
-								statisticsFieldArray.append(createEmptyStatistic())
+			<AdminFormSection title='Students'>
+				<AdminItemList>
+					{studentsArr.fields.map((field, index) => (
+						<AdminItemCard
+							key={field.id}
+							index={index}
+							total={studentsArr.fields.length}
+							title={
+								form.watch(`students.${index}.name`) ||
+								`Student ${index + 1}`
 							}
-							className='gap-1'>
-							<Plus className='h-4 w-4' />
-							Add statistic
-						</Button>
-					</div>
-
-					<div className='grid gap-4'>
-						{statisticsFieldArray.fields.map((field, index) => (
-							<div
-								key={field.id}
-								className='rounded-xl border border-slate-200 bg-slate-50/80 p-4 sm:p-5 shadow-sm transition hover:border-slate-300 hover:shadow'>
-								<div className='flex items-start justify-between gap-4'>
-									<span className='text-sm font-semibold text-slate-700'>
-										Statistic {index + 1}
-									</span>
-									<Button
-										type='button'
-										variant='ghost'
-										size='icon'
-										className='rounded-full border border-slate-200 text-slate-500 hover:border-rose-200 hover:bg-rose-100 hover:text-rose-600'
-										onClick={() => statisticsFieldArray.remove(index)}
-										disabled={statisticsFieldArray.fields.length === 1}>
-										<Trash2 className='h-4 w-4' />
-									</Button>
-								</div>
-
-								<div className='grid gap-4 sm:grid-cols-2'>
-									<FormField
-										control={form.control}
-										name={`statistics.${index}.value` as const}
-										rules={{ required: 'Value is required' }}
-										render={({ field: valueField }) => (
-											<FormItem>
-												<FormLabel>Value</FormLabel>
-												<FormControl>
-													<Input placeholder='100+' {...valueField} />
-												</FormControl>
-												<FormMessage />
-											</FormItem>
+							subtitle={form.watch(`students.${index}.company`) || undefined}
+							onMove={d => studentsArr.move(index, index + d)}
+							onRemove={
+								studentsArr.fields.length > 1
+									? () => studentsArr.remove(index)
+									: undefined
+							}>
+							<AdminFieldGrid cols={3}>
+								<AdminField
+									label='Student name'
+									error={
+										form.formState.errors.students?.[index]?.name?.message
+									}>
+									<Input
+										placeholder='Student name'
+										{...form.register(`students.${index}.name` as const, {
+											required: 'Name is required'
+										})}
+									/>
+								</AdminField>
+								<AdminField
+									label='Company'
+									error={
+										form.formState.errors.students?.[index]?.company?.message
+									}>
+									<Input
+										placeholder='Company name'
+										{...form.register(`students.${index}.company` as const, {
+											required: 'Company is required'
+										})}
+									/>
+								</AdminField>
+								<AdminField
+									label='Package'
+									error={
+										form.formState.errors.students?.[index]?.package?.message
+									}>
+									<Input
+										placeholder='₹20 LPA'
+										{...form.register(`students.${index}.package` as const, {
+											required: 'Package is required'
+										})}
+									/>
+								</AdminField>
+							</AdminFieldGrid>
+							<AdminFieldGrid>
+								<AdminField
+									label='Branch'
+									error={
+										form.formState.errors.students?.[index]?.branch?.message
+									}>
+									<Input
+										placeholder='CSE'
+										{...form.register(`students.${index}.branch` as const, {
+											required: 'Branch is required'
+										})}
+									/>
+								</AdminField>
+								<AdminField
+									label='Year'
+									error={form.formState.errors.students?.[index]?.year?.message}>
+									<Input
+										placeholder='2024'
+										{...form.register(`students.${index}.year` as const, {
+											required: 'Year is required'
+										})}
+									/>
+								</AdminField>
+							</AdminFieldGrid>
+							<AdminFieldGrid>
+								<AdminField
+									label='Profile image URL'
+									error={
+										form.formState.errors.students?.[index]?.image?.message
+									}>
+									<Input
+										placeholder='https://…'
+										{...form.register(`students.${index}.image` as const, {
+											required: 'Profile image is required'
+										})}
+									/>
+									<div className='mt-2 flex flex-wrap gap-2'>
+										<CloudinaryUploadButton
+											buttonText='Upload image'
+											onUpload={url =>
+												form.setValue(
+													`students.${index}.image` as const,
+													url,
+													{ shouldDirty: true }
+												)
+											}
+										/>
+										<Button
+											type='button'
+											variant='ghost'
+											size='sm'
+											onClick={() =>
+												form.setValue(
+													`students.${index}.image` as const,
+													'',
+													{ shouldDirty: true }
+												)
+											}>
+											Clear
+										</Button>
+									</div>
+								</AdminField>
+								<AdminField
+									label='Company logo URL'
+									error={
+										form.formState.errors.students?.[index]?.companyLogo
+											?.message
+									}>
+									<Input
+										placeholder='https://…'
+										{...form.register(
+											`students.${index}.companyLogo` as const,
+											{ required: 'Company logo is required' }
 										)}
 									/>
+									<div className='mt-2 flex flex-wrap gap-2'>
+										<CloudinaryUploadButton
+											buttonText='Upload logo'
+											onUpload={url =>
+												form.setValue(
+													`students.${index}.companyLogo` as const,
+													url,
+													{ shouldDirty: true }
+												)
+											}
+										/>
+										<Button
+											type='button'
+											variant='ghost'
+											size='sm'
+											onClick={() =>
+												form.setValue(
+													`students.${index}.companyLogo` as const,
+													'',
+													{ shouldDirty: true }
+												)
+											}>
+											Clear
+										</Button>
+									</div>
+								</AdminField>
+							</AdminFieldGrid>
+						</AdminItemCard>
+					))}
+				</AdminItemList>
+				{studentsArr.fields.length === 0 && (
+					<AdminEmptyState title='No students yet' />
+				)}
+				<AddRowButton onClick={() => studentsArr.append(createEmptyStudent())}>
+					Add student
+				</AddRowButton>
+			</AdminFormSection>
 
-									<FormField
-										control={form.control}
-										name={`statistics.${index}.label` as const}
-										rules={{ required: 'Label is required' }}
-										render={({ field: labelField }) => (
-											<FormItem>
-												<FormLabel>Label</FormLabel>
-												<FormControl>
-													<Input placeholder='Dream offers' {...labelField} />
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
+			<AdminFormSection title='Headline statistics'>
+				<AdminItemList>
+					{statsArr.fields.map((field, index) => (
+						<AdminItemCard
+							key={field.id}
+							index={index}
+							total={statsArr.fields.length}
+							title={
+								form.watch(`statistics.${index}.label`) ||
+								`Statistic ${index + 1}`
+							}
+							onMove={d => statsArr.move(index, index + d)}
+							onRemove={
+								statsArr.fields.length > 1
+									? () => statsArr.remove(index)
+									: undefined
+							}>
+							<AdminFieldGrid>
+								<AdminField
+									label='Value'
+									error={
+										form.formState.errors.statistics?.[index]?.value?.message
+									}>
+									<Input
+										placeholder='100+'
+										{...form.register(`statistics.${index}.value` as const, {
+											required: 'Value is required'
+										})}
 									/>
-								</div>
-							</div>
-						))}
-					</div>
-				</section>
-			</form>
-		</Form>
+								</AdminField>
+								<AdminField
+									label='Label'
+									error={
+										form.formState.errors.statistics?.[index]?.label?.message
+									}>
+									<Input
+										placeholder='Dream offers'
+										{...form.register(`statistics.${index}.label` as const, {
+											required: 'Label is required'
+										})}
+									/>
+								</AdminField>
+							</AdminFieldGrid>
+						</AdminItemCard>
+					))}
+				</AdminItemList>
+				{statsArr.fields.length === 0 && (
+					<AdminEmptyState title='No statistics yet' />
+				)}
+				<AddRowButton onClick={() => statsArr.append(createEmptyStatistic())}>
+					Add statistic
+				</AddRowButton>
+			</AdminFormSection>
+
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }
-
-

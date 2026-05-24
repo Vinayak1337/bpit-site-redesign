@@ -1,21 +1,23 @@
 'use client';
 
 import { useEffect, useState, useTransition } from 'react';
-import { useForm, useFieldArray } from 'react-hook-form';
-import { Button } from '@/components/ui/button';
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage
-} from '@/components/ui/form';
+import { useForm, useFieldArray, type UseFieldArrayReturn } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { BookOpen, Target, Users } from 'lucide-react';
 import { updatePrincipalMessage } from '@/app/(Private Pages)/actions/about';
 import type { PrincipalMessageData } from '@/app/(Private Pages)/actions/about';
+import {
+	AddRowButton,
+	AdminEmptyState,
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	AdminItemCard,
+	AdminItemList,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 type ParagraphFormValue = { id: string; value: string };
 
@@ -45,39 +47,40 @@ const createParagraph = (value = ''): ParagraphFormValue => ({
 	value
 });
 
-const normalizePrincipalMessage = (values: Partial<FormValues>): PrincipalMessageData => {
-	const paragraphs = (values.paragraphs ?? [])
-		.map(paragraph => (paragraph.value ?? '').trim())
-		.filter(Boolean);
-	
-	const more = (values.more ?? [])
-		.map(paragraph => (paragraph.value ?? '').trim())
-		.filter(Boolean);
-
-	return {
-		header: {
-			title: (values.headerTitle ?? '').trim() || "Principal's Message",
-			subtitle: (values.headerSubtitle ?? '').trim() || 'Leading Academic Excellence'
+const normalize = (values: Partial<FormValues>): PrincipalMessageData => ({
+	header: {
+		title: (values.headerTitle ?? '').trim() || "Principal's Message",
+		subtitle:
+			(values.headerSubtitle ?? '').trim() || 'Leading Academic Excellence'
+	},
+	quote: (values.quote ?? '').trim() || undefined,
+	paragraphs: (values.paragraphs ?? [])
+		.map(p => (p.value ?? '').trim())
+		.filter(Boolean),
+	more: (values.more ?? []).map(p => (p.value ?? '').trim()).filter(Boolean),
+	cards: {
+		academicLeadership: {
+			title:
+				(values.academicLeadershipTitle ?? '').trim() || 'Academic Leadership',
+			description:
+				(values.academicLeadershipDescription ?? '').trim() ||
+				'Guiding curriculum development and maintaining academic standards.'
 		},
-		quote: (values.quote ?? '').trim() || undefined,
-		paragraphs,
-		more,
-		cards: {
-			academicLeadership: {
-				title: (values.academicLeadershipTitle ?? '').trim() || 'Academic Leadership',
-				description: (values.academicLeadershipDescription ?? '').trim() || 'Guiding curriculum development and maintaining academic standards.'
-			},
-			strategicVision: {
-				title: (values.strategicVisionTitle ?? '').trim() || 'Strategic Vision',
-				description: (values.strategicVisionDescription ?? '').trim() || 'Developing long-term strategies for institutional growth and excellence.'
-			},
-			studentMentorship: {
-				title: (values.studentMentorshipTitle ?? '').trim() || 'Student Mentorship',
-				description: (values.studentMentorshipDescription ?? '').trim() || 'Fostering student development and career guidance.'
-			}
+		strategicVision: {
+			title: (values.strategicVisionTitle ?? '').trim() || 'Strategic Vision',
+			description:
+				(values.strategicVisionDescription ?? '').trim() ||
+				'Developing long-term strategies for institutional growth and excellence.'
+		},
+		studentMentorship: {
+			title:
+				(values.studentMentorshipTitle ?? '').trim() || 'Student Mentorship',
+			description:
+				(values.studentMentorshipDescription ?? '').trim() ||
+				'Fostering student development and career guidance.'
 		}
-	};
-};
+	}
+});
 
 export default function PrincipalMessageForm({
 	initialData,
@@ -86,10 +89,7 @@ export default function PrincipalMessageForm({
 	visibleSections
 }: Props) {
 	const [isPending, startTransition] = useTransition();
-	const [message, setMessage] = useState<{
-		type: 'success' | 'error';
-		text: string;
-	} | null>(null);
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 
 	const form = useForm<FormValues>({
 		defaultValues: {
@@ -98,336 +98,201 @@ export default function PrincipalMessageForm({
 			quote: initialData.quote || '',
 			paragraphs:
 				initialData.paragraphs.length > 0
-					? initialData.paragraphs.map(value => createParagraph(value))
+					? initialData.paragraphs.map(createParagraph)
 					: [createParagraph()],
 			more:
 				initialData.more.length > 0
-					? initialData.more.map(value => createParagraph(value))
+					? initialData.more.map(createParagraph)
 					: [createParagraph()],
-			academicLeadershipTitle: initialData.cards?.academicLeadership?.title || 'Academic Leadership',
-			academicLeadershipDescription: initialData.cards?.academicLeadership?.description || 'Guiding curriculum development and maintaining academic standards.',
-			strategicVisionTitle: initialData.cards?.strategicVision?.title || 'Strategic Vision',
-			strategicVisionDescription: initialData.cards?.strategicVision?.description || 'Developing long-term strategies for institutional growth and excellence.',
-			studentMentorshipTitle: initialData.cards?.studentMentorship?.title || 'Student Mentorship',
-			studentMentorshipDescription: initialData.cards?.studentMentorship?.description || 'Fostering student development and career guidance.'
+			academicLeadershipTitle:
+				initialData.cards?.academicLeadership?.title || 'Academic Leadership',
+			academicLeadershipDescription:
+				initialData.cards?.academicLeadership?.description || '',
+			strategicVisionTitle:
+				initialData.cards?.strategicVision?.title || 'Strategic Vision',
+			strategicVisionDescription:
+				initialData.cards?.strategicVision?.description || '',
+			studentMentorshipTitle:
+				initialData.cards?.studentMentorship?.title || 'Student Mentorship',
+			studentMentorshipDescription:
+				initialData.cards?.studentMentorship?.description || ''
 		}
 	});
 
-	const paragraphsArray = useFieldArray({
-		control: form.control,
-		name: 'paragraphs'
-	});
-
-	const moreArray = useFieldArray({
-		control: form.control,
-		name: 'more'
-	});
+	const paragraphs = useFieldArray({ control: form.control, name: 'paragraphs' });
+	const more = useFieldArray({ control: form.control, name: 'more' });
 
 	useEffect(() => {
-		onChange?.(normalizePrincipalMessage(form.getValues()));
-		const subscription = form.watch(values => {
-			const formValues: Partial<FormValues> = {
-				...values,
-				paragraphs: values.paragraphs?.filter(Boolean) as ParagraphFormValue[],
-				more: values.more?.filter(Boolean) as ParagraphFormValue[]
-			};
-			onChange?.(normalizePrincipalMessage(formValues));
+		onChange?.(normalize(form.getValues()));
+		const sub = form.watch(values => {
+			onChange?.(normalize(values as Partial<FormValues>));
+			setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 		});
-		return () => subscription.unsubscribe();
+		return () => sub.unsubscribe();
 	}, [form, onChange]);
 
-	const handleSubmit = (values: FormValues) => {
-		setMessage(null);
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
+	const handleSubmit = form.handleSubmit(values => {
+		setStatus({ kind: 'saving' });
 		startTransition(async () => {
 			try {
-				const data = normalizePrincipalMessage(values);
-				await updatePrincipalMessage(pageSlug, data);
-				setMessage({ type: 'success', text: 'Saved successfully.' });
+				await updatePrincipalMessage(pageSlug, normalize(values));
+				setStatus({ kind: 'success', message: 'Saved' });
 			} catch (error) {
 				console.error('Failed to update principal message:', error);
-				setMessage({ type: 'error', text: 'Save failed.' });
+				setStatus({ kind: 'error', message: 'Save failed' });
 			}
 		});
-	};
+	});
 
 	const showSection = (section: 'hero' | 'content' | 'cards') =>
 		!visibleSections || visibleSections.includes(section);
 
-	return (
-		<Form {...form}>
-			<form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-6'>
-				{message ? (
-					<div
-						className={`p-3 rounded-lg text-sm ${
-							message.type === 'success'
-								? 'bg-green-50 text-green-800'
-								: 'bg-red-50 text-red-800'
-						}`}>
-						{message.text}
-					</div>
-				) : null}
+	const renderListSection = (
+		title: string,
+		addLabel: string,
+		placeholder: string,
+		fieldName: 'paragraphs' | 'more',
+		array: UseFieldArrayReturn<FormValues, 'paragraphs' | 'more', 'id'>,
+		rows: number
+	) => (
+		<AdminFormSection title={title}>
+			<AdminItemList>
+				{array.fields.map((field, index) => (
+					<AdminItemCard
+						key={field.id}
+						index={index}
+						total={array.fields.length}
+						title={`Item ${index + 1}`}
+						onMove={d => array.move(index, index + d)}
+						onRemove={() => array.remove(index)}>
+						<AdminField label={`Item ${index + 1}`} className='[&_label]:sr-only'>
+							<Textarea
+								rows={rows}
+								placeholder={placeholder}
+								{...form.register(`${fieldName}.${index}.value` as const)}
+							/>
+						</AdminField>
+					</AdminItemCard>
+				))}
+			</AdminItemList>
+			{array.fields.length === 0 && <AdminEmptyState title='None yet' />}
+			<AddRowButton onClick={() => array.append(createParagraph())}>
+				{addLabel}
+			</AddRowButton>
+		</AdminFormSection>
+	);
 
-				{showSection('hero') ? (
-				<div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-					<FormField
-						control={form.control}
-						name='headerTitle'
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Title</FormLabel>
-								<FormControl>
-									<Input placeholder="Principal's Message" {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-					<FormField
-						control={form.control}
-						name='headerSubtitle'
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Subtitle</FormLabel>
-								<FormControl>
-									<Input placeholder='Leading Academic Excellence and Innovation' {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-				</div>
-				) : null}
-
-				{showSection('content') ? (
-				<>
-				<FormField
-					control={form.control}
-					name='quote'
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Quote</FormLabel>
-							<FormControl>
-								<Input placeholder='"Dear Students and Academic Community,"' {...field} />
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
+	const cardField = (
+		cardTitleLabel: string,
+		titleName:
+			| 'academicLeadershipTitle'
+			| 'strategicVisionTitle'
+			| 'studentMentorshipTitle',
+		descName:
+			| 'academicLeadershipDescription'
+			| 'strategicVisionDescription'
+			| 'studentMentorshipDescription'
+	) => (
+		<AdminFormSection title={cardTitleLabel}>
+			<AdminField label='Title'>
+				<Input
+					placeholder='Card title…'
+					{...form.register(titleName)}
 				/>
+			</AdminField>
+			<AdminField label='Description'>
+				<Textarea
+					rows={3}
+					placeholder='Card description…'
+					{...form.register(descName)}
+				/>
+			</AdminField>
+		</AdminFormSection>
+	);
 
-				<div className='space-y-3'>
-					<div className='flex items-center justify-between'>
-						<FormLabel>Main Content Paragraphs</FormLabel>
-						<Button
-							type='button'
-							variant='outline'
-							size='sm'
-							onClick={() => paragraphsArray.append(createParagraph())}>
-							Add Paragraph
-						</Button>
-					</div>
-					<div className='space-y-2'>
-						{paragraphsArray.fields.map((field, index) => (
-							<div key={field.id} className='flex gap-2'>
-								<FormField
-									control={form.control}
-									name={`paragraphs.${index}.value`}
-									render={({ field }) => (
-										<FormItem className='flex-1'>
-											<FormControl>
-												<Textarea
-													placeholder='Enter paragraph content...'
-													className='min-h-[80px]'
-													{...field}
-												/>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-								{paragraphsArray.fields.length > 1 && (
-									<Button
-										type='button'
-										variant='outline'
-										size='sm'
-										onClick={() => paragraphsArray.remove(index)}>
-										Remove
-									</Button>
-								)}
-							</div>
-						))}
-					</div>
-				</div>
+	return (
+		<AdminForm onSubmit={handleSubmit}>
+			{showSection('hero') && (
+				<AdminFormSection
+					title="Principal's message"
+					description='Header copy for the principal message section.'>
+					<AdminFieldGrid>
+						<AdminField label='Title' htmlFor='pm-title'>
+							<Input
+								id='pm-title'
+								placeholder="Principal's Message"
+								{...form.register('headerTitle')}
+							/>
+						</AdminField>
+						<AdminField label='Subtitle' htmlFor='pm-sub'>
+							<Input
+								id='pm-sub'
+								placeholder='Leading Academic Excellence and Innovation'
+								{...form.register('headerSubtitle')}
+							/>
+						</AdminField>
+					</AdminFieldGrid>
+				</AdminFormSection>
+			)}
 
-				<div className='space-y-3'>
-					<div className='flex items-center justify-between'>
-						<FormLabel>Additional Content</FormLabel>
-						<Button
-							type='button'
-							variant='outline'
-							size='sm'
-							onClick={() => moreArray.append(createParagraph())}>
-							Add More Content
-						</Button>
-					</div>
-					<div className='space-y-2'>
-						{moreArray.fields.map((field, index) => (
-							<div key={field.id} className='flex gap-2'>
-								<FormField
-									control={form.control}
-									name={`more.${index}.value`}
-									render={({ field }) => (
-										<FormItem className='flex-1'>
-											<FormControl>
-												<Textarea
-													placeholder='Additional content paragraph...'
-													className='min-h-[80px]'
-													{...field}
-												/>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-								{moreArray.fields.length > 1 && (
-									<Button
-										type='button'
-										variant='outline'
-										size='sm'
-										onClick={() => moreArray.remove(index)}>
-										Remove
-									</Button>
-								)}
-							</div>
-						))}
-					</div>
-				</div>
+			{showSection('content') && (
+				<>
+					<AdminFormSection title='Quote'>
+						<AdminField label='Quote' className='[&_label]:sr-only'>
+							<Input
+								placeholder='"Dear Students and Academic Community,"'
+								{...form.register('quote')}
+							/>
+						</AdminField>
+					</AdminFormSection>
+
+					{renderListSection(
+						'Main content paragraphs',
+						'Add paragraph',
+						'Enter paragraph content…',
+						'paragraphs',
+						paragraphs,
+						4
+					)}
+
+					{renderListSection(
+						'Additional content',
+						'Add content',
+						'Additional content paragraph…',
+						'more',
+						more,
+						3
+					)}
 				</>
-				) : null}
+			)}
 
-				{showSection('cards') ? (
-				<div className='space-y-6'>
-					<h3 className='text-lg font-semibold text-gray-900'>Cards Content</h3>
-					
-					{/* Academic Leadership Card */}
-					<div className='space-y-3 p-4 border rounded-lg'>
-						<h4 className='font-medium text-green-600 flex items-center gap-2'>
-							<BookOpen className='w-4 h-4' />
-							Academic Leadership Card
-						</h4>
-						<FormField
-							control={form.control}
-							name='academicLeadershipTitle'
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Title</FormLabel>
-									<FormControl>
-										<Input placeholder='Card title...' {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name='academicLeadershipDescription'
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Description</FormLabel>
-									<FormControl>
-										<Textarea 
-											placeholder='Card description...' 
-											{...field} 
-											rows={3}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-					</div>
+			{showSection('cards') && (
+				<>
+					{cardField(
+						'Academic Leadership card',
+						'academicLeadershipTitle',
+						'academicLeadershipDescription'
+					)}
+					{cardField(
+						'Strategic Vision card',
+						'strategicVisionTitle',
+						'strategicVisionDescription'
+					)}
+					{cardField(
+						'Student Mentorship card',
+						'studentMentorshipTitle',
+						'studentMentorshipDescription'
+					)}
+				</>
+			)}
 
-					{/* Strategic Vision Card */}
-					<div className='space-y-3 p-4 border rounded-lg'>
-						<h4 className='font-medium text-blue-600 flex items-center gap-2'>
-							<Target className='w-4 h-4' />
-							Strategic Vision Card
-						</h4>
-						<FormField
-							control={form.control}
-							name='strategicVisionTitle'
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Title</FormLabel>
-									<FormControl>
-										<Input placeholder='Card title...' {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name='strategicVisionDescription'
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Description</FormLabel>
-									<FormControl>
-										<Textarea 
-											placeholder='Card description...' 
-											{...field} 
-											rows={3}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-					</div>
-
-					{/* Student Mentorship Card */}
-					<div className='space-y-3 p-4 border rounded-lg'>
-						<h4 className='font-medium text-purple-600 flex items-center gap-2'>
-							<Users className='w-4 h-4' />
-							Student Mentorship Card
-						</h4>
-						<FormField
-							control={form.control}
-							name='studentMentorshipTitle'
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Title</FormLabel>
-									<FormControl>
-										<Input placeholder='Card title...' {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name='studentMentorshipDescription'
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Description</FormLabel>
-									<FormControl>
-										<Textarea 
-											placeholder='Card description...' 
-											{...field} 
-											rows={3}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-					</div>
-				</div>
-				) : null}
-
-				<Button type='submit' disabled={isPending} className='w-full'>
-					{isPending ? 'Saving...' : 'Save Changes'}
-				</Button>
-			</form>
-		</Form>
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }

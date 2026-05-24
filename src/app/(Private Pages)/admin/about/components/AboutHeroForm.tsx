@@ -2,14 +2,6 @@
 
 import { useEffect, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage
-} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -18,8 +10,13 @@ import {
 	updateAboutHero,
 	type AboutHeroData
 } from '@/app/(Private Pages)/actions/about';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Loader2, Save } from 'lucide-react';
+import {
+	AdminField,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 type FormValues = {
 	title: string;
@@ -35,17 +32,15 @@ type Props = {
 
 const HERO_GRADIENT = 'from-blue-600 to-blue-700';
 
-const normalizeHero = (values: Partial<FormValues>): AboutHeroData => {
-	return {
-		title: (values.title ?? '').trim(),
-		subtitle: (values.subtitle ?? '').trim(),
-		gradient: HERO_GRADIENT,
-		backgroundImage:
-			(values.backgroundImage ?? '').trim().length > 0
-				? (values.backgroundImage ?? '').trim()
-				: null
-	};
-};
+const normalizeHero = (values: Partial<FormValues>): AboutHeroData => ({
+	title: (values.title ?? '').trim(),
+	subtitle: (values.subtitle ?? '').trim(),
+	gradient: HERO_GRADIENT,
+	backgroundImage:
+		(values.backgroundImage ?? '').trim().length > 0
+			? (values.backgroundImage ?? '').trim()
+			: null
+});
 
 export default function AboutHeroForm({
 	initialData,
@@ -53,7 +48,7 @@ export default function AboutHeroForm({
 	onChange
 }: Props) {
 	const [isPending, startTransition] = useTransition();
-	const [message, setMessage] = useState<string | null>(null);
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 	const form = useForm<FormValues>({
 		defaultValues: {
 			title: initialData.title,
@@ -66,133 +61,104 @@ export default function AboutHeroForm({
 		onChange?.(normalizeHero(form.getValues()));
 		const subscription = form.watch(values => {
 			onChange?.(normalizeHero(values));
+			setStatus(current => (current.kind === 'idle' ? current : { kind: 'idle' }));
 		});
 		return () => subscription.unsubscribe();
 	}, [form, onChange]);
 
-	const handleSubmit = (values: FormValues) => {
-		setMessage(null);
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
+	const handleSubmit = form.handleSubmit(values => {
 		const payload = normalizeHero(values);
+		setStatus({ kind: 'saving' });
 		startTransition(async () => {
 			const result = await updateAboutHero(pageSlug, payload);
 			if (!result.ok) {
-				setMessage('Save failed');
+				setStatus({ kind: 'error', message: 'Save failed' });
 				return;
 			}
-			setMessage('Saved');
+			setStatus({ kind: 'success', message: 'Saved' });
 		});
-	};
+	});
+
+	const titleError = form.formState.errors.title?.message;
+	const subtitleError = form.formState.errors.subtitle?.message;
+	const backgroundImage = form.watch('backgroundImage');
 
 	return (
-		<Form {...form}>
-			<form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-6'>
-				<div className='flex items-center justify-between'>
-					<h3 className='text-lg font-semibold text-gray-900'>About Hero Section</h3>
-					<Button type='submit' disabled={isPending}>
-						{isPending ? (
-							<>
-								<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-								Saving...
-							</>
-						) : (
-							<>
-								<Save className="mr-2 h-4 w-4" />
-								Save Changes
-							</>
-						)}
-					</Button>
-				</div>
+		<AdminForm onSubmit={handleSubmit}>
+			<AdminFormSection
+				title='Hero content'
+				description='Headline, description, and background image shown at the top of the About page.'>
+				<AdminField label='Title' htmlFor='about-hero-title' error={titleError}>
+					<Input
+						id='about-hero-title'
+						placeholder='About BPIT'
+						{...form.register('title', { required: 'Title is required' })}
+					/>
+				</AdminField>
 
-				<Card>
-					<CardHeader>
-						<CardTitle>Hero Content</CardTitle>
-						<CardDescription>
-							Update the main headline, description, and background image for the About page.
-						</CardDescription>
-					</CardHeader>
-					<CardContent className='space-y-4'>
-						<FormField
-							control={form.control}
-							name='title'
-							rules={{ required: 'Title is required' }}
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Title</FormLabel>
-									<FormControl>
-										<Input placeholder='About BPIT' {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
+				<AdminField
+					label='Subtitle'
+					htmlFor='about-hero-subtitle'
+					error={subtitleError}>
+					<Textarea
+						id='about-hero-subtitle'
+						rows={3}
+						placeholder='Discover our journey of excellence…'
+						{...form.register('subtitle', { required: 'Subtitle is required' })}
+					/>
+				</AdminField>
 
-						<FormField
-							control={form.control}
-							name='subtitle'
-							rules={{ required: 'Subtitle is required' }}
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Subtitle</FormLabel>
-									<FormControl>
-										<Textarea
-											rows={3}
-											placeholder='Discover our journey of excellence...'
-											{...field}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
+				<AdminField label='Background image' htmlFor='about-hero-bg'>
+					<Input
+						id='about-hero-bg'
+						placeholder='https://…'
+						{...form.register('backgroundImage')}
+					/>
+					<div className='mt-2 flex flex-wrap gap-2'>
+						<CloudinaryUploadButton
+							buttonText='Upload image'
+							onUpload={url =>
+								form.setValue('backgroundImage', url, {
+									shouldDirty: true,
+									shouldTouch: true
+								})
+							}
+							onError={message =>
+								setStatus({ kind: 'error', message })
+							}
 						/>
+						<Button
+							type='button'
+							variant='outline'
+							onClick={() =>
+								form.setValue('backgroundImage', '', {
+									shouldDirty: true,
+									shouldTouch: true
+								})
+							}>
+							Clear
+						</Button>
+					</div>
+					{backgroundImage && (
+						<div className='mt-3 h-40 w-full overflow-hidden rounded-md border border-slate-200'>
+							{/* eslint-disable-next-line @next/next/no-img-element */}
+							<img
+								src={backgroundImage}
+								alt='Background preview'
+								className='h-full w-full object-cover'
+							/>
+						</div>
+					)}
+				</AdminField>
+			</AdminFormSection>
 
-						<FormField
-							control={form.control}
-							name='backgroundImage'
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Background Image</FormLabel>
-									<FormControl>
-										<Input placeholder='https://...' {...field} />
-									</FormControl>
-									<div className='flex gap-2 pt-2'>
-										<CloudinaryUploadButton
-											buttonText='Upload Image'
-											onUpload={url =>
-												form.setValue('backgroundImage', url, {
-													shouldDirty: true,
-													shouldTouch: true
-												})
-											}
-											onError={message => setMessage(message)}
-										/>
-										<Button
-											type='button'
-											variant='outline'
-											onClick={() =>
-												form.setValue('backgroundImage', '', {
-													shouldDirty: true,
-													shouldTouch: true
-												})
-											}>
-											Clear
-										</Button>
-									</div>
-									{field.value && (
-										<div className="mt-4 rounded-lg overflow-hidden border h-40 w-full relative">
-											<img 
-												src={field.value} 
-												alt="Background preview" 
-												className="w-full h-full object-cover"
-											/>
-										</div>
-									)}
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-					</CardContent>
-				</Card>
-			</form>
-		</Form>
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }

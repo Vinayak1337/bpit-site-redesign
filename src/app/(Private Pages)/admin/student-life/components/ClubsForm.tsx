@@ -1,25 +1,33 @@
 'use client';
 
 import { useEffect, useState, useTransition } from 'react';
-import { useForm, useFieldArray, Control } from 'react-hook-form';
 import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage
-} from '@/components/ui/form';
+	useForm,
+	useFieldArray,
+	type Control,
+	type UseFormWatch,
+	type UseFormSetValue,
+	type UseFormRegister
+} from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Loader2, Save, Plus, Trash2, Image as ImageIcon, ChevronDown } from 'lucide-react';
 import {
 	updateClubsSocieties,
 	type ClubsSocietiesData
 } from '@/app/(Private Pages)/actions/student-life';
 import UploadButton from '@/components/cloudinary/upload-button';
+import {
+	AddRowButton,
+	AdminEmptyState,
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	AdminItemCard,
+	AdminItemList,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 interface Props {
 	initialData: ClubsSocietiesData;
@@ -27,126 +35,140 @@ interface Props {
 	visibleSections?: Array<'header' | 'categories'>;
 }
 
-const ClubItemsList = ({ nestIndex, control }: { nestIndex: number, control: Control<ClubsSocietiesData> }) => {
-	const { fields, append, remove } = useFieldArray({
+function ClubsList({
+	categoryIndex,
+	control,
+	register,
+	watch,
+	setValue
+}: {
+	categoryIndex: number;
+	control: Control<ClubsSocietiesData>;
+	register: UseFormRegister<ClubsSocietiesData>;
+	watch: UseFormWatch<ClubsSocietiesData>;
+	setValue: UseFormSetValue<ClubsSocietiesData>;
+}) {
+	const { fields, append, remove, move } = useFieldArray({
 		control,
-		name: `categories.${nestIndex}.clubs`
+		name: `categories.${categoryIndex}.clubs` as const
 	});
 
 	return (
-		<div className="space-y-4 mt-4">
-			<div className="flex justify-between items-center">
-				<h4 className="text-sm font-semibold">Clubs</h4>
-				<Button
-					type="button"
-					variant="outline"
-					size="sm"
-					onClick={() => append({ name: 'New Club', description: '', icon: 'Users', image: '', activities: [] })}
-				>
-					<Plus className="w-3 h-3 mr-1" /> Add Club
-				</Button>
-			</div>
-			<div className="grid gap-4">
-				{fields.map((item, k) => (
-					<Card key={item.id} className="bg-gray-50">
-						<CardContent className="p-4 space-y-3">
-							<div className="flex justify-between">
-								<span className="text-xs font-medium">Club #{k + 1}</span>
-								<Button
-									type="button"
-									variant="ghost"
-									size="sm"
-									className="h-6 w-6 p-0 text-red-500"
-									onClick={() => remove(k)}
-								>
-									<Trash2 className="w-3 h-3" />
-								</Button>
-							</div>
-							<div className="grid grid-cols-2 gap-3">
-								<FormField
-									control={control}
-									name={`categories.${nestIndex}.clubs.${k}.name`}
-									render={({ field }) => (
-										<FormItem>
-											<FormControl><Input placeholder="Club Name" {...field} className="bg-white" /></FormControl>
-										</FormItem>
+		<div className='flex flex-col gap-3'>
+			<p className='text-sm font-medium text-slate-700'>Clubs in this category</p>
+			<AdminItemList>
+				{fields.map((field, k) => {
+					const image = watch(`categories.${categoryIndex}.clubs.${k}.image`);
+					return (
+						<AdminItemCard
+							key={field.id}
+							index={k}
+							total={fields.length}
+							title={
+								watch(`categories.${categoryIndex}.clubs.${k}.name`) ||
+								`Club ${k + 1}`
+							}
+							onMove={d => move(k, k + d)}
+							onRemove={() => remove(k)}>
+							<AdminFieldGrid>
+								<AdminField label='Name'>
+									<Input
+										placeholder='Club Name'
+										{...register(
+											`categories.${categoryIndex}.clubs.${k}.name` as const
+										)}
+									/>
+								</AdminField>
+								<AdminField label='Icon'>
+									<Input
+										placeholder='Users'
+										{...register(
+											`categories.${categoryIndex}.clubs.${k}.icon` as const
+										)}
+									/>
+								</AdminField>
+							</AdminFieldGrid>
+							<AdminField label='Image'>
+								<Input
+									placeholder='Image URL'
+									{...register(
+										`categories.${categoryIndex}.clubs.${k}.image` as const
 									)}
 								/>
-								<FormField
-									control={control}
-									name={`categories.${nestIndex}.clubs.${k}.icon`}
-									render={({ field }) => (
-										<FormItem>
-											<FormControl><Input placeholder="Icon" {...field} className="bg-white" /></FormControl>
-										</FormItem>
+								<div className='mt-2'>
+									<UploadButton
+										onUpload={url =>
+											setValue(
+												`categories.${categoryIndex}.clubs.${k}.image`,
+												url,
+												{ shouldDirty: true }
+											)
+										}
+										buttonText='Upload image'
+									/>
+								</div>
+								{image && (
+									<div className='mt-3 h-16 w-16 overflow-hidden rounded border border-slate-200'>
+										{/* eslint-disable-next-line @next/next/no-img-element */}
+										<img
+											src={image}
+											alt='Club preview'
+											className='h-full w-full object-cover'
+										/>
+									</div>
+								)}
+							</AdminField>
+							<AdminField label='Description'>
+								<Textarea
+									rows={2}
+									{...register(
+										`categories.${categoryIndex}.clubs.${k}.description` as const
 									)}
 								/>
-							</div>
-                            <FormField
-                                control={control}
-                                name={`categories.${nestIndex}.clubs.${k}.image`}
-                                render={({ field }) => (
-                                    <FormItem>
-										<FormLabel className='text-xs'>Image URL</FormLabel>
-                                        <FormControl>
-                                            <div className="space-y-2">
-												<div className='flex gap-2'>
-                                                <ImageIcon className="w-4 h-4 mt-3 text-gray-400" />
-                                                <Input placeholder="Image URL" {...field} className="bg-white" />
-												</div>
-												<UploadButton
-													onUpload={url => field.onChange(url)}
-													buttonText='Upload Club Image'
-													className='w-full'
-												/>
-												{field.value ? (
-													<div className='h-16 w-16 overflow-hidden rounded border'>
-														<img
-															src={field.value}
-															alt='Club preview'
-															className='h-full w-full object-cover'
-														/>
-													</div>
-												) : null}
-											</div>
-                                        </FormControl>
-                                    </FormItem>
-                                )}
-                            />
-							<FormField
-								control={control}
-								name={`categories.${nestIndex}.clubs.${k}.description`}
-								render={({ field }) => (
-									<FormItem>
-										<FormControl><Textarea placeholder="Description" {...field} className="bg-white" rows={2} /></FormControl>
-									</FormItem>
-								)}
-							/>
-							<FormField
-								control={control}
-								name={`categories.${nestIndex}.clubs.${k}.activities`}
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel className="text-xs">Activities (Comma separated)</FormLabel>
-										<FormControl>
-											<Input 
-                                                placeholder="Hackathons, Workshops, etc." 
-                                                className="bg-white" 
-                                                {...field} 
-                                                value={field.value?.join(', ') || ''}
-                                                onChange={(e) => field.onChange(e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
-                                            />
-										</FormControl>
-									</FormItem>
-								)}
-							/>
-						</CardContent>
-					</Card>
-				))}
-			</div>
+							</AdminField>
+							<AdminField
+								label='Activities'
+								hint='Comma separated (Hackathons, Workshops, …)'>
+								<Input
+									value={
+										(
+											watch(
+												`categories.${categoryIndex}.clubs.${k}.activities`
+											) as string[] | undefined
+										)?.join(', ') || ''
+									}
+									onChange={event =>
+										setValue(
+											`categories.${categoryIndex}.clubs.${k}.activities`,
+											event.target.value
+												.split(',')
+												.map(s => s.trim())
+												.filter(Boolean),
+											{ shouldDirty: true }
+										)
+									}
+								/>
+							</AdminField>
+						</AdminItemCard>
+					);
+				})}
+			</AdminItemList>
+			{fields.length === 0 && <AdminEmptyState title='No clubs in this category' />}
+			<AddRowButton
+				onClick={() =>
+					append({
+						name: 'New Club',
+						description: '',
+						icon: 'Users',
+						image: '',
+						activities: []
+					})
+				}>
+				Add club
+			</AddRowButton>
 		</div>
 	);
-};
+}
 
 export default function ClubsForm({
 	initialData,
@@ -154,159 +176,107 @@ export default function ClubsForm({
 	visibleSections
 }: Props) {
 	const [isPending, startTransition] = useTransition();
-	const [message, setMessage] = useState<{
-		type: 'success' | 'error';
-		text: string;
-	} | null>(null);
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 
-	const form = useForm<ClubsSocietiesData>({
-		defaultValues: initialData
-	});
-
-	const { fields, append, remove } = useFieldArray({
+	const form = useForm<ClubsSocietiesData>({ defaultValues: initialData });
+	const { fields, append, remove, move } = useFieldArray({
 		control: form.control,
 		name: 'categories'
 	});
 
 	useEffect(() => {
-		const subscription = form.watch((values) => {
+		const sub = form.watch(values => {
 			onChange?.(values as ClubsSocietiesData);
+			setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 		});
-		return () => subscription.unsubscribe();
+		return () => sub.unsubscribe();
 	}, [form, onChange]);
 
-	const handleSubmit = (values: ClubsSocietiesData) => {
-		setMessage(null);
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
+	const handleSubmit = form.handleSubmit(values => {
+		setStatus({ kind: 'saving' });
 		startTransition(async () => {
-			const result = await updateClubsSocieties('student-life-clubs-and-societies', values);
-			if (!result.ok) {
-				setMessage({ type: 'error', text: result.error ?? 'Failed to save clubs data.' });
-				return;
-			}
-			setMessage({ type: 'success', text: 'Saved successfully.' });
-			setTimeout(() => setMessage(null), 3000);
+			const result = await updateClubsSocieties(
+				'student-life-clubs-and-societies',
+				values
+			);
+			setStatus(
+				result.ok
+					? { kind: 'success', message: 'Saved' }
+					: { kind: 'error', message: result.error ?? 'Save failed' }
+			);
 		});
-	};
+	});
 
 	const showSection = (section: 'header' | 'categories') =>
 		!visibleSections || visibleSections.includes(section);
 
 	return (
-		<Form {...form}>
-			<form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-				<div className="flex items-center justify-between sticky top-0 bg-white z-10 p-4 border-b -mx-4 -mt-4 mb-4 shadow-sm">
-					<h3 className="font-semibold text-gray-900">Content</h3>
-					<div className="flex items-center gap-4">
-						{message && (
-							<span
-								className={`text-sm font-medium ${
-									message.type === 'error' ? 'text-red-600' : 'text-green-600'
-								}`}>
-								{message.text}
-							</span>
-						)}
-						<Button type="submit" disabled={isPending}>
-							{isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-							Save Changes
-						</Button>
-					</div>
-				</div>
+		<AdminForm onSubmit={handleSubmit}>
+			{showSection('header') && (
+				<AdminFormSection
+					title='Page header'
+					description='Title and intro for the clubs & societies page.'>
+					<AdminField label='Page title' htmlFor='cl-title'>
+						<Input id='cl-title' {...form.register('title')} />
+					</AdminField>
+					<AdminField label='Description' htmlFor='cl-desc'>
+						<Textarea id='cl-desc' rows={3} {...form.register('description')} />
+					</AdminField>
+				</AdminFormSection>
+			)}
 
-				{showSection('header') && (
-					<>
-						<FormField
-							control={form.control}
-							name="title"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Page Title</FormLabel>
-									<FormControl><Input {...field} /></FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
+			{showSection('categories') && (
+				<AdminFormSection title='Club categories'>
+					<AdminItemList>
+						{fields.map((field, index) => (
+							<AdminItemCard
+								key={field.id}
+								index={index}
+								total={fields.length}
+								title={
+									form.watch(`categories.${index}.title`) ||
+									`Category ${index + 1}`
+								}
+								onMove={d => move(index, index + d)}
+								onRemove={() => remove(index)}>
+								<AdminField label='Category title'>
+									<Input
+										{...form.register(`categories.${index}.title` as const)}
+									/>
+								</AdminField>
+								<AdminField label='Description'>
+									<Textarea
+										rows={2}
+										{...form.register(`categories.${index}.description` as const)}
+									/>
+								</AdminField>
+								<ClubsList
+									categoryIndex={index}
+									control={form.control}
+									register={form.register}
+									watch={form.watch}
+									setValue={form.setValue}
+								/>
+							</AdminItemCard>
+						))}
+					</AdminItemList>
+					{fields.length === 0 && <AdminEmptyState title='No categories yet' />}
+					<AddRowButton
+						onClick={() =>
+							append({ title: 'New Category', description: '', clubs: [] })
+						}>
+						Add category
+					</AddRowButton>
+				</AdminFormSection>
+			)}
 
-						<FormField
-							control={form.control}
-							name="description"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Description</FormLabel>
-									<FormControl><Textarea {...field} rows={3} /></FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-					</>
-				)}
-
-				{showSection('categories') && (
-				<div className="space-y-4">
-					<div className="flex items-center justify-between">
-						<FormLabel className="text-base">Club Categories</FormLabel>
-						<Button
-							type="button"
-							variant="outline"
-							size="sm"
-							onClick={() => append({ title: 'New Category', description: '', clubs: [] })}
-						>
-							<Plus className="w-4 h-4 mr-2" />
-							Add Category
-						</Button>
-					</div>
-
-                    <div className="space-y-4">
-                        {fields.map((field, index) => (
-                            <details key={field.id} className="group border rounded-lg bg-white px-4 open:pb-4">
-                                <summary className="flex items-center justify-between py-4 cursor-pointer list-none">
-                                    <div className="flex items-center gap-2 font-medium">
-                                        <ChevronDown className="w-4 h-4 transition-transform group-open:rotate-180" />
-                                        <span>{form.watch(`categories.${index}.title`) || `Category #${index + 1}`}</span>
-                                    </div>
-                                    <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="sm"
-                                        className="text-red-500 ml-2"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            if(confirm('Are you sure?')) remove(index);
-                                        }}
-                                    >
-                                        <Trash2 className="w-4 h-4" />
-                                    </Button>
-                                </summary>
-                                <div className="space-y-4 pt-2 border-t mt-2">
-                                    <FormField
-                                        control={form.control}
-                                        name={`categories.${index}.title`}
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Category Title</FormLabel>
-                                                <FormControl><Input {...field} /></FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name={`categories.${index}.description`}
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Description</FormLabel>
-                                                <FormControl><Textarea {...field} rows={2} /></FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <ClubItemsList nestIndex={index} control={form.control} />
-                                </div>
-                            </details>
-                        ))}
-                    </div>
-				</div>
-				)}
-			</form>
-		</Form>
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }

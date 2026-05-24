@@ -2,14 +2,6 @@
 
 import { useEffect, useMemo, useState, useTransition } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage
-} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
@@ -23,6 +15,18 @@ import type { AboutOverviewData } from '@/app/(Private Pages)/actions/about';
 import { updateAboutOverview } from '@/app/(Private Pages)/actions/about';
 import { SUPPORTED_ICON_NAMES } from '@/components/about/icons';
 import CloudinaryUploadButton from '@/components/cloudinary/upload-button';
+import {
+	AddRowButton,
+	AdminEmptyState,
+	AdminField,
+	AdminFieldGrid,
+	AdminForm,
+	AdminFormFooter,
+	AdminFormSection,
+	AdminItemCard,
+	AdminItemList,
+	type AdminFormStatus
+} from '@/app/(Private Pages)/admin/components/form-kit';
 
 type StatFormValue = {
 	id: string;
@@ -101,7 +105,7 @@ export default function AboutOverviewForm({
 	onChange
 }: Props) {
 	const [isPending, startTransition] = useTransition();
-	const [message, setMessage] = useState<string | null>(null);
+	const [status, setStatus] = useState<AdminFormStatus>({ kind: 'idle' });
 
 	const form = useForm<FormValues>({
 		defaultValues: {
@@ -120,15 +124,12 @@ export default function AboutOverviewForm({
 							value: stat.value,
 							label: stat.label,
 							color: stat.color
-					  }))
+						}))
 					: [createEmptyStat()]
 		}
 	});
 
-	const statsArray = useFieldArray({
-		control: form.control,
-		name: 'stats'
-	});
+	const statsArray = useFieldArray({ control: form.control, name: 'stats' });
 
 	useEffect(() => {
 		onChange?.(normalizeOverview(form.getValues()));
@@ -138,309 +139,226 @@ export default function AboutOverviewForm({
 				stats: values.stats?.filter(Boolean) as StatFormValue[]
 			};
 			onChange?.(normalizeOverview(formValues));
+			setStatus(c => (c.kind === 'idle' ? c : { kind: 'idle' }));
 		});
 		return () => subscription.unsubscribe();
 	}, [form, onChange]);
 
-	const handleSubmit = (values: FormValues) => {
-		setMessage(null);
+	useEffect(() => {
+		if (status.kind !== 'success') return;
+		const t = setTimeout(() => setStatus({ kind: 'idle' }), 4000);
+		return () => clearTimeout(t);
+	}, [status]);
+
+	const handleSubmit = form.handleSubmit(values => {
+		setStatus({ kind: 'saving' });
 		const payload = normalizeOverview(values);
 		startTransition(async () => {
 			const result = await updateAboutOverview(pageSlug, payload);
-			if (!result.ok) {
-				setMessage('Save failed');
-				return;
-			}
-			setMessage('Saved');
+			setStatus(
+				result.ok
+					? { kind: 'success', message: 'Saved' }
+					: { kind: 'error', message: 'Save failed' }
+			);
 		});
-	};
+	});
 
-	const iconOptions = useMemo(() => {
-		const unique = new Set(SUPPORTED_ICON_NAMES);
-		return Array.from(unique);
-	}, []);
+	const iconOptions = useMemo(
+		() => Array.from(new Set(SUPPORTED_ICON_NAMES)),
+		[]
+	);
+	const headerImage = form.watch('headerImage');
 
 	return (
-		<Form {...form}>
-			<form
-				className='space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm max-h-[70vh] overflow-y-auto overflow-x-hidden'
-				onSubmit={form.handleSubmit(handleSubmit)}>
-				<div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
-					<div>
-						<h3 className='text-lg font-semibold text-slate-900'>
-							Overview
-						</h3>
-						<p className='text-sm text-slate-500'>
-							Edit headline details and stats shown on the About overview card.
-						</p>
-					</div>
-					<div className='flex items-center gap-2'>
-						{message && (
-							<span className='rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700'>
-								{message}
-							</span>
-						)}
-						<Button type='submit' disabled={isPending}>
-							{isPending ? 'Saving...' : 'Save changes'}
-						</Button>
-					</div>
-				</div>
+		<AdminForm onSubmit={handleSubmit}>
+			<AdminFormSection
+				title='Overview'
+				description='Headline details and stats shown on the About overview card.'>
+				<AdminFieldGrid>
+					<AdminField
+						label='Title'
+						htmlFor='ovr-title'
+						error={form.formState.errors.headerTitle?.message}>
+						<Input
+							id='ovr-title'
+							placeholder='Bhagwan Parshuram Institute…'
+							{...form.register('headerTitle', { required: 'Title is required' })}
+						/>
+					</AdminField>
+					<AdminField
+						label='Subtitle'
+						htmlFor='ovr-subtitle'
+						error={form.formState.errors.headerSubtitle?.message}>
+						<Input
+							id='ovr-subtitle'
+							placeholder='Excellence in Engineering Education'
+							{...form.register('headerSubtitle', {
+								required: 'Subtitle is required'
+							})}
+						/>
+					</AdminField>
+				</AdminFieldGrid>
 
-				<div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-					<FormField
-						control={form.control}
-						name='headerTitle'
-						rules={{ required: 'Title is required' }}
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Title</FormLabel>
-								<FormControl>
-									<Input placeholder='Bhagwan Parshuram Institute...' {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
+				<AdminField
+					label='Title image (optional)'
+					htmlFor='ovr-image'
+					hint='Displayed beside the BPIT title. The blue icon shows if no image is provided.'>
+					<Input
+						id='ovr-image'
+						placeholder='https://…'
+						{...form.register('headerImage')}
 					/>
-					<FormField
-						control={form.control}
-						name='headerSubtitle'
-						rules={{ required: 'Subtitle is required' }}
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Subtitle</FormLabel>
-								<FormControl>
-									<Input placeholder='Excellence in Engineering Education' {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-					<FormField
-						control={form.control}
-						name='headerImage'
-						render={({ field }) => (
-							<FormItem className='sm:col-span-2'>
-								<FormLabel>Title image (optional)</FormLabel>
-								<FormControl>
-									<Input placeholder='https://...' {...field} />
-								</FormControl>
-								<div className='flex gap-2 pt-2'>
-									<CloudinaryUploadButton
-										buttonText='Upload image'
-										onUpload={url =>
-											form.setValue('headerImage', url, {
-												shouldDirty: true,
-												shouldTouch: true
-											})
-										}
-									/>
-									<Button
-										type='button'
-										variant='ghost'
-										size='sm'
-										onClick={() =>
-											form.setValue('headerImage', '', {
-												shouldDirty: true,
-												shouldTouch: true
-											})
-										}>
-										Clear
-									</Button>
-								</div>
-								<p className='text-xs text-slate-500'>
-									Displayed beside the BPIT title. The blue icon shows if no image is provided.
-								</p>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-					<FormField
-						control={form.control}
-						name='established'
-						rules={{ required: 'Established year is required' }}
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Established</FormLabel>
-								<FormControl>
-									<Input placeholder='2007' {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-					<FormField
-						control={form.control}
-						name='location'
-						rules={{ required: 'Location is required' }}
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Location</FormLabel>
-								<FormControl>
-									<Input placeholder='Rohini, New Delhi' {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-					<FormField
-						control={form.control}
-						name='accreditation'
-						rules={{ required: 'Accreditation is required' }}
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Accreditation</FormLabel>
-								<FormControl>
-									<Input placeholder='NBA & NAAC' {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-					<FormField
-						control={form.control}
-						name='affiliation'
-						rules={{ required: 'Affiliation is required' }}
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Affiliation</FormLabel>
-								<FormControl>
-									<Input placeholder='GGSIPU' {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-				</div>
-
-				<div className='space-y-4'>
-					<div className='flex items-center justify-between'>
-						<h4 className='text-sm font-semibold text-slate-700'>
-							Stats
-						</h4>
+					<div className='mt-2 flex flex-wrap gap-2'>
+						<CloudinaryUploadButton
+							buttonText='Upload image'
+							onUpload={url =>
+								form.setValue('headerImage', url, {
+									shouldDirty: true,
+									shouldTouch: true
+								})
+							}
+						/>
 						<Button
 							type='button'
 							variant='outline'
-							size='sm'
-							onClick={() => statsArray.append(createEmptyStat())}>
-							Add stat
+							onClick={() =>
+								form.setValue('headerImage', '', {
+									shouldDirty: true,
+									shouldTouch: true
+								})
+							}>
+							Clear
 						</Button>
 					</div>
-					<div className='space-y-4'>
-						{statsArray.fields.map((field, index) => (
-							<div
-								key={field.id}
-								className='rounded-lg border border-slate-200 p-4 space-y-4 bg-slate-50/50'>
-								<div className='flex items-center justify-between'>
-									<span className='text-sm font-medium text-slate-700'>
-										Stat {index + 1}
-									</span>
-									<Button
-										type='button'
-										variant='ghost'
-										size='sm'
-										onClick={() =>
-											statsArray.remove(index < 0 ? 0 : index)
+					{headerImage && (
+						<div className='mt-3 h-32 w-full overflow-hidden rounded-md border border-slate-200'>
+							{/* eslint-disable-next-line @next/next/no-img-element */}
+							<img
+								src={headerImage}
+								alt='Title preview'
+								className='h-full w-full object-cover'
+							/>
+						</div>
+					)}
+				</AdminField>
+
+				<AdminFieldGrid>
+					<AdminField label='Established' htmlFor='ovr-est'>
+						<Input
+							id='ovr-est'
+							placeholder='2007'
+							{...form.register('established', { required: true })}
+						/>
+					</AdminField>
+					<AdminField label='Location' htmlFor='ovr-loc'>
+						<Input
+							id='ovr-loc'
+							placeholder='Rohini, New Delhi'
+							{...form.register('location', { required: true })}
+						/>
+					</AdminField>
+					<AdminField label='Accreditation' htmlFor='ovr-acc'>
+						<Input
+							id='ovr-acc'
+							placeholder='NBA & NAAC'
+							{...form.register('accreditation', { required: true })}
+						/>
+					</AdminField>
+					<AdminField label='Affiliation' htmlFor='ovr-aff'>
+						<Input
+							id='ovr-aff'
+							placeholder='GGSIPU'
+							{...form.register('affiliation', { required: true })}
+						/>
+					</AdminField>
+				</AdminFieldGrid>
+			</AdminFormSection>
+
+			<AdminFormSection title='Stats'>
+				<AdminItemList>
+					{statsArray.fields.map((field, index) => (
+						<AdminItemCard
+							key={field.id}
+							index={index}
+							total={statsArray.fields.length}
+							title={`Stat ${index + 1}`}
+							onMove={dir => statsArray.move(index, index + dir)}
+							onRemove={() => statsArray.remove(index)}>
+							<AdminFieldGrid>
+								<AdminField label='Value'>
+									<Input
+										placeholder='1000+'
+										{...form.register(`stats.${index}.value` as const, {
+											required: true
+										})}
+									/>
+								</AdminField>
+								<AdminField label='Label'>
+									<Input
+										placeholder='Students Enrolled'
+										{...form.register(`stats.${index}.label` as const, {
+											required: true
+										})}
+									/>
+								</AdminField>
+								<AdminField label='Icon'>
+									<Select
+										value={form.watch(`stats.${index}.icon`) || FALLBACK_ICON}
+										onValueChange={v =>
+											form.setValue(`stats.${index}.icon`, v, {
+												shouldDirty: true
+											})
 										}>
-										Remove
-									</Button>
-								</div>
-								<div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-									<FormField
-										control={form.control}
-										name={`stats.${index}.value`}
-										rules={{ required: 'Value is required' }}
-										render={({ field: valueField }) => (
-											<FormItem>
-												<FormLabel>Value</FormLabel>
-												<FormControl>
-													<Input placeholder='1000+' {...valueField} />
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-									<FormField
-										control={form.control}
-										name={`stats.${index}.label`}
-										rules={{ required: 'Label is required' }}
-										render={({ field: labelField }) => (
-											<FormItem>
-												<FormLabel>Label</FormLabel>
-												<FormControl>
-													<Input
-														placeholder='Students Enrolled'
-														{...labelField}
-													/>
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-									<FormField
-										control={form.control}
-										name={`stats.${index}.icon`}
-										render={({ field: iconField }) => (
-											<FormItem>
-												<FormLabel>Icon</FormLabel>
-												<FormControl>
-													<Select
-														onValueChange={iconField.onChange}
-														value={iconField.value}>
-														<SelectTrigger>
-															<SelectValue placeholder='Select icon' />
-														</SelectTrigger>
-														<SelectContent>
-															{iconOptions.map(option => (
-																<SelectItem key={option} value={option}>
-																	{option}
-																</SelectItem>
-															))}
-														</SelectContent>
-													</Select>
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-									<FormField
-										control={form.control}
-										name={`stats.${index}.color`}
-										render={({ field: colorField }) => (
-											<FormItem>
-												<FormLabel>Color</FormLabel>
-												<FormControl>
-													<Select
-														onValueChange={colorField.onChange}
-														value={colorField.value}>
-														<SelectTrigger>
-															<SelectValue placeholder='Select color' />
-														</SelectTrigger>
-														<SelectContent>
-															{COLOR_OPTIONS.map(color => (
-																<SelectItem key={color} value={color}>
-																	{color.charAt(0).toUpperCase() +
-																		color.slice(1)}
-																</SelectItem>
-															))}
-														</SelectContent>
-													</Select>
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-								</div>
-							</div>
-						))}
-						{statsArray.fields.length === 0 ? (
-							<div className='rounded-lg border border-dashed border-slate-300 p-4 text-sm text-slate-500'>
-								Add at least one stat to display in this section.
-							</div>
-						) : null}
-					</div>
-				</div>
-			</form>
-		</Form>
+										<SelectTrigger>
+											<SelectValue placeholder='Select icon' />
+										</SelectTrigger>
+										<SelectContent>
+											{iconOptions.map(option => (
+												<SelectItem key={option} value={option}>
+													{option}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								</AdminField>
+								<AdminField label='Color'>
+									<Select
+										value={form.watch(`stats.${index}.color`) || 'blue'}
+										onValueChange={v =>
+											form.setValue(
+												`stats.${index}.color`,
+												v as StatFormValue['color'],
+												{ shouldDirty: true }
+											)
+										}>
+										<SelectTrigger>
+											<SelectValue placeholder='Select color' />
+										</SelectTrigger>
+										<SelectContent>
+											{COLOR_OPTIONS.map(color => (
+												<SelectItem key={color} value={color}>
+													{color.charAt(0).toUpperCase() + color.slice(1)}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								</AdminField>
+							</AdminFieldGrid>
+						</AdminItemCard>
+					))}
+				</AdminItemList>
+				{statsArray.fields.length === 0 && (
+					<AdminEmptyState
+						title='No stats yet'
+						description='Add at least one stat to display in this section.'
+					/>
+				)}
+				<AddRowButton onClick={() => statsArray.append(createEmptyStat())}>
+					Add stat
+				</AddRowButton>
+			</AdminFormSection>
+
+			<AdminFormFooter status={status} saving={isPending} />
+		</AdminForm>
 	);
 }
-
